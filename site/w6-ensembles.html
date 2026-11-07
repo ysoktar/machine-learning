@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topluluk yöntemleri · Yapay Öğrenme</title>
+<meta name="description" content="Bagging, OOB, rastgele orman, AdaBoost, gradyan artırma, stacking.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w6-ensembles">
+<main><div class="content">
+
+<h1>Topluluk yöntemleri</h1>
+<p class="lead">Birçok zayıf ya da kararsız modelin oyu, tek bir iyi modelden daha iyi olabilir. Bagging ve rastgele orman <strong>varyansı</strong>, boosting <strong>yanlılığı</strong> azaltır. Ara sınavda: bootstrap/OOB hesabı, AdaBoost ağırlık güncellemesi (küçük örnek), gradyan artırmanın sezgisi, kısa kavram soruları.</p>
+
+<h2>Kalabalığın bilgeliği</h2>
+<p>Her biri %80 doğru, <em>bağımsız</em> hata yapan 3 sınıflandırıcının çoğunluk oyu: en az 2'si yanılmalı → 3·0.2²·0.8 + 0.2³ = 0.104 (hata %20'den %10'a). 5 üyeyle 0.058. İki varsayım: üyeler %50'den iyi ve <strong>bağımsız</strong>. Pratikte bozulan bağımsızlıktır: aynı veriyle eğitilen modeller aynı zor örneklerde yanılır. Topluluk yöntemlerinin bütün işi <strong>çeşitlilik</strong> üretmektir (bootstrap örneklemleri, rastgele öznitelikler, yeniden ağırlıklandırma).</p>
+<div data-widget="vote"></div>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Strateji</th><th>Nasıl</th><th>Neyi azaltır</th><th>Tipik temel öğrenici</th></tr></thead>
+<tbody>
+<tr><td><strong>Bagging</strong></td><td>paralel: bootstrap örneklemlerinde eğit, oy/ortalama</td><td>varyans</td><td>derin ağaç</td></tr>
+<tr><td><strong>Rastgele orman</strong></td><td>bagging + her bölmede rastgele m öznitelik</td><td>varyans (ağaçlar arası korelasyonu da kırar)</td><td>derin ağaç</td></tr>
+<tr><td><strong>Boosting</strong> (AdaBoost, gradyan artırma)</td><td>sıralı: her model öncekilerin hatasından öğrenir</td><td>yanlılık</td><td>kütük / sığ ağaç (derinlik 3–8)</td></tr>
+<tr><td><strong>Stacking</strong></td><td>farklı modellerin tahminleri üstüne meta-model</td><td>ikisi de</td><td>karışık</td></tr>
+</tbody></table></div>
+
+<h2>Bagging ve torba dışı (OOB) hata</h2>
+<p>Bootstrap: n örnekten <strong>yerine koyarak</strong> n örnek çek. Bir örneğin hiç seçilmeme olasılığı <span class="m">(1 − 1/n)ⁿ → e⁻¹ ≈ 0.368</span>: her örneklem verinin ≈ %63'ünü içerir, ≈ %37'si torba dışında kalır.</p>
+<div data-widget="bootstrap"></div>
+<p><strong>OOB hata</strong>: her örneği, onu <em>görmemiş</em> ağaçların oyuyla tahmin et; hiç OOB olmayan örnek atlanır. Bedava, dürüst bir doğrulama kestirimidir (B büyükse her örneğe ≈ 0.37·B ağaç oy verir). Eğitim oyu ise ağaçların ezberlediği örnekleri notlamalarına izin verir: eğitim hatası 0 iken OOB hatası 0.25 olabilir.</p>
+<div class="callout"><div class="callout-title">Elle OOB örneği</div><p>Örnekler 1–5, etiketler +, +, −, −, +. T1 örneklemi {1, 1, 2, 4, 5} → OOB(T1) = {3}; T2 {2, 3, 3, 4, 4} → OOB = {1, 5}; T3 {1, 2, 2, 5, 5} → OOB = {3, 4}. Örnek 2 hiç OOB değil: tahmin yok. Her OOB örneği yalnız onu görmeyen ağaçların oyuyla tahmin edilir; hata = yanlışlar / tahmin alan örnek sayısı.</p></div>
+<p><strong>Bagging neden yanlılığı azaltmaz?</strong> Her ağaç aynı türden ve aynı dağılımdan; ortalamanın beklentisi tek ağacınkiyle aynıdır, yalnız dalgalanması azalır. Ağaçlar korelasyonlu olduğu için (örneklemler büyük ölçüde örtüşür) varyans da sıfıra inmez: B ağacın ortalamasının varyansı <span class="m">ρσ² + (1 − ρ)σ²/B</span>.</p>
+
+<h2>Rastgele orman</h2>
+<ul>
+<li>İkinci rastgelelik kaynağı: <strong>her bölmede yalnız rastgele m öznitelik</strong> aday. Güçlü tek bir öznitelik her bootstrap ağacının kökünde oturup ağaçları benzer yapmasın: ağaçlar arası korelasyon ρ düşer.</li>
+<li>m: sınıflandırmada √p (p = 64 → 8), regresyonda p/3. m = p bagging'dir.</li>
+<li>Ağaç sayısını artırmak aşırı uyumu <strong>artırmaz</strong>: ortalamanın varyansı düşer, hata bir platoya iner; bedeli yalnız zaman ve bellek. Durma noktasını OOB söyler. Ormanı aşırı uyduran: max_features ve gürültülü veride derinlik/min_samples_leaf.</li>
+<li><strong>Öznitelik önemi</strong>: safsızlık azalması (hızlı ama çok değerli özniteliklere yanlı) ya da permütasyon önemi (OOB/doğrulamada bir sütunu karıştırınca skor ne kadar düşüyor).</li>
+</ul>
+<div class="callout exam"><div class="callout-title">Örnek sınav sorusu</div><p>“Rastgele orman neden tek bir derin ağaçtan daha az aşırı uyar? İki mekanizma.” (1) <strong>Bagging</strong>: her ağaç farklı bootstrap örnekleminde; ortalama almak varyansı düşürür. (2) <strong>Rastgele öznitelik alt kümesi</strong>: ağaçları ilişkisizleştirir, ortalamanın varyans azaltımını büyütür. “Ağaç sayısı arttıkça doğrulama hatası?” → azalır ve platoya oturur, yükselmez.</p></div>
+
+<h2>AdaBoost</h2>
+<ol>
+<li>Ağırlıklar eşit: wᵢ = 1/n.</li>
+<li>Her tur t: ağırlıklı hatası <span class="m">εₜ = Σ<sub>yanlış</sub> wᵢ</span> en küçük kütüğü hₜ seç.</li>
+<li><span class="m">αₜ = ½ ln((1 − εₜ)/εₜ)</span> (ε küçükse büyük söz hakkı; ε = 0.5 → α = 0).</li>
+<li>Yanlışlar × e^α, doğrular × e^−α, sonra toplam 1 olacak şekilde böl. <strong>Kestirme</strong>: yanlışlar × 1/(2ε), doğrular × 1/(2(1 − ε)). Normalleştirmeden sonra yanlışların toplam ağırlığı <strong>her zaman 0.5</strong>.</li>
+<li>Son kural: <span class="m">H(x) = sign(Σ αₜ hₜ(x))</span>.</li>
+</ol>
+<p>10 eşit ağırlıklı örnek, kütük 2'sinde yanılıyor: ε = 0.2, α = ½ ln 4 = 0.693 (e^α = 2). Yanlış: 0.1·2 = 0.2, doğru: 0.1·0.5 = 0.05, Z = 0.8 → normalleştirilmiş 0.25 ve 0.0625. Bir sonraki turda <strong>sayı değil ağırlıklı hata karar verir</strong>: ağır bir örnekte yanılan 2 hatalı kütük, hafif 4 örnekte yanılan kütüğe kaybedebilir. Önceki turun kütüğü artık işe yaramaz (hatası tam 0.5).</p>
+<div data-widget="adaboost"></div>
+<p>Varsayılan veri derste kullanılan 8 müşterilik “cep bankası”: tur 1'de “yaş ≥ orta → Evet” (yalnız B'de yanlış, ε = 1/8, α = ½ ln 7 = 0.973), tur 2'de “bakiye ≥ orta → Evet” (ε = 1/7, α = ½ ln 6 = 0.896), tur 3'te “yaş = yaşlı → Evet” (ε = 1/12, α = ½ ln 11 = 1.199); üç kütüğün ağırlıklı oyu 8'in 8'ini doğru bilir. Gürültülü etiketlerde AdaBoost'un üstel kaybı yanlış etiketli noktaların ağırlığını sürekli büyütür: hızla aşırı uyar.</p>
+
+<h2>Gradyan artırma</h2>
+<p>Kare kayıpta: F₀ = ȳ; her turda <strong>kalıntılara</strong> (y − F) küçük bir ağaç uydur ve F ← F + η·f ekle. (Genelde kalıntı, kaybın negatif gradyanıdır: “fonksiyon uzayında gradyan inişi”.)</p>
+<div data-widget="gboost"></div>
+<p>Varsayılan: y = (1, 3, 5, 7), η = 0.5, kütük x ≤ 2.5. F₀ = 4, kalıntılar (−3, −1, 1, 3), yapraklar −2 ve +2, F₁ = (3, 3, 5, 5), MSE 5 → 2; F₂ = (2.5, 3.5, 4.5, 5.5), MSE 1.25. η = 1 ile ilk tur (2, 2, 6, 6)'ya sıçrar ve aynı kütük ikinci turda hiçbir şey ekleyemez. <strong>Küçük η + çok ağaç</strong> daha pürüzsüz yaklaşır ve daha iyi genelleşir; ağaç sayısı erken durdurmayla seçilir. XGBoost/LightGBM: düzenlileştirme, alt örnekleme (subsample 0.5–0.8), histogram tabanlı hızlı bölme; tablo verisinde hâlâ en güçlü yöntemler.</p>
+
+<h2>Stacking</h2>
+<p>Seviye-0 modellerin tahminleri meta-modelin öznitelikleri olur. <strong>Sızıntı riski</strong>: seviye-0 modeller eğitildikleri veride tahmin yaparsa meta-model ezberlenmiş, iyimser tahminlerden öğrenir. Çözüm: meta-öznitelikleri <strong>katlar dışı</strong> (out-of-fold) üret (her tahmin o satırı görmemiş bir modelden). Daha basit alternatifler: olasılıkların (ağırlıklı) ortalaması, çoğunluk oyu.</p>
+
+<h2>Hiperparametre satırları</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
+<tbody>
+<tr><td>RF: ağaç sayısı B</td><td>değişmez</td><td class="down">azalır</td><td class="down">azalır / plato</td><td>zararı yok, yalnız zaman</td></tr>
+<tr><td>RF: max_features m</td><td class="down">biraz azalır</td><td class="up">artar</td><td class="up">artar</td><td>m = p → bagging</td></tr>
+<tr><td>RF: min_samples_leaf</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>gürültüde 5–20</td></tr>
+<tr><td>GB: ağaç sayısı M</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>erken durdurmayla seç</td></tr>
+<tr><td>GB: öğrenme oranı η</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>küçük η + çok ağaç</td></tr>
+<tr><td>GB: ağaç derinliği</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>3–8; etkileşim derecesi</td></tr>
+<tr><td>AdaBoost: tur T</td><td class="down">azalır</td><td class="up">artar</td><td>orta</td><td>gürültülü etikette hızla aşırı uyar</td></tr>
+</tbody></table></div>
+
+<h2>Sınama soruları</h2>
+<div class="quiz" data-answer="2"><p>Bagging ile boosting arasındaki temel fark?</p><ol>
+<li data-why="Boosting genelde sığ ağaç/kütük kullanır.">Bagging kütük, boosting derin ağaç kullanır</li>
+<li data-why="">Bagging modelleri paralel ve bağımsız örneklemlerde eğitip ortalar (varyans↓); boosting sıralı eğitir, her model öncekilerin hatalarına odaklanır (yanlılık↓)</li>
+<li data-why="İkisi de sınıflandırma ve regresyonda kullanılır.">Bagging yalnız regresyon, boosting yalnız sınıflandırma içindir</li>
+<li data-why="Bootstrap bagging'e özgüdür; AdaBoost ağırlıklandırır.">İkisi de bootstrap örneklemi kullanır, fark yoktur</li></ol></div>
+
+<div class="quiz" data-answer="3"><p>n = 4 örnekli bootstrap'te belirli bir örneğin dışarıda kalma olasılığı?</p><ol>
+<li data-why="Bu limit değeri (n → ∞).">0.368</li>
+<li data-why="1/4 bir çekilişte seçilme olasılığı.">0.25</li>
+<li data-why="">(3/4)⁴ = 81/256 ≈ 0.316</li>
+<li data-why="Bu dahil olma olasılığına yakın.">0.684</li></ol></div>
+
+<div class="quiz" data-answer="1"><p>AdaBoost turunda ε = 0.25. α ve yanlış örneklerin çarpanı? (ln 3 = 1.099)</p><ol>
+<li data-why="">α = ½ ln 3 = 0.549; yanlışlar × 1/(2·0.25) = × 2</li>
+<li data-why="½ unutuldu.">α = ln 3 = 1.099; yanlışlar × 3</li>
+<li data-why="Yanlışların ağırlığı artar, azalmaz.">α = 0.549; yanlışlar × 0.5</li>
+<li data-why="α = 0 yalnız ε = 0.5'te.">α = 0; ağırlıklar değişmez</li></ol></div>
+
+<div class="quiz" data-answer="4"><p>Rastgele ormanda ağaç sayısı 100'den 1000'e çıkarılırsa?</p><ol>
+<li data-why="Daha çok ağaç ortalamayı kararlı kılar; aşırı uyum artmaz.">Aşırı uyum belirgin biçimde artar</li>
+<li data-why="Yanlılık ağaç sayısıyla değişmez.">Yanlılık belirgin biçimde azalır</li>
+<li data-why="Hata platoya iner, yükselmez.">Doğrulama hatası önce düşer sonra yükselir</li>
+<li data-why="">Doğrulama hatası düşüp bir platoya oturur; bedel eğitim/tahmin süresi ve bellek</li></ol></div>
+
+<div class="quiz" data-answer="2"><p>Stacking'te meta-model nasıl sızıntısız eğitilir?</p><ol>
+<li data-why="Bu tam olarak sızıntıdır.">Seviye-0 modellerin eğitim verisindeki tahminleriyle</li>
+<li data-why="">Katlar dışı (out-of-fold) tahminlerle: her satırın tahmini o satırı görmemiş modelden</li>
+<li data-why="Test kümesi eğitimde kullanılmaz.">Test kümesindeki tahminlerle</li>
+<li data-why="Meta-modelin verisi tahminlerdir.">Ham özniteliklerle</li></ol></div>
+
+</div></main>
+</body>
+</html>

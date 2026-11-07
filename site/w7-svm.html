@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Destek vektör makineleri · Yapay Öğrenme</title>
+<meta name="description" content="Marj, destek vektörleri, elle w ve b, yumuşak marj ve C, çekirdekler.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w7-svm">
+<main><div class="content">
+
+<h1>Destek vektör makineleri</h1>
+<p class="lead">Ayrılabilir veride sonsuz sayıda ayırıcı doğru vardır; SVM en geniş “sokağı” açanı seçer. Marj, destek vektörleri, 2B'de elle w ve b, yumuşak marj ve C, menteşe kaybı, çekirdek hilesi. Ara sınavın E bölümü (17 puan): <strong>2B'de destek vektörlerini bul, w ve b'yi hesapla</strong>.</p>
+
+<h2>Marj ve geometri</h2>
+<p>Ayırıcı <span class="m">w·x + b = 0</span>. <strong>Kanonik biçim</strong>: w ve b'nin ölçeği, sınıra en yakın noktalarda |w·x + b| = 1 olacak şekilde sabitlenir. O zaman:</p>
+<div class="formula">uzaklık = |w·x + b| / ‖w‖ &nbsp;·&nbsp; marj = 1/‖w‖ &nbsp;·&nbsp; sokak genişliği = 2/‖w‖</div>
+<p>Marjı büyütmek = ‖w‖'yi küçültmek. <strong>Sert marj (birincil) problemi</strong>:</p>
+<div class="formula">min ½‖w‖² &nbsp; öyle ki &nbsp; yᵢ(w·xᵢ + b) ≥ 1 &nbsp; ∀i</div>
+<p>(Eşdeğer: marj 1/‖w‖ <em>en büyüklenir</em>.) Kısıt <strong>eşitlikle</strong> sağlanan noktalar (yᵢ(w·xᵢ + b) = 1, sokağın kenarındakiler) <strong>destek vektörleridir</strong>. Çözüm yalnız onlara bağlıdır: diğer noktaları silmek w ve b'yi değiştirmez.</p>
+<div data-widget="svmpoint"></div>
+
+<h2>2B'de elle çözüm (sınav kalıbı)</h2>
+<ol>
+<li><strong>Çiz</strong>. İki sınıfın birbirine en yakın parçalarını bul (dışbükey örtüler arasındaki en kısa uzaklık). Sokağa değecek aday noktaları seç.</li>
+<li>Her destek vektörü için kanonik denklemi yaz: pozitifte <span class="m">w·x + b = +1</span>, negatifte <span class="m">−1</span>. İki bilinmeyen w₁, w₂ ve b: genelde 3 denklem.</li>
+<li>Çöz; sınırı, ‖w‖'yi ve marjı yaz.</li>
+<li><strong>Denetle</strong>: diğer bütün noktalarda yᵢ(w·xᵢ + b) ≥ 1 mi? Değilse yanlış destek vektörü seçilmiştir.</li>
+</ol>
+<div data-widget="hardsvm"></div>
+<p>Varsayılan veri: pozitifler (2, 2), (3, 1); negatifler (0, 0), (1, 0). En yakın parça: (1, 0) ile pozitiflerin (2,2)–(3,1) kenarı; yön (1, 1). Denklemler 2w₁ + 2w₂ + b = 1, 3w₁ + w₂ + b = 1, w₁ + b = −1 → w₁ = w₂ = 2/3, b = −5/3; sınır x₁ + x₂ = 2.5, ‖w‖ = 0.943, marj 1.06. (0, 0)'da f = −1.67 ≤ −1: destek vektörü değil.</p>
+<p><strong>İkil biçim</strong>: <span class="m">w = Σ αᵢyᵢxᵢ</span>, <span class="m">Σ αᵢyᵢ = 0</span>, αᵢ ≥ 0; destek vektörü olmayanlarda α = 0. Yukarıdaki örnekte α = 2/9, 2/9 (pozitifler) ve 4/9 (negatif): tek negatif destek vektörü iki pozitifi dengeler. Bazen bir nokta sokağın kenarında durur ama α = 0 çıkar (dejenere destek vektörü).</p>
+<div class="callout"><div class="callout-title">Neden büyük marj iyi genelleme?</div><p>Bir model sınıfı n noktayı <strong>parçalar</strong> (shatter): n noktanın 2ⁿ etiketlemesinin her biri için hepsini doğru sınıflayan bir model varsa. <strong>VC boyutu</strong>: parçalanabilen en büyük nokta sayısı. Düzlemde doğrular: 3 (doğrusal olmayan 3 nokta 8 biçimde ayrılır; 4 noktada XOR etiketlemesi ayrılamaz). VC boyutu kapasitedir: büyükse eğitim ile test hatası arasındaki açık büyüyebilir. En az Δ marjlı ayırıcıların etkin kapasitesi Δ büyüdükçe düşer: geniş marj = düşük kapasite = küçük genelleme açığı.</p></div>
+
+<h2>Yumuşak marj ve C</h2>
+<div class="formula">min ½‖w‖² + C Σ ξᵢ &nbsp; öyle ki &nbsp; yᵢ(w·xᵢ + b) ≥ 1 − ξᵢ, &nbsp; ξᵢ ≥ 0</div>
+<ul>
+<li><strong>Gevşek değişken</strong> ξᵢ: ξ = 0 sokağın dışında/kenarında; 0 &lt; ξ &lt; 1 sokağın içinde ama doğru tarafta; ξ = 1 tam sınırda; ξ &gt; 1 yanlış tarafta. Ayrılamayan ya da aykırı noktalı veride sert marj imkânsız/kırılgandır.</li>
+<li><strong>Menteşe kaybı</strong>: ξᵢ = max(0, 1 − yᵢf(xᵢ)). SVM = menteşe kaybı + L2 düzenlileştirme (λ = 1/C).</li>
+<li><strong>Küçük C</strong>: ihlal ucuz → geniş marj, çok destek vektörü, yüksek yanlılık / düşük varyans. <strong>Büyük C</strong>: ihlal pahalı → dar marj, az destek vektörü, aykırı noktayı izler; C → ∞ sert marj.</li>
+</ul>
+<div data-widget="softsvm"></div>
+<p>Varsayılan: aykırı pozitif (1.5, 2). H1 (w = (1, 0), b = −2) geniş marjlı (1), aykırı noktada ξ = 1.5. H2 (w = (2, 2), b = −5) her şeyi ayırır ama marj 0.354. C = 1: H1 kazanır (0.5 + 1.5 = 2.0 &lt; 4.0); C = 10: H2 kazanır (15.5 &gt; 4.0).</p>
+
+<h2>Çekirdek hilesi</h2>
+<p>Doğrusal ayrılamayan veriyi bir φ ile daha yüksek boyuta taşıyınca doğrusal ayrılabilir hâle gelebilir (örn. çember içi/dışı → x₁² + x₂² özniteliği). İkil biçimde eğitim ve tahmin veriyi <strong>yalnız iç çarpımlar</strong> xᵢ·xⱼ üzerinden kullanır; her iç çarpımı <span class="m">K(xᵢ, xⱼ) = φ(xᵢ)·φ(xⱼ)</span> ile değiştirmek, φ'yi hiç hesaplamadan o uzayda doğrusal SVM eğitmektir.</p>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Çekirdek</th><th>K(x, z)</th><th>Parametre</th><th>Ne zaman</th></tr></thead>
+<tbody>
+<tr><td>Doğrusal</td><td>x·z</td><td>yalnız C</td><td>yüksek boyut, metin (TF-IDF), büyük N</td></tr>
+<tr><td>Polinom</td><td>(γ x·z + r)^d</td><td>d, r, γ</td><td>öznitelik etkileşimleri (d = 2–3)</td></tr>
+<tr><td>RBF (Gauss)</td><td>exp(−γ‖x − z‖²)</td><td>γ = 1/(2σ²)</td><td>varsayılan; yumuşak, yerel sınırlar</td></tr>
+<tr><td>Sigmoid</td><td>tanh(γ x·z + r)</td><td>γ, r</td><td>nadiren (her ayarda geçerli değil)</td></tr>
+</tbody></table></div>
+<div data-widget="kernel"></div>
+<p>Geçerli çekirdek (Mercer): simetrik ve pozitif yarı tanımlı. Çekirdeği ve parametrelerini <strong>kullanıcı</strong> seçer, α ve b otomatiktir. <strong>Ölçekleme zorunlu</strong>: ‖x − z‖ en büyük ölçekli öznitelik tarafından ele geçirilir. C ve γ birlikte, logaritmik ızgarada CV ile ayarlanır (Pipeline içinde ölçekleme). Eğitim %100 / test %60 ise önce γ'yı düşürün.</p>
+
+<h2>SVM mi, lojistik regresyon mu?</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th></th><th>SVM</th><th>Lojistik regresyon</th></tr></thead>
+<tbody>
+<tr><td>Kayıp</td><td>menteşe (marjın dışındaki noktalar etkisiz)</td><td>log-loss (bütün noktalar katkı yapar)</td></tr>
+<tr><td>Olasılık</td><td>doğrudan yok (Platt ölçekleme)</td><td><strong>var</strong>, kalibre</td></tr>
+<tr><td>Ayrılabilir veride çözüm</td><td><strong>tek</strong> (en büyük marj)</td><td>‖w‖ → ∞ (düzenlileştirme şart)</td></tr>
+<tr><td>Doğrusal olmayan</td><td><strong>çekirdekler</strong> hazır</td><td>elle öznitelik dönüşümü</td></tr>
+<tr><td>Ölçek</td><td>çekirdekli SVM O(n²)+</td><td>SGD ile milyonlarca satır</td></tr>
+<tr><td>Tercih</td><td>belirgin marj, n'ye göre yüksek boyut (metin), doğrusal olmayan sınır</td><td>olasılık ve yorumlanabilir katsayı gerekiyorsa, çok büyük veri</td></tr>
+</tbody></table></div>
+<p>Çok sınıflı SVM: one-vs-rest ya da one-vs-one (scikit-learn SVC OvO kullanır). Köprü: SVM, sabit (çekirdekle tanımlı) özniteliklerin üstünde marjı en büyükleyen bir perceptron gibidir; MLP ise öznitelikleri de öğrenir.</p>
+
+<h2>Hiperparametre satırları</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
+<tbody>
+<tr><td>C</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>dar marj, az destek vektörü; λ = 1/C</td></tr>
+<tr><td>RBF γ</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>dar tümsekler, adalar; γ → 0 doğrusala yaklaşır</td></tr>
+<tr><td>Polinom derecesi d</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>d &gt; 3 nadiren gerekir</td></tr>
+<tr><td>Çekirdek: doğrusal → RBF</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>kapasite büyür</td></tr>
+</tbody></table></div>
+<p class="small">Destek vektörü oranı %50'nin üstündeyse C ya da γ çok büyük olabilir (ya da veri çok gürültülü). Dikkat: C'yi 0.1'den 100'e çıkarırsak marj daralır, destek vektörü sayısı azalır, yanlılık düşer, varyans artar. (Bazı kaynaklar C'yi ters yönde “ihlal bütçesi” olarak tanımlar; formüle bakın: burada C, Σξ'nin katsayısıdır.)</p>
+
+<h2>Sınama soruları</h2>
+<div class="quiz" data-answer="2"><p>w = (1, 2), b = −3 (kanonik). Marj ve (2, 2) noktasının konumu? (√5 = 2.236)</p><ol>
+<li data-why="Sokak genişliği 2/‖w‖ = 0.894; marj bunun yarısı.">marj 0.894; nokta sokağın içinde</li>
+<li data-why="">marj 1/√5 = 0.447; f(2,2) = 3 &gt; 1 → sokağın dışında, uzaklık 3/√5 = 1.342</li>
+<li data-why="f = 2 + 4 − 3 = 3.">marj 0.447; nokta sınırın üstünde</li>
+<li data-why="‖w‖ = √5.">marj 1/3</li></ol></div>
+
+<div class="quiz" data-answer="4"><p>Pozitifler (2,1), (3,2); negatifler (0,1), (1,0). Sert marj çözümü?</p><ol>
+<li data-why="(3,2)'de f = 3: sokağın dışında, destek vektörü değil.">w = (1, 1), b = −2 ve bütün noktalar destek vektörü</li>
+<li data-why="Bu denklemler (2,1) ile (1,0)'ın ortasından geçen sınırı vermez.">w = (2, 0), b = −3</li>
+<li data-why="Veri ayrılabilir.">Sert marj çözümü yoktur</li>
+<li data-why="">w = (1, 1), b = −2; sınır x₁ + x₂ = 2, marj 1/√2 ≈ 0.707</li></ol>
+<div class="explain">2w₁ + w₂ + b = 1, w₁ + b = −1, w₂ + b = −1 → w₁ = w₂ = 1, b = −2. (3,2): f = 3 ≥ 1 ✓.</div></div>
+
+<div class="quiz" data-answer="1"><p>Yumuşak marjlı SVM'de C küçültülürse?</p><ol>
+<li data-why="">Marj genişler, destek vektörü sayısı artar, aşırı uyum eğilimi azalır</li>
+<li data-why="Ters yön.">Marj daralır, destek vektörü azalır</li>
+<li data-why="C doğrudan marjı belirler.">Yalnız eğitim süresi değişir</li>
+<li data-why="Küçük C ihlali ucuzlatır; sert marja C → ∞ yaklaşır.">Sert marja yaklaşılır</li></ol></div>
+
+<div class="quiz" data-answer="3"><p>x = (1, 1), z = (2, 0) için K = (x·z)² kaçtır ve neyi gösterir?</p><ol>
+<li data-why="x·z = 2, kare 4.">2; iç çarpımın kendisi</li>
+<li data-why="Bu RBF olurdu.">e⁻²</li>
+<li data-why="">4; φ(v) = (v₁², √2v₁v₂, v₂²) ile φ(x)·φ(z) = 4: φ hesaplanmadan aynı sonuç</li>
+<li data-why="Çekirdek simetriktir.">K(x, z) ≠ K(z, x) olduğundan tanımsız</li></ol></div>
+
+<div class="quiz" data-answer="2"><p>RBF-SVM eğitimde %100, testte %60. İlk ne denenir?</p><ol>
+<li data-why="Büyük γ dar tümsekler = daha çok ezber.">γ'yı büyütmek</li>
+<li data-why="">γ'yı (ve/veya C'yi) küçültmek; ölçeklemeyi denetlemek</li>
+<li data-why="Daha çok kapasite aşırı uyumu kötüleştirir.">Polinom çekirdeğe geçip d'yi büyütmek</li>
+<li data-why="Test kümesi ayar için kullanılmaz.">Test kümesinde C ızgarası denemek</li></ol></div>
+
+<div class="quiz" data-answer="4"><p>Düzlemdeki doğruların VC boyutu neden 4 değil?</p><ol>
+<li data-why="3 nokta (doğrusal olmayan) bütün 8 biçimde ayrılabilir.">3 nokta bile parçalanamaz</li>
+<li data-why="VC boyutu en az bir nokta kümesinin parçalanabilmesine bakar.">Bütün 4'lü kümeler doğrusal olduğu için</li>
+<li data-why="VC boyutu parametre sayısıyla bire bir aynı olmak zorunda değildir.">Doğrunun 2 parametresi olduğu için</li>
+<li data-why="">Hiçbir 4 nokta kümesi parçalanamaz: örn. çaprazlar aynı sınıf (XOR) etiketlemesi tek doğruyla ayrılmaz</li></ol></div>
+
+</div></main>
+</body>
+</html>

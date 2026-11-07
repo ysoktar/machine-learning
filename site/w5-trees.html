@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Karar ağaçları · Yapay Öğrenme</title>
+<meta name="description" content="Entropi, bilgi kazancı (ID3), kazanç oranı, Gini, sürekli eşik, budama.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w5-trees">
+<main><div class="content">
+
+<h1>Karar ağaçları</h1>
+<p class="lead">Kökten yaprağa her yol bir “eğer … ve … ise → sınıf” kuralıdır. ID3 her düğümde düzensizliği (entropiyi) en çok azaltan özniteliği seçer. Ara sınavın B bölümü (17 puan) ve örnek sınavın 1. sorusu: <strong>6–8 satırlık tabloda tam ID3 hesabı</strong>. Puanın çoğu ara adımlardadır: tabloyu düzgün kurun, log değerlerini tablodan alıp yazın, 3 ondalık taşıyın, son ağacı dallardaki değerlerle çizin.</p>
+
+<h2>Entropi ve bilgi kazancı</h2>
+<div class="formula">H(D) = −Σ pᵢ log₂ pᵢ &nbsp;&nbsp;&nbsp; IG(D, A) = H(D) − Σ<sub>v</sub> (|D_v| / |D|) · H(D_v)</div>
+<ul>
+<li>İki sınıfta H ∈ [0, 1]: saf düğüm 0, 50/50 düğüm 1 bit. <strong>0 · log 0 = 0</strong> (p log p → 0; olmayan sınıf belirsizlik katmaz).</li>
+<li>Bilgi kazancı = bölmeden önceki entropi − bölmeden sonraki <em>ağırlıklı</em> entropi. En büyük IG kök olur; sonra her dalda kalan özniteliklerle özyinelenir.</li>
+<li>Duruş: düğüm saf, öznitelik kalmadı ya da hiçbir bölme kazanç getirmiyor (çoğunluk sınıfı yaprağı).</li>
+</ul>
+<div data-widget="entropy"></div>
+<div class="callout tip"><div class="callout-title">Sık kullanılan değerler (sınavda tablo verilir)</div>
+<p>H(1/2) = 1 · H(1/3) = 0.918 · H(1/4) = 0.811 · H(2/5) = 0.971 · H(1/5) = 0.722 · H(2/7) = 0.863 · H(3/7) = 0.985 · H(3/8) = 0.954 · H(1/6) = 0.650<br>
+−log₂: 1/2 → 1, 1/3 → 1.585, 2/3 → 0.585, 1/4 → 2, 3/4 → 0.415, 2/5 → 1.322, 3/5 → 0.737, 1/7 → 2.807, 2/7 → 1.807, 3/7 → 1.222, 4/7 → 0.807. <a href="cheatsheet.html#log2-tablosu">Tam tablo</a>.</p></div>
+
+<h2>ID3 adım adım</h2>
+<p>Aşağıdaki araç her düğüm için sınavdaki tabloyu (dal, n, sınıf sayıları, H, ağırlıklı H, IG) kurar ve son ağacı çizer. Kendi tablonuzu yapıştırın. Varsayılan veri önceki dönemin alıştırma listesindeki Boy/Saç/Göz sorusu.</p>
+<div data-widget="id3"></div>
+<p>Çözüm: H(D) = H(3/8) = 0.954. IG(Boy) = 0.003, IG(Saç) = 0.454, IG(Göz) = 0.348 → <strong>kök Saç</strong>. kızıl → + (saf), koyu → − (saf), sarı {+, −, +, −}: Göz'ün kazancı 1.0 (mavi → +, kahve → −), Boy'unki 0. Ağaç: Saç? koyu → −; kızıl → +; sarı → Göz? (mavi → +, kahve → −). Boy hiç kullanılmadı.</p>
+<div class="callout"><div class="callout-title">İkinci örnek: kredi (Loan) verisi, 15 başvuru</div><p>9 Evet / 6 Hayır, H(D) = 0.971. IG: Yaş 0.083, İşi var 0.324, <strong>Evi var 0.420</strong>, Kredi notu 0.363 → kök Evi var. Evi var = evet → 6/6 Evet (saf). Evi yok dalında (3 Evet / 6 Hayır) İşi var'ın kazancı 0.918: iki dal da saf. Derinlik 2. Kendiniz denemek için aracın veri kutusuna yapıştırın.</p></div>
+
+<h3>Kazanç oranı (C4.5)</h3>
+<p>IG çok değerli öznitelikleri kayırır: her müşteriye ayrı değer veren “müşteri no” sütunu veriyi tek örnekli saf parçalara böler, IG = H(D) (en büyük olası) ama hiçbir şeye genellenmez. C4.5 kazancı <strong>bölme bilgisine</strong> böler:</p>
+<div class="formula">SplitInfo(A) = −Σ (|D_v|/|D|) log₂(|D_v|/|D|) &nbsp;&nbsp; GainRatio = IG / SplitInfo</div>
+<p>7 farklı değerli kimlik sütununda SplitInfo = log₂ 7 = 2.807, GR = 0.863/2.807 = 0.307; anlamlı bir öznitelik (IG 0.470, SI 0.985) GR = 0.477 ile kazanır. Araçta ölçütü “kazanç oranı” yapın.</p>
+
+<h3>Gini safsızlığı (CART)</h3>
+<div class="formula">Gini(D) = 1 − Σ pᵢ² &nbsp;&nbsp;(iki sınıfta en çok 0.5)</div>
+<p>Ağırlıklı Gini'si <em>en küçük</em> olan (yani azalması en büyük) bölme seçilir. Çoğu veride entropiyle aynı kökü seçer; hesabı log gerektirmez. CART her zaman <strong>ikili</strong> bölme yapar.</p>
+
+<h2>Sayısal öznitelikte eşik</h2>
+<p>Değerleri sırala; ardışık değerlerin orta noktaları aday eşiktir; her “x ≤ t” için IG hesapla. Kısayol: en iyi eşik hep <strong>sınıfın değiştiği</strong> yerlerden biridir, yalnız onlara bakmak yeter.</p>
+<div data-widget="threshold"></div>
+<p>Varsayılan: hesap tutarı 2, 3, 5, 7, 8 ve bahşiş E, E, H, H, E. Sınıf 3–5 arasında (t = 4) ve 7–8 arasında (t = 7.5) değişir. t = 4: sol {E, E} saf, sağ {H, H, E} H = 0.918, ağırlıklı 0.551, IG = 0.420. t = 7.5: IG 0.171. En iyi: tutar ≤ 4.</p>
+<div class="callout exam"><div class="callout-title">Aynı öznitelik bir yolda iki kez kullanılabilir mi?</div><p><strong>Kategorik</strong> (her değere bir dal): hayır, anlamsız; o dalda öznitelik artık tek değerlidir, kazancı 0. <strong>Sayısal</strong> (ikili eşik): evet; “x ≤ 5” dalında “x ≤ 2.5” ile yeniden bölmek bir aralığı daha da daraltır.</p></div>
+
+<h2>CART ve regresyon ağaçları</h2>
+<p>Regresyon ağacında her yaprak bir sabit (dalın ortalaması) tahmin eder; bölme ölçütü SSE (kareler toplamı) azalması. Çok derin bir regresyon ağacı her yaprakta bir örnekle eğitim noktalarından (gürültüleri dahil) geçen bir <strong>merdiven</strong>dir.</p>
+<div data-widget="regtree"></div>
+
+<h2>Aşırı uyum ve budama</h2>
+<ul>
+<li>Saf yapraklara kadar büyüyen ağaç eğitim verisini ezberler; sınırlar eksenlere paralel basamaklardır.</li>
+<li><strong>Ön budama</strong> (erken durdurma): max_depth, min_samples_leaf, min_impurity_decrease. Ucuz (ağaç hiç büyümez) ama <strong>XOR tuzağı</strong>: XOR'da tek başına hiçbir özniteliğin kazancı yoktur (her bölme 50/50 çocuk bırakır), “en az şu kadar kazanç” kuralı ilk bölmeyi reddeder; oysa ikinci bölme veriyi kusursuz ayırırdı.</li>
+<li><strong>Sonradan budama</strong>: önce tam ağaç, sonra doğrulama ya da maliyet-karmaşıklıkla geri kes. Sonradan yararlı olacak bir bölmeyi kaçırmaz.</li>
+<li><strong>Maliyet-karmaşıklık budaması</strong>: R_α(T) = R(T) + α·|T| (|T|: yaprak sayısı). α CV ile seçilir: örn. α = 0 (40 yaprak) doğrulama 0.82, α = 0.03 (7 yaprak) 0.90, α = 0.1 (3 yaprak) 0.85 → α = 0.03.</li>
+</ul>
+<div class="two-col">
+<div class="card"><h3>Güçlü yönler</h3><p>Yorumlanabilir (kurallar), ölçekleme gerekmez, kategorik ve sayısal veriyi birlikte işler, etkileşimleri yakalar, hızlı.</p></div>
+<div class="card"><h3>Zayıf yönler</h3><p><strong>Yüksek varyans / kararsızlık</strong>: tek bir etiket değişince bambaşka ağaç çıkabilir. Eksene paralel sınırlar (çapraz bir doğruyu basamaklarla taklit eder). Çare: çok ağacın ortalaması (6. hafta).</p></div>
+</div>
+<p><strong>Ağaç iyi, doğrusal kötü</strong> (ya da tersi) olabilir mi? Evet: XOR ya da “içi pozitif bir kare” gibi eksenlere hizalı ama doğrusal olmayan bir yapıda ağaç kusursuz, doğrusal model rastgele kalır. Tersi: sınıfları ayıran sınır çapraz bir doğruysa (x₁ + x₂ &gt; 1) doğrusal model tek doğruyla çözer, ağaç çok sayıda basamağa ihtiyaç duyar ve az veride kötü genelleşir.</p>
+
+<h2>Hiperparametre satırları</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
+<tbody>
+<tr><td>max_depth</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>derinlik 1 = karar kütüğü (stump)</td></tr>
+<tr><td>min_samples_leaf / split</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>daha basık, kararlı ağaç</td></tr>
+<tr><td>ccp_alpha (α)</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>yaprak sayısı cezalandırılır</td></tr>
+<tr><td>Yaprak sayısı |T|</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>α'nın ters yönü</td></tr>
+<tr><td>min_impurity_decrease</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>az kazançlı bölmeyi keser; XOR tuzağı</td></tr>
+<tr><td>criterion (gini / entropy)</td><td colspan="3">çoğunlukla aynı ağaç</td><td>genelleme düğmesi değil</td></tr>
+</tbody></table></div>
+
+<h2>Sınama soruları</h2>
+<div class="quiz" data-answer="3"><p>Bir düğümde 6 Evet / 0 Hayır var. Entropi?</p><ol>
+<li data-why="1 bit 50/50 düğümdür.">1</li>
+<li data-why="Saf düğümün belirsizliği yoktur.">0.5</li>
+<li data-why="">0</li>
+<li data-why="0·log 0 = 0 kabul edilir.">Tanımsız (log 0)</li></ol></div>
+
+<div class="quiz" data-answer="1"><p>7 örnekli bir tabloya her satırda farklı olan “müşteri no” sütunu eklendi. Bilgi kazancı ne olur ve neden sorun?</p><ol>
+<li data-why="">IG = H(D), en büyük olası değer; ama hiç genellenmez → kazanç oranı (SplitInfo = log₂7) bunu cezalandırır</li>
+<li data-why="Her dal tek örnekli ve saf: ağırlıklı entropi 0.">IG = 0, çünkü sütun anlamsızdır</li>
+<li data-why="Gini de aynı yanlılığa sahiptir.">Gini kullanılırsa sorun yoktur</li>
+<li data-why="ID3 öznitelik türüne bakmaz.">ID3 bu sütunu kendiliğinden atar</li></ol></div>
+
+<div class="quiz" data-answer="2"><p>Sayısal öznitelik değerleri 2, 3, 5, 7, 8; sınıflar E, E, H, H, E. Hangi eşikler aday olarak yeterlidir?</p><ol>
+<li data-why="Sınıfın değişmediği bir eşik en iyi olamaz.">Bütün orta noktalar: 2.5, 4, 6, 7.5 (hepsine bakmak zorunlu)</li>
+<li data-why="">Sınıfın değiştiği orta noktalar: 4 ve 7.5</li>
+<li data-why="Eşikler orta noktalardan seçilir.">Değerlerin kendisi: 2, 3, 5, 7, 8</li>
+<li data-why="Medyan eşiği özel bir aday değildir.">Yalnız medyan: 5</li></ol></div>
+
+<div class="quiz" data-answer="4"><p>Ön budamanın (min_impurity_decrease) başarısız olduğu klasik durum?</p><ol>
+<li data-why="Saf veride zaten bölme gerekmez.">Bütün örnekler aynı sınıftaysa</li>
+<li data-why="Çok öznitelik ön budamayı bozmaz.">Öznitelik sayısı çok fazlaysa</li>
+<li data-why="Sürekli öznitelikler eşikle bölünür.">Öznitelikler sayısalsa</li>
+<li data-why="">XOR benzeri veride: tek başına hiçbir bölmenin kazancı yok, ama iki bölme birlikte kusursuz</li></ol></div>
+
+<div class="quiz" data-answer="3"><p>max_depth artırılırsa?</p><ol>
+<li data-why="Ters yön.">Yanlılık artar, varyans azalır</li>
+<li data-why="Derinlik doğrudan karmaşıklıktır.">Hiçbiri değişmez</li>
+<li data-why="">Yanlılık azalır, varyans ve aşırı uyum riski artar</li>
+<li data-why="Varyans artar.">İkisi de azalır</li></ol></div>
+
+</div></main>
+</body>
+</html>

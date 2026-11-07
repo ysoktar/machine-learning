@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giriş ve temel kavramlar · Yapay Öğrenme</title>
+<meta name="description" content="T/E/P, öğrenme türleri, hipotez uzayı, Find-S, ezber ve genelleme.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w1-intro">
+<main><div class="content">
+
+<h1>Giriş ve temel kavramlar</h1>
+<p class="lead">Makine öğrenmesi nedir, klasik programlamadan farkı ne, hangi türleri var ve “öğrenmek” neden aslında bir hipotez uzayında arama yapmaktır? Bu haftanın asıl mesajı: <strong>amaç eğitim verisini ezberlemek değil, görülmemiş veride iyi olmak (genelleme)</strong>.</p>
+
+<h2>Tanım: T, E, P</h2>
+<p>Mitchell'in (1997) tanımı sınavda doğrudan kullanılır: bir program, <strong>T</strong> görevindeki <strong>P</strong> ile ölçülen başarımı <strong>E</strong> deneyimiyle artıyorsa öğreniyordur.</p>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Sistem</th><th>Görev T</th><th>Deneyim E</th><th>Başarım P</th><th>Tür</th></tr></thead>
+<tbody>
+<tr><td>Spam filtresi</td><td>e-postayı spam / değil diye ayır</td><td>kullanıcıların etiketlediği e-postalar</td><td>yeni e-postalarda doğru sınıflama oranı (ve yanlış alarm oranı)</td><td>gözetimli, sınıflandırma</td></tr>
+<tr><td>Daire fiyatı</td><td>fiyat tahmini</td><td>geçmiş satışlar (m², kat, semt, fiyat)</td><td>yeni dairelerde MSE / MAE</td><td>gözetimli, regresyon</td></tr>
+<tr><td>Müşteri gruplama</td><td>benzer davranışlı grupları bul</td><td>etiketsiz alışveriş geçmişi</td><td>küme içi uzaklık / kampanya yanıtı</td><td>gözetimsiz, kümeleme</td></tr>
+<tr><td>Yürümeyi öğrenen robot</td><td>düşmeden ilerle</td><td>kendi denemeleri + ödül</td><td>bölüm başına toplanan ödül</td><td>pekiştirmeli</td></tr>
+</tbody></table></div>
+
+<h3>Kural mı, veri mi?</h3>
+<div class="two-col">
+<div class="card"><h3>Klasik programlama</h3><p>Girdi: veri + <strong>kurallar</strong> → çıktı: cevaplar. Kuralı insan yazar. Vergi hesabı, sıralama algoritması: kural kesin ve tam olarak bilinir.</p></div>
+<div class="card"><h3>Makine öğrenmesi</h3><p>Girdi: veri + <strong>cevaplar (etiketler)</strong> → çıktı: kurallar (model). El yazısı “7”yi tanımak, dolandırıcılık tespiti: kural yazılamaz ya da sürekli değişir, ama bol veri vardır.</p></div>
+</div>
+<p>Yapay zekâ ⊃ makine öğrenmesi ⊃ derin öğrenme ⊃ büyük dil modelleri (LLM).</p>
+
+<h2>Öğrenme türleri</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Tür</th><th>Veri</th><th>Alt problemler</th><th>Örnek</th></tr></thead>
+<tbody>
+<tr><td><strong>Gözetimli</strong> (denetimli)</td><td>etiketli çiftler (x, y)</td><td><strong>sınıflandırma</strong>: y ayrık (spam mı?) · <strong>regresyon</strong>: y sürekli (ev fiyatı)</td><td>tümör iyi/kötü huylu; yarın kaç bisiklet kiralanır</td></tr>
+<tr><td><strong>Gözetimsiz</strong></td><td>yalnız x, etiket yok</td><td>kümeleme (k-ortalamalar), boyut indirgeme (PCA), yoğunluk kestirimi, anomali tespiti</td><td>aynı olayı anlatan haberleri grupla</td></tr>
+<tr><td><strong>Pekiştirmeli</strong></td><td>eylem → ödül sinyali</td><td>deneme-yanılmayla politika öğrenme</td><td>oyun oynayan ajan, robot, LLM hizalama (RLHF)</td></tr>
+</tbody></table></div>
+<div class="callout exam"><div class="callout-title">Sınav kalıbı</div><p>“Gözetimli öğrenmenin iki tahmin türünü yazın, her birine bir örnek verin” ve “gözetimli ile gözetimsiz farkı nedir, gözetimsiz bir model ve kullanım senaryosu verin” geçmiş alıştırma listelerinde var. Kalan süre/sayı tahmini (kaç gün sonra bozulur?) <em>regresyondur</em>; 5 kategoriden birini seçmek çok sınıflı <em>sınıflandırmadır</em>.</p></div>
+
+<h2>Tipik bir makine öğrenmesi akışı</h2>
+<ol>
+<li><strong>Problem</strong>: görev, metrik, başarı ölçütü.</li>
+<li><strong>Veri</strong>: toplama, temizleme, keşif.</li>
+<li><strong>Öznitelikler</strong>: kodlama, ölçekleme, seçim.</li>
+<li><strong>Model</strong>: seçim, eğitim, hiperparametre ayarı (doğrulama kümesinde).</li>
+<li><strong>Değerlendirme</strong>: test kümesinde <em>bir kez</em>, hata analizi.</li>
+<li><strong>Yayına alma</strong>: izleme, güncelleme.</li>
+</ol>
+<p>Zamanın çoğu 2. ve 3. adımda geçer: model birkaç satır koddur, asıl iş veriyi anlamak ve doğru değerlendirmektir.</p>
+
+<h2>Öğrenme = hipotez uzayında arama</h2>
+<p>Bir <strong>hipotez</strong> h, girdiden çıktıya bir fonksiyondur; modelin ifade edebildiği bütün hipotezler <strong>hipotez uzayı H</strong>'dir. Öğrenme, H içinde eğitim verisiyle tutarlı (ya da hatası küçük) bir h aramaktır.</p>
+<p>Mitchell'in EnjoySport örneğinde bir hipotez her öznitelik için bir kısıttır: belirli bir değer, <code>?</code> (her değer olur) ya da <code>Ø</code> (hiçbir değer olmaz). Örneğin ⟨Güneşli, ?, ?, Kuvvetli, ?, ?⟩ “güneşli ve rüzgâr kuvvetli olan her gün pozitif” demektir.</p>
+<div data-widget="hypspace"></div>
+<p>Sayma mantığı: her öznitelik kendi değerlerinden birini ya da <code>?</code> alır → <span class="m">∏(kᵢ + 1)</span>; içinde Ø olan bütün hipotezler aynı boş kavramdır, bir kez eklenir → <span class="m">1 + ∏(kᵢ + 1)</span>. EnjoySport: 96 gün, 973 anlamca farklı hipotez, ama 2⁹⁶ olası kavram.</p>
+
+<h3>Find-S ve tümevarımsal yanlılık</h3>
+<p><strong>Find-S</strong> en özel hipotezden (⟨Ø, …, Ø⟩) başlar, yalnız <em>pozitif</em> örneklere bakar; bir kısıt örneğe uymuyorsa o kısıtı <code>?</code> yapar. Sonuç, veriyle tutarlı <em>en özel</em> VE'li hipotezdir. Negatif örnekleri hiç kullanmaz.</p>
+<div data-widget="finds"></div>
+<div class="callout"><div class="callout-title">Tümevarımsal yanlılık (inductive bias)</div>
+<p>Hipotez dilini “kısıtların VE'li birleşimi” seçmek bir varsayımdır: “Güneşli VEYA Ilık” bu dilde yazılamaz. <strong>Hiç varsayım yapmayan bir öğrenici genelleyemez</strong>: veri, görülmemiş örnekler hakkında tek başına bir şey söylemez; her etiketleme eğitim verisiyle eşit derecede tutarlıdır. Genelleme, bazı hipotezleri ötekilere yeğlemeyi (pürüzsüz, basit, doğrusal, sığ ağaç…) gerektirir; her model ailesi kendi yanlılığını taşır.</p>
+<p><strong>Tümevarımsal öğrenme varsayımı:</strong> yeterince büyük bir eğitim kümesinde hedefe iyi yaklaşan bir hipotez, görülmemiş örneklerde de iyi yaklaşır.</p></div>
+
+<h2>Ezber mi, öğrenme mi? Genelleme</h2>
+<p>Klasik deney: <span class="m">sin(2πx)</span> eğrisinden gürültüyle 10 nokta, bunlara M dereceli polinom uyduruyoruz. M = 0–1 <strong>yetersiz uyum</strong> (iki hata da yüksek), M = 3 eğriyi yakalar (en düşük test hatası), M = 9 bütün noktalardan geçer: eğitim hatası 0, test hatası patlar: <strong>aşırı uyum</strong>.</p>
+<div data-widget="polyfit"></div>
+<p>Aşırı uyuma karşı (M'yi değiştirmeden): daha çok veri, düzenlileştirme (büyük katsayıları cezalandırmak), doğrulama kümesiyle model seçimi / erken durdurma, birden çok modelin ortalaması (6. hafta). Aynı M = 9 ile 100 nokta olsa polinom her gürültülü noktadan geçemez, varyans düşer ve test hatası gürültü düzeyine yaklaşır.</p>
+
+<h2>Dönemin tekrar eden sorusu: hiperparametre tablosu</h2>
+<p>Her haftanın sonunda o haftanın modeli için aynı tablo doldurulur ve sınavda aynı biçimde sorulur: <em>“X artarsa yanlılık, varyans ve aşırı uyum riski nasıl değişir, neden?”</em></p>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum riski</th><th>Neden</th></tr></thead>
+<tbody>
+<tr><td>Polinom derecesi M</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>daha esnek eğri gürültüye de uyar</td></tr>
+<tr><td>Eğitim örneği sayısı n</td><td>değişmez</td><td class="down">azalır</td><td class="down">azalır</td><td>veri modeli sabitler; doğruyu sinüse çeviremez</td></tr>
+<tr><td>Düzenlileştirme gücü λ</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>katsayılar küçülür, model basitleşir</td></tr>
+</tbody></table></div>
+<p><strong>Yanlılık</strong>: modelin basitliğinden gelen sistematik hata (küçük M). <strong>Varyans</strong>: eğitim verisi biraz değişince modelin ne kadar oynadığı (büyük M). Bütün satırlar: <a href="hyper.html">hiperparametre tablosu</a>.</p>
+
+<h2>Sınama soruları</h2>
+<div class="quiz" data-answer="3"><p>Hangisi makine öğrenmesiyle değil, klasik programlamayla çözülmeli?</p><ol>
+<li data-why="Herkesin el yazısını kapsayan bir kural yazılamaz; etiketli örneklerden öğrenilir.">El yazısıyla yazılmış posta kodlarını tanımak</li>
+<li data-why="Bol veri var, sabit kural yok ve örüntüler zamanla değişiyor: ML.">Sahte kredi kartı işlemlerini işaretlemek</li>
+<li data-why="">Maaştan gelir vergisini hesaplamak</li>
+<li data-why="Tercihler veriden öğrenilir.">Bir kullanıcıya film önermek</li></ol>
+<div class="explain">Vergi kuralı yasada kesin ve eksiksiz yazılıdır; öğrenmeye gerek yok.</div></div>
+
+<div class="quiz" data-answer="2"><p>EnjoySport'tan “Su” özniteliği (2 değer) çıkarılırsa anlamca farklı hipotez sayısı ne olur? (Kalanlar: 3, 2, 2, 2, 2 değerli)</p><ol>
+<li data-why="Bu, örnek (gün) sayısı: 3·2·2·2·2 = 48.">48</li>
+<li data-why="">1 + 4·3·3·3·3 = 325</li>
+<li data-why="Ø'lu hipotezlerin hepsi tek bir boş kavramdır; ayrı ayrı sayılmaz.">5·4·4·4·4 = 1280</li>
+<li data-why="Bu, 6 öznitelikli asıl sayı.">973</li></ol>
+<div class="explain">Her öznitelik değerlerinden biri ya da “?”: (3+1)·(2+1)⁴ = 324, artı tek boş hipotez: 325.</div></div>
+
+<div class="quiz" data-answer="4"><p>Bir arkadaşınız: “Modelim eğitimde %100, yeni veride %61; hep çoğunluk sınıfını söylemek %60 veriyor.” Ne oluyor?</p><ol>
+<li data-why="Yetersiz uyumda eğitim hatası da yüksek olurdu.">Yetersiz uyum: model çok basit</li>
+<li data-why="Test başarımı tabana yakın; iyi genelleme değil.">İyi genelleme: %61 > %60</li>
+<li data-why="Eğitim başarımı yeni veri hakkında bir şey söylemez.">Model doğru; daha çok epoch eğitilmeli</li>
+<li data-why="">Aşırı uyum (ezber): esnekliği azaltın / düzenlileştirin, ayarı doğrulamada yapın, sızıntıyı denetleyin, veri ekleyin</li></ol>
+<div class="explain">Eğitim %100, test ≈ taban çizgisi: ezber. Önce bölme ve sızıntıyı denetleyin; sonra esnekliği azaltın (λ↑, derinlik↓, k↑) ve ayarı doğrulama kümesinde yapın; mümkünse veri ekleyin.</div></div>
+
+<div class="quiz" data-answer="1"><p>Find-S negatif örneklere ne yapar?</p><ol>
+<li data-why="">Hiçbir şey: yalnız pozitif örneklerle hipotezi genelleştirir</li>
+<li data-why="Find-S hiç özelleştirmez; aday eleme (candidate elimination) negatifleri de kullanır.">Hipotezi negatif örneği dışlayacak biçimde özelleştirir</li>
+<li data-why="Find-S negatifleri kullanmadığı için onlarla çelişen veriyi fark etmez bile.">Negatif örnekle çelişirse durur ve hata verir</li>
+<li data-why="Yanlış.">Negatif örnekleri pozitife çevirir</li></ol></div>
+
+<div class="quiz" data-answer="3"><p>Hiç tümevarımsal yanlılığı olmayan (bütün 2ⁿ kavramı ifade edebilen) bir öğrenici için hangisi doğrudur?</p><ol>
+<li data-why="Tam tersi.">En iyi genelleme onda olur</li>
+<li data-why="Veri miktarı sorunu çözmez: görülmemiş her örnek için iki etiket de tutarlıdır.">Yeterince veriyle genelleyebilir</li>
+<li data-why="">Görülmemiş örnekler hakkında hiçbir şey söyleyemez; yalnız ezberleyebilir</li>
+<li data-why="İfade gücü sorun değildir; seçim yapamaması sorundur.">Doğrusal modelle aynı şekilde davranır</li></ol></div>
+
+</div></main>
+</body>
+</html>

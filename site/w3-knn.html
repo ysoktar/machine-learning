@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kNN ve model seçimi · Yapay Öğrenme</title>
+<meta name="description" content="Kayıp ve risk, kNN, yanlılık-varyans, düzenlileştirme, veri sızıntısı.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w3-knn">
+<main><div class="content">
+
+<h1>Gözetimli öğrenme, kNN ve model seçimi</h1>
+<p class="lead">Veriden fonksiyona: neyi, hangi ölçüte göre, hangi varsayım altında öğreniyoruz? Kayıp ve risk, i.i.d. varsayımı, taban çizgisi, k en yakın komşu, yanlılık-varyans ayrışımı, düzenlileştirme ve veri sızıntısı. Ara sınavda kNN elle hesap (kare uzaklıklarla sıralama) ve “k artarsa?” sorusu kesin gibi.</p>
+
+<h2>Denetimli öğrenme çerçevesi</h2>
+<ul>
+<li><strong>Veri</strong> D = {(xᵢ, yᵢ)}, bilinmeyen bir P(x, y) dağılımından çekilir.</li>
+<li><strong>Hipotez uzayı</strong> H: aday fonksiyonlar (doğrusal, ağaç, kNN, sinir ağı).</li>
+<li><strong>Kayıp</strong> L(y, ŷ): tek örnekteki hata. <strong>Risk</strong> R(h) = E[L]: bütün dağılım üzerindeki beklenen hata (bilinmez!). <strong>Ampirik risk</strong> R̂(h) = (1/n)Σ L(yᵢ, h(xᵢ)): eğitim hatası. Farkları = <strong>genelleme açığı</strong>.</li>
+<li><strong>ERM</strong> (ampirik risk minimizasyonu): R̂'yi küçülten h'yi seç. Sorun: H çok zenginse R̂ ≈ 0 olurken R büyük olabilir (ezber).</li>
+</ul>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Kayıp</th><th>Formül</th><th>Kim kullanır?</th><th>Not</th></tr></thead>
+<tbody>
+<tr><td>0-1</td><td>𝟙[y ≠ ŷ]</td><td>“hata oranı”</td><td>basamak fonksiyonu: türevi hemen her yerde 0 → gradyanla doğrudan optimize edilemez</td></tr>
+<tr><td>Kare</td><td>(y − ŷ)²</td><td>doğrusal regresyon</td><td>aykırı değere duyarlı</td></tr>
+<tr><td>Mutlak</td><td>|y − ŷ|</td><td>gürbüz regresyon</td><td>MAE</td></tr>
+<tr><td>Log-loss</td><td>−[y log p + (1−y) log(1−p)]</td><td>lojistik regresyon, sinir ağları</td><td>dışbükey</td></tr>
+<tr><td>Menteşe (hinge)</td><td>max(0, 1 − y·f(x))</td><td>SVM</td><td>marj tabanlı</td></tr>
+</tbody></table></div>
+<p><strong>i.i.d. varsayımı</strong>: eğitim ve test örnekleri aynı dağılımdan, birbirinden bağımsız. Bozulduğu yerler: dağılım kayması (2019 verisiyle eğitilip 2020'de kullanılan talep modeli; internet fotoğraflarıyla eğitilip klinik kamerasında kullanılan sınıflandırıcı), örnekleme yanlılığı, aynı hastanın görüntülerinin hem eğitimde hem testte olması, zaman serisi. Çare: test kümesi gerçek kullanımı taklit etsin (zamana / gruba göre bölme).</p>
+<div class="callout tip"><div class="callout-title">Önce taban çizgisi</div><p>15 başvurunun 9'u onaylı: “herkesi onayla” accuracy 9/15 = 0.60. Tek öznitelikli “evi var → onay” kuralı 12/15 = 0.80. Accuracy'si 0.58 olan bir model hiçbir şey öğrenmemiştir (ya da hattında bir hata vardır). Her model çoğunluk sınıfını geçmek zorunda.</p></div>
+
+<h2>k en yakın komşu (kNN)</h2>
+<ol>
+<li><strong>Sakla</strong>: eğitimde hiçbir şey öğrenme (tembel öğrenme). Eğitim O(1), tahmin O(n·d).</li>
+<li><strong>Uzaklık</strong>: sorgudan her eğitim noktasına d(q, xᵢ).</li>
+<li><strong>k komşu</strong>: en küçük k uzaklık.</li>
+<li><strong>Oyla</strong>: sınıflandırmada çoğunluk, regresyonda ortalama. İkili problemde k tek seçilir (oy beraberliği olmasın).</li>
+</ol>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Uzaklık</th><th>Formül</th><th>Ne zaman</th></tr></thead>
+<tbody>
+<tr><td>Öklid (L2)</td><td>√Σ(xⱼ − zⱼ)²</td><td>sürekli, ölçeklenmiş öznitelikler; varsayılan</td></tr>
+<tr><td>Manhattan (L1)</td><td>Σ|xⱼ − zⱼ|</td><td>yüksek boyut, aykırı değerlere daha gürbüz</td></tr>
+<tr><td>Minkowski</td><td>(Σ|xⱼ − zⱼ|ᵖ)^(1/p)</td><td>p = 1 → L1, p = 2 → L2</td></tr>
+<tr><td>Kosinüs</td><td>1 − x·z / (‖x‖‖z‖)</td><td>metin, gömmeler: yön önemli, büyüklük değil</td></tr>
+<tr><td>Hamming</td><td>farklı öznitelik sayısı</td><td>ikili / kategorik öznitelikler</td></tr>
+</tbody></table></div>
+<div class="callout exam"><div class="callout-title">Elle hesap ipucu</div><p>Öklid'de karekök almadan <strong>d² ile sıralamak</strong> aynı sırayı verir (yalnız Öklid için; L1'de değil). Eşit uzaklıkta iki nokta k. sıraya düşerse bunu yazın ve bir beraberlik kuralı belirtin (en küçük ad, rastgele, ya da hepsini al).</p></div>
+<div data-widget="knn"></div>
+<p>Yukarıdaki varsayılan veride q = (4, 3): k = 1 → E (−); k = 3 → E, D, C → 2 artı, 1 eksi → <strong>+</strong>; k = 5 → +. k = 1 tek bir uzaktaki komşuya teslim oldu, k = 3 yerel çoğunluğu gördü. Manhattan'a geçin: C ile D eşitlenir, A ile B eşitlenir.</p>
+
+<h3>Ölçekleme komşuluğu değiştirir</h3>
+<p>Yaş (onlarca) ve gelir (on binlerce TL) aynı uzaklıkta ham hâliyle toplanırsa gelir yaşı “yutar”: 29 yaş daha yaşlı ama gelir farkı 1000 TL olan müşteri en yakın komşu çıkar. z-score sonrası iki öznitelik eşit söz sahibi olur ve karar değişebilir. Sınavda μ ve σ verilir; z değerlerini 2 ondalıkla hesaplayıp d²'ye göre sıralamak yeter.</p>
+
+<h3>k seçimi</h3>
+<ul>
+<li>k = 1'de eğitim doğruluğu <strong>hep %100</strong>dür (her nokta kendi komşusu): k seçmek için işe yaramaz.</li>
+<li>k = n: her sorguya çoğunluk sınıfı (sabit model).</li>
+<li>Ayrı doğrulama kümesi yoksa (küçük veri): LOO ya da k-katlı CV ile bir k ızgarası dene. Başlangıç için k ≈ √n.</li>
+</ul>
+<div data-widget="loo"></div>
+<p><strong>Boyut laneti</strong>: boyut arttıkça rastgele noktalar arasındaki uzaklıklar birbirine yaklaşır; “en yakın” ile “en uzak” ayırt edilemez olur. İlgisiz özniteliklerle dolu yüksek boyutlu veride kNN çöker; çare öznitelik seçimi, PCA ya da başka model ailesi.</p>
+
+<h2>Karmaşıklık, Ockham ve model seçimi</h2>
+<p><strong>Ockham'ın usturası</strong>: veriyi eşit derecede iyi açıklayan iki hipotezden basit olanı yeğle. Aynı eğitim hatalı bir düz çizgi ile üç noktanın etrafından dolanan kıvrımlı sınır arasında eğitim verisi karar veremez; yalnız doğrulama/CV verebilir. Kıvrımlı sınır düşük yanlılık + yüksek varyans; düz çizgi biraz yanlılık + düşük varyans. Ama problem de karmaşık olabilir: doğrusal model XOR'u çözemez. Modelin karmaşıklığı problemin karmaşıklığına ve veri miktarına uymalıdır.</p>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Model</th><th>Karmaşıklık düğmesi</th><th>Basit uç</th><th>Karmaşık uç</th></tr></thead>
+<tbody>
+<tr><td>kNN</td><td>k</td><td>büyük k</td><td>k = 1</td></tr>
+<tr><td>Polinom regresyon</td><td>derece</td><td>1</td><td>≥ n − 1 (ara değerleme)</td></tr>
+<tr><td>Karar ağacı</td><td>derinlik, yaprak sayısı</td><td>tek bölme (kütük)</td><td>saf yapraklar</td></tr>
+<tr><td>Doğrusal / lojistik</td><td>λ</td><td>büyük λ</td><td>λ = 0</td></tr>
+<tr><td>Sinir ağı</td><td>katman, nöron, epoch</td><td>küçük ağ</td><td>derin ve uzun eğitim</td></tr>
+</tbody></table></div>
+
+<h2>Aşırı uyum, yetersiz uyum, yanlılık-varyans</h2>
+<div class="formula">E[(y − ĥ(x))²] = (f(x) − E[ĥ(x)])² + E[(ĥ(x) − E[ĥ(x)])²] + σ² &nbsp;=&nbsp; yanlılık² + varyans + gürültü</div>
+<ul>
+<li><strong>Yanlılık</strong>: farklı eğitim kümelerinden öğrenilen modellerin <em>ortalaması</em> gerçek f'ten ne kadar uzak? Basit model → yüksek yanlılık.</li>
+<li><strong>Varyans</strong>: eğitim kümesi değişince model ne kadar değişiyor? Karmaşık model → yüksek varyans.</li>
+<li><strong>Gürültü</strong> σ²: etiketlerdeki rastgelelik; hiçbir model azaltamaz.</li>
+</ul>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Eğitim hatası</th><th>Doğrulama hatası</th><th>Tanı</th><th>Ne yapmalı</th></tr></thead>
+<tbody>
+<tr><td>yüksek (0.30)</td><td>yüksek, yakın (0.31)</td><td><strong>yetersiz uyum</strong> (yanlılık)</td><td>daha esnek model (k↓, derece↑, λ↓), daha iyi öznitelik; daha çok veri <em>işe yaramaz</em></td></tr>
+<tr><td>düşük (0.05)</td><td>yüksek (0.28)</td><td><strong>aşırı uyum</strong> (varyans)</td><td>esnekliği azalt (k↑, λ↑, budama), daha çok veri, düzenlileştirme</td></tr>
+<tr><td>düşük (0.12)</td><td>düşük, yakın (0.14)</td><td>makul</td><td>—</td></tr>
+</tbody></table></div>
+<p><strong>Doğrulama eğrisi</strong>: x ekseni hiperparametre, tepe noktası seçilir; eğitim-doğrulama açığı aşırı uyumu gösterir. <strong>Öğrenme eğrisi</strong>: x ekseni veri miktarı; eğriler henüz buluşmadıysa daha çok veri işe yarar (varyans), erken buluşup yüksek kalıyorsa gereken daha karmaşık model (yanlılık).</p>
+
+<h2>Düzenlileştirme</h2>
+<div class="formula">min<sub>h</sub> R̂(h) + λ·Ω(h)</div>
+<p>(uyum terimi) + λ·(basitlik terimi): Ockham'ın matematiksel biçimi. Ridge Ω = ‖w‖², Lasso Ω = ‖w‖₁ (4. hafta), ağaçta yaprak sayısı (5. hafta), sinir ağında weight decay, dropout, erken durdurma; kNN'de k'yı büyütmek de bir tür düzenlileştirmedir. λ → 0: düz ERM (aşırı uyum riski); λ → ∞: sabit model (yetersiz uyum). λ bir hiperparametredir: logaritmik ızgarada CV ile seçilir, sonra bütün eğitim verisiyle yeniden uydurulur.</p>
+
+<h2>Veri sızıntısı</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Tür</th><th>Örnek</th><th>Çözüm</th></tr></thead>
+<tbody>
+<tr><td>Ön işleme</td><td>ölçekleme / PCA / öznitelik seçimi / doldurmayı bütün veride yapıp sonra bölmek</td><td>Pipeline: her şey yalnız eğitim katına uydurulur</td></tr>
+<tr><td>Hedef</td><td>etiketi dolaylı içeren öznitelik: müşteri kaybını “hesap kapanış tarihi” ile tahmin etmek</td><td>yalnız tahmin anında gerçekten bilinen öznitelikler</td></tr>
+<tr><td>Bölme</td><td>aynı hastanın görüntüleri hem eğitimde hem testte; zaman serisinde gelecekle eğitmek; yinelenen satırlar</td><td>GroupKFold, TimeSeriesSplit, yineleme temizliği</td></tr>
+<tr><td>Analist (test kümesine aşırı uyum)</td><td>ayar yaparken aynı test kümesine 20 kez bakmak</td><td>ayarı doğrulama/CV'de yap, teste bir kez bak</td></tr>
+</tbody></table></div>
+<p>Belirti: “gerçek olamayacak kadar iyi” bir skor ve şüpheli biçimde baskın bir öznitelik. <strong>Güvenilir protokol</strong>: test kümesini en başta ayır ve kilitle → Pipeline → hiperparametre ızgarası + k-katlı CV (ortalama ± std) → en iyi ayarı bütün eğitim verisine uydur → testi bir kez raporla. Rapor biçimi: “5 katlı CV F1 = 0.84 ± 0.03; test F1 = 0.82”.</p>
+<div class="callout exam"><div class="callout-title">Örnek sınav sorusu: CV'de iyi, testte kötü</div><p>5 katlı CV ile seçilen model ayrı test kümesinde çok daha kötü. Üç olası neden: (1) sızıntı (ön işleme CV dışında yapıldı, gruplar/zaman katlara bölündü); (2) çok sayıda ayar denenip CV'ye aşırı uyuldu (seçim yanlılığı; iç içe CV kullanılmalı); (3) test kümesi farklı dağılımdan (dağılım kayması) ya da çok küçük/gürültülü.</p></div>
+
+<h2>Hiperparametre satırları</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
+<tbody>
+<tr><td>kNN: k</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>k = 1: eğitim hatası 0; k = n: çoğunluk</td></tr>
+<tr><td>kNN: 1/d ağırlıklı oy</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>en yakın komşu baskın</td></tr>
+<tr><td>kNN: öznitelik sayısı d</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>boyut laneti</td></tr>
+<tr><td>Polinom derecesi</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>derece ≥ n − 1: ara değerleme</td></tr>
+<tr><td>λ</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>λ = 0 düz ERM</td></tr>
+<tr><td>n</td><td>değişmez</td><td class="down">azalır</td><td class="down">azalır</td><td>öğrenme eğrisi</td></tr>
+</tbody></table></div>
+<p class="small">Kural: model esnekleşiyorsa yanlılık düşer, varyans ve risk yükselir; katılaşıyorsa tersi. k = 1 ve k = n uç durumları: k = 1 sıfır yanlılık değil ama çok yüksek varyans (tek gürültülü komşu kararı değiştirir); k = n sıfır varyans (her eğitim kümesinde aynı sabit), çok yüksek yanlılık.</p>
+
+<h2>Sınama soruları</h2>
+<div class="quiz" data-answer="3"><p>A(1,1)+, B(2,2)+, C(1,3)+, D(5,4)−, E(6,2)−, F(4,5)−; q = (3,3). k = 3 kararı?</p><ol>
+<li data-why="B, C ve D/F'den biri: iki artı bir eksi.">−</li>
+<li data-why="Üçüncü sırada D ile F eşit (d² = 5), ama ikisi de −; karar etkilenmez.">Tanımsız: beraberlik var</li>
+<li data-why="">+</li>
+<li data-why="Öklid'de d² ile sıralamak yeterlidir.">Karekök almadan karar verilemez</li></ol>
+<div class="explain">d²: A 8, B 2, C 4, D 5, E 10, F 5. Sıra B, C, D = F → +, +, − → +.</div></div>
+
+<div class="quiz" data-answer="2"><p>Eğitim hatası 0.05, doğrulama hatası 0.28. kNN'de ilk ne denersiniz?</p><ol>
+<li data-why="k'yı küçültmek esnekliği artırır, aşırı uyumu kötüleştirir.">k'yı küçültmek</li>
+<li data-why="">k'yı büyütmek (ve/veya ilgisiz öznitelikleri atmak, veri eklemek)</li>
+<li data-why="Test kümesi ayar için kullanılmaz.">Test kümesinde birkaç k denemek</li>
+<li data-why="Büyük açık aşırı uyum gösterir; model zaten çok esnek.">Daha esnek bir model ailesine geçmek</li></ol></div>
+
+<div class="quiz" data-answer="1"><p>Öğrenme eğrisinde eğitim ve doğrulama hataları erkenden buluşuyor ve ikisi de yüksek kalıyor. Hangi terim baskın, ne yapılmalı?</p><ol>
+<li data-why="">Yanlılık; daha esnek model / daha iyi öznitelik</li>
+<li data-why="Eğriler buluştuğu için veri eklemek hatayı düşürmez.">Varyans; daha çok veri</li>
+<li data-why="Gürültüyü bilemeyiz; önce yanlılığı azaltmayı deneriz.">Gürültü; yapılacak bir şey yok</li>
+<li data-why="Düzenlileştirme modeli daha da basitleştirir.">Yanlılık; λ'yı artırmak</li></ol></div>
+
+<div class="quiz" data-answer="4"><p>“Müşteri kaybını tahmin et” problemine “hesap kapanış tarihi” özniteliği eklendi ve doğrulama F1'i 0.99 oldu. Bu ne tür bir sızıntıdır?</p><ol>
+<li data-why="Ön işleme sızıntısı, ölçekleme/PCA'nın bütün veride yapılmasıdır.">Ön işleme sızıntısı</li>
+<li data-why="Bölme sızıntısı, aynı grubun iki tarafta olmasıdır.">Bölme sızıntısı</li>
+<li data-why="Bu, test kümesine aşırı uyumdur.">Analist sızıntısı</li>
+<li data-why="">Hedef sızıntısı: öznitelik yalnızca zaten ayrılmış müşterilerde var</li></ol></div>
+
+<div class="quiz" data-answer="2"><p>Neden 0-1 kaybı gradyan inişiyle doğrudan optimize edilmez?</p><ol>
+<li data-why="0-1 kaybı dışbükey değildir, ama asıl sorun türevidir.">Çünkü dışbükeydir</li>
+<li data-why="">Basamak fonksiyonudur: türevi hemen her yerde 0, sıçramada tanımsız; yön bilgisi vermez</li>
+<li data-why="0-1 kaybı sınıflandırmada kullanılan doğal ölçüttür.">Çünkü yalnız regresyon içindir</li>
+<li data-why="Hesaplaması ucuzdur.">Hesaplaması çok pahalıdır</li></ol>
+<div class="explain">Bu yüzden onun yerine türevlenebilir “vekil” kayıplar (log-loss, menteşe) optimize edilir.</div></div>
+
+</div></main>
+</body>
+</html>

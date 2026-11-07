@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Derin öğrenme ve CNN · Yapay Öğrenme</title>
+<meta name="description" content="İlklendirme, dropout, BN, evrişim hesabı, çıktı boyutu ve parametre sayısı.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w9-cnn">
+<main><div class="content">
+
+<h1>Derin öğrenme pratiği ve CNN</h1>
+<p class="lead">Ara sınav haftası (9 Kasım). Derslerin konusu: derin ağları eğitmenin püf noktaları (ilklendirme, kaybolan/patlayan gradyan, dropout, toplu normalleştirme, veri çoğaltma, öğrenme oranı çizelgesi) ve evrişimli sinir ağları. Finalde: <strong>elle 1B/2B evrişim, çıktı boyutu ve parametre sayma</strong>.</p>
+
+<h2>Derin ağları eğitmek</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Konu</th><th>Ne?</th><th>Neden / nasıl</th></tr></thead>
+<tbody>
+<tr><td>İlklendirme</td><td>Xavier/Glorot: Var(w) = 2/(n_in + n_out) (sigmoid, tanh) · He/Kaiming: Var(w) = 2/n_in (ReLU)</td><td>her katmanda çıktı varyansı girdininkine eşit kalsın; sıfır = simetri kırılmaz; çok küçük = sinyal söner, çok büyük = doyma/patlama. n_in = 256, ReLU: std ≈ 0.088.</td></tr>
+<tr><td>Kaybolan / patlayan gradyan</td><td>geri yayılımda katman katman çarpılan türevler küçülür ya da büyür</td><td>ReLU, iyi ilklendirme, BN, artık bağlantılar; patlamaya karşı <strong>gradyan kırpma</strong></td></tr>
+<tr><td>Dropout (seyreltme)</td><td>eğitimde her adımda nöronların p oranını rastgele kapat; testte hepsi açık (ölçekli)</td><td>nöronların birbirine yaslanmasını önler; örtük bir topluluk: düzenlileştirici</td></tr>
+<tr><td>Toplu normalleştirme (BN)</td><td>mini-batch içinde etkinleştirmeleri ortalama 0, varyans 1'e getir, sonra öğrenilen γ, β ile ölçekle/kaydır</td><td>eğitimi hızlandırır ve kararlı kılar, daha büyük η'ya izin verir; düzenlileştirici etkisi zayıf bir yan üründür</td></tr>
+<tr><td>Erken durdurma</td><td>doğrulama kaybı “patience” epoch iyileşmezse dur</td><td>epoch sayısını veriden seçer; düzenlileştirici</td></tr>
+<tr><td>Veri çoğaltma</td><td>kırpma, çevirme, döndürme, renk oynaması</td><td>etkin veri büyür (varyans ↓); etiketi bozan dönüşümden kaçın (6 ↔ 9)</td></tr>
+<tr><td>Öğrenme oranı çizelgesi</td><td>adım azaltma, kosinüs, ısınma (warm-up)</td><td>başta hızlı, sonda ince ayar</td></tr>
+</tbody></table></div>
+
+<h2>Neden evrişim?</h2>
+<p>32×32×3 görüntüde tek bir tam bağlı katman bile 3072 girdi × nöron sayısı kadar ağırlık ister; yüksek çözünürlükte patlar ve uzamsal yapıyı (yakın piksellerin ilişkisi) yok sayar. Evrişim: küçük bir filtre bütün görüntüde <strong>kaydırılır</strong> (yerel bağlantı + <strong>ağırlık paylaşımı</strong>): parametre sayısı görüntü boyutundan bağımsızdır ve aynı desen her yerde tanınır (kaymaya eşdeğişkenlik). MLP'nin görüntüde verimsizliğinin cevabı budur.</p>
+
+<h2>Elle evrişim</h2>
+<p><strong>1B</strong>: f = (4, 3, 2, −5, 3, 5, 2, 5, 5, 6), kutu filtre (⅓, ⅓, ⅓) → ilk hücre (4 + 3 + 2)/3 = 3, sonra 0, 0, 1, 10/3, 4, 4, 16/3: çıktı 10 − 3 + 1 = 8 eleman. Kutu filtre <strong>alçak geçiren</strong> (yumuşatır, gürültüyü bastırır); kenar filtresi (1, 0, −1) <strong>yüksek geçiren</strong> (ani değişimleri, kenarları vurgular).</p>
+<p><strong>2B</strong>: çıktı hücresi = filtre ile girdi penceresinin eleman eleman çarpımlarının toplamı (kütüphanelerdeki “evrişim” aslında çapraz ilişkidir, filtre çevrilmez). Varsayılan örnek: 4×4 görüntü, dikey kenar filtresi [[1,0,−1],[1,0,−1],[1,0,−1]] → her hücre “sol sütun toplamı − sağ sütun toplamı”; çıktı [[0, 2], [−1, −1]]. Dolgu 1 ile çıktı 4×4 kalır (“same”).</p>
+<div data-widget="conv"></div>
+<div class="formula">çıktı boyutu = ⌊(n + 2p − k)/s⌋ + 1</div>
+<p>Dolgu yok (“valid”): kenar pikselleri az görülür, çıktı küçülür. Sıfır dolgu p = (k − 1)/2 ve s = 1: “same”. Adım s &gt; 1 çıktıyı küçültür. Dikdörtgen filtre ve farklı yatay/dikey adım/dolgu: her eksen için formülü ayrı uygulayın.</p>
+
+<h2>Havuzlama ve parametre sayma</h2>
+<p><strong>Max/ortalama havuzlama</strong> (tipik 2×2, adım 2): her penceredeki en büyük ya da ortalama değer; boyutu yarıya indirir, parametresi yoktur, küçük kaymalara dayanıklılık verir.</p>
+<div class="formula">evrişim katmanı parametresi = (k_h·k_w·C_in + 1)·C_out</div>
+<div class="table-wrap"><table class="simple compact">
+<thead><tr><th>Katman</th><th>Girdi</th><th>Çıktı</th><th>Parametre</th></tr></thead>
+<tbody>
+<tr><td>Conv 3→16, 3×3, p = 1</td><td>3×32×32</td><td>16×32×32</td><td>(3·3·3 + 1)·16 = 448</td></tr>
+<tr><td>MaxPool 2×2</td><td>16×32×32</td><td>16×16×16</td><td>0</td></tr>
+<tr><td>Conv 16→32, 3×3, p = 1</td><td>16×16×16</td><td>32×16×16</td><td>(3·3·16 + 1)·32 = 4,640</td></tr>
+<tr><td>MaxPool 2×2</td><td>32×16×16</td><td>32×8×8</td><td>0</td></tr>
+<tr><td>Flatten → Linear 2048→10</td><td>2048</td><td>10</td><td>2048·10 + 10 = 20,490</td></tr>
+<tr class="hl"><td>Toplam</td><td></td><td></td><td>25,578 (çoğunu tam bağlı katman taşır)</td></tr>
+</tbody></table></div>
+<div data-widget="convlayer"></div>
+<p>Varsayılan değerler geçmiş final sorusudur: 128×128×16 girdi, 64 tane 3×7 filtre, adım (2, 3), dolgu (1, 2) → çıktı 64×42×64; 64·3·7·16 = 21,504 ağırlık, 64 bias.</p>
+
+<h2>Mimariler ve aktarımlı öğrenme</h2>
+<ul>
+<li><strong>LeNet</strong> (rakamlar; conv-pool-conv-pool-FC), <strong>AlexNet</strong> (2012; ReLU, dropout, GPU, büyük veri), <strong>VGG</strong> (üst üste 3×3), <strong>ResNet</strong> (artık bağlantı <span class="m">y = F(x) + x</span>: gradyan kısa yoldan akar, yüzlerce katman eğitilebilir).</li>
+<li><strong>Aktarımlı öğrenme</strong>: ImageNet'te ön eğitilmiş ağın erken katmanları genel desenleri (kenar, doku) öğrenmiştir; bunlar tıbbi görüntü gibi çok farklı alanlarda da işe yarar. Az veride çoğu katmanı dondurup yalnız yeni sınıflandırıcı başını eğit; çok veride daha çok katmanı küçük η ile ince ayarla. Ön eğitilmiş modelin son katmandan önceki çıktısı bir <strong>gömme</strong> (embedding) olarak başka modellere girdi yapılabilir.</li>
+</ul>
+
+<h2>Hiperparametre satırları</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
+<tbody>
+<tr><td>Dropout oranı p</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>çok büyükse yetersiz uyum</td></tr>
+<tr><td>Ağırlık sönümü λ</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>AdamW</td></tr>
+<tr><td>Veri çoğaltma</td><td class="up">hafif artar</td><td class="down">azalır</td><td class="down">azalır</td><td>etkin veri büyür</td></tr>
+<tr><td>Filtre / kanal sayısı</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>(k²C_in + 1)C_out</td></tr>
+<tr><td>Evrişim katmanı sayısı</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>algı alanı büyür</td></tr>
+<tr><td>Havuzlama katmanı sayısı</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>bilgi ve boyut küçülür</td></tr>
+<tr><td>Dondurulmuş katman (aktarım)</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>az veri: çok dondur</td></tr>
+</tbody></table></div>
+
+<h2>Sınama soruları</h2>
+<div class="quiz" data-answer="3"><p>32×32 girdi, 5×5 filtre, dolgu 0, adım 1. Çıktı?</p><ol>
+<li data-why="Bu “same” dolguyla olurdu.">32×32</li>
+<li data-why="(32 − 5)/1 + 1 = 28.">27×27</li>
+<li data-why="">28×28</li>
+<li data-why="Adım 1.">14×14</li></ol></div>
+
+<div class="quiz" data-answer="2"><p>16 kanallı girdiye 32 tane 3×3 filtreli evrişim katmanının parametre sayısı?</p><ol>
+<li data-why="Girdi kanallarını unutmayın.">32·(3·3 + 1) = 320</li>
+<li data-why="">32·(3·3·16 + 1) = 4,640</li>
+<li data-why="Parametre sayısı görüntü boyutuna bağlı değildir.">Görüntü boyutu bilinmeden hesaplanamaz</li>
+<li data-why="Bias filtre başınadır.">3·3·16·32 + 16 = 4,624</li></ol></div>
+
+<div class="quiz" data-answer="4"><p>Toplu normalleştirmenin asıl yararı?</p><ol>
+<li data-why="BN parametre ekler (γ, β).">Parametre sayısını azaltmak</li>
+<li data-why="Testte ortalama/varyans eğitimdeki koşu ortalamalarıdır.">Testte her batch'i ayrı normalleştirmek</li>
+<li data-why="Etkisi zayıf, yan ürün.">Dropout'un yerine geçen güçlü bir düzenlileştirici</li>
+<li data-why="">Etkinleştirme dağılımlarını sabitleyip eğitimi hızlandırmak ve kararlı kılmak (daha büyük η)</li></ol></div>
+
+</div></main>
+</body>
+</html>

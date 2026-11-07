@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yapay Öğrenme · BİL/YAP 470 çalışma sitesi</title>
+<meta name="description" content="BİL/YAP 470 – BİL 570 Yapay Öğrenme (TOBB ETÜ, 2026–2027 Güz) için etkileşimli çalışma sitesi: ara sınav (9 Kasım) ve final için konu anlatımı, hesaplayıcılar, çözümlü sorular ve alıştırma üreteci.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="index">
+<main><div class="content">
+
+<section class="hero">
+  <div>
+    <div class="kicker"><span>BİL/YAP 470 – BİL 570 · TOBB ETÜ · 2026–2027 Güz</span></div>
+    <h1>Yapay Öğrenme</h1>
+    <p class="lead">Ara sınav ve final için tek yerde: her haftanın konusu kısa ve net anlatımla, sınavda elle yapılan her hesap için
+      <strong>adım adım çözen bir hesaplayıcı</strong>, örnek ara sınavın tam çözümü ve sınırsız rastgele soru üreten bir alıştırma aracı.</p>
+    <div class="btn-row" style="margin-top:1rem">
+      <a class="btn primary" href="exam-midterm.html">Ara sınav rehberi →</a>
+      <a class="btn" href="sample-midterm.html">Örnek sınav çözümü</a>
+      <a class="btn" href="drill.html">Alıştırma üreteci</a>
+    </div>
+  </div>
+  <div data-widget="countdown"></div>
+</section>
+
+<div class="callout news">
+  <div class="callout-title">📣 Duyuru (18 Ekim): ara sınav tarihi değişti</div>
+  <p>Ara sınav <strong>9 Kasım 2026 Pazartesi 16:30</strong>'da, ders saatinde (9. hafta) yapılacak; 2 Kasım'da <em>değil</em>.
+    Kapsam aynı: <strong>1–7. haftalar</strong>, kâğıt üzerinde, hesap makinesi yok, log ve üstel tabloları verilir.
+    8. haftada (2 ve 6 Kasım) iki normal ders var: <a href="w8-nn.html">yapay sinir ağları</a>. Ödev sayfası, izlence ve slaytlar güncellendi;
+    U7–U10 teslimleri bir hafta kaydı (U7: 18 Kasım).</p>
+</div>
+
+<h2>Sınavlar</h2>
+<div class="table-wrap"><table class="simple">
+  <thead><tr><th>Sınav</th><th>Tarih</th><th>Ağırlık</th><th>Kapsam ve biçim</th></tr></thead>
+  <tbody>
+    <tr class="hl"><td><strong>Ara sınav</strong></td><td>9 Kasım 2026 Pzt, 16:30 (ders saati)</td><td>%30</td><td>1–7. haftalar. Kâğıt üzerinde, kitap/not kapalı, elektronik cihaz yok. Küçük veri setlerinde elle model kurma + 4'er puanlık kısa kavram soruları. <a href="exam-midterm.html">Rehber</a></td></tr>
+    <tr><td><strong>Final</strong></td><td>7–18 Aralık (kesin tarih akademik takvimden)</td><td>%40</td><td>Dönemin tamamı, ağırlık 8–12. haftalarda. Aynı kurallar. Finale girmeyen dersten kalır. <a href="exam-final.html">Rehber</a></td></tr>
+  </tbody>
+</table></div>
+<p class="small muted">Diğer bileşenler: haftalık uygulamalar U1–U10 (%15, hiçbiri elenmez), aşamalı proje (%15: öneri %2, ara rapor %3 · 20 Kasım, video %5 · 4 Aralık, IEEE son rapor %5 · 7 Aralık). Son raporu teslim etmeyen de dersten kalır.</p>
+
+<h2>Plan</h2>
+<p>Sayfalar haftaların sırasını izler. Her sayfa: kısa anlatım, sınavda çıkan hesap kalıpları için etkileşimli bir araç (değerleri değiştirin, tablo kendiliğinden yeniden hesaplanır), sık hatalar, o haftanın hiperparametre satırları ve sınama soruları.</p>
+<div class="cards" id="parts"></div>
+
+<h2>Haftalık takvim (güncel)</h2>
+<div class="table-wrap"><table class="simple compact">
+  <thead><tr><th>Hafta</th><th>Tarih</th><th>Konu</th><th>Uygulama (son teslim çarşamba 23:59)</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>14–18 Eyl</td><td><a href="w1-intro.html">Giriş ve temel kavramlar</a></td><td>— (U1: 27 Eyl pazar)</td></tr>
+    <tr><td>2</td><td>21–25 Eyl</td><td><a href="w2-data.html">Veri, öznitelik ve değerlendirme</a></td><td>U1 veri ve değerlendirme · 27 Eyl</td></tr>
+    <tr><td>3</td><td>28 Eyl–2 Eki</td><td><a href="w3-knn.html">Gözetimli öğrenme, kNN, model seçimi</a></td><td>U2 kNN · 7 Eki; proje önerisi 2 Eki</td></tr>
+    <tr><td>4</td><td>5–9 Eki</td><td><a href="w4-linear.html">Doğrusal modeller</a></td><td>U3 · 14 Eki</td></tr>
+    <tr><td>5</td><td>12–16 Eki</td><td><a href="w5-trees.html">Karar ağaçları</a></td><td>U4 · 21 Eki</td></tr>
+    <tr><td>6</td><td>19–23 Eki</td><td><a href="w6-ensembles.html">Topluluk yöntemleri</a></td><td>U5 · 28 Eki</td></tr>
+    <tr><td>7</td><td>26–30 Eki</td><td><a href="w7-svm.html">Destek vektör makineleri</a></td><td>U6 · 4 Kas</td></tr>
+    <tr><td>8</td><td>2–6 Kas</td><td><a href="w8-nn.html">Yapay sinir ağları</a> (iki normal ders, sınav yok)</td><td>U7 MLP · <strong>18 Kas</strong></td></tr>
+    <tr class="hl"><td>9</td><td>9–13 Kas</td><td><strong>ARA SINAV 9 Kas 16:30</strong>; <a href="w9-cnn.html">derin öğrenme pratiği ve CNN</a></td><td>U8 · 25 Kas; proje ara raporu 20 Kas</td></tr>
+    <tr><td>10</td><td>16–20 Kas</td><td>RNN/LSTM, dikkat, Transformer, gömmeler, LLM</td><td>U9 · 2 Ara</td></tr>
+    <tr><td>11</td><td>23–27 Kas</td><td>Gözetimsiz ve olasılıksal öğrenme (k-ortalamalar, GMM/EM, Naive Bayes)</td><td>U10 · 9 Ara</td></tr>
+    <tr><td>12</td><td>30 Kas–4 Ara</td><td>Pekiştirmeli öğrenme, güvenilir ML, proje sunumları</td><td>Proje videosu 4 Ara</td></tr>
+    <tr><td>Final</td><td>7–18 Ara</td><td><a href="exam-final.html">Final sınavı</a></td><td>Son rapor 7 Ara</td></tr>
+  </tbody>
+</table></div>
+
+<h2>İki gün kaldıysa: önerilen sıra</h2>
+<ol>
+  <li><a href="exam-midterm.html">Ara sınav rehberini</a> okuyun: bölümler, puanlar, sık hatalar (15 dk).</li>
+  <li><a href="sample-midterm.html">Örnek ara sınavı</a> önce kendiniz kâğıtta çözün, sonra çözümle karşılaştırın (2 saat). Neredeyse bütün soru tipleri orada.</li>
+  <li>Puanı en yüksek dört hesap tipini <a href="drill.html">alıştırma üretecinde</a> tekrarlayın: ID3 (entropi), perceptron/lojistik adımı, karmaşıklık matrisi + F1, SVM'de w ve b.</li>
+  <li><a href="hyper.html">Hiperparametre tablosunu</a> bütün satırlarıyla bir kez doldurun: kısa soruların kalıbı budur.</li>
+  <li>Son akşam: <a href="cheatsheet.html">formül kâğıdı</a> ve her sayfanın sonundaki sınama soruları.</li>
+</ol>
+
+<h2>Sitenin kullanımı</h2>
+<div class="two-col">
+  <div>
+    <h3>Araçlar</h3>
+    <p>Kutulardaki sayıları ya da veri tablosunu değiştirin: sonuç tablosu kendiliğinden yeniden hesaplanır, sınavda yazmanız gereken ara adımlarla birlikte. Hesaplar testlerle derste çözülen örneklere karşı doğrulandı.</p>
+  </div>
+  <div>
+    <h3>İlerleme</h3>
+    <p>Her sayfanın başındaki “Bu sayfayı çalıştım” kutusu menüde ✓ olarak görünür. Bu işaretler ve alıştırma skorları yalnız bu tarayıcıda saklanır.</p>
+  </div>
+</div>
+<div class="callout warn">
+  <div class="callout-title">Resmî değil</div>
+  <p>Bu site bir öğrencinin çalışma notudur; ders slaytlarının kendisini içermez (anlatım ve örnekler yeniden yazıldı). Tarih, kapsam ve kural konusunda her zaman ders platformundaki duyuruyu ve izlenceyi esas alın.</p>
+</div>
+
+<script type="module">
+  import { NAV, href } from "./js/layout.js";
+  const parts = document.getElementById("parts");
+  for (const p of NAV.slice(1)) for (const it of p.items) {
+    const a = document.createElement("a");
+    a.className = "card"; a.href = href(it.id);
+    a.innerHTML = `<div class="card-top"><span>${p.part}</span><span>${it.week ? it.week + ". hafta" : ""}</span></div><h3></h3><p></p>`;
+    a.querySelector("h3").textContent = it.title; a.querySelector("p").textContent = it.desc;
+    parts.append(a);
+  }
+</script>
+</div></main>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formül kâğıdı ve sözlük · Yapay Öğrenme</title>
+<meta name="description" content="Formüller, log2 ve üstel tablolar, Türkçe–İngilizce terimler.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="cheatsheet">
+<main><div class="content">
+
+<h1>Formül kâğıdı ve sözlük</h1>
+<p class="lead">Bütün dönemin formülleri tek sayfada, sınavda verilen türden log₂ ve eˣ tabloları ve Türkçe–İngilizce terimler. Yazdırılabilir (tarayıcının yazdır komutu menüleri gizler).</p>
+
+<h2>Veri ve değerlendirme</h2>
+<div class="table-wrap"><table class="simple">
+<tbody>
+<tr><td>min-max</td><td class="m">x′ = (x − min)/(max − min)</td></tr>
+<tr><td>z-score</td><td class="m">z = (x − μ)/σ, &nbsp;σ² = Σ(x − μ)²/n</td></tr>
+<tr><td>Accuracy · Precision · Recall</td><td class="m">(TP+TN)/n · TP/(TP+FP) · TP/(TP+FN)</td></tr>
+<tr><td>Specificity · FPR</td><td class="m">TN/(TN+FP) · FP/(FP+TN) = 1 − spec.</td></tr>
+<tr><td>F1</td><td class="m">2PR/(P+R) = 2TP/(2TP+FP+FN)</td></tr>
+<tr><td>AUC</td><td>doğru sıralanmış (pozitif, negatif) çiftleri / (P·N)</td></tr>
+<tr><td>MSE · RMSE · MAE</td><td class="m">(1/n)Σ(y−ŷ)² · √MSE · (1/n)Σ|y−ŷ|</td></tr>
+<tr><td>R²</td><td class="m">1 − Σ(y−ŷ)²/Σ(y−ȳ)²</td></tr>
+<tr><td>Kovaryans (PCA)</td><td class="m">s_jk = Σ(x_j − μ_j)(x_k − μ_k)/(n − 1)</td></tr>
+<tr><td>2×2 özdeğer</td><td class="m">λ² − (s₁₁+s₂₂)λ + (s₁₁s₂₂ − s₁₂²) = 0; &nbsp;eşit köşegen: a ± c, yön (1,±1)</td></tr>
+<tr><td>Açıklanan varyans</td><td class="m">λ_k / Σλ</td></tr>
+</tbody></table></div>
+
+<h2>kNN, risk, yanlılık-varyans</h2>
+<div class="table-wrap"><table class="simple"><tbody>
+<tr><td>Öklid · Manhattan</td><td class="m">√Σ(x_j − z_j)² · Σ|x_j − z_j|</td></tr>
+<tr><td>Kosinüs uzaklığı</td><td class="m">1 − x·z/(‖x‖‖z‖)</td></tr>
+<tr><td>Ampirik risk</td><td class="m">R̂(h) = (1/n)Σ L(yᵢ, h(xᵢ))</td></tr>
+<tr><td>Ayrışım</td><td class="m">E[(y − ĥ)²] = yanlılık² + varyans + σ²</td></tr>
+<tr><td>Düzenlileştirilmiş ERM</td><td class="m">min R̂(h) + λΩ(h)</td></tr>
+</tbody></table></div>
+
+<h2>Doğrusal modeller</h2>
+<div class="table-wrap"><table class="simple"><tbody>
+<tr><td>En küçük kareler</td><td class="m">w = (XᵀX)⁻¹Xᵀy; &nbsp;w₁ = Σ(x−x̄)(y−ȳ)/Σ(x−x̄)², w₀ = ȳ − w₁x̄</td></tr>
+<tr><td>Ridge</td><td class="m">w = (XᵀX + λI)⁻¹Xᵀy</td></tr>
+<tr><td>Gradyan inişi</td><td class="m">w ← w − η∇L; &nbsp;MSE: ∇L = (2/n)Xᵀ(Xw − y)</td></tr>
+<tr><td>Sigmoid</td><td class="m">σ(z) = 1/(1+e⁻ᶻ), σ(−z) = 1 − σ(z), σ′ = σ(1−σ) ≤ 0.25</td></tr>
+<tr><td>Log-loss</td><td class="m">−[y ln p + (1−y) ln(1−p)]</td></tr>
+<tr><td>LR gradyanı</td><td class="m">∂L/∂w = (p − y)x, ∂L/∂b = p − y</td></tr>
+<tr><td>Perceptron</td><td class="m">z ≥ 0 → +1; hatada w ← w + ηyx, b ← b + ηy</td></tr>
+<tr><td>Softmax · çapraz entropi</td><td class="m">p_k = e^{z_k}/Σe^{z_j} · −ln p_y</td></tr>
+<tr><td>Sınıra uzaklık</td><td class="m">|w·x + b|/‖w‖</td></tr>
+</tbody></table></div>
+
+<h2>Ağaçlar ve topluluklar</h2>
+<div class="table-wrap"><table class="simple"><tbody>
+<tr><td>Entropi · Gini</td><td class="m">−Σpᵢ log₂ pᵢ · 1 − Σpᵢ²</td></tr>
+<tr><td>Bilgi kazancı</td><td class="m">IG = H(D) − Σ(|D_v|/|D|)H(D_v)</td></tr>
+<tr><td>Kazanç oranı</td><td class="m">IG / SplitInfo, SplitInfo = −Σ(|D_v|/|D|)log₂(|D_v|/|D|)</td></tr>
+<tr><td>Maliyet-karmaşıklık</td><td class="m">R_α(T) = R(T) + α|T|</td></tr>
+<tr><td>Çoğunluk oyu hatası</td><td class="m">Σ_{k>n/2} C(n,k)(1−p)ᵏ pⁿ⁻ᵏ</td></tr>
+<tr><td>Bootstrap dışarıda kalma</td><td class="m">(1 − 1/n)ⁿ → e⁻¹ = 0.368</td></tr>
+<tr><td>AdaBoost</td><td class="m">ε = Σ_yanlış w, &nbsp;α = ½ ln((1−ε)/ε); &nbsp;yanlış × 1/(2ε), doğru × 1/(2(1−ε)); &nbsp;H = sign(Σαh)</td></tr>
+<tr><td>Gradyan artırma</td><td class="m">F₀ = ȳ, r = y − F, F ← F + η·f(r)</td></tr>
+</tbody></table></div>
+
+<h2>SVM</h2>
+<div class="table-wrap"><table class="simple"><tbody>
+<tr><td>Sert marj</td><td class="m">min ½‖w‖² s.t. yᵢ(w·xᵢ + b) ≥ 1</td></tr>
+<tr><td>Marj · sokak</td><td class="m">1/‖w‖ · 2/‖w‖</td></tr>
+<tr><td>Destek vektörü</td><td class="m">yᵢ(w·xᵢ + b) = 1 (α &gt; 0)</td></tr>
+<tr><td>İkil</td><td class="m">w = Σαᵢyᵢxᵢ, Σαᵢyᵢ = 0, αᵢ ≥ 0</td></tr>
+<tr><td>Yumuşak marj</td><td class="m">min ½‖w‖² + CΣξᵢ, ξᵢ = max(0, 1 − yᵢf(xᵢ))</td></tr>
+<tr><td>Çekirdekler</td><td class="m">(γx·z + r)^d · exp(−γ‖x − z‖²)</td></tr>
+</tbody></table></div>
+
+<h2>Sinir ağları ve CNN (final)</h2>
+<div class="table-wrap"><table class="simple"><tbody>
+<tr><td>Katman</td><td class="m">h = g(Wx + b)</td></tr>
+<tr><td>Çıktı deltası (sigmoid + BCE / softmax + CE)</td><td class="m">δ_out = ŷ − y</td></tr>
+<tr><td>Gizli delta</td><td class="m">δ_j = (Σ_k δ_k v_kj) · g′(z_j), &nbsp;∂L/∂w_ji = δ_j x_i</td></tr>
+<tr><td>Momentum · Adam</td><td class="m">m ← βm + g, θ ← θ − ηm · (m, s birlikte; η = 10⁻³, β₁ = 0.9, β₂ = 0.999)</td></tr>
+<tr><td>Evrişim çıktı boyutu</td><td class="m">⌊(n + 2p − k)/s⌋ + 1</td></tr>
+<tr><td>Evrişim parametresi</td><td class="m">F·(k_h·k_w·C_in) ağırlık + F bias</td></tr>
+<tr><td>Boole → step nöronu</td><td class="m">VE: +1 / −1 ağırlık, b = −(#pozitif değişmez) + 0.5 · VEYA: ağırlık 1, b = −0.5</td></tr>
+</tbody></table></div>
+
+<h2 id="log2-tablosu">log₂ ve entropi tablosu</h2>
+<div class="two-col">
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>p = k/n</th><th class="num">−log₂ p</th><th class="num">H(p) iki sınıf</th></tr></thead><tbody>
+<tr><td>1/2</td><td class="num">1.000</td><td class="num">1.000</td></tr>
+<tr><td>1/3</td><td class="num">1.585</td><td class="num">0.918</td></tr>
+<tr><td>2/3</td><td class="num">0.585</td><td class="num">0.918</td></tr>
+<tr><td>1/4</td><td class="num">2.000</td><td class="num">0.811</td></tr>
+<tr><td>3/4</td><td class="num">0.415</td><td class="num">0.811</td></tr>
+<tr><td>1/5</td><td class="num">2.322</td><td class="num">0.722</td></tr>
+<tr><td>2/5</td><td class="num">1.322</td><td class="num">0.971</td></tr>
+<tr><td>3/5</td><td class="num">0.737</td><td class="num">0.971</td></tr>
+<tr><td>4/5</td><td class="num">0.322</td><td class="num">0.722</td></tr>
+<tr><td>1/6</td><td class="num">2.585</td><td class="num">0.650</td></tr>
+<tr><td>5/6</td><td class="num">0.263</td><td class="num">0.650</td></tr>
+<tr><td>1/7</td><td class="num">2.807</td><td class="num">0.592</td></tr>
+<tr><td>2/7</td><td class="num">1.807</td><td class="num">0.863</td></tr>
+<tr><td>3/7</td><td class="num">1.222</td><td class="num">0.985</td></tr>
+<tr><td>4/7</td><td class="num">0.807</td><td class="num">0.985</td></tr>
+<tr><td>5/7</td><td class="num">0.485</td><td class="num">0.863</td></tr>
+<tr><td>6/7</td><td class="num">0.222</td><td class="num">0.592</td></tr>
+<tr><td>1/8</td><td class="num">3.000</td><td class="num">0.544</td></tr>
+<tr><td>3/8</td><td class="num">1.415</td><td class="num">0.954</td></tr>
+<tr><td>5/8</td><td class="num">0.678</td><td class="num">0.954</td></tr>
+<tr><td>7/8</td><td class="num">0.193</td><td class="num">0.544</td></tr>
+</tbody></table></div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>x</th><th class="num">e⁻ˣ</th><th class="num">eˣ</th><th class="num">σ(x)</th></tr></thead><tbody>
+<tr><td>0</td><td class="num">1.000</td><td class="num">1.000</td><td class="num">0.500</td></tr>
+<tr><td>0.2</td><td class="num">0.819</td><td class="num">1.221</td><td class="num">0.550</td></tr>
+<tr><td>0.4</td><td class="num">0.670</td><td class="num">1.492</td><td class="num">0.599</td></tr>
+<tr><td>0.5</td><td class="num">0.607</td><td class="num">1.649</td><td class="num">0.622</td></tr>
+<tr><td>0.6</td><td class="num">0.549</td><td class="num">1.822</td><td class="num">0.646</td></tr>
+<tr><td>0.8</td><td class="num">0.449</td><td class="num">2.226</td><td class="num">0.690</td></tr>
+<tr><td>1</td><td class="num">0.368</td><td class="num">2.718</td><td class="num">0.731</td></tr>
+<tr><td>1.2</td><td class="num">0.301</td><td class="num">3.320</td><td class="num">0.769</td></tr>
+<tr><td>1.4</td><td class="num">0.247</td><td class="num">4.055</td><td class="num">0.802</td></tr>
+<tr><td>1.5</td><td class="num">0.223</td><td class="num">4.482</td><td class="num">0.818</td></tr>
+<tr><td>1.6</td><td class="num">0.202</td><td class="num">4.953</td><td class="num">0.832</td></tr>
+<tr><td>1.8</td><td class="num">0.165</td><td class="num">6.050</td><td class="num">0.858</td></tr>
+<tr><td>2</td><td class="num">0.135</td><td class="num">7.389</td><td class="num">0.881</td></tr>
+<tr><td>2.5</td><td class="num">0.082</td><td class="num">12.182</td><td class="num">0.924</td></tr>
+<tr><td>3</td><td class="num">0.050</td><td class="num">20.086</td><td class="num">0.953</td></tr>
+<tr><td>3.5</td><td class="num">0.030</td><td class="num">33.115</td><td class="num">0.971</td></tr>
+<tr><td>4</td><td class="num">0.018</td><td class="num">54.598</td><td class="num">0.982</td></tr>
+<tr><td>5</td><td class="num">0.007</td><td class="num">148.413</td><td class="num">0.993</td></tr>
+</tbody></table></div>
+</div>
+<p class="small">ln 2 = 0.693 · ln 3 = 1.099 · ln 4 = 1.386 · ln 5 = 1.609 · ln 6 = 1.792 · ln 7 = 1.946 · ln 11 = 2.398 · √2 = 1.414 · √5 = 2.236 · σ(−x) = 1 − σ(x).</p>
+
+<h2>Sözlük (Türkçe – İngilizce)</h2>
+<div class="table-wrap"><table class="simple compact">
+<thead><tr><th>Türkçe</th><th>İngilizce</th><th>Türkçe</th><th>İngilizce</th></tr></thead>
+<tbody>
+<tr><td>gözetimli / denetimli öğrenme</td><td>supervised learning</td><td>gözetimsiz öğrenme</td><td>unsupervised learning</td></tr>
+<tr><td>pekiştirmeli öğrenme</td><td>reinforcement learning</td><td>öznitelik</td><td>feature</td></tr>
+<tr><td>öznitelik seçimi / çıkarımı</td><td>feature selection / extraction</td><td>etiket</td><td>label</td></tr>
+<tr><td>hipotez uzayı</td><td>hypothesis space</td><td>tümevarımsal yanlılık</td><td>inductive bias</td></tr>
+<tr><td>genelleme</td><td>generalization</td><td>aşırı / yetersiz uyum</td><td>overfitting / underfitting</td></tr>
+<tr><td>yanlılık · varyans</td><td>bias · variance</td><td>düzenlileştirme</td><td>regularization</td></tr>
+<tr><td>çapraz doğrulama</td><td>cross-validation</td><td>veri sızıntısı</td><td>data leakage</td></tr>
+<tr><td>karmaşıklık (karışıklık) matrisi</td><td>confusion matrix</td><td>kesinlik · duyarlılık</td><td>precision · recall (sensitivity)</td></tr>
+<tr><td>özgüllük</td><td>specificity</td><td>eğri altındaki alan</td><td>AUC</td></tr>
+<tr><td>temel bileşen analizi</td><td>PCA</td><td>boyut laneti</td><td>curse of dimensionality</td></tr>
+<tr><td>en küçük kareler</td><td>least squares</td><td>gradyan inişi</td><td>gradient descent</td></tr>
+<tr><td>öğrenme oranı</td><td>learning rate</td><td>karar sınırı</td><td>decision boundary</td></tr>
+<tr><td>algılayıcı</td><td>perceptron</td><td>log kaybı / çapraz entropi</td><td>log-loss / cross-entropy</td></tr>
+<tr><td>bilgi kazancı · kazanç oranı</td><td>information gain · gain ratio</td><td>budama</td><td>pruning</td></tr>
+<tr><td>karar kütüğü</td><td>decision stump</td><td>torbalama</td><td>bagging</td></tr>
+<tr><td>önyükleme örneklemi</td><td>bootstrap sample</td><td>torba dışı hata</td><td>out-of-bag (OOB) error</td></tr>
+<tr><td>artırma</td><td>boosting</td><td>yığma</td><td>stacking</td></tr>
+<tr><td>destek vektörü</td><td>support vector</td><td>marj(in)</td><td>margin</td></tr>
+<tr><td>esnek/yumuşak marj</td><td>soft margin</td><td>menteşe kaybı</td><td>hinge loss</td></tr>
+<tr><td>gevşek değişken</td><td>slack variable</td><td>çekirdek hilesi</td><td>kernel trick</td></tr>
+<tr><td>etkinleştirme işlevi</td><td>activation function</td><td>geri yayılım</td><td>backpropagation</td></tr>
+<tr><td>ileri yayılım</td><td>forward pass</td><td>kaybolan gradyan</td><td>vanishing gradient</td></tr>
+<tr><td>erken durdurma</td><td>early stopping</td><td>seyreltme</td><td>dropout</td></tr>
+<tr><td>toplu normalleştirme</td><td>batch normalization</td><td>evrişim · dolgu · adım</td><td>convolution · padding · stride</td></tr>
+<tr><td>havuzlama</td><td>pooling</td><td>aktarımlı öğrenme · ince ayar</td><td>transfer learning · fine-tuning</td></tr>
+</tbody></table></div>
+
+</div></main>
+</body>
+</html>

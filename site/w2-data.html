@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Veri, öznitelik ve değerlendirme · Yapay Öğrenme</title>
+<meta name="description" content="Kodlama, ölçekleme, PCA, çapraz doğrulama, karmaşıklık matrisi, ROC-AUC, regresyon ölçütleri.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w2-data">
+<main><div class="content">
+
+<h1>Veri, öznitelik ve değerlendirme</h1>
+<p class="lead">Modelden önce veri, modelden sonra ölçüm. Bu hafta: veri türleri ve kodlama, ölçekleme, öznitelik seçimi/çıkarımı ve PCA, eğitim/doğrulama/test ve çapraz doğrulama, karmaşıklık matrisinden F1'e, ROC-AUC ve regresyon ölçütleri. Ara sınavın “kNN ve ölçütler” bölümü (17 puan) büyük ölçüde buradan.</p>
+
+<h2>Veri türleri ve kodlama</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Tür</th><th>Örnek</th><th>Ne anlamlı?</th><th>Kodlama</th></tr></thead>
+<tbody>
+<tr><td><strong>Nominal</strong> (sırasız kategorik)</td><td>şehir, renk, ürün kodu</td><td>yalnız eşitlik</td><td><strong>one-hot</strong> (k kategori → k sütun; doğrusal modelde k−1 yeter)</td></tr>
+<tr><td><strong>Sıralı</strong> (ordinal)</td><td>S/M/L/XL, 1–5 memnuniyet</td><td>sıra var, aralıklar eşit değil</td><td>tam sayı 1, 2, 3… (one-hot da olur)</td></tr>
+<tr><td><strong>Sayısal</strong></td><td>yaş, gelir, sıcaklık</td><td>aritmetik</td><td>sayı olarak bırak, <strong>ölçekle</strong></td></tr>
+<tr><td>Sıralı dizi / zaman serisi</td><td>sensör, hisse, metin</td><td>örnekler bağımlı</td><td>rastgele karıştırma = sızıntı; <strong>zamana göre böl</strong></td></tr>
+<tr><td>Yapısız</td><td>görüntü, ses, metin</td><td>—</td><td>önce sayısal vektöre (derin öğrenme bunu kendi öğrenir)</td></tr>
+</tbody></table></div>
+<p>Nominal değişkeni “Ankara = 1, İzmir = 2, İstanbul = 3” diye kodlamak <strong>yapay bir sıra ve uzaklık</strong> uydurur (İstanbul, Ankara'ya İzmir'den “daha uzak” olur). 10.000 değerli bir ürün kimliği için one-hot 10.000 seyrek sütun demektir: hedef kodlaması, hashing ya da gömme (embedding) kullanın.</p>
+<div class="callout"><div class="callout-title">İkili (binary) kodlama ile one-hot farkı</div><p>One-hot'ta her kategori ayrı bir 0/1 sütunudur, tam olarak biri 1'dir. İkili kodlamada kategorinin sıra numarası ikili sayıyla yazılır (k kategori → ⌈log₂k⌉ sütun): daha az sütun, ama sütunlar anlamsız bileşimler. Sinir ağlarında one-hot hem girdide (kategorik öznitelik) hem <strong>çıktıda</strong> (çok sınıflı etiket; softmax'la karşılaştırılır) kullanılır.</p></div>
+
+<h2>Ölçekleme (normalizasyon)</h2>
+<div class="formula">min-max: x′ = (x − min) / (max − min) ∈ [0, 1]&nbsp;&nbsp;&nbsp;&nbsp; z-score: z = (x − μ) / σ</div>
+<p>σ sınavda <strong>n'ye bölünerek</strong> (popülasyon formülü) hesaplanır. min-max tek bir aykırı değere çok duyarlıdır (o değer bütün ölçeği belirler); z-score sınırsızdır ama daha dayanıklıdır. Sağa çarpık veride (gelir, sözcük sıklığı) önce log alın.</p>
+<div data-widget="scaling"></div>
+<p><strong>Kim etkilenir?</strong> Uzaklık temelli yöntemler (kNN, k-ortalamalar, SVM), gradyan inişiyle eğitilenler (lojistik regresyon, sinir ağları) ve PCA: evet. Ağaç temelli modeller: <strong>hayır</strong> (eşik karşılaştırması sıralamaya bakar).</p>
+<div class="callout warn"><div class="callout-title">Altın kural: test verisini ön işlemede asla kullanmayın</div>
+<p>min, max, μ, σ, PCA eksenleri, one-hot sözlüğü, eksik değer ortalaması: hepsi <strong>yalnız eğitim verisinden</strong> hesaplanır, sonra teste aynen uygulanır. <code>scaler.fit(X_all)</code> sonra bölmek, ya da bütün veride <code>fillna(mean)</code> → veri sızıntısı: test skoru iyimser çıkar. Çapraz doğrulamada bu, ölçekleyicinin bir <code>Pipeline</code> içinde <em>her katın eğitim parçasına</em> uydurulması demektir.</p></div>
+
+<h2>Öznitelik seçimi ve çıkarımı</h2>
+<div class="two-col">
+<div class="card"><h3>Seçim (selection)</h3><p>Var olan sütunların bir alt kümesi; sütunlar değişmez, <strong>yorumlanabilirlik korunur</strong>. Filtre (korelasyon, karşılıklı bilgi, ki-kare), sarmalayıcı (ileri/geri seçim, RFE), gömülü (Lasso katsayıları, ağaç önemleri).</p></div>
+<div class="card"><h3>Çıkarım (extraction)</h3><p>Eskilerden <strong>yeni</strong> sütunlar kurulur, boyut düşer. Doğrusal: PCA, LDA. Doğrusal olmayan: t-SNE, UMAP, otokodlayıcılar. Yeni eksenler genelde yorumlanması zor bileşimlerdir.</p></div>
+</div>
+
+<h2>PCA: temel bileşen analizi</h2>
+<p>Veriyi en çok yayıldığı (varyansı en büyük) yönlere izdüşürür, gerisini atar. Adımlar: <strong>merkezle → kovaryans matrisi S (n − 1 ile) → özdeğer/özvektör → büyükten küçüğe sırala</strong>. PC1 en büyük özdeğerin özvektörüdür; PC2 ona diktir. Açıklanan varyans oranı <span class="m">λₖ / Σλ</span>. Doğrusal, <strong>denetimsiz</strong> (etiketleri kullanmaz), ölçeğe duyarlı (önce z-score).</p>
+<p>2×2 simetrik matriste özdeğerler: <span class="m">λ² − (s₁₁ + s₂₂)λ + (s₁₁s₂₂ − s₁₂²) = 0</span>. Kısa yol: köşegen girdiler eşitse (a, a; c) özdeğerler <span class="m">a ± c</span>, özvektörler (1, 1) ve (1, −1) yönündedir.</p>
+<div data-widget="pca"></div>
+<p>Kaç bileşen? Birikimli açıklanan varyansın %90–95'e ulaştığı k, ya da “dirsek”; sınıflandırmada CV ile. <strong>Boyut laneti</strong>: d büyüdükçe uzay üstel büyür, örnekler seyrekleşir, uzaklıklar birbirine benzer (birim küpün hacminin %10'unu kaplayan küpün kenarı 0.1^(1/d): d = 10'da 0.79, d = 100'de 0.98).</p>
+
+<h2>Eğitim, doğrulama, test ve çapraz doğrulama</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Küme</th><th>Ne için?</th><th>Tipik pay</th></tr></thead>
+<tbody>
+<tr><td>Eğitim</td><td>parametreleri öğrenir (ağırlıklar, bölme kuralları)</td><td>%60–80</td></tr>
+<tr><td>Doğrulama</td><td>hiperparametre seçer (k, derinlik, λ), modelleri karşılaştırır</td><td>%10–20</td></tr>
+<tr><td>Test</td><td>yalnız <strong>bir kez, en sonda</strong>: genelleme kestirimi</td><td>%10–20</td></tr>
+</tbody></table></div>
+<p>Test kümesine bakarak karar verirseniz (k'yı test başarımına göre seçmek, 5 denemenin en iyisini raporlamak) test artık “görülmemiş” değildir; raporlanan sayı iyimserdir.</p>
+<p><strong>k-katlı çapraz doğrulama</strong>: veri k parçaya bölünür; her turda bir parça doğrulama, kalanı eğitim. k model eğitilir, her örnek tam bir kez doğrulamada kullanılır; sonuç <strong>ortalama ± std</strong>. 1000 örnekte 5 kat: 5 model, her biri 800 örnekle eğitilir 200'le sınanır. <strong>Katmanlı</strong> (stratified): sınıf oranı her katta korunur. k = n: birini dışarıda bırak (LOO). Seçimden sonra <strong>son model bütün eğitim verisiyle yeniden eğitilir</strong>; kat modelleri atılır. Std büyükse model kararsızdır: ortalamalar arasındaki fark std'den küçükse fark ikna edici değildir. Zaman serisinde katlar zamana göre (geçmişte eğit, sonraki dönemde doğrula).</p>
+
+<h2>Karmaşıklık matrisi ve ölçütler</h2>
+<p>Satırlar gerçek sınıf, sütunlar tahmin (scikit-learn kuralı). Önce her örneği <strong>TP / FN / FP / TN</strong> diye etiketleyin, sonra sayın. Denetim: TP + FN = pozitif sayısı, FP + TN = negatif sayısı.</p>
+<div class="formula">Accuracy = (TP+TN)/n &nbsp;·&nbsp; Precision = TP/(TP+FP) &nbsp;·&nbsp; Recall = TP/(TP+FN) &nbsp;·&nbsp; F1 = 2PR/(P+R) = 2TP/(2TP+FP+FN)</div>
+<div data-widget="confusion"></div>
+<ul>
+<li><strong>Precision</strong>: “pozitif dediklerimin kaçı gerçekten pozitif?” FP'yi cezalandırır. <strong>Recall (duyarlılık, TPR)</strong>: “gerçek pozitiflerin kaçını yakaladım?” FN'yi cezalandırır. Eşik yükselince precision genelde artar, recall düşer: ikisi arasında bir denge (trade-off) vardır.</li>
+<li><strong>Specificity</strong> = TN/(TN+FP); <strong>FPR</strong> = 1 − specificity.</li>
+<li>F1 harmonik ortalamadır: küçük olanı cezalandırır (P = 1, R = 0.1 → aritmetik ortalama 0.55, F1 = 0.18).</li>
+</ul>
+<div class="callout warn"><div class="callout-title">%98 accuracy tuzağı</div><p>1000 işlemin 20'si sahte. A modeli her şeye “normal” der: accuracy 0.98, recall 0, precision tanımsız (0/0), F1 0. B modeli 15 sahteyi yakalar, 30 yanlış alarm verir: accuracy 0.965, precision 15/45 = 0.33, recall 0.75, F1 0.46. A daha “doğru” ama işe yaramaz. Dengesiz veride precision/recall/F1 (ve PR-AUC) kullanın, çoğunluk sınıfı taban çizgisini mutlaka raporlayın.</p></div>
+<p><strong>Hangi hata pahalı?</strong> Kanser taraması / acil triyaj: FN pahalı → <strong>recall</strong>. İş e-postasında spam filtresi: FP (önemli e-postayı silmek) pahalı → <strong>precision</strong>. Müşterileri sıralayıp en üstteki %10'u aramak: tek eşik değil sıralama → <strong>ROC-AUC</strong> (ya da en üst %10'daki precision).</p>
+
+<h2>ROC eğrisi ve AUC</h2>
+<p>Model skor üretir; eşik t'yi kaydırdıkça her eşik bir (FPR, TPR) noktasıdır. Eşik yükseldikçe FP düşer ama TP de düşer. Eğri sol üst köşeye ne kadar yakınsa o kadar iyi. <strong>AUC</strong> eğrinin altındaki alandır ve şu olasılıktır: <em>rastgele bir pozitifin skoru rastgele bir negatifinkinden yüksek</em>. Elle en hızlı yol: her negatifin önünde kaç pozitif olduğunu sayıp toplamı P·N'ye bölmek. AUC = 0.5 rastgele, 1 kusursuz; eşikten bağımsızdır.</p>
+<div data-widget="roc"></div>
+<p class="small muted">Lift: skorlara göre sıralanmış ilk %10'da alıcıların oranı / genel oran. Örn. alıcıların %42'si ilk kutudaysa lift = 4.2. İş kararı: her kutu için (satış kârı − posta maliyeti) hesaplanır, kâr pozitif olduğu sürece gönderilir.</p>
+
+<h2>Regresyon ölçütleri</h2>
+<div class="formula">MSE = (1/n)Σ(y − ŷ)² &nbsp;·&nbsp; RMSE = √MSE &nbsp;·&nbsp; MAE = (1/n)Σ|y − ŷ| &nbsp;·&nbsp; R² = 1 − Σ(y − ŷ)² / Σ(y − ȳ)²</div>
+<div data-widget="regmetrics"></div>
+<p>MSE hataları karesini aldığı için tek büyük hatadan çok etkilenir; MAE dayanıklıdır. R² = 0 “hep ȳ tahmin etmek kadar iyi”; testte negatif olabilir (ortalamadan kötü).</p>
+
+<h2>Hiperparametre satırları</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
+<tbody>
+<tr><td>kNN: k</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>k = 1 ezber, k = n çoğunluk sınıfı</td></tr>
+<tr><td>PCA bileşen sayısı</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>çok az = bilgi kaybı; %90–95 kuralı ya da CV</td></tr>
+<tr><td>Öznitelik sayısı</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>ilgisiz öznitelikler kNN'i bozar</td></tr>
+<tr><td>Eğitim örneği n</td><td>değişmez</td><td class="down">azalır</td><td class="down">azalır</td><td>veri varyansı düşürür, yanlılığı değil</td></tr>
+<tr><td>CV kat sayısı k</td><td colspan="2">puan <em>kestiriminin</em> yanlılığı azalır, varyansı artar</td><td>—</td><td>modelin değil, kestirimin özelliği; k = 5–10</td></tr>
+</tbody></table></div>
+
+<h2>Sınama soruları</h2>
+<div class="quiz" data-answer="2"><p>x = (1, 2, 2, 4, 5, 10) eğitim verisi. Test değeri 7'nin z-skoru nedir? (σ: n'ye bölünen)</p><ol>
+<li data-why="Bu min-max değeri: (7 − 1)/9.">0.67</li>
+<li data-why="">1.0</li>
+<li data-why="μ'yü test değeriyle birlikte yeniden hesaplamak sızıntıdır.">μ ve σ, 7 eklenerek yeniden hesaplanır</li>
+<li data-why="σ = √(54/6) = 3, n − 1 değil.">0.93</li></ol>
+<div class="explain">μ = 24/6 = 4, sapmaların kareleri 9, 4, 4, 0, 1, 36 → toplam 54, σ² = 54/6 = 9, σ = 3. z = (7 − 4)/3 = 1.0.</div></div>
+
+<div class="quiz" data-answer="4"><p>Hangisi veri sızıntısı <em>değildir</em>?</p><ol>
+<li data-why="Ölçekleyici test satırlarını görmüş olur.">Bütün veride <code>scaler.fit</code>, sonra bölmek</li>
+<li data-why="Test satırları doldurma ortalamasına katkı yapar.">Eksik değerleri bütün verinin ortalamasıyla doldurup sonra bölmek</li>
+<li data-why="Test kümesi bir karar için kullanıldı; raporlanan sayı iyimser.">k'yı test başarımına göre seçip o başarımı raporlamak</li>
+<li data-why="">Önce bölmek, <code>scaler.fit(X_train)</code>, sonra <code>scaler.transform(X_test)</code></li></ol></div>
+
+<div class="quiz" data-answer="1"><p>TP = 8, FN = 2, FP = 20, TN = 470. F1 kaçtır?</p><ol>
+<li data-why="">16/38 ≈ 0.42</li>
+<li data-why="Bu recall: 8/10.">0.80</li>
+<li data-why="Bu accuracy: 478/500.">0.956</li>
+<li data-why="Bu precision: 8/28.">0.29</li></ol>
+<div class="explain">F1 = 2TP/(2TP + FP + FN) = 16/(16 + 20 + 2) = 16/38 ≈ 0.42.</div></div>
+
+<div class="quiz" data-answer="3"><p>Skora göre sıralı sınıflar: + + − + − −. AUC?</p><ol>
+<li data-why="Bu, ilk üçün doğruluğu gibi bir şey; AUC çift sayımıdır.">0.67</li>
+<li data-why="Yamuk ya da çift sayma 0.89 verir.">0.75</li>
+<li data-why="">8/9 ≈ 0.89</li>
+<li data-why="Bir (pozitif, negatif) çifti ters sıralı: 3. sıradaki negatif 4. sıradaki pozitifin önünde.">1.0</li></ol>
+<div class="explain">3 pozitif × 3 negatif = 9 çift. 1. negatifin (3. sıra) önünde 2, diğer iki negatifin önünde 3'er pozitif: 2 + 3 + 3 = 8 → 8/9.</div></div>
+
+<div class="quiz" data-answer="2"><p>5 katlı CV: A modeli F1 = 0.81 ± 0.09, B modeli 0.79 ± 0.01. En makul yorum?</p><ol>
+<li data-why="Fark A'nın std'sinden küçük; A kararsız.">A açıkça daha iyi, A seçilir</li>
+<li data-why="">Ortalamalar arasındaki fark A'nın std'sinden küçük; kararlılık önemliyse B daha güvenli</li>
+<li data-why="Std, katlar arası dalgalanmayı ölçer; görmezden gelinmez.">Std önemsizdir, yalnız ortalamaya bakılır</li>
+<li data-why="Test kümesi model seçmek için kullanılmaz.">Kararı test kümesinde ikisini deneyip verin</li></ol></div>
+
+<div class="quiz" data-answer="3"><p>4 noktada PCA: kovaryans S = [[5/3, 4/3], [4/3, 5/3]]. PC1'in açıkladığı varyans oranı?</p><ol>
+<li data-why="Bu λ₂/iz: (1/3)/(10/3).">%10</li>
+<li data-why="Özdeğerler a ± c = 3 ve 1/3.">%60</li>
+<li data-why="">%90</li>
+<li data-why="İz 10/3, λ₁ = 3.">%100</li></ol>
+<div class="explain">Köşegenler eşit (a = 5/3), c = 4/3 → λ = 3 ve 1/3. Oran 3/(10/3) = 0.90; PC1 yönü (1, 1)/√2.</div></div>
+
+</div></main>
+</body>
+</html>

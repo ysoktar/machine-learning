@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alıştırma üreteci · Yapay Öğrenme</title>
+<meta name="description" content="Sınav hesap türlerinden sınırsız rastgele soru, cevap denetimiyle.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="drill">
+<main><div class="content">
+
+<h1>Alıştırma üreteci</h1>
+<p class="lead">Sınavdaki hesap türlerinden sınırsız rastgele soru. Cevapları kutulara yazın (3 ondalık yeter, virgül de olur), <strong>Denetle</strong>'ye basın; takılırsanız çözümü açın. Her sorunun bir numarası var: aynı numarayı girince aynı soru gelir (arkadaşınızla paylaşabilirsiniz).</p>
+
+<div data-widget="drill"></div>
+
+<h2>Hangi türü ne kadar?</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Sınav bölümü</th><th>Üreteçteki türler</th></tr></thead>
+<tbody>
+<tr><td>B: karar ağacı (17 p)</td><td>Bilgi kazancı (ID3 kökü). Sonra <a href="w5-trees.html">ID3 aracında</a> bütün ağacı kurmayı deneyin.</td></tr>
+<tr><td>C: güncelleme adımı (17 p)</td><td>Perceptron bir epoch, lojistik regresyon adımı, en küçük kareler, softmax</td></tr>
+<tr><td>D: kNN ve ölçütler (17 p)</td><td>kNN elle, karmaşıklık matrisi ve ölçütler, ROC-AUC, min-max ve z-score</td></tr>
+<tr><td>E: SVM (17 p)</td><td>SVM: f(x), uzaklık, menteşe. 2B'de w ve b için <a href="w7-svm.html#2b-de-elle-cozum-sinav-kalibi">sert marj aracına</a> kendi noktalarınızı tıklayın.</td></tr>
+<tr><td>Kısa sorular</td><td>Çoğunluk oyu, AdaBoost turu; ayrıca <a href="hyper.html">hiperparametre tablosu</a></td></tr>
+</tbody></table></div>
+<p class="small muted">Sorular rastgele üretildiği için bazen elle hesabı sınavdakinden biraz daha çirkin sayılar çıkabilir; yöntem aynıdır. Skorunuz yalnız bu tarayıcıda saklanır.</p>
+
+</div></main>
+</body>
+</html>

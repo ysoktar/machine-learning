@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hiperparametre tablosu · Yapay Öğrenme</title>
+<meta name="description" content="X artarsa yanlılık, varyans ve aşırı uyum nasıl değişir: alıştırmalı tablo.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="hyper">
+<main><div class="content">
+
+<h1>Hiperparametre tablosu</h1>
+<p class="lead">Her haftanın sonunda doldurulan ve sınavda aynı biçimde sorulan tablo: <em>“X artarsa yanlılık, varyans ve aşırı uyum riski nasıl değişir, neden?”</em> Tek kelimelik yanıt ve tek cümlelik gerekçe yeter.</p>
+
+<div class="callout"><div class="callout-title">Tek kural</div><p>Hiperparametre <strong>modeli esnekleştiriyorsa</strong> (daha karmaşık sınır, daha az ceza) → yanlılık ↓, varyans ↑, aşırı uyum riski ↑. <strong>Katılaştırıyorsa</strong> (daha çok ceza, daha çok ortalama, daha basık ağaç) → tersi. İstisnalar: eğitim örneği sayısı n ve rastgele ormanda ağaç sayısı yanlılığı değiştirmez, yalnız varyansı düşürür. Öğrenme oranı ve batch boyutu eniyileme eksenindedir, ayrı tutun.</p></div>
+
+<div data-widget="hyper"></div>
+
+<h2>Sınavda nasıl yazılır?</h2>
+<p><strong>Soru:</strong> “SVM'de C'yi 0.1'den 100'e çıkarırsak marj, destek vektörü sayısı, yanlılık ve varyans nasıl değişir?”<br>
+<strong>Cevap:</strong> Marj daralır, destek vektörü sayısı azalır, yanlılık düşer, varyans artar; çünkü C ihlallerin bedelidir, büyük C ihlalleri pahalılaştırır ve model eğitim noktalarına (aykırılar dahil) sıkıca uyar. C → ∞ sert marjdır.</p>
+<p><strong>Soru:</strong> “Geçmiş final kalıbı: When X of Y increases, bias increases/decreases …” Aynı mantık: C (yumuşak marjlı SVM), RBF ağında taban fonksiyonu sayısı (↑ esneklik), MLP'de epoch / gizli katman sayısı / gizli katman boyutu (↑ esneklik), CNN'de evrişim katmanı sayısı/boyutu (↑) ve havuzlama katmanı sayısı (↓ esneklik).</p>
+
+</div></main>
+</body>
+</html>

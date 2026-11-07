@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doğrusal modeller · Yapay Öğrenme</title>
+<meta name="description" content="En küçük kareler, gradyan inişi, lojistik regresyon, perceptron, softmax, ridge ve lasso.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w4-linear">
+<main><div class="content">
+
+<h1>Doğrusal modeller</h1>
+<p class="lead">Regresyondan sınıflandırmaya hepsi aynı kalıp: <span class="m">ŷ = f(wᵀx + b)</span>. En küçük kareler, gradyan inişi, lojistik regresyon, perceptron, softmax, ridge/lasso. Ara sınavın C bölümü (17 puan): <strong>bir lojistik regresyon ya da perceptron güncelleme adımı</strong>. Güncelleme kuralını ezbere bilin, her satırda z'yi açıkça yazın.</p>
+
+<h2>Doğrusal regresyon ve en küçük kareler</h2>
+<p>Model <span class="m">ŷ = w₀ + w₁x₁ + … + w_dx_d</span>; x'in başına sabit 1 eklenirse w₀ ağırlık vektörüne girer: ŷ = wᵀx. Kayıp: MSE. “Doğrusal” <em>parametrelerde</em> doğrusal demektir: x², log x gibi türetilmiş öznitelikler kullanılabilir.</p>
+<div class="formula">w* = (XᵀX)⁻¹Xᵀy &nbsp;(normal denklemler) &nbsp;·&nbsp; tek değişken: w₁ = Σ(xᵢ − x̄)(yᵢ − ȳ) / Σ(xᵢ − x̄)², &nbsp; w₀ = ȳ − w₁x̄</div>
+<div data-widget="lsq"></div>
+<ul>
+<li>XᵀX'in tersi alınabilmeli: n ≥ d, sütunlar doğrusal bağımsız. Maliyet O(nd² + d³): d binlere çıkınca pahalı → ridge (λI ekle) ya da gradyan inişi.</li>
+<li>Geometri: ŷ, y'nin X'in sütun uzayına dik izdüşümüdür; artık vektörü her sütuna diktir. Bias terimi varsa <strong>artıkların toplamı 0</strong> (iyi bir denetim).</li>
+<li><strong>Neden kare hata?</strong> Gürültü Gauss ise (y = wᵀx + ε, ε ~ N(0, σ²)) en küçük kareler en büyük olabilirlik (ML) tahminidir. Laplace gürültü → MAE; Bernoulli etiket → log-loss. (Türetme istenmez; iki cümle yeter.)</li>
+</ul>
+
+<h2>Gradyan inişi</h2>
+<div class="formula">w ← w − η ∇L(w), &nbsp;&nbsp; MSE için ∇L(w) = (2/n) Xᵀ(Xw − y)</div>
+<p>Kayıp yüzeyinde en dik iniş yönünde küçük adımlar. MSE dışbükeydir: tek global minimum, uygun η ile yakınsama garantili. <strong>Küçük η</strong>: yavaş. <strong>Büyük η</strong>: minimumu aşar, salınır, ıraksar. Durma: kayıptaki değişim ε'dan küçük ya da iterasyon sayısı doldu. Neden kapalı çözüm yerine gradyan inişi? Büyük d/n'de (XᵀX)⁻¹ pahalı ya da bellek yetmez; lojistik regresyon ve sinir ağlarının kapalı çözümü <em>yoktur</em>.</p>
+<div data-widget="gd"></div>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th></th><th>Batch</th><th>Stokastik (SGD)</th><th>Mini-batch</th></tr></thead>
+<tbody>
+<tr><td>Her adımda</td><td>n örneğin hepsi</td><td>rastgele tek örnek</td><td>B örnek (32–512)</td></tr>
+<tr><td>Adım maliyeti</td><td>O(nd)</td><td>O(d)</td><td>O(Bd)</td></tr>
+<tr><td>Gradyan gürültüsü</td><td>yok, kayıp düzgün azalır</td><td>yüksek (yerel minimumdan kaçmaya yarar)</td><td>orta</td></tr>
+<tr><td>Kullanım</td><td>küçük veri</td><td>akan veri, online</td><td>derin ağlar (GPU'da vektörize, standart)</td></tr>
+</tbody></table></div>
+<p>SGD ve mini-batch'te her epoch başında veri karıştırılır. Öznitelikler ölçeklenmezse kayıp yüzeyi uzun ince bir vadi olur ve gradyan inişi zikzak çizerek yavaşlar.</p>
+
+<h2>Doğrusal sınıflandırıcı ve karar sınırı</h2>
+<p><span class="m">ŷ = sign(wᵀx + b)</span>; sınır <span class="m">wᵀx + b = 0</span> (2B'de doğru, d boyutta hiperdüzlem). w sınıra diktir ve pozitif tarafı gösterir; b sınırı kaydırır. Bir noktanın sınıra uzaklığı <span class="m">|wᵀx + b| / ‖w‖</span>.</p>
+<div data-widget="boundary"></div>
+<h3>Mantık kapıları ve XOR</h3>
+<div data-widget="gates"></div>
+<p>AND: w = (1, 1), b = −1.5. OR: w = (1, 1), b = −0.5. NAND: AND'in işaretlerini çevir, w = (−1, −1), b = 1.5. <strong>XOR tek bir doğruyla ayrılamaz</strong>: (0,1) ve (1,0) pozitif, (0,0) ve (1,1) negatif; w₁ + b ≥ 0 ile w₂ + b ≥ 0 toplanınca w₁ + w₂ + 2b ≥ 0 çıkar, bu b &lt; 0 ve w₁ + w₂ + b &lt; 0 ile çelişir. Gizli katman gerekir (8. hafta).</p>
+
+<h2>Lojistik regresyon</h2>
+<div class="formula">p(y = 1 | x) = σ(wᵀx + b), &nbsp; σ(z) = 1/(1 + e⁻ᶻ)</div>
+<ul>
+<li>σ(0) = 0.5, σ(−z) = 1 − σ(z), <strong>σ′(z) = σ(z)(1 − σ(z)) ≤ 0.25</strong>.</li>
+<li>Karar p ≥ 0.5 ⇔ wᵀx + b ≥ 0: <strong>sınır yine doğrusal</strong>. Eşiği değiştirmek precision/recall dengesini değiştirir.</li>
+<li>log-odds: log(p/(1 − p)) = wᵀx + b. w_j = 0.7: x_j bir birim artınca odds e⁰·⁷ ≈ 2 katına çıkar (nedensellik değil, ilişki).</li>
+</ul>
+<div class="formula">L = −(1/n) Σ [ yᵢ log pᵢ + (1 − yᵢ) log(1 − pᵢ) ] &nbsp;&nbsp;&nbsp; ∂L/∂w = (1/n) Σ (pᵢ − yᵢ) xᵢ, &nbsp; ∂L/∂b = (1/n) Σ (pᵢ − yᵢ)</div>
+<p><strong>Log-loss</strong> Bernoulli olabilirliğinin negatif logaritmasıdır. y = 1 iken kayıp −ln p: p → 0 iken sonsuza gider, “emin olup yanılmanın” bedeli sınırsızdır. Neden MSE değil? σ ile MSE dışbükey değildir ve emin yanlışları çok az cezalandırır (p = 0.88 iken y = 0: log-loss 2.12, kare hata 0.77). Kapalı çözüm yok: gradyan inişi ya da Newton (IRLS).</p>
+<div data-widget="logstep"></div>
+<p>Varsayılan değerler sınav kalıbıdır: x = (1, 2), y = 1, w = 0, b = 0, η = 0.4 → p = 0.5, kayıp ln 2 = 0.693; gradyan (−0.5, −1), b için −0.5; yeni w = (0.2, 0.4), b = 0.2; yeni z = 1.2, p = σ(1.2) = 0.769, kayıp 0.263. <strong>Gradyan adımı kaybı düşürmeli</strong>; düşürmüyorsa η çok büyük. İşaret hatasına dikkat: w ← w <em>−</em> η·(p − y)x.</p>
+<div class="callout"><div class="callout-title">Aynı kalıp: hata × girdi</div>
+<div class="table-wrap"><table class="simple compact">
+<thead><tr><th></th><th>Doğrusal regresyon</th><th>Lojistik regresyon</th><th>Perceptron</th></tr></thead>
+<tbody>
+<tr><td>Çıktı</td><td>wᵀx + b</td><td>σ(wᵀx + b)</td><td>sign(wᵀx + b)</td></tr>
+<tr><td>Kayıp</td><td>MSE</td><td>log-loss</td><td>yanlışlarda −y(wᵀx + b)</td></tr>
+<tr><td>Gradyan / güncelleme</td><td>(ŷ − y)x</td><td>(p − y)x</td><td>hatada w += ηyx</td></tr>
+<tr><td>Kapalı çözüm</td><td>evet</td><td>hayır</td><td>hayır</td></tr>
+<tr><td>Olasılık verir mi?</td><td>hayır</td><td>evet</td><td>hayır</td></tr>
+</tbody></table></div></div>
+
+<h2>Perceptron</h2>
+<ol>
+<li>w, b verilen değerlerle (ya da 0) başlar; η öğrenme oranı.</li>
+<li>Her (xᵢ, yᵢ) için sırayla: z = wᵀxᵢ + b; <strong>z ≥ 0 ise ŷ = +1</strong>, değilse −1.</li>
+<li>Yanlışsa: <strong>w ← w + η·y·xᵢ, b ← b + η·y</strong>. Doğruysa hiçbir şey.</li>
+<li>Verinin üzerinden bir geçiş = 1 epoch. Hata kalmayınca dur.</li>
+</ol>
+<div data-widget="perceptron"></div>
+<p>Varsayılan veri derste çözülen örnektir: w = (−0.5, 0.5), b = −0.7, η = 0.4. 1. epoch'ta 1., 2. ve 4. örneklerde güncelleme olur; sonunda w = (−0.1, 0.5), b = −1.1; son ağırlıklarla 3. örnek hâlâ yanlış (TP 3, FN 1, FP 0, TN 3; accuracy 0.857). Epoch sayısını artırıp yakınsamasını izleyin.</p>
+<div class="callout"><div class="callout-title">Yakınsama teoremi ve sıra etkisi</div><p>Veri doğrusal ayrılabiliyorsa perceptron sonlu sayıda güncellemede ayıran bir sınır bulur; ayrılamıyorsa döngü hiç bitmez (epoch sınırı koyun). Bulduğu sınır ayıranlardan <em>biridir</em>, en iyisi değil (SVM, 7. hafta). Aynı veri farklı sırayla verilirse farklı sonuca gider: her epoch başında karıştırın.</p></div>
+<div class="callout exam"><div class="callout-title">İkinci tip: bias ağırlık vektörünün içinde</div><p>Bazı sorularda x₀ = 1 eklenir ve w = (w₀, w₁, …) tek vektördür; güncelleme <span class="m">wⱼ ← wⱼ + η(y − ŷ)xⱼ</span> biçimindedir. Hatada y − ŷ = ±2 olduğundan bu, bizim kuralda 2η'ya denktir (η = 0.1 ↔ 0.2). Aracı bu tip için kullanmak isterseniz η'yı iki katı girin; b, w₀'dır. z = 0 iken ŷ = +1 kuralını unutmayın: çoğu zaman sonucu o belirler.</p></div>
+
+<h2>Çok sınıflı sınıflandırma</h2>
+<div class="two-col">
+<div class="card"><h3>One-vs-rest (OvR)</h3><p>K sınıf için K ikili model (“k mı, değil mi?”); tahmin en yüksek skor. Basit, paralel eğitilir; ama skorlar birbiriyle tam karşılaştırılabilir olmayabilir ve her ikili eğitim kümesi dengesizdir. (One-vs-one: her sınıf çifti için bir model, K(K−1)/2 model, oylama.)</p></div>
+<div class="card"><h3>Softmax (çok terimli LR)</h3><p>Sınıf başına bir w_k, tek model; olasılıkların toplamı 1; kayıp çapraz entropi −log p_y. Sinir ağının standart çıktı katmanı. K = 2 iken sigmoide indirgenir.</p></div>
+</div>
+<div class="formula">p(y = k | x) = exp(w_kᵀx) / Σⱼ exp(wⱼᵀx)</div>
+<div data-widget="softmax"></div>
+
+<h2>Düzenlileştirme: ridge ve lasso</h2>
+<ul>
+<li><strong>Ridge</strong>: L(w) + λ‖w‖²; kapalı çözüm (XᵀX + λI)⁻¹Xᵀy (tersi alınamama sorununu da çözer). Katsayıları küçültür, sıfıra indirmez.</li>
+<li><strong>Lasso</strong>: L(w) + λ‖w‖₁; bazı katsayıları <strong>tam 0</strong> yapar (L1 topunun köşeleri) → öznitelik seçimi, seyrek ve yorumlanabilir model. Kapalı çözümü yok.</li>
+<li>Elastic net: ikisinin karışımı. Aynı cezalar lojistik regresyonda da var; scikit-learn'de <strong>C = 1/λ</strong>: büyük C daha <em>az</em> düzenlileştirme.</li>
+<li>Öznitelikleri <strong>ölçekleyin</strong>: ceza her katsayıya aynı uygulanır, ama katsayının büyüklüğü özniteliğin birimine bağlıdır (TL cinsinden gelirin katsayısı küçüktür).</li>
+</ul>
+
+<h2>Hiperparametre satırları</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Neden</th></tr></thead>
+<tbody>
+<tr><td>λ (ya da C azalırsa)</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>katsayılar küçülür</td></tr>
+<tr><td>Polinom öznitelikler (derece 2) eklemek</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>hipotez uzayı doğrulardan eğrilere büyür</td></tr>
+<tr><td>Epoch sayısı (ezberleyebilen modelde)</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>uyum sıkılaşır; erken durdurma bir düzenlileştiricidir</td></tr>
+<tr><td>Öğrenme oranı η</td><td colspan="3">yanlılık-varyans ekseninde değil, eniyileme ekseninde</td><td>büyük: ıraksar; küçük: yavaş (eksik uyum gibi görünür)</td></tr>
+</tbody></table></div>
+
+<h2>Sınama soruları</h2>
+<div class="quiz" data-answer="2"><p>Perceptron: w = (0, 0), b = 0, η = 1; örnek (0, 1), y = −1. Ne olur?</p><ol>
+<li data-why="z = 0 ≥ 0 olduğundan tahmin +1: yanlış, güncelleme var.">z = 0, tahmin −1, güncelleme yok</li>
+<li data-why="">z = 0 → ŷ = +1 (yanlış); w = (0, −1), b = −1</li>
+<li data-why="Güncelleme w + η·y·x: y = −1 olduğu için çıkarılır.">w = (0, 1), b = 1</li>
+<li data-why="Perceptron yalnız yanlışlarda günceller ama burada yanlış var.">Perceptron doğru sınıflanan örnekte de günceller</li></ol></div>
+
+<div class="quiz" data-answer="3"><p>Doğrusal ayrılabilir veride, düzenlileştirmesiz lojistik regresyonun ağırlıklarına ne olur?</p><ol>
+<li data-why="Perceptron'un aksine LR, bütün örnekler doğru olsa da kaybı azaltmaya devam eder.">Perceptron gibi ilk ayıran sınırda durur</li>
+<li data-why="Sınır yönü sabitlenir ama ‖w‖ büyümeye devam eder.">Sıfıra yakınsar</li>
+<li data-why="">‖w‖ sınırsız büyür (p'ler 0/1'e yaklaştıkça kayıp hep azalır); çözüm tek değildir, düzenlileştirme gerekir</li>
+<li data-why="Log-loss dışbükeydir ama burada sonlu minimum yoktur.">Tek bir sonlu optimuma yakınsar</li></ol></div>
+
+<div class="quiz" data-answer="1"><p>Skor z = 2 için p = σ(2) = 0.88. Gerçek etiket y = 0 ise log-loss kaçtır? (ln 0.12 = −2.12)</p><ol>
+<li data-why="">2.12</li>
+<li data-why="Bu y = 1 için: −ln 0.88.">0.13</li>
+<li data-why="Bu kare hata: 0.88².">0.77</li>
+<li data-why="−ln(1 − 0.88) = −ln 0.12.">0.88</li></ol></div>
+
+<div class="quiz" data-answer="4"><p>Lasso'yu ridge'den ayıran özellik hangisi?</p><ol>
+<li data-why="Ridge'in kapalı çözümü vardır, lasso'nun yoktur.">Lasso'nun kapalı çözümü vardır</li>
+<li data-why="İkisi de ölçeklemeye duyarlıdır.">Lasso ölçeklemeye duyarsızdır</li>
+<li data-why="İkisinde de λ büyüdükçe katsayılar küçülür.">Lasso λ büyüdükçe katsayıları büyütür</li>
+<li data-why="">Bazı katsayıları tam sıfır yaparak öznitelik seçer</li></ol></div>
+
+<div class="quiz" data-answer="2"><p>Gradyan inişinde, ŷ = wx, noktalar (1, 2) ve (2, 4), w = 0, η = 1.0. İlk adım?</p><ol>
+<li data-why="Bu η = 0.1 ile elde edilir.">w = 1.0</li>
+<li data-why="">w = 10; sonraki adım −30: ıraksar</li>
+<li data-why="Minimum 2'dir ama η = 1 ile tek adımda varılmaz.">w = 2 (minimum)</li>
+<li data-why="Gradyan −10'dur, w − η·(−10) = 10.">w = −10</li></ol>
+<div class="explain">∂L/∂w = (2/n)Σ(wx − y)x = (0 − 2)·1 + (0 − 4)·2 = −10 → w = 0 − 1·(−10) = 10. Sonra gradyan (8 + 32) = 40 → w = −30.</div></div>
+
+<div class="quiz" data-answer="3"><p>w = (2, −1), b = −1. (1, 0) noktasının sınıra uzaklığı? (√5 = 2.236)</p><ol>
+<li data-why="Bu z değeridir; ‖w‖'ye bölmek gerekir.">1</li>
+<li data-why="‖w‖ = √(4 + 1).">1/√3</li>
+<li data-why="">1/√5 ≈ 0.45</li>
+<li data-why="w ve b'yi 3'le çarpmak uzaklığı değiştirmez.">w'nin ölçeğine bağlı olduğu için belirsiz</li></ol></div>
+
+</div></main>
+</body>
+</html>

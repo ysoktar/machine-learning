@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Final rehberi · Yapay Öğrenme</title>
+<meta name="description" content="Final kapsamı ve geçmiş final alıştırma soruları.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="exam-final">
+<main><div class="content">
+
+<h1>Final rehberi</h1>
+<p class="lead">Final dönemi <strong>7–18 Aralık 2026</strong> (kesin tarih akademik takvimden gelecek; platformda görünen tarih geçicidir). Ağırlık %40, kâğıt üzerinde, kitap ve not kapalı, hesap makinesi yok, 4'er puanlık kısa kavram soruları. <strong>Dönemin tamamı</strong>, ağırlık 8–12. haftalarda. Finale girmeyen dersten kalır.</p>
+
+<div class="callout news"><div class="callout-title">Bu sayfa dönem ilerledikçe dolacak</div><p>8. ve 9. hafta konuları sitede hazır. 10–12. haftaların slaytları yayımlandıkça aynı biçimde eklenebilir; aşağıdaki listeler izlencedeki konular ve önceki dönemin final alıştırma sorularından derlendi.</p></div>
+
+<h2>Kapsam</h2>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Hafta</th><th>Konu</th><th>Elle hesap / tasarım</th><th>Sitede</th></tr></thead>
+<tbody>
+<tr><td>1–7</td><td>Temeller ve klasik modeller</td><td>ara sınavdaki her şey</td><td><a href="exam-midterm.html">ara sınav rehberi</a></td></tr>
+<tr><td>8</td><td>Yapay sinir ağları</td><td>Boole ifadesi ve bölgeler için step/sign MLP, ileri/geri yayılım (2-2-1), etkinleştirme türevleri</td><td><a href="w8-nn.html">hazır</a></td></tr>
+<tr><td>9</td><td>Derin öğrenme pratiği, CNN</td><td>1B/2B evrişim (dolgu, adım), çıktı boyutu, parametre sayma</td><td><a href="w9-cnn.html">hazır</a></td></tr>
+<tr><td>10</td><td>RNN/LSTM, dikkat, Transformer, gömmeler, LLM</td><td>gizli durum güncellemesi, parametre sayma, Word2Vec girdi/etiket çiftleri</td><td>yakında</td></tr>
+<tr><td>11</td><td>k-ortalamalar, hiyerarşik kümeleme, GMM/EM, t-SNE/UMAP, Naive Bayes, anomali</td><td>k-ortalamalar adımları, tam/tek bağlantılı dendrogram, Naive Bayes olasılıkları</td><td>yakında</td></tr>
+<tr><td>12</td><td>MDP, değer/politika yinelemesi, Q-öğrenme; adillik, yorumlanabilirlik, MLOps</td><td>Q güncellemesi, ε-greedy</td><td>yakında</td></tr>
+</tbody></table></div>
+
+<h2>Geçmiş final alıştırma soruları (önceki dönem)</h2>
+<p>Önceki verilişin final alıştırma listesindeki soru türleri, konularına göre. Bu dönemin konularıyla örtüşenler işaretli.</p>
+<h3>SVM ve kapasite</h3>
+<ul>
+<li>VC boyutu nedir, model karmaşıklığı ile genelleme arasındaki dengeyle ilişkisi. → <a href="w7-svm.html">H7</a></li>
+<li>SVM'de kısıt yᵢ(w·xᵢ + b) ≥ 1 altında en büyüklenen maliyet nedir (marj 2/‖w‖), hangi xᵢ için eşitlik sağlanır (destek vektörleri)?</li>
+<li>Sert ve yumuşak marj farkı, gevşek değişkenler, C'nin marja ve genellemeye etkisi, çekirdek hilesi ne zaman ve nasıl, SVM'nin avantaj/dezavantajları, MLP ile SVM farkı.</li>
+<li>Doğrusal ayrılamayan veriyi doğrusal ayırmanın üç yolu (öznitelik dönüşümü/çekirdek, gizli katman/MLP, yumuşak marj ya da yüksek boyuta taşıma).</li>
+</ul>
+<h3>Sinir ağları → <a href="w8-nn.html">H8</a></h3>
+<ul>
+<li>Neden sign yerine tanh (iki neden)? ReLU ve tanh nerede kullanılır, çizin, ReLU'nun bir avantajı ve dezavantajı.</li>
+<li>One-hot vektör ve softmax katmanı: nerede, nasıl, neden?</li>
+<li>Geri yayılımın mekanizması ve neden gerekli olduğu; erken durdurma, dropout, toplu normalleştirme; kaybolan gradyan.</li>
+<li><strong>Tasarım</strong>: verilen noktaları/bölgeleri ayıran MLP (sign gizli, step çıktı); Boole ifadesi için step MLP (4–8 girdi); “tam olarak K tanesi 1” MLP'si (sign ve step sürümleri). → <a href="w8-nn.html#elle-mlp-tasarimi-step-sign">Boole aracı</a></li>
+</ul>
+<h3>CNN ve aktarım → <a href="w9-cnn.html">H9</a></h3>
+<ul>
+<li>MLP yüksek boyutlu veride (görüntü) neden verimsiz?</li>
+<li>Dolgusuz / sıfır / same dolgu ve 1, 2, … adımla 1B evrişim çıktısı; 3×3 / 5×5 filtreyle, farklı yatay/dikey adımla 2B evrişim. → <a href="w9-cnn.html#elle-evrisim">evrişim aracı</a></li>
+<li>Alçak ve yüksek geçiren filtre farkı, birer örnek.</li>
+<li>64 tane 3×7 filtre, adım (2, 3), dolgu (1, 2), girdi 128×128×16: çıktı boyutu, ağırlık ve bias sayısı (cevap: 64×42×64, 21,504 ağırlık, 64 bias).</li>
+<li>Aktarımlı öğrenme geleneksel gözetimli öğrenmeden nasıl farklı; ön eğitilmiş modeller neden tıbbi görüntüde bile işe yarar; ön eğitilmiş modelle gömme çıkarmak.</li>
+</ul>
+<h3>Diziler ve dikkat (10. hafta)</h3>
+<ul>
+<li>RNN'ler zaman serisi ve dilde neden MLP'den etkili; gizli durum geçmişi nasıl taşır; çift yönlü RNN; zamanda geri yayılım (BPTT) ve farkı.</li>
+<li>Gradyan kırpma ve patlayan gradyan; LSTM kapıları (unutma, girdi, çıktı) ve amaçları; kapıların bilgiyi nasıl tuttuğu/attığı; LSTM'in kaybolan gradyana çözümü; GRU ile farkı, birer avantaj/dezavantaj.</li>
+<li>Dikkat katmanı neden; RNN ile dizi sınıflandırmada dikkat. Gömmeler one-hot'un sınırlarını nasıl aşar; “kral − erkek + kadın = kraliçe”; Word2Vec (2-gram komşulukla girdi/etiket örnekleri).</li>
+</ul>
+<h3>Gözetimsiz öğrenme (11. hafta)</h3>
+<ul>
+<li>İki gözetimsiz öğrenme türü ve örnek problemler; kümeleme ile anomali tespiti; gözetimsiz ve gözetimli öğrenmenin birlikte kullanıldığı üç durum.</li>
+<li>Boyut indirgeme ve boyut laneti; PCA'da varyans ve bilgi; PCA adımları ve gözetimli modelle kullanırken bileşen sayısı seçimi. → <a href="w2-data.html#pca-temel-bilesen-analizi">H2 PCA</a></li>
+<li>k-ortalamalar: verilen noktalar ve başlangıç merkezleriyle 3 adım; dirsek yöntemi, siluet katsayısı; başlangıç merkezlerinin etkisi (k-means++); aykırı değerler; zayıflıklar; yumuşak k-ortalamalar.</li>
+<li>Tek ve tam bağlantı; kosinüs benzerliği ile Öklid farkı (metinde neden kosinüs); hiyerarşik kümelemenin k-ortalamalara göre artı/eksileri; uzaklık matrisinden tam bağlantılı dendrogram.</li>
+<li>Otokodlayıcı ve evrişimli otokodlayıcı; gürültü giderme.</li>
+</ul>
+<h3>Pekiştirmeli öğrenme (12. hafta)</h3>
+<ul>
+<li>Gözetimli ve pekiştirmeli öğrenme farkı; TD ile Monte Carlo; aktif RL; Q-öğrenme; keşif-sömürü dengesi, ε-greedy; DQN'in Q-öğrenmeden farkı.</li>
+</ul>
+<h3>Hiperparametre tablosu</h3>
+<p>“X artarsa yanlılık / varyans / aşırı uyum”: C (yumuşak marjlı SVM), RBF ağında taban fonksiyonu sayısı, MLP'de epoch / gizli katman sayısı / gizli katman boyutu, CNN'de evrişim katmanı sayısı / boyutu ve havuzlama katmanı sayısı, RL'de durum sayısı, az keşif, aşırı sömürü. → <a href="hyper.html">alıştırma</a></p>
+
+<h2>Önerilen çalışma sırası</h2>
+<ol>
+<li>8. hafta tasarım soruları: <a href="w8-nn.html">Boole aracında</a> listedeki bütün ifadeleri önce kâğıtta kurun, sonra denetleyin.</li>
+<li>9. hafta: evrişim ve parametre sayma (her finalde bir tane çıkma olasılığı yüksek).</li>
+<li>10–12. haftalar yayımlandıkça kısa soru listelerini cevaplayın.</li>
+<li>Ara sınav konularını <a href="drill.html">alıştırma üretecinde</a> tazeleyin: final dönemin tamamını kapsar.</li>
+</ol>
+
+</div></main>
+</body>
+</html>
