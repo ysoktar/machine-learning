@@ -98,7 +98,7 @@
 <script type="module">
   import { NAV, href } from "./js/layout.js";
   const parts = document.getElementById("parts");
-  for (const p of NAV.slice(1)) for (const it of p.items) {
+  for (const p of NAV) for (const it of p.items.filter((x) => x.id !== "index")) {
     const a = document.createElement("a");
     a.className = "card"; a.href = href(it.id);
     a.innerHTML = `<div class="card-top"><span>${p.part}</span><span>${it.week ? it.week + ". hafta" : ""}</span></div><h3></h3><p></p>`;

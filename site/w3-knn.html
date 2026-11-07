@@ -23,9 +23,12 @@
 <tr><td>Rejim tanısı</td><td>eğitim/doğrulama hataları verilir: yetersiz, aşırı, makul?</td><td>rejim + ne değiştirilir</td></tr>
 <tr><td>Kavram (4 p)</td><td>k artarsa yanlılık/varyans; k = 1 ve k = n; sızıntı örneği; i.i.d.; 0-1 kaybı</td><td>tek cümlelik gerekçe</td></tr>
 </tbody></table></div></div>
+<!-- taught -->
+<div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-kayip-fonksiyonu">Kayıp</a> · <a href="sozluk.html#t-knn">kNN</a> · <a href="sozluk.html#t-boyut-laneti">Boyut laneti</a> · <a href="sozluk.html#t-yanlilik-model">Yanlılık</a> · <a href="sozluk.html#t-varyans-model">Varyans</a> · <a href="sozluk.html#t-yanlilik-varyans-ayrisimi">Yanlılık-varyans ayrışımı</a> · <a href="sozluk.html#t-duzenlilestirme">Düzenlileştirme</a> · <a href="sozluk.html#t-veri-sizintisi">Veri sızıntısı</a> · <a href="sozluk.html#t-i-i-d">i.i.d.</a> · <a href="sozluk.html#t-cogunluk-sinifi-taban-cizgisi">Çoğunluk sınıfı</a></div>
 
 
 <h2>Denetimli öğrenme çerçevesi</h2>
+<div class="intuition"><div class="intuition-title">💡 Neyi küçültmeye çalışıyoruz?</div><p>Her tahminin bir “bedeli” vardır: yanlış sınıflamanın bedeli 1, doğrunun 0 (0-1 kaybı) ya da fiyat tahmininde hatanın karesi. Asıl istediğimiz, <em>gelecekteki bütün</em> örneklerde ortalama bedelin (gerçek risk) küçük olması. Ama geleceği bilmiyoruz; elimizde yalnız eğitim verisi var. Bu yüzden eğitim verisindeki ortalama bedeli (ampirik risk) küçültüp bunun geleceğe taşınmasını umarız.</p><p>Bu umut ancak eğitim ve test verisi aynı kaynaktan geliyorsa (i.i.d.) ve model veriyi ezberleyecek kadar serbest değilse tutar.</p></div>
 <ul>
 <li><strong>Veri</strong> D = {(xᵢ, yᵢ)}, bilinmeyen bir P(x, y) dağılımından çekilir.</li>
 <li><strong>Hipotez uzayı</strong> H: aday fonksiyonlar (doğrusal, ağaç, kNN, sinir ağı).</li>
@@ -45,6 +48,7 @@
 <div class="callout tip"><div class="callout-title">Önce taban çizgisi</div><p>15 başvurunun 9'u onaylı: “herkesi onayla” accuracy 9/15 = 0.60. Tek öznitelikli “evi var → onay” kuralı 12/15 = 0.80. Accuracy'si 0.58 olan bir model hiçbir şey öğrenmemiştir (ya da hattında bir hata vardır). Her model çoğunluk sınıfını geçmek zorunda.</p></div>
 
 <h2>k en yakın komşu (kNN)</h2>
+<div class="intuition"><div class="intuition-title">💡 Komşuna bak</div><p>Yeni taşındığınız mahallede bir evin fiyatını tahmin etmek için ne yaparsınız? En yakındaki benzer evlerin fiyatlarına bakarsınız. kNN de böyledir: yeni bir örneğin sınıfını, ona en çok benzeyen (en yakın) k eğitim örneğinin çoğunluğuna göre verir. Eğitimde hiçbir şey öğrenmez; bütün iş tahmin anındadır.</p><p>Tek bir komşuya bakmak (k = 1) riskli: o komşu yanlış etiketliyse yanılırsınız. Çok komşuya bakmak (k büyük) da yerel farkları siler. k bu dengenin düğmesidir.</p></div><div data-widget="fig" data-fig="knnidea" data-caption="Sorgu q için k = 1 en yakın tek komşuya, k = 3 dairenin içindeki üç komşunun çoğunluğuna bakar: karar değişebilir."></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>Komşular (d² ile) sıralı: A(+), B(−), C(−), D(+), E(+). k = 1, 3, 5 kararları?</p><details><summary>Cevabı göster</summary><p>k = 1: A → <strong>+</strong>; k = 3: A, B, C → 1 artı 2 eksi → <strong>−</strong>; k = 5: 3 artı 2 eksi → <strong>+</strong>. k değiştikçe karar değişebilir: k'yı doğrulamayla seçeriz.</p></details></div>
 <ol>
 <li><strong>Sakla</strong>: eğitimde hiçbir şey öğrenme (tembel öğrenme). Eğitim O(1), tahmin O(n·d).</li>
 <li><strong>Uzaklık</strong>: sorgudan her eğitim noktasına d(q, xᵢ).</li>
@@ -96,6 +100,7 @@
 </tbody></table></div>
 
 <h2>Aşırı uyum, yetersiz uyum, yanlılık-varyans</h2>
+<div data-widget="fig" data-fig="dartboard" data-caption="Hedefin ortası doğru cevap. Yanlılık: atışların ortalaması merkezden ne kadar uzak. Varyans: atışlar ne kadar dağınık."></div><div class="intuition"><div class="intuition-title">💡 Hedef tahtası</div><p>Aynı modeli farklı eğitim kümeleriyle defalarca eğittiğimizi düşünün; her eğitim tahtaya bir atış. <strong>Yanlılık</strong> atışların ortalamasının merkezden uzaklığıdır: model sistematik olarak yanılıyor (çok basit model, örneğin eğriye doğru uydurmak). <strong>Varyans</strong> atışların dağınıklığıdır: model veriye göre çok oynuyor (çok esnek model). İkisini birden küçük tutmak isteriz ama genelde biri azalırken öteki artar.</p></div>
 <div class="formula">E[(y − ĥ(x))²] = (f(x) − E[ĥ(x)])² + E[(ĥ(x) − E[ĥ(x)])²] + σ² &nbsp;=&nbsp; yanlılık² + varyans + gürültü</div>
 <ul>
 <li><strong>Yanlılık</strong>: farklı eğitim kümelerinden öğrenilen modellerin <em>ortalaması</em> gerçek f'ten ne kadar uzak? Basit model → yüksek yanlılık.</li>
@@ -112,10 +117,12 @@
 <p><strong>Doğrulama eğrisi</strong>: x ekseni hiperparametre, tepe noktası seçilir; eğitim-doğrulama açığı aşırı uyumu gösterir. <strong>Öğrenme eğrisi</strong>: x ekseni veri miktarı; eğriler henüz buluşmadıysa daha çok veri işe yarar (varyans), erken buluşup yüksek kalıyorsa gereken daha karmaşık model (yanlılık).</p>
 
 <h2>Düzenlileştirme</h2>
+<div class="intuition"><div class="intuition-title">💡 Basitliği ödüllendirmek</div><p>Bir modele “veriye uy ama gereksiz karmaşık olma” demenin matematiksel yolu, kayba bir ceza terimi eklemektir. Ceza büyük ağırlıklara (ridge, lasso), çok yaprağa (ağaç budaması) ya da çok uzun eğitime (erken durdurma) verilebilir. λ cezanın gücüdür: 0 ise ceza yok, çok büyükse model hiçbir şey öğrenmez.</p></div>
 <div class="formula">min<sub>h</sub> R̂(h) + λ·Ω(h)</div>
 <p>(uyum terimi) + λ·(basitlik terimi): Ockham'ın matematiksel biçimi. Ridge Ω = ‖w‖², Lasso Ω = ‖w‖₁ (4. hafta), ağaçta yaprak sayısı (5. hafta), sinir ağında weight decay, dropout, erken durdurma; kNN'de k'yı büyütmek de bir tür düzenlileştirmedir. λ → 0: düz ERM (aşırı uyum riski); λ → ∞: sabit model (yetersiz uyum). λ bir hiperparametredir: logaritmik ızgarada CV ile seçilir, sonra bütün eğitim verisiyle yeniden uydurulur.</p>
 
 <h2>Veri sızıntısı</h2>
+<div class="intuition"><div class="intuition-title">💡 Kopya çekmek</div><p>Sızıntı, modelin eğitim sırasında gerçekte göremeyeceği bir bilgiyi görmesidir: sınavdan önce cevap anahtarının bir kısmını görmek gibi. Sonuç şaşırtıcı derecede iyi bir skor ama gerçek kullanımda hayal kırıklığıdır.</p></div>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Tür</th><th>Örnek</th><th>Çözüm</th></tr></thead>
 <tbody>

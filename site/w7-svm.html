@@ -24,9 +24,12 @@
 <tr><td>Çekirdek değeri</td><td>polinom (x·z)² ve açık φ ile denetim; RBF farklı γ</td><td>φ(x)·φ(z) = K(x, z) göstermek</td></tr>
 <tr><td>Kavram (4 p)</td><td>C ve γ etkisi; çekirdek hilesi; VC boyutu; SVM vs LR; sert vs yumuşak marj</td><td>marj/destek vektörü/yanlılık/varyans dörtlüsü</td></tr>
 </tbody></table></div></div>
+<!-- taught -->
+<div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-svm">SVM</a> · <a href="sozluk.html#t-marj">Marj</a> · <a href="sozluk.html#t-destek-vektoru">Destek vektörü</a> · <a href="sozluk.html#t-yumusak-marj">Yumuşak marj</a> · <a href="sozluk.html#t-gevsek-degisken">Gevşek değişken</a> · <a href="sozluk.html#t-mentese-kaybi">Menteşe kaybı</a> · <a href="sozluk.html#t-cekirdek-kernel">Çekirdek</a></div>
 
 
 <h2>Marj ve geometri</h2>
+<div class="intuition"><div class="intuition-title">💡 En geniş yol</div><p>İki köyün arasına bir yol yapacaksınız; yolun iki köyden de olabildiğince uzak geçmesini istersiniz ki kimse yanlışlıkla öbür tarafa geçmesin. Perceptron iki sınıfı ayıran <em>herhangi</em> bir doğru bulur; SVM ise iki sınıfa da en uzak, yani en geniş “sokağı” açan doğruyu bulur. Sokağın kenarına değen noktalar <strong>destek vektörleridir</strong>: sokağın yerini yalnız onlar belirler.</p><p>Neden geniş sokak? Yeni noktalar eğitim noktalarının biraz yanına düşer; sınır noktalardan uzaksa küçük sapmalar yanlış tarafa geçmeye yetmez: daha iyi genelleme.</p></div><div data-widget="fig" data-fig="street" data-caption="SVM sokağı: ortadaki çizgi karar sınırı, kesikli çizgiler sokağın kenarları, halkalı noktalar destek vektörleri."></div>
 <p>Ayırıcı <span class="m">w·x + b = 0</span>. <strong>Kanonik biçim</strong>: w ve b'nin ölçeği, sınıra en yakın noktalarda |w·x + b| = 1 olacak şekilde sabitlenir. O zaman:</p>
 <div class="formula">uzaklık = |w·x + b| / ‖w‖ &nbsp;·&nbsp; marj = 1/‖w‖ &nbsp;·&nbsp; sokak genişliği = 2/‖w‖</div>
 <p>Marjı büyütmek = ‖w‖'yi küçültmek. <strong>Sert marj (birincil) problemi</strong>:</p>
@@ -35,6 +38,7 @@
 <div data-widget="svmpoint"></div>
 
 <h2>2B'de elle çözüm (sınav kalıbı)</h2>
+<div class="intuition"><div class="intuition-title">💡 Neden “= ±1” denklemleri?</div><p>w ve b'yi 2 ile çarparsak aynı doğruyu elde ederiz; ölçeği sabitlemek için “destek vektörlerinde w·x + b tam +1 ya da −1 olsun” deriz (kanonik biçim). Böylece destek vektörlerini bildiğimizde her biri bize bir denklem verir; üç bilinmeyen (w₁, w₂, b) için genelde üç denklem yeter.</p></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>Pozitif (2, 0), negatif (0, 0). Destek vektörleri bu iki nokta. w = (w₁, 0) varsayarak w ve b?</p><details><summary>Cevabı göster</summary><p>2w₁ + b = +1, 0 + b = −1 → b = <strong>−1</strong>, w₁ = <strong>1</strong>. Sınır x₁ = 1 (iki noktanın tam ortası), marj 1/‖w‖ = 1.</p></details></div>
 <ol>
 <li><strong>Çiz</strong>. İki sınıfın birbirine en yakın parçalarını bul (dışbükey örtüler arasındaki en kısa uzaklık). Sokağa değecek aday noktaları seç.</li>
 <li>Her destek vektörü için kanonik denklemi yaz: pozitifte <span class="m">w·x + b = +1</span>, negatifte <span class="m">−1</span>. İki bilinmeyen w₁, w₂ ve b: genelde 3 denklem.</li>
@@ -47,6 +51,7 @@
 <div class="callout"><div class="callout-title">Neden büyük marj iyi genelleme?</div><p>Bir model sınıfı n noktayı <strong>parçalar</strong> (shatter): n noktanın 2ⁿ etiketlemesinin her biri için hepsini doğru sınıflayan bir model varsa. <strong>VC boyutu</strong>: parçalanabilen en büyük nokta sayısı. Düzlemde doğrular: 3 (doğrusal olmayan 3 nokta 8 biçimde ayrılır; 4 noktada XOR etiketlemesi ayrılamaz). VC boyutu kapasitedir: büyükse eğitim ile test hatası arasındaki açık büyüyebilir. En az Δ marjlı ayırıcıların etkin kapasitesi Δ büyüdükçe düşer: geniş marj = düşük kapasite = küçük genelleme açığı.</p></div>
 
 <h2>Yumuşak marj ve C</h2>
+<div class="intuition"><div class="intuition-title">💡 Kuralları biraz esnetmek</div><p>Gerçek veride bir iki nokta yanlış tarafta olabilir (gürültü, aykırı değer). Sert marjlı SVM o zaman ya hiç çözüm bulamaz ya da o tek nokta yüzünden çok dar bir sokak açar. Yumuşak marj birkaç noktanın kuralı çiğnemesine izin verir ama her ihlal için ceza öder; C cezanın büyüklüğüdür. Küçük C: “birkaç hata olsun, sokak geniş olsun”. Büyük C: “hiç hata istemem”.</p></div><div data-widget="fig" data-fig="hinge" data-caption="Menteşe kaybı: nokta doğru tarafta ve marjın dışındaysa (y·f ≥ 1) kayıp 0; marja girdikçe doğrusal artar."></div>
 <div class="formula">min ½‖w‖² + C Σ ξᵢ &nbsp; öyle ki &nbsp; yᵢ(w·xᵢ + b) ≥ 1 − ξᵢ, &nbsp; ξᵢ ≥ 0</div>
 <ul>
 <li><strong>Gevşek değişken</strong> ξᵢ: ξ = 0 sokağın dışında/kenarında; 0 &lt; ξ &lt; 1 sokağın içinde ama doğru tarafta; ξ = 1 tam sınırda; ξ &gt; 1 yanlış tarafta. Ayrılamayan ya da aykırı noktalı veride sert marj imkânsız/kırılgandır.</li>
@@ -57,6 +62,7 @@
 <p>Varsayılan: aykırı pozitif (1.5, 2). H1 (w = (1, 0), b = −2) geniş marjlı (1), aykırı noktada ξ = 1.5. H2 (w = (2, 2), b = −5) her şeyi ayırır ama marj 0.354. C = 1: H1 kazanır (0.5 + 1.5 = 2.0 &lt; 4.0); C = 10: H2 kazanır (15.5 &gt; 4.0).</p>
 
 <h2>Çekirdek hilesi</h2>
+<div class="intuition"><div class="intuition-title">💡 Kâğıdı bükmek</div><p>Bir sınıfın noktaları ortada, ötekininki çevresinde bir halka olsun: hiçbir doğru ayıramaz. Ama her noktaya “merkeze uzaklığın karesi” diye üçüncü bir öznitelik eklersek ortadakiler aşağıda, halkadakiler yukarıda kalır ve bir düzlemle ayrılırlar. Çekirdek hilesi bu yeni öznitelikleri hiç hesaplamadan, yalnız noktalar arası “benzerlik” fonksiyonuyla aynı sonucu verir.</p></div>
 <p>Doğrusal ayrılamayan veriyi bir φ ile daha yüksek boyuta taşıyınca doğrusal ayrılabilir hâle gelebilir (örn. çember içi/dışı → x₁² + x₂² özniteliği). İkil biçimde eğitim ve tahmin veriyi <strong>yalnız iç çarpımlar</strong> xᵢ·xⱼ üzerinden kullanır; her iç çarpımı <span class="m">K(xᵢ, xⱼ) = φ(xᵢ)·φ(xⱼ)</span> ile değiştirmek, φ'yi hiç hesaplamadan o uzayda doğrusal SVM eğitmektir.</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Çekirdek</th><th>K(x, z)</th><th>Parametre</th><th>Ne zaman</th></tr></thead>

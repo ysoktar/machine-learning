@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terim ve formül sözlüğü · Yapay Öğrenme</title>
+<meta name="description" content="Dersin bütün terimleri sade Türkçeyle ve formüller sembol sembol.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="sozluk">
+<main><div class="content">
+
+<h1>Terim ve formül sözlüğü</h1>
+<p class="lead">Dersin bütün terimleri sade Türkçeyle, İngilizce karşılıkları ve geçtikleri sayfayla. Bir kelimeye takıldığınızda buraya gelin: her açıklama “hiç duymamış birine” anlatır gibi yazıldı. Altta da en sık formüller, her sembolün anlamı ve küçük bir sayısal örnekle.</p>
+
+<h2>Terimler</h2>
+<p><input type="search" class="glossary-filter" id="gfilter" placeholder="Ara: örn. marj, recall, entropi" aria-label="Sözlükte ara"></p>
+<nav class="letter-nav" aria-label="Harfler"><a href="#t-accuracy-dogruluk">A</a><a href="#t-bagging-torbalama">B</a><a href="#t-capraz-dogrulama">Ç</a><a href="#t-destek-vektoru">D</a><a href="#t-entropi">E</a><a href="#t-f1">F</a><a href="#t-genelleme">G</a><a href="#t-hiperparametre">H</a><a href="#t-i-i-d">I</a><a href="#t-i-leri-yayilim">İ</a><a href="#t-kalinti-artik">K</a><a href="#t-lasso">L</a><a href="#t-marj">M</a><a href="#t-normallestirme">N</a><a href="#t-one-hot-kodlama">O</a><a href="#t-ogrenme-orani">Ö</a><a href="#t-pca">P</a><a href="#t-rastgele-orman">R</a><a href="#t-sigmoid">S</a><a href="#t-test-kumesi">T</a><a href="#t-varyans-model">V</a><a href="#t-yanlilik-model">Y</a><a href="#t-z-score">Z</a></nav>
+<dl class="glossary" id="glossary">
+<dt id="t-accuracy-dogruluk" data-letter="A">Accuracy (doğruluk)<span class="en">accuracy</span></dt>
+<dd>Bütün tahminlerin yüzde kaçı doğru? En sezgisel ölçüt ama sınıflar dengesizse yanıltır: 1000 işlemin 20'si sahteyse “hepsi normal” diyen model %98 alır. <span class="m">(TP + TN) / n</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-adaboost">AdaBoost<span class="en">adaptive boosting</span></dt>
+<dd>Zayıf modelleri (genelde tek sorulu karar kütükleri) sırayla eğitir; her turda yanlış bilinen örneklerin ağırlığını artırır ki sonraki model onlara odaklansın. Sonunda modeller α ağırlıklı oy verir. <span class="m">α = ½ ln((1 − ε)/ε)</span> <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
+<dt id="t-agirlik">Ağırlık<span class="en">weight</span></dt>
+<dd>Modelin öğrendiği sayılardan biri: bir özniteliğin karara ne kadar ve hangi yönde katkı yaptığı. w = (2, −1) ise x₁ artınca skor artar, x₂ artınca azalır. <span class="m">ŷ = w·x + b</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-aktarimli-ogrenme">Aktarımlı öğrenme<span class="en">transfer learning</span></dt>
+<dd>Büyük bir veri setinde önceden eğitilmiş bir modeli alıp kendi küçük verinizde yalnız son katmanlarını eğitmek (ya da hafifçe ince ayar yapmak). Erken katmanlar kenar, doku gibi genel desenleri zaten öğrenmiştir. <a class="see" href="w9-cnn.html">→ sayfa</a></dd>
+<dt id="t-asiri-uyum">Aşırı uyum<span class="en">overfitting</span></dt>
+<dd>Modelin eğitim verisini, gürültüsüyle birlikte ezberlemesi: eğitim hatası çok düşük, yeni verideki hata yüksek. Sınavı ezberleyip konuyu anlamamış öğrenci gibi. <span class="m">eğitim ≪ doğrulama hatası</span> <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-auc">AUC<span class="en">area under the ROC curve</span></dt>
+<dd>ROC eğrisinin altındaki alan. Rastgele seçilen bir pozitife, rastgele seçilen bir negatiften daha yüksek skor verme olasılığı. 0.5 rastgele, 1 kusursuz; eşik seçmekten bağımsızdır. <span class="m">doğru sıralı (pozitif, negatif) çift / (P·N)</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-bagging-torbalama" data-letter="B">Bagging (torbalama)<span class="en">bootstrap aggregating</span></dt>
+<dd>Veriden yerine koyarak çekilmiş birçok örneklem (bootstrap) oluşturup her birinde ayrı model eğitmek ve oylarını birleştirmek. Tek tek kararsız modellerin (derin ağaçların) varyansını azaltır. <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
+<dt id="t-batch-mini-batch-sgd">Batch, mini-batch, SGD<span class="en">batch / stochastic gradient descent</span></dt>
+<dd>Gradyanı her adımda kaç örnekle hesapladığımız: hepsiyle (batch), tek örnekle (SGD) ya da 32–512 örnekle (mini-batch, derin öğrenmede standart). <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-bias-yanlilik-terimi-b">Bias (yanlılık terimi, b)<span class="en">bias / intercept</span></dt>
+<dd>Doğrusal modeldeki sabit sayı: karar sınırını orijinden kaydırır. “Yanlılık-varyans”taki yanlılıkla aynı kelime ama farklı kavram. <span class="m">ŷ = w·x + <b>b</b></span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-bilgi-kazanci">Bilgi kazancı<span class="en">information gain</span></dt>
+<dd>Bir özniteliğe göre bölünce belirsizliğin (entropinin) ne kadar azaldığı. ID3 her düğümde kazancı en büyük özniteliği seçer. <span class="m">IG = H(D) − Σ (|D_v|/|D|)·H(D_v)</span> <a class="see" href="w5-trees.html">→ sayfa</a></dd>
+<dt id="t-boosting-artirma">Boosting (artırma)<span class="en">boosting</span></dt>
+<dd>Modelleri sırayla eğitip her yenisini öncekilerin hatalarına odaklayan topluluk yöntemi (AdaBoost, gradyan artırma). Yanlılığı azaltır. <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
+<dt id="t-bootstrap-orneklemi">Bootstrap örneklemi<span class="en">bootstrap sample</span></dt>
+<dd>n örnekten yerine koyarak n örnek çekmek. Bazı örnekler birkaç kez, ortalama %37'si hiç seçilmez (torba dışı). <span class="m">(1 − 1/n)ⁿ → 0.368</span> <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
+<dt id="t-boyut-laneti">Boyut laneti<span class="en">curse of dimensionality</span></dt>
+<dd>Öznitelik sayısı arttıkça uzay o kadar hızlı büyür ki veri seyrekleşir ve bütün uzaklıklar birbirine benzer; “en yakın komşu” anlamını yitirir. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-budama">Budama<span class="en">pruning</span></dt>
+<dd>Karar ağacını küçültmek: ya büyümeden durdurmak (ön budama) ya da tam büyütüp yararsız dalları kesmek (sonradan budama). Aşırı uyuma karşı. <span class="m">R_α(T) = R(T) + α·|T|</span> <a class="see" href="w5-trees.html">→ sayfa</a></dd>
+<dt id="t-capraz-dogrulama" data-letter="Ç">Çapraz doğrulama<span class="en">cross-validation</span></dt>
+<dd>Veriyi k parçaya bölüp her seferinde birini doğrulama, kalanını eğitim yaparak k kez değerlendirmek; sonucun ortalaması ± std. Küçük veride tek bölmeden daha güvenilir. <span class="m">k-katlı CV</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-cekirdek-kernel">Çekirdek (kernel)<span class="en">kernel</span></dt>
+<dd>İki noktanın “benzerliğini” ölçen fonksiyon; SVM'de veriyi açıkça yüksek boyuta taşımadan oradaki iç çarpımı hesaplamayı sağlar (çekirdek hilesi). <span class="m">RBF: exp(−γ‖x − z‖²)</span> <a class="see" href="w7-svm.html">→ sayfa</a></dd>
+<dt id="t-cogunluk-sinifi-taban-cizgisi">Çoğunluk sınıfı (taban çizgisi)<span class="en">majority baseline</span></dt>
+<dd>Hiçbir şey öğrenmeden her örneğe en sık sınıfı söylemek. Her model en azından bunu geçmeli. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-destek-vektoru" data-letter="D">Destek vektörü<span class="en">support vector</span></dt>
+<dd>SVM'de karar sınırına en yakın, “sokağın” kenarına değen noktalar. Çözüm yalnız onlara bağlıdır; diğer noktaları silmek sınırı değiştirmez. <span class="m">y·(w·x + b) = 1</span> <a class="see" href="w7-svm.html">→ sayfa</a></dd>
+<dt id="t-dogrulama-kumesi">Doğrulama kümesi<span class="en">validation set</span></dt>
+<dd>Hiperparametre seçmek ve modelleri karşılaştırmak için ayrılan veri. Test kümesi en sona saklanır. <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-dropout-seyreltme">Dropout (seyreltme)<span class="en">dropout</span></dt>
+<dd>Eğitimde her adımda nöronların bir kısmını rastgele kapatmak; ağ tek bir nörona güvenmeyi öğrenmez. Düzenlileştiricidir. <a class="see" href="w9-cnn.html">→ sayfa</a></dd>
+<dt id="t-duzenlilestirme">Düzenlileştirme<span class="en">regularization</span></dt>
+<dd>Kayba “karmaşıklık cezası” ekleyerek modeli basit kalmaya zorlamak (ridge, lasso, budama, dropout). Aşırı uyumu azaltır, biraz yanlılık ekler. <span class="m">min kayıp + λ·ceza</span> <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-entropi" data-letter="E">Entropi<span class="en">entropy</span></dt>
+<dd>Bir kümenin ne kadar “karışık” olduğu. Hepsi aynı sınıfsa 0, iki sınıf yarı yarıyaysa 1 bit. “Bu örneğin sınıfını öğrenmek için ortalama kaç evet/hayır sorusu gerekir?” <span class="m">H = −Σ pᵢ log₂ pᵢ</span> <a class="see" href="w5-trees.html">→ sayfa</a></dd>
+<dt id="t-epoch">Epoch<span class="en">epoch</span></dt>
+<dd>Eğitim verisinin tamamının üzerinden bir kez geçmek. <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-erken-durdurma">Erken durdurma<span class="en">early stopping</span></dt>
+<dd>Doğrulama hatası birkaç epoch boyunca iyileşmezse eğitimi durdurmak; aşırı uyum başlamadan en iyi noktada kalmak. <a class="see" href="w8-nn.html">→ sayfa</a></dd>
+<dt id="t-esik">Eşik<span class="en">threshold</span></dt>
+<dd>Skoru sınıfa çeviren sınır: p ≥ 0.5 ise pozitif. Eşiği değiştirmek precision/recall dengesini değiştirir. Ağaçlarda “x ≤ 4” bölmesindeki 4 de bir eşiktir. <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-etkinlestirme-islevi">Etkinleştirme işlevi<span class="en">activation function</span></dt>
+<dd>Nöronun toplamını (z) çıktıya çeviren doğrusal olmayan fonksiyon: sigmoid, tanh, ReLU, step, sign. <span class="m">h = g(z)</span> <a class="see" href="w8-nn.html">→ sayfa</a></dd>
+<dt id="t-evrisim">Evrişim<span class="en">convolution</span></dt>
+<dd>Küçük bir filtreyi görüntü (ya da sinyal) üzerinde kaydırıp her konumda çarpımların toplamını almak. Aynı filtre her yerde kullanıldığı için parametre azdır. <span class="m">çıktı = ⌊(n + 2p − k)/s⌋ + 1</span> <a class="see" href="w9-cnn.html">→ sayfa</a></dd>
+<dt id="t-f1" data-letter="F">F1<span class="en">F1 score</span></dt>
+<dd>Precision ve recall'un harmonik ortalaması: ikisi de yüksekse yüksek. Dengesiz veride accuracy'den çok daha bilgilendirici. <span class="m">2PR/(P + R) = 2TP/(2TP + FP + FN)</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-genelleme" data-letter="G">Genelleme<span class="en">generalization</span></dt>
+<dd>Modelin görmediği yeni veride de iyi çalışması. Makine öğrenmesinin asıl amacı. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
+<dt id="t-geri-yayilim">Geri yayılım<span class="en">backpropagation</span></dt>
+<dd>Sinir ağında kaybın her ağırlığa göre türevini, çıktıdan girdiye doğru zincir kuralıyla verimli hesaplamak. <span class="m">δ = δ_sonraki·v·g′(z)</span> <a class="see" href="w8-nn.html">→ sayfa</a></dd>
+<dt id="t-gevsek-degisken">Gevşek değişken<span class="en">slack variable (ξ)</span></dt>
+<dd>Yumuşak marjlı SVM'de bir noktanın marj kuralını ne kadar çiğnediği: 0 = sorun yok, 0–1 arası sokağın içinde, 1'den büyük yanlış tarafta. <span class="m">ξ = max(0, 1 − y·f(x))</span> <a class="see" href="w7-svm.html">→ sayfa</a></dd>
+<dt id="t-gini-safsizligi">Gini safsızlığı<span class="en">Gini impurity</span></dt>
+<dd>Entropiye benzer karışıklık ölçüsü (CART kullanır): rastgele iki örnek çekince farklı sınıftan olma olasılığı. <span class="m">1 − Σ pᵢ²</span> <a class="see" href="w5-trees.html">→ sayfa</a></dd>
+<dt id="t-gradyan">Gradyan<span class="en">gradient</span></dt>
+<dd>Kaybın her parametreye göre türevlerinden oluşan vektör; kaybın en hızlı arttığı yön. Ters yöne gidilir. <span class="m">∇L</span> <a class="see" href="on-bilgi.html">→ sayfa</a></dd>
+<dt id="t-gradyan-artirma">Gradyan artırma<span class="en">gradient boosting</span></dt>
+<dd>Her turda, o ana kadarki modelin kalıntılarına (hatalarına) küçük bir ağaç uydurup η ile çarparak eklemek. <span class="m">F ← F + η·f</span> <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
+<dt id="t-gradyan-inisi">Gradyan inişi<span class="en">gradient descent</span></dt>
+<dd>Kaybı küçültmek için parametreleri gradyanın tersi yönünde küçük adımlarla güncellemek. <span class="m">w ← w − η∇L</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-hiperparametre" data-letter="H">Hiperparametre<span class="en">hyperparameter</span></dt>
+<dd>Eğitimle öğrenilmeyen, bizim seçtiğimiz ayar: kNN'de k, ağaçta derinlik, SVM'de C ve γ, öğrenme oranı. Doğrulama kümesi ya da CV ile seçilir. <a class="see" href="hyper.html">→ sayfa</a></dd>
+<dt id="t-hipotez-uzayi">Hipotez uzayı<span class="en">hypothesis space</span></dt>
+<dd>Modelin ifade edebildiği bütün fonksiyonlar. Doğrusal modelin hipotez uzayı bütün doğrulardır; öğrenme bu uzayda iyi bir hipotez aramaktır. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
+<dt id="t-i-i-d" data-letter="I">i.i.d.<span class="en">independent and identically distributed</span></dt>
+<dd>Eğitim ve test örneklerinin aynı dağılımdan ve birbirinden bağımsız geldiği varsayımı. Bozulursa (zaman serisi, aynı hastanın görüntüleri) skorlar iyimser çıkar. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-id3">ID3<span class="en">Iterative Dichotomiser 3</span></dt>
+<dd>Karar ağacı kurma algoritması: her düğümde bilgi kazancı en yüksek özniteliğe göre böl, dallarda tekrarla. <a class="see" href="w5-trees.html">→ sayfa</a></dd>
+<dt id="t-i-leri-yayilim" data-letter="İ">İleri yayılım<span class="en">forward pass</span></dt>
+<dd>Girdiden başlayıp katman katman çıktıyı ve kaybı hesaplamak. <a class="see" href="w8-nn.html">→ sayfa</a></dd>
+<dt id="t-kalinti-artik" data-letter="K">Kalıntı (artık)<span class="en">residual</span></dt>
+<dd>Gerçek değer ile tahmin arasındaki fark: y − ŷ. <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-karar-kutugu">Karar kütüğü<span class="en">decision stump</span></dt>
+<dd>Tek bölmeli (derinliği 1) karar ağacı: “x₂ ≥ 0.5 ise Evet”. AdaBoost'un tipik zayıf öğrenicisi. <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
+<dt id="t-karar-siniri">Karar sınırı<span class="en">decision boundary</span></dt>
+<dd>Modelin bir sınıftan diğerine geçtiği çizgi/yüzey. Doğrusal modelde w·x + b = 0 doğrusu. <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-karmasiklik-matrisi">Karmaşıklık matrisi<span class="en">confusion matrix</span></dt>
+<dd>Gerçek sınıfa (satır) ve tahmine (sütun) göre örnekleri sayan 2×2 tablo: TP, FN, FP, TN. Bütün sınıflandırma ölçütleri buradan çıkar. <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-kayip-fonksiyonu">Kayıp (fonksiyonu)<span class="en">loss function</span></dt>
+<dd>Tek bir tahminin ne kadar kötü olduğunu ölçen sayı. Eğitim, ortalama kaybı küçültmektir. <span class="m">kare: (y − ŷ)², log-loss, menteşe</span> <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-kazanc-orani">Kazanç oranı<span class="en">gain ratio</span></dt>
+<dd>Bilgi kazancının bölme bilgisine bölünmesi; çok değerli öznitelikleri (müşteri no gibi) kayırmayı düzeltir (C4.5). <span class="m">IG / SplitInfo</span> <a class="see" href="w5-trees.html">→ sayfa</a></dd>
+<dt id="t-knn">kNN<span class="en">k-nearest neighbours</span></dt>
+<dd>Yeni örneği, eğitim verisindeki en yakın k komşusunun çoğunluk oyuyla sınıflamak. Eğitimde hiçbir şey öğrenmez, yalnız veriyi saklar. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-kovaryans">Kovaryans<span class="en">covariance</span></dt>
+<dd>İki değişkenin birlikte nasıl değiştiği: biri artarken öteki de artıyorsa pozitif. <span class="m">Σ(x − x̄)(y − ȳ)/(n − 1)</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-lasso" data-letter="L">Lasso<span class="en">lasso (L1)</span></dt>
+<dd>Ağırlıkların mutlak değerleri toplamını cezalandıran düzenlileştirme; bazı ağırlıkları tam sıfır yaparak öznitelik seçer. <span class="m">L + λΣ|wⱼ|</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-log-loss-capraz-entropi">Log-loss (çapraz entropi)<span class="en">log loss / cross-entropy</span></dt>
+<dd>Olasılık tahminlerinin kaybı: doğru sınıfa verilen olasılığın negatif logaritması. Emin olup yanılmayı çok ağır cezalandırır. <span class="m">−[y ln p + (1 − y) ln(1 − p)]</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-lojistik-regresyon">Lojistik regresyon<span class="en">logistic regression</span></dt>
+<dd>Doğrusal skoru sigmoidden geçirerek pozitif sınıfın olasılığını veren sınıflandırıcı. Adı “regresyon” ama sınıflandırma yapar. <span class="m">p = σ(w·x + b)</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-marj" data-letter="M">Marj<span class="en">margin</span></dt>
+<dd>SVM'de karar sınırı ile en yakın noktalar arasındaki uzaklık. SVM bunu en büyük yapan sınırı seçer. <span class="m">1/‖w‖</span> <a class="see" href="w7-svm.html">→ sayfa</a></dd>
+<dt id="t-mentese-kaybi">Menteşe kaybı<span class="en">hinge loss</span></dt>
+<dd>SVM'nin kaybı: nokta doğru tarafta ve marjın dışındaysa 0, değilse marja ne kadar girdiyse o kadar. <span class="m">max(0, 1 − y·f(x))</span> <a class="see" href="w7-svm.html">→ sayfa</a></dd>
+<dt id="t-min-max-olcekleme">min-max ölçekleme<span class="en">min-max scaling</span></dt>
+<dd>Değerleri [0, 1] aralığına sıkıştırmak. <span class="m">(x − min)/(max − min)</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-mlp-cok-katmanli-algilayici">MLP (çok katmanlı algılayıcı)<span class="en">multilayer perceptron</span></dt>
+<dd>Nöronların katmanlar hâlinde bağlandığı sinir ağı; gizli katmanlar sayesinde XOR gibi doğrusal olmayan problemleri çözer. <a class="see" href="w8-nn.html">→ sayfa</a></dd>
+<dt id="t-mse-mae-rmse">MSE, MAE, RMSE<span class="en">mean squared / absolute error</span></dt>
+<dd>Regresyon hata ölçütleri: hataların karelerinin ortalaması, mutlak değerlerinin ortalaması, MSE'nin karekökü. <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-normallestirme" data-letter="N">Normalleştirme<span class="en">normalization / feature scaling</span></dt>
+<dd>Öznitelikleri karşılaştırılabilir ölçeğe getirmek (min-max, z-score). Uzaklık ve gradyan temelli yöntemler için şart. <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-one-hot-kodlama" data-letter="O">One-hot kodlama<span class="en">one-hot encoding</span></dt>
+<dd>Sırasız bir kategoriyi her değer için ayrı 0/1 sütunuyla göstermek: Ankara = (1, 0, 0). <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-oob-torba-disi-hata">OOB (torba dışı) hata<span class="en">out-of-bag error</span></dt>
+<dd>Her örneği, onu eğitimde hiç görmemiş ağaçların oyuyla tahmin edip ölçülen hata: bagging'de bedava doğrulama. <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
+<dt id="t-ogrenme-orani" data-letter="Ö">Öğrenme oranı<span class="en">learning rate (η)</span></dt>
+<dd>Gradyan inişinde her adımın büyüklüğü. Küçükse yavaş, büyükse savrulur ya da ıraksar. <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-oznitelik">Öznitelik<span class="en">feature</span></dt>
+<dd>Bir örneği anlatan ölçülebilir özellik: yaş, gelir, piksel değeri. Tablodaki bir sütun. <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-oznitelik-secimi-cikarimi">Öznitelik seçimi / çıkarımı<span class="en">feature selection / extraction</span></dt>
+<dd>Seçim: var olan sütunlardan bir alt küme tutmak (yorumlanabilir). Çıkarım: eskilerden yeni sütunlar türetmek (PCA). <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-pca" data-letter="P">PCA<span class="en">principal component analysis</span></dt>
+<dd>Veriyi en çok yayıldığı (varyansı en büyük) dik yönlere döndürüp az sayıda yönle özetlemek. Etiket kullanmaz. <span class="m">λₖ/Σλ açıklanan varyans</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-perceptron-algilayici">Perceptron (algılayıcı)<span class="en">perceptron</span></dt>
+<dd>En basit doğrusal sınıflandırıcı: skor ≥ 0 ise +1. Yalnız yanlış sınıfladığı örnekte ağırlıklarını o örneğe doğru çeker. <span class="m">hatada w ← w + η·y·x</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-precision-kesinlik">Precision (kesinlik)<span class="en">precision</span></dt>
+<dd>“Pozitif dediklerimin kaçı gerçekten pozitif?” Yanlış alarm (FP) pahalıysa önemli (spam filtresi). <span class="m">TP/(TP + FP)</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-rastgele-orman" data-letter="R">Rastgele orman<span class="en">random forest</span></dt>
+<dd>Bootstrap örneklemleri + her bölmede rastgele öznitelik alt kümesiyle eğitilmiş birçok ağacın oyu. <span class="m">m ≈ √p</span> <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
+<dt id="t-recall-duyarlilik-tpr">Recall (duyarlılık, TPR)<span class="en">recall / sensitivity</span></dt>
+<dd>“Gerçek pozitiflerin kaçını yakaladım?” Kaçırmak (FN) pahalıysa önemli (kanser taraması). <span class="m">TP/(TP + FN)</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-ridge">Ridge<span class="en">ridge (L2)</span></dt>
+<dd>Ağırlıkların kareleri toplamını cezalandıran düzenlileştirme; ağırlıkları küçültür ama sıfırlamaz. <span class="m">L + λΣwⱼ²</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-roc-egrisi">ROC eğrisi<span class="en">ROC curve</span></dt>
+<dd>Eşik değiştikçe (FPR, TPR) noktalarının çizdiği eğri. <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-r">R²<span class="en">coefficient of determination</span></dt>
+<dd>Regresyon modelinin “hep ortalamayı söylemek”e göre ne kadar iyi olduğu: 1 kusursuz, 0 ortalama kadar, negatif daha kötü. <span class="m">1 − SSE/SST</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-sigmoid" data-letter="S">Sigmoid<span class="en">sigmoid / logistic function</span></dt>
+<dd>Her sayıyı 0 ile 1 arasına sıkıştıran S biçimli fonksiyon; olasılık gibi okunur. <span class="m">σ(z) = 1/(1 + e⁻ᶻ)</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-softmax">Softmax<span class="en">softmax</span></dt>
+<dd>Birden çok sınıfın skorlarını toplamı 1 olan olasılıklara çevirir. <span class="m">e^{zₖ}/Σe^{zⱼ}</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
+<dt id="t-specificity-ozgulluk">Specificity (özgüllük)<span class="en">specificity / TNR</span></dt>
+<dd>“Gerçek negatiflerin kaçını doğru bıraktım?” <span class="m">TN/(TN + FP)</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-svm">SVM<span class="en">support vector machine</span></dt>
+<dd>Sınıfları en geniş “sokakla” ayıran doğrusal sınıflandırıcı; çekirdeklerle doğrusal olmayan sınırlar da çizer. <span class="m">min ½‖w‖²</span> <a class="see" href="w7-svm.html">→ sayfa</a></dd>
+<dt id="t-test-kumesi" data-letter="T">Test kümesi<span class="en">test set</span></dt>
+<dd>Yalnız en sonda, bir kez, modelin gerçek başarımını tahmin etmek için kullanılan veri. Karar vermek için kullanılırsa “görülmemiş” olmaktan çıkar. <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-tumevarimsal-yanlilik">Tümevarımsal yanlılık<span class="en">inductive bias</span></dt>
+<dd>Bir öğrenicinin veriyle eşit uyumlu hipotezler arasından birini seçmesini sağlayan varsayımları (doğrusal, basit, pürüzsüz…). Hiç varsayımı olmayan öğrenici genelleyemez. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
+<dt id="t-varyans-model" data-letter="V">Varyans (model)<span class="en">variance</span></dt>
+<dd>Eğitim verisi biraz değişince modelin ne kadar değiştiği. Karmaşık modellerde yüksektir. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-veri-sizintisi">Veri sızıntısı<span class="en">data leakage</span></dt>
+<dd>Test (ya da gelecek) bilgisinin eğitime karışması: ölçekleyiciyi bütün veride fit etmek, etiketi ele veren öznitelik kullanmak. Skor gerçek olamayacak kadar iyi çıkar. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-yanlilik-model" data-letter="Y">Yanlılık (model)<span class="en">bias</span></dt>
+<dd>Modelin basitliğinden gelen sistematik hata: sinüs eğrisine doğru uydurmak. Daha çok veri bunu düzeltmez. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-yanlilik-varyans-ayrisimi">Yanlılık-varyans ayrışımı<span class="en">bias-variance decomposition</span></dt>
+<dd>Beklenen test hatası = yanlılık² + varyans + gürültü. Esneklik arttıkça yanlılık düşer, varyans artar. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-yetersiz-uyum">Yetersiz uyum<span class="en">underfitting</span></dt>
+<dd>Model veriyi yakalayamayacak kadar basit: eğitim hatası da test hatası da yüksek. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-yumusak-marj">Yumuşak marj<span class="en">soft margin</span></dt>
+<dd>SVM'nin birkaç noktanın marjı çiğnemesine C ile ayarlanan bir bedel karşılığında izin veren biçimi; ayrılamayan ya da aykırı noktalı veride gerekli. <span class="m">½‖w‖² + C·Σξ</span> <a class="see" href="w7-svm.html">→ sayfa</a></dd>
+<dt id="t-z-score" data-letter="Z">z-score<span class="en">standardization</span></dt>
+<dd>Değerden ortalamayı çıkarıp standart sapmaya bölmek: “ortalamadan kaç standart sapma uzakta?” <span class="m">(x − μ)/σ</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+</dl>
+
+<h2>Formül sözlüğü</h2>
+<p>Formülü okurken önce sembollerin ne olduğunu söyleyin, sonra küçük bir sayı koyun: anlamı genelde kendiliğinden ortaya çıkar. Bütün formüller tek sayfada: <a href="cheatsheet.html">formül kâğıdı</a>; semboller ve matematik: <a href="on-bilgi.html">ön bilgi</a>.</p>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Ne?</th><th>Formül</th><th>Semboller</th><th>Mini örnek</th></tr></thead>
+<tbody>
+<tr><td><strong>Entropi</strong></td><td class="m">H(D) = −Σᵢ pᵢ log₂ pᵢ</td><td>pᵢ: i. sınıfın kümedeki oranı. Her sınıf için “oran × −log₂ oran”, sonra topla.</td><td class="small">5 Evet / 2 Hayır: (5/7)(0.485) + (2/7)(1.807) = 0.863</td></tr>
+<tr><td><strong>Bilgi kazancı</strong></td><td class="m">IG = H(D) − Σᵥ (|Dᵥ|/|D|)·H(Dᵥ)</td><td>Dᵥ: özniteliğin v değerini alan örnekler; |Dᵥ|/|D| o dalın payı.</td><td class="small">0.863 − (3/7)(0.918) = 0.470</td></tr>
+<tr><td><strong>Gini</strong></td><td class="m">Gini = 1 − Σᵢ pᵢ²</td><td>pᵢ: sınıf oranları.</td><td class="small">5/2: 1 − 0.510 − 0.082 = 0.408</td></tr>
+<tr><td><strong>Accuracy · Precision · Recall · F1</strong></td><td class="m">(TP+TN)/n · TP/(TP+FP) · TP/(TP+FN) · 2TP/(2TP+FP+FN)</td><td>TP doğru pozitif, FP yanlış alarm, FN kaçırılan, TN doğru negatif.</td><td class="small">TP 4, FN 2, FP 1, TN 3 → 0.70 · 0.80 · 0.67 · 0.73</td></tr>
+<tr><td><strong>min-max · z-score</strong></td><td class="m">(x − min)/(max − min) · (x − μ)/σ</td><td>min, max, μ, σ yalnız eğitim verisinden.</td><td class="small">x = 7, μ = 4, σ = 3 → z = 1</td></tr>
+<tr><td><strong>Öklid uzaklığı</strong></td><td class="m">d(x, z) = √Σⱼ (xⱼ − zⱼ)²</td><td>j: öznitelik indisi. Sıralama için kökü almayın.</td><td class="small">(1,2)–(4,6): √25 = 5</td></tr>
+<tr><td><strong>En küçük kareler (tek değişken)</strong></td><td class="m">w₁ = Σ(xᵢ − x̄)(yᵢ − ȳ) / Σ(xᵢ − x̄)², w₀ = ȳ − w₁x̄</td><td>x̄, ȳ ortalamalar.</td><td class="small">x = 1..4, y = 2,3,5,6 → w₁ = 7/5 = 1.4, w₀ = 0.5</td></tr>
+<tr><td><strong>Gradyan inişi</strong></td><td class="m">w ← w − η·∇L(w)</td><td>η öğrenme oranı, ∇L kaybın türevi. Eksi: yokuş aşağı.</td><td class="small">∇L = −10, η = 0.1 → w: 0 → 1</td></tr>
+<tr><td><strong>Sigmoid</strong></td><td class="m">σ(z) = 1/(1 + e⁻ᶻ)</td><td>z = w·x + b skor; σ(0) = 0.5.</td><td class="small">σ(1) = 1/1.368 = 0.731</td></tr>
+<tr><td><strong>Log-loss</strong></td><td class="m">L = −[y ln p + (1 − y) ln(1 − p)]</td><td>y gerçek etiket (0/1), p modelin P(y = 1) tahmini.</td><td class="small">y = 1, p = 0.5 → ln 2 = 0.693</td></tr>
+<tr><td><strong>Lojistik regresyon güncellemesi</strong></td><td class="m">w ← w − η(p − y)x, b ← b − η(p − y)</td><td>(p − y) tahmin hatası.</td><td class="small">p = 0.5, y = 1, x = (1,2), η = 0.4 → w = (0.2, 0.4)</td></tr>
+<tr><td><strong>Perceptron güncellemesi</strong></td><td class="m">yanlışsa w ← w + η·y·x, b ← b + η·y</td><td>y ∈ {−1, +1}; z ≥ 0 → +1.</td><td class="small">y = +1, x = (2,3), η = 0.4 → w += (0.8, 1.2)</td></tr>
+<tr><td><strong>Softmax</strong></td><td class="m">pₖ = e^{zₖ} / Σⱼ e^{zⱼ}</td><td>zₖ: k. sınıfın skoru.</td><td class="small">z = (2,1,0) → (0.665, 0.245, 0.090)</td></tr>
+<tr><td><strong>Doğruya uzaklık</strong></td><td class="m">|w·x + b| / ‖w‖</td><td>‖w‖ = √(w₁² + w₂²).</td><td class="small">w = (2,−1), b = −1, x = (1,0): 1/√5 = 0.45</td></tr>
+<tr><td><strong>AdaBoost</strong></td><td class="m">ε = Σ_yanlış wᵢ · α = ½ ln((1−ε)/ε) · yanlış × 1/(2ε), doğru × 1/(2(1−ε))</td><td>wᵢ örnek ağırlıkları (toplam 1).</td><td class="small">ε = 0.2 → α = 0.693, yanlış 0.1 → 0.25</td></tr>
+<tr><td><strong>Çoğunluk oyu hatası</strong></td><td class="m">Σ_{k > n/2} C(n,k)(1−p)ᵏ pⁿ⁻ᵏ</td><td>p tek üyenin doğruluğu.</td><td class="small">n = 3, p = 0.8 → 0.104</td></tr>
+<tr><td><strong>SVM marjı</strong></td><td class="m">marj = 1/‖w‖, sokak = 2/‖w‖</td><td>kanonik biçim: destek vektörlerinde |w·x + b| = 1.</td><td class="small">w = (1,1) → 0.707</td></tr>
+<tr><td><strong>Menteşe / gevşek değişken</strong></td><td class="m">ξ = max(0, 1 − y·f(x))</td><td>f(x) = w·x + b.</td><td class="small">y = +1, f = 0 → 1</td></tr>
+<tr><td><strong>Evrişim çıktısı</strong></td><td class="m">⌊(n + 2p − k)/s⌋ + 1</td><td>n girdi, k filtre, p dolgu, s adım.</td><td class="small">32, k = 5, p = 0, s = 1 → 28</td></tr>
+</tbody></table></div>
+
+<script type="module">
+  const inp = document.getElementById("gfilter");
+  const dl = document.getElementById("glossary");
+  inp.addEventListener("input", () => {
+    const q = inp.value.trim().toLocaleLowerCase("tr");
+    for (const dt of dl.querySelectorAll("dt")) {
+      const dd = dt.nextElementSibling;
+      const hit = !q || (dt.textContent + " " + dd.textContent).toLocaleLowerCase("tr").includes(q);
+      dt.hidden = dd.hidden = !hit;
+    }
+  });
+</script>
+
+</div></main>
+</body>
+</html>

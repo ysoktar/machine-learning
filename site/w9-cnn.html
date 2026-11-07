@@ -23,6 +23,8 @@
 <tr><td>Çıktı boyutu ve parametre</td><td>girdi H×W×C, F filtre k_h×k_w, adım, dolgu</td><td>⌊(n + 2p − k)/s⌋ + 1 her eksen için; F·k_h·k_w·C ağırlık + F bias</td></tr>
 <tr><td>Kavram</td><td>MLP görüntüde neden verimsiz; dropout, BN, erken durdurma, ilklendirme; aktarımlı öğrenme</td><td>mekanizma + fayda</td></tr>
 </tbody></table></div><p class="small">Ara sınavda yok; finalde.</p></div>
+<!-- taught -->
+<div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-evrisim">Evrişim</a> · <a href="sozluk.html#t-dropout-seyreltme">Dropout</a> · <a href="sozluk.html#t-aktarimli-ogrenme">Aktarımlı öğrenme</a> · <a href="sozluk.html#t-erken-durdurma">Erken durdurma</a></div>
 
 
 <h2>Derin ağları eğitmek</h2>
@@ -39,6 +41,7 @@
 </tbody></table></div>
 
 <h2>Neden evrişim?</h2>
+<div class="intuition"><div class="intuition-title">💡 Büyüteçle taramak</div><p>Bir fotoğrafta kedi aramak için her pikseli ayrı ayrı bütün diğer piksellerle ilişkilendirmeye gerek yok; küçük bir büyüteci (filtre) resmin üzerinde gezdirip her yerde aynı deseni (kulak, göz, kenar) ararsınız. Evrişim budur: aynı küçük filtre her konumda kullanılır, bu yüzden öğrenilecek sayı az olur ve desen nerede olursa olsun tanınır.</p></div>
 <p>32×32×3 görüntüde tek bir tam bağlı katman bile 3072 girdi × nöron sayısı kadar ağırlık ister; yüksek çözünürlükte patlar ve uzamsal yapıyı (yakın piksellerin ilişkisi) yok sayar. Evrişim: küçük bir filtre bütün görüntüde <strong>kaydırılır</strong> (yerel bağlantı + <strong>ağırlık paylaşımı</strong>): parametre sayısı görüntü boyutundan bağımsızdır ve aynı desen her yerde tanınır (kaymaya eşdeğişkenlik). MLP'nin görüntüde verimsizliğinin cevabı budur.</p>
 
 <h2>Elle evrişim</h2>

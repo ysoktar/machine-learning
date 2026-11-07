@@ -3,6 +3,8 @@
 import { h, $, $$, table, frame, num, select, checkbox, button, area, parseNums, parseRows, errorBox, store } from "./lib/ui.js";
 import * as ml from "./lib/ml.js";
 import { scatter, lines } from "./lib/plot.js";
+import { figure } from "./figures.js";
+import * as I from "./interactive.js";
 
 const f = ml.fmt;
 const f2 = (x) => ml.fmt(x, 2);
@@ -12,6 +14,7 @@ const signTxt = (y) => (y > 0 ? "+1" : "−1");
 const lin = (w, b) => { const t = w.map((c, i) => [c, `x${"₁₂₃₄"[i]}`]).filter(([c]) => Math.abs(c) > 1e-12).map(([c, x], k) => `${c < 0 ? (k ? " − " : "−") : k ? " + " : ""}${f(Math.abs(c))}${x}`).join(""); return `${t}${b < 0 ? " − " : " + "}${f(Math.abs(b))}`; };
 const vec = (v, d = 3) => `(${v.map((x) => f(x, d)).join(", ")})`;
 const W = {};
+W.fig = (ds) => figure(ds);
 
 export function mountAll(root) {
   for (const el of $$("[data-widget]", root)) {
@@ -520,7 +523,8 @@ W.id3 = (ds) => {
   const crit = select("ölçüt ", [["entropy", "entropi / bilgi kazancı"], ["gr", "kazanç oranı (C4.5)"], ["gini", "Gini"]], ds.crit || "entropy");
   const out = outBox();
   body.append(h("p", { class: "field-hint" }, "İlk satır sütun adları, son sütun sınıf. Değerler boşlukla ayrılır (boşluklu değerlere alt çizgi koyun)."), t, h("div", { class: "controls" }, crit.label), out);
-  live(body, () => {
+  const state = { key: "", shown: -1, guess: null };
+  const run = live(body, () => {
     const rows = parseRows(t.value);
     if (rows.length < 3) return;
     const head = rows[0], data = rows.slice(1).map((r) => Object.fromEntries(head.map((k, i) => [k, r[i]])));
@@ -529,11 +533,13 @@ W.id3 = (ds) => {
     const mode = crit.get();
     const tree = ml.id3(data, feats, target, { classes, crit: mode === "gini" ? "gini" : "entropy", useGainRatio: mode === "gr" });
     const blocks = [];
+    let maxDepth = 0;
     const walk = (node, path) => {
       if (node.leaf && !node.cands) return;
+      maxDepth = Math.max(maxDepth, node.depth);
       const title = path.length ? path.join(" ∧ ") : "Kök";
       const imp = mode === "gini" ? "Gini" : "H";
-      blocks.push(h("h4", {}, `${title}: n = ${node.rows.length}, sınıflar ${classes.map((c, i) => `${c}=${node.counts[i]}`).join(", ")}, ${imp} = ${f(node.imp)}`));
+      const part = [h("h4", {}, `${title}: n = ${node.rows.length}, sınıflar ${classes.map((c, i) => `${c}=${node.counts[i]}`).join(", ")}, ${imp} = ${f(node.imp)}`)];
       if (node.cands) {
         const rowsT = [];
         for (const c of node.cands) {
@@ -541,13 +547,27 @@ W.id3 = (ds) => {
         }
         const hd = ["öznitelik", "değer", "n", classes.join(" / "), imp, mode === "gini" ? "ağırlıklı Gini" : "ağırlıklı H", mode === "gini" ? "azalma" : "IG"];
         if (mode === "gr") hd.push("SplitInfo → GR");
-        blocks.push(table(hd, rowsT, { cls: "compact" }));
-        blocks.push(h("p", { class: "small" }, node.leaf ? "Hiçbir bölme kazanç getirmiyor: yaprak (çoğunluk sınıfı)." : `Seçilen: ${node.feature}.`));
+        part.push(table(hd, rowsT, { cls: "compact" }));
+        part.push(h("p", { class: "small" }, node.leaf ? "Hiçbir bölme kazanç getirmiyor: yaprak (çoğunluk sınıfı)." : `Seçilen: ${node.feature} (en büyük ${mode === "gini" ? "azalma" : mode === "gr" ? "kazanç oranı" : "kazanç"}). ${node.children.filter((c) => c.child.leaf).map((c) => `${node.feature} = ${c.value} dalı saf → yaprak “${c.child.label}”.`).join(" ")}`));
       }
+      blocks.push({ depth: node.depth, part });
       if (!node.leaf) for (const c of node.children) walk(c.child, [...path, `${node.feature} = ${c.value}`]);
     };
     walk(tree, []);
-    put(out, ...blocks, h("p", {}, h("strong", {}, "Son ağaç"), " (köşeli parantezde sınıf sayıları):"), h("div", { class: "tree" }, treeText(tree)));
+    const key = t.value + mode;
+    if (key !== state.key) { state.key = key; state.shown = -1; state.guess = null; }
+    const rootGain = tree.cands ? Object.fromEntries(tree.cands.map((c) => [c.feature, mode === "gr" ? c.gainRatio : c.gain])) : {};
+    if (state.shown < 0 && tree.cands) {
+      put(out, h("div", { class: "guess" }, h("b", {}, "Önce tahmin et: "), `kökte hangi öznitelik olur? Tabloya bakın: hangi sütunun değerleri sınıfları en “saf” gruplara ayırıyor?`,
+        h("div", { class: "btn-row" }, feats.map((ft) => h("button", { type: "button", class: "btn small", onclick: () => { state.guess = ft; state.shown = 0; run(); } }, ft)),
+          h("button", { type: "button", class: "btn small", onclick: () => { state.shown = maxDepth; run(); } }, "Tahmin etmeden bütün çözümü göster"))));
+      return;
+    }
+    const verdict = state.guess ? (state.guess === tree.feature ? h("div", { class: "goal done" }, `✓ Doğru: kök ${tree.feature}.`) : h("div", { class: "goal" }, `Tahminin ${state.guess} (kazanç ${f(rootGain[state.guess])}), ama ${tree.feature} daha çok kazandırıyor (${f(rootGain[tree.feature])}). Aşağıdaki tabloda nedenini görün.`)) : null;
+    const visible = blocks.filter((b) => b.depth <= state.shown).flatMap((b) => b.part);
+    const more = state.shown < maxDepth ? h("div", { class: "stepbar" }, h("button", { type: "button", class: "btn small primary", onclick: () => { state.shown++; run(); } }, `Sonraki seviyeyi göster (${state.shown + 2}. seviye) ▶`),
+      h("button", { type: "button", class: "btn small", onclick: () => { state.shown = maxDepth; run(); } }, "Hepsini göster")) : null;
+    put(out, verdict, ...visible, more, state.shown >= maxDepth ? [h("p", {}, h("strong", {}, "Son ağaç"), " (köşeli parantezde sınıf sayıları):"), h("div", { class: "tree" }, treeText(tree))] : null);
   });
   return el;
 };
@@ -1171,3 +1191,12 @@ W.countdown = () => {
   setInterval(paint, 1000);
   return box;
 };
+
+// ======================================================================= interactive versions (drag, step, explore)
+W.knn = I.knn;
+W.hardsvm = I.hardsvm;
+W.perceptron = I.perceptron;
+W.lineplay = I.lineplay;
+W.sigplay = I.sigplay;
+W.entplay = I.entplay;
+W.gdplay = I.gdplay;

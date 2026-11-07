@@ -24,9 +24,12 @@
 <tr><td>Gradyan artırma adımı</td><td>4 nokta, η, kütük; F₀, kalıntılar, F₁, MSE</td><td>yaprak ortalamaları ve η çarpanı</td></tr>
 <tr><td>Kavram (4 p)</td><td>bagging vs boosting; RF'nin iki mekanizması; ağaç sayısı ve aşırı uyum; stacking sızıntısı</td><td>mekanizmayı adlandırıp bir cümleyle açıklamak</td></tr>
 </tbody></table></div></div>
+<!-- taught -->
+<div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-bagging-torbalama">Bagging</a> · <a href="sozluk.html#t-bootstrap-orneklemi">Bootstrap örneklemi</a> · <a href="sozluk.html#t-oob-torba-disi-hata">OOB</a> · <a href="sozluk.html#t-rastgele-orman">Rastgele orman</a> · <a href="sozluk.html#t-boosting-artirma">Boosting</a> · <a href="sozluk.html#t-adaboost">AdaBoost</a> · <a href="sozluk.html#t-karar-kutugu">Karar kütüğü</a> · <a href="sozluk.html#t-gradyan-artirma">Gradyan artırma</a></div>
 
 
 <h2>Kalabalığın bilgeliği</h2>
+<div class="intuition"><div class="intuition-title">💡 Bir kişiye mi, kalabalığa mı?</div><p>Bir kavanozdaki şeker sayısını tahmin eden 100 kişinin <em>ortalaması</em>, genelde tek tek çoğu kişiden daha isabetlidir: herkesin hatası farklı yöndedir ve birbirini götürür. Topluluk yöntemleri de birçok modeli birleştirir. Şart: modellerin hataları birbirinden farklı (bağımsız) olmalı; hepsi aynı yerde yanılıyorsa birleştirmek işe yaramaz.</p></div><div data-widget="fig" data-fig="ensemble" data-caption="Bagging modelleri paralel ve bağımsız eğitip oylatır; boosting sırayla eğitir, her yeni model öncekinin hatalarına odaklanır."></div>
 <p>Her biri %80 doğru, <em>bağımsız</em> hata yapan 3 sınıflandırıcının çoğunluk oyu: en az 2'si yanılmalı → 3·0.2²·0.8 + 0.2³ = 0.104 (hata %20'den %10'a). 5 üyeyle 0.058. İki varsayım: üyeler %50'den iyi ve <strong>bağımsız</strong>. Pratikte bozulan bağımsızlıktır: aynı veriyle eğitilen modeller aynı zor örneklerde yanılır. Topluluk yöntemlerinin bütün işi <strong>çeşitlilik</strong> üretmektir (bootstrap örneklemleri, rastgele öznitelikler, yeniden ağırlıklandırma).</p>
 <div data-widget="vote"></div>
 <div class="table-wrap"><table class="simple">
@@ -39,6 +42,7 @@
 </tbody></table></div>
 
 <h2>Bagging ve torba dışı (OOB) hata</h2>
+<div class="intuition"><div class="intuition-title">💡 Aynı veriden farklı modeller nasıl çıkar?</div><p>Tek bir veri setimiz var ama farklı modeller istiyoruz. Hile: veriden <em>yerine koyarak</em> rastgele çekiliş yapıp aynı büyüklükte yeni setler oluşturmak (bootstrap). Her sette bazı örnekler birkaç kez, bazıları hiç yer almaz; böylece her ağaç biraz farklı bir veri görür ve biraz farklı hatalar yapar. Oylarının ortalaması tek bir ağaçtan çok daha kararlıdır.</p><p>Bir ağacın görmediği örnekler (torba dışı) o ağaç için bedava bir test kümesidir.</p></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>5 örnekten bootstrap: 1, 1, 3, 4, 4. Hangi örnekler torba dışında?</p><details><summary>Cevabı göster</summary><p>2 ve 5 hiç seçilmemiş: <strong>{2, 5}</strong>. Bu ağacın 2 ve 5'teki tahmini, OOB hata hesabında kullanılır.</p></details></div>
 <p>Bootstrap: n örnekten <strong>yerine koyarak</strong> n örnek çek. Bir örneğin hiç seçilmeme olasılığı <span class="m">(1 − 1/n)ⁿ → e⁻¹ ≈ 0.368</span>: her örneklem verinin ≈ %63'ünü içerir, ≈ %37'si torba dışında kalır.</p>
 <div data-widget="bootstrap"></div>
 <p><strong>OOB hata</strong>: her örneği, onu <em>görmemiş</em> ağaçların oyuyla tahmin et; hiç OOB olmayan örnek atlanır. Bedava, dürüst bir doğrulama kestirimidir (B büyükse her örneğe ≈ 0.37·B ağaç oy verir). Eğitim oyu ise ağaçların ezberlediği örnekleri notlamalarına izin verir: eğitim hatası 0 iken OOB hatası 0.25 olabilir.</p>
@@ -55,6 +59,7 @@
 <div class="callout exam"><div class="callout-title">Örnek sınav sorusu</div><p>“Rastgele orman neden tek bir derin ağaçtan daha az aşırı uyar? İki mekanizma.” (1) <strong>Bagging</strong>: her ağaç farklı bootstrap örnekleminde; ortalama almak varyansı düşürür. (2) <strong>Rastgele öznitelik alt kümesi</strong>: ağaçları ilişkisizleştirir, ortalamanın varyans azaltımını büyütür. “Ağaç sayısı arttıkça doğrulama hatası?” → azalır ve platoya oturur, yükselmez.</p></div>
 
 <h2>AdaBoost</h2>
+<div class="intuition"><div class="intuition-title">💡 Hatalara odaklanan öğrenci</div><p>Bir deneme sınavından sonra yalnız yanlış yaptığınız konulara daha çok çalışırsınız. AdaBoost da her turdan sonra yanlış bilinen örneklerin “önemini” (ağırlığını) artırır; bir sonraki basit model bu ağır örnekleri doğru bilmeye zorlanır. Sonunda her model, ne kadar isabetli olduğuna göre (α) söz hakkı alarak oy verir.</p><p>α'nın anlamı: hata ε küçükse model güvenilir, α büyük; ε = 0.5 (yazı-tura) ise α = 0, hiç söz hakkı yok.</p></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>4 örnek, eşit ağırlık 0.25; kütük 1 örnekte yanılıyor. ε ve yanlış örneğin yeni ağırlığı?</p><details><summary>Cevabı göster</summary><p>ε = <strong>0.25</strong>. Yanlış × 1/(2ε) = × 2 → <strong>0.5</strong>; doğrular × 1/(2·0.75) = × 2/3 → 0.167. Toplam 0.5 + 3·0.167 = 1 ✓.</p></details></div>
 <div class="recipe"><div class="recipe-title">📝 AdaBoost turu kâğıtta</div><ol>
 <li>Her aday kütük için yanlış örnekleri listeleyin; ε = yanlışların <strong>ağırlıkları toplamı</strong> (ilk turda sayı/n).</li>
 <li>En küçük ε'lu kütüğü seçin (ilk turdan sonra sayı değil ağırlık belirler!).</li>
@@ -75,6 +80,7 @@
 <p>Varsayılan veri derste kullanılan 8 müşterilik “cep bankası”: tur 1'de “yaş ≥ orta → Evet” (yalnız B'de yanlış, ε = 1/8, α = ½ ln 7 = 0.973), tur 2'de “bakiye ≥ orta → Evet” (ε = 1/7, α = ½ ln 6 = 0.896), tur 3'te “yaş = yaşlı → Evet” (ε = 1/12, α = ½ ln 11 = 1.199); üç kütüğün ağırlıklı oyu 8'in 8'ini doğru bilir. Gürültülü etiketlerde AdaBoost'un üstel kaybı yanlış etiketli noktaların ağırlığını sürekli büyütür: hızla aşırı uyar.</p>
 
 <h2>Gradyan artırma</h2>
+<div class="intuition"><div class="intuition-title">💡 Kalan hatayı düzelt</div><p>Önce kaba bir tahmin yap (herkese ortalamayı söyle). Sonra her örnekte ne kadar yanıldığına (kalıntı) bak ve bu kalıntıyı tahmin eden küçük bir ağaç kur; tahminine bu ağacın çıktısının küçük bir kısmını (η) ekle. Tekrarla. Her ağaç, öncekilerin bıraktığı hatayı biraz daha kapatır.</p></div>
 <p>Kare kayıpta: F₀ = ȳ; her turda <strong>kalıntılara</strong> (y − F) küçük bir ağaç uydur ve F ← F + η·f ekle. (Genelde kalıntı, kaybın negatif gradyanıdır: “fonksiyon uzayında gradyan inişi”.)</p>
 <div data-widget="gboost"></div>
 <p>Varsayılan: y = (1, 3, 5, 7), η = 0.5, kütük x ≤ 2.5. F₀ = 4, kalıntılar (−3, −1, 1, 3), yapraklar −2 ve +2, F₁ = (3, 3, 5, 5), MSE 5 → 2; F₂ = (2.5, 3.5, 4.5, 5.5), MSE 1.25. η = 1 ile ilk tur (2, 2, 6, 6)'ya sıçrar ve aynı kütük ikinci turda hiçbir şey ekleyemez. <strong>Küçük η + çok ağaç</strong> daha pürüzsüz yaklaşır ve daha iyi genelleşir; ağaç sayısı erken durdurmayla seçilir. XGBoost/LightGBM: düzenlileştirme, alt örnekleme (subsample 0.5–0.8), histogram tabanlı hızlı bölme; tablo verisinde hâlâ en güçlü yöntemler.</p>

@@ -10,6 +10,8 @@ export const MIDTERM = new Date("2026-11-09T16:30:00+03:00");
 export const NAV = [
   { part: "Başlangıç", items: [
     { id: "index", title: "Genel bakış ve takvim", desc: "Sınav tarihleri, kapsam, haftalık plan ve sitenin kullanımı." },
+    { id: "on-bilgi", title: "Matematik ön bilgisi", desc: "Semboller, log ve üstel, vektör ve iç çarpım, türev ve zincir kuralı, olasılık: elle hesap püf noktalarıyla." },
+    { id: "sozluk", title: "Terim ve formül sözlüğü", desc: "Bütün terimler sade Türkçeyle, formüller sembol sembol, aranabilir." },
   ] },
   { part: "Bölüm I · Temeller", short: "H1–3", items: [
     { id: "w1-intro", week: 1, title: "Giriş ve temel kavramlar", desc: "T/E/P, öğrenme türleri, hipotez uzayı, Find-S, ezber ve genelleme." },
@@ -322,6 +324,11 @@ async function init() {
   if ($("[data-widget]", content)) {
     const { mountAll } = await import("./widgets.js");
     mountAll(content);
+  }
+  if (id !== "sozluk") {
+    const { annotateTerms, installTermPopover } = await import("./glossary.js");
+    annotateTerms(content);
+    installTermPopover();
   }
   buildPageNav(content, id);
   const cur = $(".sidebar [aria-current]"), side = $(".sidebar");

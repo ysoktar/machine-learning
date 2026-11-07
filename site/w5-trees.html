@@ -23,21 +23,25 @@
 <tr><td>Sürekli eşik</td><td>5–7 sayısal değer + etiket</td><td>sıralama, aday eşikler (sınıf değişen orta noktalar), en iyi eşiğin IG'si</td></tr>
 <tr><td>Kısa kavram (4 p)</td><td>ön/sonradan budama farkı; IG neden çok değerli özniteliği kayırır; aynı öznitelik iki kez</td><td>kazanç oranıyla açıklama; 2–3 cümle</td></tr>
 </tbody></table></div><p class="small">Puanın çoğu ara adımlarda: tabloyu düzgün kurun, log değerlerini tablodan alıp yazın, 3 ondalık taşıyın, son ağacı dallardaki değerlerle çizin.</p></div>
+<!-- taught -->
+<div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-entropi">Entropi</a> · <a href="sozluk.html#t-bilgi-kazanci">Bilgi kazancı</a> · <a href="sozluk.html#t-id3">ID3</a> · <a href="sozluk.html#t-gini-safsizligi">Gini safsızlığı</a> · <a href="sozluk.html#t-kazanc-orani">Kazanç oranı</a> · <a href="sozluk.html#t-esik">Eşik</a> · <a href="sozluk.html#t-budama">Budama</a> · <a href="sozluk.html#t-karar-kutugu">Karar kütüğü</a></div>
 
 
 <h2>Entropi ve bilgi kazancı</h2>
+<div data-widget="fig" data-fig="tree" data-caption="Bir karar ağacı: her düğüm bir soru, her dal bir cevap, her yaprak bir karar."></div><div class="intuition"><div class="intuition-title">💡 “20 soru” oyunu</div><p>Karar ağacı, “20 soru” oyunu gibi sorular sorarak karar verir: “Acele var mı? Hayır → tatlı alır. Evet → Kiminle? Yalnız → almaz…”. İyi bir oyuncu ilk soruyu öyle seçer ki cevap, olasılıkları olabildiğince “saf” gruplara ayırsın. Ağaç da böyle yapar; “saflığı” ölçmek için <strong>entropi</strong> kullanır.</p><p>Entropi bir grubun ne kadar karışık olduğunu söyler: grupta herkes aynı sınıftaysa 0 (hiç belirsizlik yok), yarı yarıyaysa 1 bit (en belirsiz). Bir soru sorup grubu bölünce dalların ortalama entropisi düşer; bu düşüş <strong>bilgi kazancıdır</strong>. En çok kazandıran soru önce sorulur.</p></div><div data-widget="fig" data-fig="entropy" data-caption="İki sınıfta entropi ve Gini: p = 0.5'te en büyük (en karışık), p = 0 ya da 1'de sıfır (saf)."></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>Bir düğümde 2 Evet, 2 Hayır var. Entropi? 4 Evet, 0 Hayır olsaydı?</p><details><summary>Cevabı göster</summary><p>2/2: yarı yarıya → <strong>1</strong> bit. 4/0: saf → <strong>0</strong>. Bir soru 2/2'lik düğümü iki saf dala ayırabilseydi kazancı 1 − 0 = 1 olurdu (en iyisi).</p></details></div>
 <div class="formula">H(D) = −Σ pᵢ log₂ pᵢ &nbsp;&nbsp;&nbsp; IG(D, A) = H(D) − Σ<sub>v</sub> (|D_v| / |D|) · H(D_v)</div>
 <ul>
 <li>İki sınıfta H ∈ [0, 1]: saf düğüm 0, 50/50 düğüm 1 bit. <strong>0 · log 0 = 0</strong> (p log p → 0; olmayan sınıf belirsizlik katmaz).</li>
 <li>Bilgi kazancı = bölmeden önceki entropi − bölmeden sonraki <em>ağırlıklı</em> entropi. En büyük IG kök olur; sonra her dalda kalan özniteliklerle özyinelenir.</li>
 <li>Duruş: düğüm saf, öznitelik kalmadı ya da hiçbir bölme kazanç getirmiyor (çoğunluk sınıfı yaprağı).</li>
 </ul>
-<div data-widget="entropy"></div>
+<div data-widget="entplay"></div>
 <div class="callout tip"><div class="callout-title">Sık kullanılan değerler (sınavda tablo verilir)</div>
 <p>H(1/2) = 1 · H(1/3) = 0.918 · H(1/4) = 0.811 · H(2/5) = 0.971 · H(1/5) = 0.722 · H(2/7) = 0.863 · H(3/7) = 0.985 · H(3/8) = 0.954 · H(1/6) = 0.650<br>
 −log₂: 1/2 → 1, 1/3 → 1.585, 2/3 → 0.585, 1/4 → 2, 3/4 → 0.415, 2/5 → 1.322, 3/5 → 0.737, 1/7 → 2.807, 2/7 → 1.807, 3/7 → 1.222, 4/7 → 0.807. <a href="cheatsheet.html#log2-tablosu">Tam tablo</a>.</p></div>
 
 <h2>ID3 adım adım</h2>
+<div class="intuition"><div class="intuition-title">💡 Algoritma tek cümleyle</div><p>Bütün sorular (öznitelikler) için “bu soruyu sorsam belirsizlik ne kadar azalır?” hesapla, en çok azaltanı sor, her cevap dalında kalan örneklerle aynı şeyi tekrarla; bir dal saflaşınca (hepsi aynı sınıf) yaprak yap.</p></div>
 <div class="recipe"><div class="recipe-title">📝 ID3 sorusu kâğıtta: şablon</div><ol>
 <li>Sınıf sayılarını yazın: örn. 5 Evet / 2 Hayır → H(D) = −(5/7)log₂(5/7) − (2/7)log₂(2/7) = (5/7)(0.485) + (2/7)(1.807).</li>
 <li>Her öznitelik için bir tablo: <em>dal (değer) · n · Evet/Hayır · H(dal)</em>. Saf dalın H'si 0, 50/50 dalınki 1.</li>
@@ -62,6 +66,7 @@
 <p>Ağırlıklı Gini'si <em>en küçük</em> olan (yani azalması en büyük) bölme seçilir. Çoğu veride entropiyle aynı kökü seçer; hesabı log gerektirmez. CART her zaman <strong>ikili</strong> bölme yapar.</p>
 
 <h2>Sayısal öznitelikte eşik</h2>
+<div class="intuition"><div class="intuition-title">💡 Sayıları nasıl sorarız?</div><p>“Rüzgâr hızı kaç?” sorusunun sonsuz cevabı var; ağaç bunun yerine evet/hayır sorusu sorar: “rüzgâr ≤ 20 mi?”. Hangi eşik? Değerleri sırala, ardışık iki değerin ortasını aday yap, her adayın kazancını hesapla. Sınıfın değişmediği yere eşik koymak hiçbir şey kazandırmaz, o yüzden yalnız sınıfın değiştiği yerlere bakmak yeter.</p></div>
 <p>Değerleri sırala; ardışık değerlerin orta noktaları aday eşiktir; her “x ≤ t” için IG hesapla. Kısayol: en iyi eşik hep <strong>sınıfın değiştiği</strong> yerlerden biridir, yalnız onlara bakmak yeter.</p>
 <div data-widget="threshold"></div>
 <p>Varsayılan: hesap tutarı 2, 3, 5, 7, 8 ve bahşiş E, E, H, H, E. Sınıf 3–5 arasında (t = 4) ve 7–8 arasında (t = 7.5) değişir. t = 4: sol {E, E} saf, sağ {H, H, E} H = 0.918, ağırlıklı 0.551, IG = 0.420. t = 7.5: IG 0.171. En iyi: tutar ≤ 4.</p>
@@ -72,6 +77,7 @@
 <div data-widget="regtree"></div>
 
 <h2>Aşırı uyum ve budama</h2>
+<div class="intuition"><div class="intuition-title">💡 Çok soru sormanın tehlikesi</div><p>Yeterince soru sorarsanız her örneği ayrı bir yaprağa koyabilirsiniz: eğitim hatası 0. Ama son sorular genelde gürültüye göre sorulmuştur (“bu müşteri salı günü geldi”); yeni müşteride işe yaramaz. Budama, ağacı genellemeye yetecek kadar küçük tutmaktır.</p></div>
 <ul>
 <li>Saf yapraklara kadar büyüyen ağaç eğitim verisini ezberler; sınırlar eksenlere paralel basamaklardır.</li>
 <li><strong>Ön budama</strong> (erken durdurma): max_depth, min_samples_leaf, min_impurity_decrease. Ucuz (ağaç hiç büyümez) ama <strong>XOR tuzağı</strong>: XOR'da tek başına hiçbir özniteliğin kazancı yoktur (her bölme 50/50 çocuk bırakır), “en az şu kadar kazanç” kuralı ilk bölmeyi reddeder; oysa ikinci bölme veriyi kusursuz ayırırdı.</li>

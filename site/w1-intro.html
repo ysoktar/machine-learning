@@ -23,9 +23,12 @@
 <tr><td>Find-S izleme</td><td>4 örnekli tablo; her adımdan sonraki hipotez</td><td>negatif örnekte “değişmez” yazmak, ? koymayı doğru yerde yapmak</td></tr>
 <tr><td>Aşırı/yetersiz uyum yorumu</td><td>eğitim/test hatası tablosu (polinom derecesi)</td><td>rejimi adlandırıp bir çare söylemek</td></tr>
 </tbody></table></div><p class="small">Bu hafta genelde kısa (4 puanlık) kavram sorusu olarak gelir; hiperparametre tablosunun ilk satırları da buradan başlar.</p></div>
+<!-- taught -->
+<div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-genelleme">Genelleme</a> · <a href="sozluk.html#t-asiri-uyum">Aşırı uyum</a> · <a href="sozluk.html#t-yetersiz-uyum">Yetersiz uyum</a> · <a href="sozluk.html#t-hipotez-uzayi">Hipotez uzayı</a> · <a href="sozluk.html#t-tumevarimsal-yanlilik">Tümevarımsal yanlılık</a> · <a href="sozluk.html#t-oznitelik">Öznitelik</a> · <a href="sozluk.html#t-hiperparametre">Hiperparametre</a></div>
 
 
 <h2>Tanım: T, E, P</h2>
+<div class="intuition"><div class="intuition-title">💡 Önce bir benzetme</div><p>Bir çocuğa kedi ile köpeği ayırt etmeyi öğretirken ona “kulakları sivri, bıyıkları uzunsa kedidir” gibi kurallar yazmazsınız; yüzlerce resim gösterip “bu kedi, bu köpek” dersiniz. Çocuk kuralı kendisi çıkarır ve <em>daha önce hiç görmediği</em> bir kediyi de tanır. Makine öğrenmesi tam olarak budur: <strong>kuralı programcı yazmaz, örneklerden (veriden) bilgisayar çıkarır</strong>.</p><p>“Öğreniyor” demek için üç şeyi belirtmek gerekir: ne yapıyor (görev, T), neyden öğreniyor (deneyim, E) ve iyi yaptığını nasıl ölçüyoruz (başarım, P). Deneyim arttıkça ölçülen başarım artıyorsa sistem öğreniyordur.</p></div>
 <p>Mitchell'in (1997) tanımı sınavda doğrudan kullanılır: bir program, <strong>T</strong> görevindeki <strong>P</strong> ile ölçülen başarımı <strong>E</strong> deneyimiyle artıyorsa öğreniyordur.</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Sistem</th><th>Görev T</th><th>Deneyim E</th><th>Başarım P</th><th>Tür</th></tr></thead>
@@ -44,6 +47,7 @@
 <p>Yapay zekâ ⊃ makine öğrenmesi ⊃ derin öğrenme ⊃ büyük dil modelleri (LLM).</p>
 
 <h2>Öğrenme türleri</h2>
+<div class="intuition"><div class="intuition-title">💡 Fark nerede?</div><p><strong>Gözetimli</strong>: öğretmen var; her örneğin doğru cevabı (etiketi) verilir. <strong>Gözetimsiz</strong>: öğretmen yok; yalnız örnekler var, model içlerindeki yapıyı (gruplar, örüntüler) kendisi bulur. <strong>Pekiştirmeli</strong>: doğru cevap söylenmez ama yaptığı şeyin sonunda bir ödül ya da ceza gelir; bisiklete binmeyi düşe kalka öğrenmek gibi.</p><p>Gözetimli öğrenmede soru şudur: tahmin edilen şey bir <em>kategori</em> mi (spam/değil, hangi rakam: <strong>sınıflandırma</strong>) yoksa bir <em>sayı</em> mı (fiyat, sıcaklık, kaç gün: <strong>regresyon</strong>)?</p></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>“Bir müşterinin önümüzdeki ay kaç TL harcayacağını tahmin et” hangi tür? Peki “müşteri gelecek ay aboneliğini iptal eder mi?”</p><details><summary>Cevabı göster</summary><p>İlki <strong>regresyon</strong> (sayı tahmini), ikincisi <strong>sınıflandırma</strong> (evet/hayır). İkisi de geçmiş müşterilerin bilinen sonuçlarıyla eğitildiği için gözetimli.</p></details></div>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Tür</th><th>Veri</th><th>Alt problemler</th><th>Örnek</th></tr></thead>
 <tbody>
@@ -65,6 +69,7 @@
 <p>Zamanın çoğu 2. ve 3. adımda geçer: model birkaç satır koddur, asıl iş veriyi anlamak ve doğru değerlendirmektir.</p>
 
 <h2>Öğrenme = hipotez uzayında arama</h2>
+<div class="intuition"><div class="intuition-title">💡 Hipotez ne demek?</div><p>Hipotez, “şu koşullarda cevap Evet'tir” diyen bir tahmin kuralıdır. Öğrenme algoritması bir kural <em>ailesi</em> seçer (örneğin “öznitelik kısıtlarının VE'si” ya da “bir doğru”) ve bu ailenin içinden veriye en uygun olanı arar. Ailenin bütün üyelerine <strong>hipotez uzayı</strong> denir.</p><p>Aile ne kadar zenginse veriye o kadar iyi uyabilir; ama çok zengin bir aile her şeyi, gürültüyü bile açıklayabilir ve yeni veride işe yaramaz. Bu gerginlik dersin her haftasında karşımıza çıkacak.</p></div>
 <p>Bir <strong>hipotez</strong> h, girdiden çıktıya bir fonksiyondur; modelin ifade edebildiği bütün hipotezler <strong>hipotez uzayı H</strong>'dir. Öğrenme, H içinde eğitim verisiyle tutarlı (ya da hatası küçük) bir h aramaktır.</p>
 <p>Mitchell'in EnjoySport örneğinde bir hipotez her öznitelik için bir kısıttır: belirli bir değer, <code>?</code> (her değer olur) ya da <code>Ø</code> (hiçbir değer olmaz). Örneğin ⟨Güneşli, ?, ?, Kuvvetli, ?, ?⟩ “güneşli ve rüzgâr kuvvetli olan her gün pozitif” demektir.</p>
 <div data-widget="hypspace"></div>
@@ -78,11 +83,13 @@
 <p><strong>Tümevarımsal öğrenme varsayımı:</strong> yeterince büyük bir eğitim kümesinde hedefe iyi yaklaşan bir hipotez, görülmemiş örneklerde de iyi yaklaşır.</p></div>
 
 <h2>Ezber mi, öğrenme mi? Genelleme</h2>
+<div class="intuition"><div class="intuition-title">💡 Sınav benzetmesi</div><p>Geçen yılın sorularını cevaplarıyla ezberleyen öğrenci o sorularda 100 alır (<strong>eğitim hatası 0</strong>) ama yeni sorularda kötü yapar: <strong>aşırı uyum</strong>. Hiç çalışmayan öğrenci ikisinde de kötüdür: <strong>yetersiz uyum</strong>. Konuyu anlayan öğrenci yeni sorularda da iyidir: <strong>genelleme</strong>.</p><p>Bu yüzden bir modeli asla eğitildiği veriyle değerlendirmeyiz; ayrı tuttuğumuz, modelin hiç görmediği verilerle ölçeriz (2. hafta).</p></div><div data-widget="fig" data-fig="bvcurve" data-caption="Model karmaşıklaştıkça yanlılık düşer, varyans artar; toplam hata önce düşer sonra yükselir. Amaç aradaki tatlı nokta."></div>
 <p>Klasik deney: <span class="m">sin(2πx)</span> eğrisinden gürültüyle 10 nokta, bunlara M dereceli polinom uyduruyoruz. M = 0–1 <strong>yetersiz uyum</strong> (iki hata da yüksek), M = 3 eğriyi yakalar (en düşük test hatası), M = 9 bütün noktalardan geçer: eğitim hatası 0, test hatası patlar: <strong>aşırı uyum</strong>.</p>
 <div data-widget="polyfit"></div>
 <p>Aşırı uyuma karşı (M'yi değiştirmeden): daha çok veri, düzenlileştirme (büyük katsayıları cezalandırmak), doğrulama kümesiyle model seçimi / erken durdurma, birden çok modelin ortalaması (6. hafta). Aynı M = 9 ile 100 nokta olsa polinom her gürültülü noktadan geçemez, varyans düşer ve test hatası gürültü düzeyine yaklaşır.</p>
 
 <h2>Dönemin tekrar eden sorusu: hiperparametre tablosu</h2>
+<div class="intuition"><div class="intuition-title">💡 Neden her hafta aynı tablo?</div><p>Her modelde “ne kadar esnek olsun?” sorusunu ayarlayan bir düğme vardır: kNN'de k, ağaçta derinlik, SVM'de C. Bu düğmelere <strong>hiperparametre</strong> denir (model onları öğrenmez, biz seçeriz). Düğmeyi esnekliğe doğru çevirince model eğitim verisine daha çok uyar (yanlılık ↓) ama daha kararsız olur (varyans ↑). Bu tek fikri bilen kişi tablonun bütün satırlarını çıkarabilir.</p></div>
 <p>Her haftanın sonunda o haftanın modeli için aynı tablo doldurulur ve sınavda aynı biçimde sorulur: <em>“X artarsa yanlılık, varyans ve aşırı uyum riski nasıl değişir, neden?”</em></p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum riski</th><th>Neden</th></tr></thead>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matematik ön bilgisi · Yapay Öğrenme</title>
+<meta name="description" content="Semboller, logaritma, vektör ve iç çarpım, türev ve zincir kuralı, olasılık: sınavda gereken matematik.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="on-bilgi">
+<main><div class="content">
+
+<h1>Matematik ön bilgisi</h1>
+<p class="lead">Bu derste sınavda gereken matematik azdır ama her hafta kullanılır: logaritma, üstel sayılar, vektörler ve iç çarpım, uzaklık, türev ve zincir kuralı, biraz olasılık. Hesap makinesi olmadığı için her birinin <strong>elle nasıl yapıldığını</strong> da gösteriyoruz. Konuyu biliyorsanız bu sayfayı atlayın; bir yerde takılırsanız buraya dönün.</p>
+
+<h2>Sembolleri okumak</h2>
+<p>Kitaplarda ve slaytlarda aynı birkaç sembol sürekli geçer. Bir formülü sesli okuyabiliyorsanız yarısını anlamışsınız demektir.</p>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Sembol</th><th>Okunuşu</th><th>Anlamı ve örnek</th></tr></thead>
+<tbody>
+<tr><td class="m">Σᵢ aᵢ</td><td>“i üzerinden a'ların toplamı”</td><td>Σᵢ₌₁³ aᵢ = a₁ + a₂ + a₃. Örn. Σ(1, 4, 5) = 10.</td></tr>
+<tr><td class="m">∏ᵢ aᵢ</td><td>“çarpım”</td><td>∏(2, 3, 4) = 24. Hipotez saymada kullanılır.</td></tr>
+<tr><td class="m">x̄, μ</td><td>“x bar”, “mü”: ortalama</td><td>x̄ = (1/n)Σxᵢ. (2, 4, 6) için 4.</td></tr>
+<tr><td class="m">σ, σ²</td><td>“sigma”: standart sapma, varyans</td><td>verinin ortalamadan ortalama uzaklığı (bkz. aşağı). Not: <em>σ(z)</em> aynı harf ama sigmoid fonksiyonudur; bağlamdan anlaşılır.</td></tr>
+<tr><td class="m">x, <strong>x</strong></td><td>vektör</td><td>bir örneğin öznitelikleri: x = (yaş, gelir) = (34, 9500).</td></tr>
+<tr><td class="m">xᵢ, xⱼ, x⁽ⁱ⁾</td><td>alt indis</td><td>genelde xᵢ i. örnek, xⱼ j. öznitelik. Slayta göre değişir; tabloya bakın.</td></tr>
+<tr><td class="m">ŷ</td><td>“y şapka”</td><td>modelin <em>tahmini</em>; y gerçek değerdir.</td></tr>
+<tr><td class="m">w, b</td><td>ağırlık, yanlılık (bias)</td><td>modelin öğrendiği sayılar: ŷ = w·x + b.</td></tr>
+<tr><td class="m">η</td><td>“eta”: öğrenme oranı</td><td>her adımda ne kadar ilerleneceği (0.1 gibi).</td></tr>
+<tr><td class="m">λ, C</td><td>“lambda”, “C”</td><td>düzenlileştirme gücü; C = 1/λ (scikit-learn, SVM).</td></tr>
+<tr><td class="m">‖w‖</td><td>“w'nin normu (uzunluğu)”</td><td>√(w₁² + w₂² + …). ‖(3, 4)‖ = 5.</td></tr>
+<tr><td class="m">∂L/∂w</td><td>“L'nin w'ye göre kısmi türevi”</td><td>w biraz artınca kayıp L ne kadar değişir?</td></tr>
+<tr><td class="m">∇L</td><td>“nabla L”: gradyan</td><td>bütün kısmi türevlerin vektörü; kaybın en hızlı arttığı yön.</td></tr>
+<tr><td class="m">argmin</td><td>“en küçük yapan değer”</td><td>argmin<sub>w</sub> L(w): L'yi en küçük yapan w (değerin kendisi değil).</td></tr>
+<tr><td class="m">𝟙[koşul]</td><td>gösterge</td><td>koşul doğruysa 1, değilse 0. 𝟙[y ≠ ŷ] = hata mı?</td></tr>
+<tr><td class="m">⌊x⌋</td><td>taban</td><td>aşağı yuvarla: ⌊3.7⌋ = 3 (CNN çıktı boyutu).</td></tr>
+<tr><td class="m">∧, ∨, ¬</td><td>ve, veya, değil</td><td>Boole ifadeleri (8. hafta).</td></tr>
+<tr><td class="m">P(A | B)</td><td>“B verildiğinde A'nın olasılığı”</td><td>koşullu olasılık.</td></tr>
+</tbody></table></div>
+
+<h2>Logaritma ve üstel sayılar</h2>
+<div class="intuition"><div class="intuition-title">Sezgi</div>
+<p><strong>log₂ x</strong>, “2'yi kaçıncı kuvvete yükseltirsem x olur?” sorusunun cevabıdır: log₂ 8 = 3 çünkü 2³ = 8. Bilgi kuramında log₂ “kaç evet/hayır sorusu” anlamına gelir: 8 eşit olasılıklı seçenekten birini bulmak için 3 soru yeter. Entropi bu yüzden log₂ ile tanımlanır.</p></div>
+<ul>
+<li><strong>Kurallar</strong>: log(ab) = log a + log b; log(a/b) = log a − log b; log(aᵏ) = k·log a; log 1 = 0.</li>
+<li>Kesirlerin logaritması negatiftir: log₂(1/4) = −2. Bu yüzden entropide önüne eksi konur: −log₂ p pozitif bir sayıdır.</li>
+<li><strong>Elle hesap</strong>: sınavda tablo verilir (−log₂(1/3) = 1.585 gibi). Tabloda olmayanı kurallarla türetin: log₂(3/4) = log₂3 − log₂4 = 1.585 − 2 = −0.415.</li>
+<li><strong>ln</strong> doğal logaritmadır (taban e ≈ 2.718). Log-loss, AdaBoost'taki α ve softmax kaybında ln kullanılır. ln 2 = 0.693, ln 3 = 1.099.</li>
+<li><strong>e⁻ˣ</strong>: x büyüdükçe 0'a hızla iner (e⁻¹ = 0.368, e⁻² = 0.135). Sigmoid ve RBF çekirdeğinde geçer; sınavda tablo verilir.</li>
+<li><strong>0·log 0 = 0</strong> kabul edilir (p küçüldükçe p·log p sıfıra yaklaşır).</li>
+</ul>
+<div class="tryit"><div class="tryit-title">Hemen dene</div><p>Tabloda −log₂(1/3) = 1.585 ve −log₂(2/3) = 0.585 verilmiş. (1 Evet, 2 Hayır) bir düğümün entropisi?</p>
+<details><summary>Cevap</summary><p>H = (1/3)·1.585 + (2/3)·0.585 = 0.528 + 0.390 = <strong>0.918</strong>. (Her sınıf için “oranı × −log₂ oranı”, sonra topla.)</p></details></div>
+
+<h2>Ortalama, varyans, standart sapma</h2>
+<p>x = (2, 4, 4, 4, 5, 5, 7, 9) için:</p>
+<ol>
+<li>Ortalama μ = toplam/adet = 40/8 = <strong>5</strong>.</li>
+<li>Her değerin ortalamadan farkı: −3, −1, −1, −1, 0, 0, 2, 4.</li>
+<li>Farkların kareleri: 9, 1, 1, 1, 0, 0, 4, 16 → toplam 32.</li>
+<li>Varyans σ² = 32/8 = <strong>4</strong> (ders z-score için n'ye böler). Standart sapma σ = √4 = <strong>2</strong>.</li>
+</ol>
+<p>Neden kare? Farkların toplamı her zaman 0'dır (artılar eksileri götürür); kare almak hepsini pozitif yapar. PCA'daki kovaryans aynı fikrin iki değişkenli hâlidir: (x farkı) × (y farkı) ortalaması; ikisi birlikte artıyorsa pozitif çıkar.</p>
+
+<h2>Vektörler, iç çarpım ve uzaklık</h2>
+<div class="intuition"><div class="intuition-title">Sezgi</div>
+<p>Bir örnek, öznitelikleri sırayla yazılmış bir listedir: (yaş, gelir) = (34, 9500). Bunu düzlemde bir <strong>nokta</strong> gibi düşünmek bütün dersin anahtarıdır: “benzer örnekler” birbirine yakın noktalardır (kNN), sınıflar bir doğruyla ayrılabilir (perceptron, SVM).</p></div>
+<ul>
+<li><strong>İç çarpım</strong> w·x = w₁x₁ + w₂x₂ + … (karşılıklı çarp, topla). w = (2, −1), x = (3, 4): 6 − 4 = <strong>2</strong>. Doğrusal modellerin hepsi bu sayıyı hesaplar.</li>
+<li><strong>Uzunluk (norm)</strong> ‖w‖ = √(w·w). ‖(2, −1)‖ = √5 ≈ 2.236.</li>
+<li><strong>Öklid uzaklığı</strong> d(x, z) = √Σ(xⱼ − zⱼ)². (1, 2) ile (4, 6): √(9 + 16) = 5. Sıralama için karekök gereksizdir: d² = 25 yeter.</li>
+<li><strong>Manhattan</strong> Σ|xⱼ − zⱼ| = 3 + 4 = 7 (şehir bloklarında yürümek gibi).</li>
+<li><strong>Doğru denklemi</strong> w₁x₁ + w₂x₂ + b = 0. Çizmek için x₂'yi yalnız bırakın: x₂ = −(w₁x₁ + b)/w₂. Örn. x₁ − 2x₂ + 1 = 0 → x₂ = (x₁ + 1)/2: (0, 0.5) ve (1, 1)'den geçer. w vektörü doğruya diktir ve w·x + b'nin <em>pozitif</em> olduğu tarafı gösterir.</li>
+<li>Bir noktanın doğruya uzaklığı |w·x + b| / ‖w‖.</li>
+</ul>
+<div class="tryit"><div class="tryit-title">Hemen dene</div><p>w = (1, 1), b = −2. (3, 2) noktası doğrunun hangi tarafında ve doğruya uzaklığı ne?</p>
+<details><summary>Cevap</summary><p>w·x + b = 3 + 2 − 2 = 3 &gt; 0 → pozitif taraf. Uzaklık 3/√2 = 3/1.414 ≈ <strong>2.12</strong>.</p></details></div>
+
+<h2>Türev, gradyan ve zincir kuralı</h2>
+<div class="intuition"><div class="intuition-title">Sezgi</div>
+<p>Türev “eğim”dir: girdiyi bir tık artırınca çıktı ne kadar değişir? Bir modeli eğitmek, kaybı (hatayı) küçültmektir; türev bize <em>hangi yöne</em> gidersek kaybın azalacağını söyler. Sisli bir dağda en dik inen yöne küçük adımlar atmak gibi: buna <strong>gradyan inişi</strong> denir.</p></div>
+<div class="table-wrap"><table class="simple compact">
+<thead><tr><th>Fonksiyon</th><th>Türevi</th><th>Nerede?</th></tr></thead>
+<tbody>
+<tr><td>c (sabit)</td><td>0</td><td></td></tr>
+<tr><td>a·x</td><td>a</td><td>doğrusal model</td></tr>
+<tr><td>x²</td><td>2x</td><td>kare hata</td></tr>
+<tr><td>(wx − y)² (w'ye göre)</td><td>2(wx − y)·x</td><td>gradyan inişi örneği</td></tr>
+<tr><td>ln x</td><td>1/x</td><td>log-loss</td></tr>
+<tr><td>eˣ</td><td>eˣ</td><td>softmax</td></tr>
+<tr><td>σ(z)</td><td>σ(z)(1 − σ(z))</td><td>lojistik regresyon, sinir ağı</td></tr>
+<tr><td>max(0, z) (ReLU)</td><td>1 (z &gt; 0), 0 (z &lt; 0)</td><td>sinir ağı</td></tr>
+</tbody></table></div>
+<p><strong>Kısmi türev</strong>: birden çok değişken varsa birini oynatıp diğerlerini sabit tutarak alınan türev. <strong>Gradyan</strong> bunların vektörüdür: ∇L = (∂L/∂w₁, ∂L/∂w₂, …). Gradyan kaybın en hızlı <em>arttığı</em> yönü gösterir; biz tersine gideriz: <span class="m">w ← w − η·∇L</span>.</p>
+<p><strong>Zincir kuralı</strong>: iç içe fonksiyonda türevler çarpılır. L = (u − y)², u = w·x ise ∂L/∂w = (∂L/∂u)·(∂u/∂w) = 2(u − y)·x. Geri yayılım (8. hafta) bu kuralın katman katman uygulanmasıdır.</p>
+<div class="tryit"><div class="tryit-title">Hemen dene</div><p>L(w) = (w·2 − 4)². w = 0 iken türev nedir, η = 0.1 ile bir adımda w ne olur?</p>
+<details><summary>Cevap</summary><p>dL/dw = 2(2w − 4)·2 = 4(2w − 4). w = 0: 4·(−4) = −16. w ← 0 − 0.1·(−16) = <strong>1.6</strong>. (Minimum w = 2'ye doğru gitti.)</p></details></div>
+
+<h2>Olasılık: sınavda gereken kadarı</h2>
+<ul>
+<li><strong>Olasılık</strong> 0 ile 1 arasında bir sayıdır; bütün sonuçların olasılıkları toplamı 1'dir (softmax bu yüzden toplamı 1 olan sayılar üretir).</li>
+<li><strong>Bağımsız</strong> olaylarda olasılıklar çarpılır: iki bağımsız sınıflandırıcının ikisinin de yanılma olasılığı 0.2·0.2 = 0.04.</li>
+<li><strong>Binom</strong>: n bağımsız denemede tam k “başarı”: C(n, k)·pᵏ(1 − p)ⁿ⁻ᵏ. C(5, 3) = 10 (5'ten 3 seçme). Çoğunluk oyu hatası bununla hesaplanır (6. hafta).</li>
+<li><strong>Koşullu olasılık</strong> P(A | B) = P(A ve B)/P(B). Lojistik regresyon P(y = 1 | x)'i, yani “bu özniteliklere sahipken pozitif olma olasılığını” tahmin eder.</li>
+<li><strong>Beklenen değer</strong> E[X] = Σ x·P(x): uzun vadede ortalama. Risk = beklenen kayıp.</li>
+<li>(1 − 1/n)ⁿ → e⁻¹ ≈ 0.368: bootstrap'te bir örneğin hiç seçilmeme olasılığı.</li>
+</ul>
+
+<h2>Kesir ve ondalık püf noktaları (hesap makinesi yok)</h2>
+<ul>
+<li>Sık kesirler: 1/3 = 0.333, 2/3 = 0.667, 1/7 = 0.143, 2/7 = 0.286, 3/7 = 0.429, 4/7 = 0.571, 1/6 = 0.167, 5/6 = 0.833, 3/8 = 0.375.</li>
+<li>Bölmeyi sona bırakın: F1 = 2TP/(2TP + FP + FN) kesir olarak yazılıp en sonda bölünür.</li>
+<li>3 ondalık taşıyın, sonucu 2–3 ondalıkla yazın; ara sonuçları yuvarlayıp sonra tekrar kullanmak hatayı büyütür.</li>
+<li>Karekök: √2 = 1.414, √3 = 1.732, √5 = 2.236, √8 = 2.828, √10 = 3.162. Öklid'de sıralama için kökü hiç almayın.</li>
+<li>Kendinizi denetleyin: olasılıklar 0–1 arasında mı? Ağırlıklar toplamı 1 mi? TP + FN = pozitif sayısı mı?</li>
+</ul>
+
+</div></main>
+</body>
+</html>
