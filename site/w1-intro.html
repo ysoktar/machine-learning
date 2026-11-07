@@ -13,10 +13,12 @@
 <body data-page="w1-intro">
 <main><div class="content">
 
+<!-- clarified -->
 <h1>Giriş ve temel kavramlar</h1>
 <p class="lead">Makine öğrenmesi nedir, klasik programlamadan farkı ne, hangi türleri var ve “öğrenmek” neden aslında bir hipotez uzayında arama yapmaktır? Bu haftanın asıl mesajı: <strong>amaç eğitim verisini ezberlemek değil, görülmemiş veride iyi olmak (genelleme)</strong>.</p>
 <!-- enriched -->
 <div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<p class="small"><b>Bu tablo nasıl kullanılır?</b> Sayfayı okumadan önce göz gezdir: neye odaklanacağını söyler. Terimleri henüz bilmiyorsan sorun değil; sayfanın sonunda geri dön ve her satırı kendin yapabiliyor musun diye kontrol et.</p>
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
 <tr><td>T, E, P ve öğrenme türü</td><td>“Spam filtresi / film önerisi / satranç programı için görev, deneyim, başarım ölçüsü ve öğrenme türünü yazın.”</td><td>üçünü de somut yazmak (P ölçülebilir olmalı) + türü doğru adlandırmak</td></tr>
 <tr><td>Hipotez sayma</td><td>“EnjoySport'a bir öznitelik eklenirse kaç örnek, kaç anlamca farklı hipotez?”</td><td>formülü yazıp çarpımı açık göstermek: 1 + ∏(kᵢ + 1)</td></tr>
@@ -70,10 +72,53 @@
 
 <h2>Öğrenme = hipotez uzayında arama</h2>
 <div class="intuition"><div class="intuition-title">💡 Hipotez ne demek?</div><p>Hipotez, “şu koşullarda cevap Evet'tir” diyen bir tahmin kuralıdır. Öğrenme algoritması bir kural <em>ailesi</em> seçer (örneğin “öznitelik kısıtlarının VE'si” ya da “bir doğru”) ve bu ailenin içinden veriye en uygun olanı arar. Ailenin bütün üyelerine <strong>hipotez uzayı</strong> denir.</p><p>Aile ne kadar zenginse veriye o kadar iyi uyabilir; ama çok zengin bir aile her şeyi, gürültüyü bile açıklayabilir ve yeni veride işe yaramaz. Bu gerginlik dersin her haftasında karşımıza çıkacak.</p></div>
-<p>Bir <strong>hipotez</strong> h, girdiden çıktıya bir fonksiyondur; modelin ifade edebildiği bütün hipotezler <strong>hipotez uzayı H</strong>'dir. Öğrenme, H içinde eğitim verisiyle tutarlı (ya da hatası küçük) bir h aramaktır.</p>
-<p>Mitchell'in EnjoySport örneğinde bir hipotez her öznitelik için bir kısıttır: belirli bir değer, <code>?</code> (her değer olur) ya da <code>Ø</code> (hiçbir değer olmaz). Örneğin ⟨Güneşli, ?, ?, Kuvvetli, ?, ?⟩ “güneşli ve rüzgâr kuvvetli olan her gün pozitif” demektir.</p>
+<h3>Örnek problem: EnjoySport</h3>
+<p>Tom Mitchell'in kitabındaki klasik örnek: Aldo adlı biri hangi günlerde su sporundan keyif alıyor? Her gün 6 öznitelikle anlatılıyor; her özniteliğin alabileceği değerler sabit:</p>
+<div class="table-wrap"><table class="simple compact">
+<thead><tr><th>Öznitelik</th><th>Alabileceği değerler</th><th>Değer sayısı</th></tr></thead>
+<tbody>
+<tr><td>Gökyüzü</td><td>Güneşli, Bulutlu, Yağmurlu</td><td>3</td></tr>
+<tr><td>Sıcaklık</td><td>Ilık, Soğuk</td><td>2</td></tr>
+<tr><td>Nem</td><td>Normal, Yüksek</td><td>2</td></tr>
+<tr><td>Rüzgâr</td><td>Kuvvetli, Zayıf</td><td>2</td></tr>
+<tr><td>Su</td><td>Ilık, Serin</td><td>2</td></tr>
+<tr><td>Tahmin</td><td>Aynı, Değişken</td><td>2</td></tr>
+</tbody></table></div>
+<p>Elimizde birkaç günün kaydı ve her gün için “keyif aldı mı? Evet/Hayır” etiketi var. Amaç, “Aldo hangi günlerde keyif alır?” sorusuna bir <strong>kural</strong> bulmak.</p>
+
+<h3>Hipotez nasıl yazılır?</h3>
+<p>Bu problemde kurallar (hipotezler) tek bir biçimde yazılır: her öznitelik için bir koşul, sırayla, köşeli parantez içinde: <span class="m">⟨Gökyüzü, Sıcaklık, Nem, Rüzgâr, Su, Tahmin⟩</span>. Her koşul üç türden biri olabilir:</p>
+<ul>
+<li><strong>Belirli bir değer</strong> (örn. <code>Güneşli</code>): o öznitelik tam bu değeri almalı.</li>
+<li><code>?</code>: “fark etmez”, o öznitelik her değeri alabilir.</li>
+<li><code>Ø</code> (boş küme): “hiçbir değer olmaz”; bu koşulu hiçbir gün sağlayamaz.</li>
+</ul>
+<p>Bir gün, hipotezin <em>bütün</em> koşullarını sağlıyorsa hipotez o gün için “Evet” der (koşullar VE ile bağlıdır). Örnekler:</p>
+<ul>
+<li><span class="m">⟨Güneşli, ?, ?, Kuvvetli, ?, ?⟩</span>: “gökyüzü güneşli <em>ve</em> rüzgâr kuvvetliyse Evet; diğer öznitelikler fark etmez”.</li>
+<li><span class="m">⟨?, ?, ?, ?, ?, ?⟩</span>: her gün Evet (en genel hipotez).</li>
+<li><span class="m">⟨Ø, Ø, Ø, Ø, Ø, Ø⟩</span>: hiçbir gün Evet değil (en özel hipotez). Aslında içinde tek bir Ø olan her hipotez de hiçbir güne Evet demez.</li>
+</ul>
+<p><strong>Hipotez uzayı</strong>, bu biçimde yazılabilen bütün kuralların kümesidir. Öğrenmek, bu küme içinde eğitim günlerinin etiketleriyle tutarlı bir kural bulmaktır.</p>
+
+<h3>Hipotezleri saymak: önce minik bir örnek</h3>
+<p>Formüle geçmeden önce yalnız 2 öznitelikli bir oyuncak problemde her şeyi tek tek sayalım: <b>Hava</b> (Güneşli, Yağmurlu) ve <b>Rüzgâr</b> (Var, Yok).</p>
+<ol>
+<li><strong>Kaç farklı gün olabilir?</strong> Hava 2 değer × Rüzgâr 2 değer = <strong>4 gün</strong>: (G, Var), (G, Yok), (Y, Var), (Y, Yok).</li>
+<li><strong>Ø içermeyen kaç hipotez?</strong> Her öznitelik için 2 değer + “?” = 3 seçenek: 3 × 3 = <strong>9 hipotez</strong>: ⟨G, Var⟩, ⟨G, Yok⟩, ⟨G, ?⟩, ⟨Y, Var⟩, ⟨Y, Yok⟩, ⟨Y, ?⟩, ⟨?, Var⟩, ⟨?, Yok⟩, ⟨?, ?⟩. Bunların her biri farklı bir gün kümesine Evet der.</li>
+<li><strong>Ø içerenler</strong> (⟨Ø, Var⟩, ⟨G, Ø⟩, ⟨Ø, Ø⟩…) yazılış olarak farklı ama hepsi aynı şeyi söyler: “hiçbir gün Evet değil”. Anlam olarak tek bir hipotezdir, <strong>1</strong> kez sayılır.</li>
+<li>Toplam <strong>anlamca farklı hipotez</strong> = 9 + 1 = <strong>10</strong>.</li>
+<li><strong>Kaç olası “kavram” var?</strong> Kavram, günlerin hangilerinin Evet olduğunu söyleyen herhangi bir etiketleme. 4 günün her biri bağımsız olarak Evet ya da Hayır olabilir: 2⁴ = <strong>16 kavram</strong>. Hipotez dilimiz bunların yalnız 10'unu yazabiliyor. Örneğin “(G, Var) ya da (Y, Yok) günleri Evet” kavramı VE'li bir kuralla yazılamaz.</li>
+</ol>
+<div class="callout"><div class="callout-title">Genel formül (kᵢ: i. özniteliğin değer sayısı)</div>
+<ul>
+<li>Örnek (gün) sayısı = k₁ × k₂ × … (değer sayılarının çarpımı).</li>
+<li>Anlamca farklı hipotez = 1 + (k₁ + 1) × (k₂ + 1) × … (her özniteliğe “?” seçeneği eklenir; en baştaki 1, Ø'lu bütün hipotezlerin temsil ettiği tek “boş” kural).</li>
+<li>Olası kavram sayısı = 2^(örnek sayısı).</li>
+</ul>
+<p><b>EnjoySport</b> (değerler 3, 2, 2, 2, 2, 2): örnek 3·2·2·2·2·2 = <strong>96</strong>; hipotez 1 + 4·3·3·3·3·3 = 1 + 972 = <strong>973</strong>; kavram 2⁹⁶ (yaklaşık 8 × 10²⁸).</p></div>
 <div data-widget="hypspace"></div>
-<p>Sayma mantığı: her öznitelik kendi değerlerinden birini ya da <code>?</code> alır → <span class="m">∏(kᵢ + 1)</span>; içinde Ø olan bütün hipotezler aynı boş kavramdır, bir kez eklenir → <span class="m">1 + ∏(kᵢ + 1)</span>. EnjoySport: 96 gün, 973 anlamca farklı hipotez, ama 2⁹⁶ olası kavram.</p>
+<p><b>Bu sayılar neden önemli?</b> 973, 2⁹⁶'nın yanında yok denecek kadar küçük. Yani “VE'li kurallar” dilini seçerek, olası kavramların neredeyse hepsini baştan dışarıda bırakmış olduk. Bu bir kayıp gibi görünse de öğrenmeyi mümkün kılan şey tam olarak budur: dil kısıtlı olduğu için birkaç örnek bile adayları hızla eler (aşağıda Find-S ve tümevarımsal yanlılık).</p>
 
 <h3>Find-S ve tümevarımsal yanlılık</h3>
 <p><strong>Find-S</strong> en özel hipotezden (⟨Ø, …, Ø⟩) başlar, yalnız <em>pozitif</em> örneklere bakar; bir kısıt örneğe uymuyorsa o kısıtı <code>?</code> yapar. Sonuç, veriyle tutarlı <em>en özel</em> VE'li hipotezdir. Negatif örnekleri hiç kullanmaz.</p>
@@ -101,36 +146,30 @@
 <p><strong>Yanlılık</strong>: modelin basitliğinden gelen sistematik hata (küçük M). <strong>Varyans</strong>: eğitim verisi biraz değişince modelin ne kadar oynadığı (büyük M). Bütün satırlar: <a href="hyper.html">hiperparametre tablosu</a>.</p>
 
 <h2>Sınav tipi çözümlü problemler</h2>
-<p>Her problemi önce kâğıtta çözün; çözümde her adımın <em>neden</em> öyle yapıldığı yazıyor.</p>
+<p>Aşağıdaki problemler sınavdaki biçimdedir. Her birini önce kâğıtta çözmeye çalış (5–10 dakika), sonra “çözümü aç”a bas: çözümde her adımın <em>neden</em> öyle yapıldığı da yazıyor. Takılırsan sayfanın ilgili bölümüne dön.</p>
 <h3>Problem 1: T, E, P</h3>
-<div class="problem"><div class="ptitle">Soru <span class="muted small">(1. hafta derste çözülen)</span></div><p>Üç sistem için görevi, deneyimi ve başarım ölçüsünü yazın; öğrenme türünü belirtin: (a) plaka tanıyan kamera, (b) izleme geçmişinden film önerisi (açık puan yok), (c) satrancı sıfırdan, kendine karşı oynayarak öğrenen program.</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol>
-<li><strong>(a)</strong> T: görüntüdeki plaka metnini okumak. E: plaka metni etiketlenmiş görüntüler. P: karakter (ya da plaka) doğruluğu. <strong>Gözetimli</strong> (etiket var).</li>
-<li><strong>(b)</strong> T: kullanıcıya filmleri sıralamak. E: izleme geçmişi (örtük geri bildirim). P: önerilenlerin tıklanma/izlenme oranı. Açık etiket olmadığı için gözetimsiz/örtük geri bildirimli; benzer kullanıcıları ya da filmleri bulmak kümeleme mantığıdır.</li>
-<li><strong>(c)</strong> T: oyunu kazanmak. E: kendine karşı oynanan oyunlar ve sonuçları (ödül). P: kazanma oranı. <strong>Pekiştirmeli</strong>: doğru hamle etiketi yok, yalnız oyun sonunda ödül var.</li>
-</ol>
-<p class="small muted">Puan ipucu: P'yi “iyi çalışması” gibi muğlak değil, <em>ölçülebilir</em> bir sayı olarak yazın.</p></div></details>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(1. hafta derste)</span></div><p>Aşağıdaki üç sistem için görevi (T), deneyimi (E) ve başarım ölçüsünü (P) yazın ve öğrenme türünü belirtin: (a) plaka tanıyan bir kamera, (b) izleme geçmişine bakarak film öneren bir sistem (kullanıcılar puan vermiyor), (c) satrancı kendine karşı oynayarak öğrenen bir program.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Her sistem için üç soruyu sırayla cevaplıyoruz: sistem ne yapıyor, neyi görerek öğreniyor ve iyi yaptığını hangi sayıyla ölçüyoruz?</p><p>(a) Kameranın görevi, görüntüdeki plakanın yazısını okumaktır. Deneyimi, üzerindeki plaka yazısı önceden etiketlenmiş görüntülerdir. Başarımını, plakaları (ya da karakterleri) doğru okuma oranıyla ölçeriz. Her görüntünün doğru cevabı elimizde olduğu için bu <strong>gözetimli</strong> öğrenmedir.</p><p>(b) Öneri sisteminin görevi, filmleri kullanıcı için sıralamaktır. Deneyimi, kullanıcıların neleri izlediğidir; kimse “bu film iyiydi” diye açık bir etiket vermiyor. Başarımı, önerilen filmlerin tıklanma ya da izlenme oranıdır. Açık etiket olmadığı için bu, örtük geri bildirimle çalışan, gözetimsiz öğrenmeye yakın bir problemdir (benzer kullanıcıları ya da filmleri bulmak kümelemeye benzer).</p><p>(c) Satranç programının görevi oyunu kazanmaktır. Deneyimi, kendine karşı oynadığı oyunlar ve bu oyunların sonucudur. Başarımı, kazanma oranıdır. Hiçbir hamle için “doğru hamle buydu” bilgisi yok, yalnız oyunun sonunda bir ödül (kazandı/kaybetti) var; bu yüzden <strong>pekiştirmeli</strong> öğrenmedir.</p><p class="small muted">Puan ipucu: P'yi “iyi çalışması” gibi muğlak bir ifadeyle değil, ölçülebilir bir sayı olarak yazın.</p></div></details>
 <h3>Problem 2: hipotez uzayını say</h3>
-<div class="problem"><div class="ptitle">Soru <span class="muted small">(1. hafta derste çözülen)</span></div><p>EnjoySport'a 7. öznitelik olarak “Dalga” (Düşük / Yüksek) ekleniyor. (a) Kaç farklı gün (örnek) vardır? (b) Kaç anlamca farklı hipotez? (c) Olası kavram sayısı ve hipotez dilinin bunun ne kadarını ifade ettiği?</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol>
-<li><strong>Örnek sayısı</strong>: her özniteliğin değer sayılarının çarpımı. Asıl 96 gün × 2 = <strong>192</strong>.</li>
-<li><strong>Hipotez</strong>: her öznitelik ya bir değerini ya “?” alır → (değer sayısı + 1). 3+1 = 4 ve altı tane 2+1 = 3: 4·3⁶ = 4·729 = 2916. Ø içeren bütün hipotezler aynı (boş) kavram → <strong>+1</strong>: <strong>2917</strong>.</li>
-<li><strong>Kavram</strong>: her gün bağımsız olarak evet/hayır → 2¹⁹² kavram. 2917 bunun yanında yok denecek kadar küçük: VE'li dil çok kısıtlayıcı, yani <strong>güçlü bir tümevarımsal yanlılık</strong>. Bu kısıt olmasa sonlu sayıda örnek seçimi daraltamazdı.</li>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(1. hafta derste çözülen)</span></div><p>EnjoySport'taki 6 özniteliğe (değer sayıları 3, 2, 2, 2, 2, 2) 7. öznitelik olarak “Dalga” (Düşük / Yüksek, yani 2 değer) ekleniyor. (a) Kaç farklı gün (örnek) vardır? (b) Kaç anlamca farklı hipotez vardır? (c) Kaç olası kavram vardır ve hipotez dili bunların ne kadarını yazabilir?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<p>Yukarıdaki “Genel formül” kutusunu uyguluyoruz. Yeni değer sayıları: 3, 2, 2, 2, 2, 2, <b>2</b>.</p>
+<ol>
+<li><strong>(a) Örnek sayısı</strong> = değer sayılarının çarpımı = 3·2·2·2·2·2·2 = 3·2⁶ = 3·64 = <strong>192</strong>. (Kısa yol: eskiden 96 gün vardı; yeni öznitelik her günü 2'ye böler: 96 × 2 = 192.)</li>
+<li><strong>(b) Hipotez sayısı</strong>: her özniteliğe “?” seçeneği eklenir: Gökyüzü 3 + 1 = 4 seçenek, diğer altı özniteliğin her biri 2 + 1 = 3 seçenek. Ø içermeyen hipotez sayısı 4·3·3·3·3·3·3 = 4·3⁶ = 4·729 = 2916. Ø içeren bütün hipotezler aynı “hiçbir gün Evet değil” kuralı olduğu için 1 tane eklenir: 2916 + 1 = <strong>2917</strong>.</li>
+<li><strong>(c) Kavram sayısı</strong>: 192 günün her biri bağımsız olarak Evet ya da Hayır olabilir: 2¹⁹² kavram. Hipotez dili bunlardan yalnız 2917 tanesini yazabilir: oran neredeyse sıfır. Yorum: VE'li kural dili çok kısıtlayıcıdır, yani <strong>güçlü bir tümevarımsal yanlılığa</strong> sahiptir; ama bu kısıt sayesinde birkaç örnek adayları eleyebilir. Hiç kısıt olmasaydı (2¹⁹² kavramın hepsi aday olsaydı) görülmemiş bir gün için hiçbir tahmin yapılamazdı.</li>
 </ol></div></details>
 <h3>Problem 3: Find-S</h3>
-<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H1)</span></div><p>Öznitelikler Hava (Güneşli/Yağmurlu), Sıcaklık (Ilık/Soğuk), Rüzgâr (Kuvvetli/Zayıf). Örnekler sırayla: 1) Güneşli Ilık Kuvvetli Evet, 2) Güneşli Ilık Zayıf Evet, 3) Yağmurlu Soğuk Kuvvetli Hayır, 4) Güneşli Soğuk Kuvvetli Evet. Her adımdaki hipotezi yazın; (Yağmurlu, Ilık, Zayıf) için tahmin nedir? Dört örnekle tutarlı başka bir VE'li hipotez var mı?</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><div class="table-wrap"><table class="simple compact"><thead><tr><th>Adım</th><th>Hipotez</th><th>Neden</th></tr></thead><tbody>
-<tr><td>h₀</td><td>⟨Ø, Ø, Ø⟩</td><td>en özel başlangıç</td></tr>
-<tr><td>h₁</td><td>⟨Güneşli, Ilık, Kuvvetli⟩</td><td>ilk pozitifin kendisi</td></tr>
-<tr><td>h₂</td><td>⟨Güneşli, Ilık, ?⟩</td><td>Rüzgâr farklı → ?</td></tr>
-<tr><td>h₃</td><td>⟨Güneşli, Ilık, ?⟩</td><td>negatif: Find-S kullanmaz</td></tr>
-<tr><td>h₄</td><td>⟨Güneşli, ?, ?⟩</td><td>Sıcaklık farklı → ?</td></tr></tbody></table></div>
-<p>(Yağmurlu, Ilık, Zayıf): Hava kısıtı tutmuyor → <strong>Hayır</strong>. VE'li dilde başka tutarlı hipotez yok: daha genel ⟨?, ?, ?⟩ 3. (negatif) örneği kabul eder, daha özel olan bir pozitifi reddeder. Dil dışında “Güneşli VEYA Ilık” da dört örneğe uyar ama VE ile yazılamaz: hangi tutarlı hipotezlerin <em>düşünülebildiğini</em> dil (yanlılık) belirler.</p></div></details>
-<h3>Problem 4: eğitim/test hatasını yorumla</h3>
-<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H1)</span></div><p>10 gürültülü sinüs noktasına M = 0, 1, 3, 9 dereceli polinomlar uyduruldu. Eğitim hataları 0.60, 0.42, 0.08, 0.00; test hataları 0.62, 0.45, 0.10, 0.90. (a) Hangileri yetersiz, hangisi aşırı uyuyor, hangisini seçersiniz? (b) Aynı M = 9 ile 100 nokta olunca test hatası 0.12'ye düşüyor: neden? (c) M'yi değiştirmeden iki çare.</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>(a) M = 0, 1 <strong>yetersiz uyum</strong>: iki hata da yüksek ve birbirine yakın. M = 9 <strong>aşırı uyum</strong>: eğitim 0, test 0.90 (dev açık). Seçim <strong>M = 3</strong>: en düşük test hatası.</li>
-<li>(b) 100 noktada 9. derece polinom her gürültülü noktadan geçemez; eğitim verisi modeli sabitler, <strong>varyans düşer</strong>, test hatası gürültü düzeyine yaklaşır.</li>
-<li>(c) Düzenlileştirme (büyük katsayıları cezalandır), daha çok veri, doğrulama kümesi ile seçim/erken durdurma, birden çok modelin ortalaması.</li></ol></div></details>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H1)</span></div><p>Öznitelikler Hava (Güneşli/Yağmurlu), Sıcaklık (Ilık/Soğuk) ve Rüzgâr (Kuvvetli/Zayıf). Eğitim örnekleri sırayla: 1) Güneşli, Ilık, Kuvvetli → Evet; 2) Güneşli, Ilık, Zayıf → Evet; 3) Yağmurlu, Soğuk, Kuvvetli → Hayır; 4) Güneşli, Soğuk, Kuvvetli → Evet. Find-S'i adım adım uygulayın. Son hipotez (Yağmurlu, Ilık, Zayıf) günü için ne der? Dört örnekle tutarlı başka bir VE'li hipotez var mı?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Find-S, hiçbir güne Evet demeyen en dar hipotezle başlar ve yalnız Evet etiketli örneklere bakar. Her Evet örneğinde, hipotezin o örneğe uymayan koşullarını gevşetir (“?” yapar); böylece hipotez, gördüğü bütün pozitif günleri kapsayacak kadar genişler ama gereğinden fazla genişlemez.</p><div class="table-wrap"><table class="simple compact"><thead><tr><th>Adım</th><th>Hipotez</th><th>Ne oldu?</th></tr></thead><tbody>
+<tr><td>Başlangıç</td><td>⟨Ø, Ø, Ø⟩</td><td>Hiçbir gün Evet değil.</td></tr>
+<tr><td>1. örnek (Evet)</td><td>⟨Güneşli, Ilık, Kuvvetli⟩</td><td>İlk pozitif örneğin kendisi alınır.</td></tr>
+<tr><td>2. örnek (Evet)</td><td>⟨Güneşli, Ilık, ?⟩</td><td>Rüzgâr bu sefer Zayıf; koşul tutmadığı için “?” yapılır.</td></tr>
+<tr><td>3. örnek (Hayır)</td><td>⟨Güneşli, Ilık, ?⟩</td><td>Negatif örnek; Find-S bunu hiç kullanmaz.</td></tr>
+<tr><td>4. örnek (Evet)</td><td>⟨Güneşli, ?, ?⟩</td><td>Sıcaklık bu sefer Soğuk; o koşul da “?” olur.</td></tr></tbody></table></div><p>Son hipotez “Hava Güneşli ise Evet, gerisi fark etmez” diyor. (Yağmurlu, Ilık, Zayıf) gününde Hava koşulu sağlanmadığı için tahmin <strong>Hayır</strong>dır.</p><p>VE'li dilde başka tutarlı bir hipotez yoktur: daha genel olan ⟨?, ?, ?⟩ 3. örneğe (Hayır) de Evet derdi; daha dar bir hipotez ise pozitif örneklerden birini reddederdi. VE'li dilin dışında “Güneşli VEYA Ilık” kuralı da dört örneğe uyar, ama bu dilde yazılamaz. Yani hangi kuralların aday olabileceğini seçtiğimiz dil belirler: bu da tümevarımsal yanlılıktır.</p></div></details>
+<h3>Problem 4: eğitim ve test hatasını yorumla</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H1)</span></div><p>Sinüs eğrisinden üretilmiş 10 gürültülü noktaya M = 0, 1, 3 ve 9 dereceli polinomlar uyduruldu. Eğitim hataları sırasıyla 0.60, 0.42, 0.08, 0.00; test hataları 0.62, 0.45, 0.10, 0.90. (a) Hangi dereceler yetersiz, hangisi aşırı uyuyor, hangisini seçersiniz? (b) Aynı M = 9 ile 100 nokta kullanılınca test hatası 0.12'ye düşüyor; neden? (c) Dereceyi değiştirmeden aşırı uyuma karşı iki çare söyleyin.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Bir modeli değerlendirirken iki hataya birlikte bakarız: eğitim hatası modelin gördüğü veriye ne kadar uyduğunu, test hatası görmediği veride ne kadar iyi olduğunu söyler.</p><p>(a) M = 0 ve M = 1'de iki hata da yüksek ve birbirine yakın: model eğriyi yakalayamayacak kadar basit, yani <strong>yetersiz uyum</strong> var. M = 9'da eğitim hatası 0 ama test hatası 0.90: model 10 noktanın hepsinden, gürültüleriyle birlikte geçmiş, yani <strong>aşırı uyum</strong> var. Test hatası en düşük olan <strong>M = 3</strong> seçilir.</p><p>(b) 100 noktayla 9. derece bir polinom artık her noktadan geçemez; çok sayıda nokta eğriyi gerçek şekle doğru sabitler. Böylece modelin veriye göre oynaması (varyansı) azalır ve test hatası gürültü düzeyine yaklaşır.</p><p>(c) Dereceyi değiştirmeden şunlar yapılabilir: büyük katsayıları cezalandıran düzenlileştirme kullanmak, daha çok veri toplamak, bir doğrulama kümesiyle eğitimi erken durdurmak ya da birden çok modelin ortalamasını almak.</p></div></details>
 <h2>Sık hatalar</h2>
 <ul class="mistakes">
 <li>Hipotez sayarken Ø'lu hipotezleri ayrı ayrı saymak (hepsi tek bir boş kavramdır: <strong>+1</strong>).</li>

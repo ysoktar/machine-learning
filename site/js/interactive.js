@@ -348,3 +348,125 @@ export function gdplay() {
   reset();
   return el;
 }
+
+// ======================================================================= threshold → confusion matrix → ROC
+export function threshplay(ds) {
+  const { el, body } = frame("Eşiği kaydır: karmaşıklık matrisi, ölçütler ve ROC birlikte değişsin", "Keşfet");
+  const scores = (ds.scores || "0.95 0.85 0.8 0.7 0.65 0.55 0.45 0.4 0.3 0.2 0.15 0.05").split(/\s+/).map(Number);
+  let labels = (ds.labels || "1 1 0 1 1 0 1 0 0 1 0 0").split(/\s+/).map(Number);
+  const th = slider("eşik t", 0, 1, 0.05, 0.5, () => render());
+  const strip = h("div", { class: "score-strip" });
+  const out = h("div", { class: "out" });
+  function render() {
+    const t = th.get();
+    const pred = scores.map((s) => (s >= t ? 1 : 0));
+    const c = ml.confusion(labels, pred, 1);
+    const m = ml.metrics(c);
+    put(strip, scores.map((s, i) => {
+      const chip = h("button", { type: "button", class: `chip-ex ${labels[i] ? "is-pos" : "is-neg"} ${pred[i] ? "said-pos" : ""}`, title: "Tıkla: gerçek sınıfı değiştir" },
+        h("span", { class: "sc" }, f(s, 2)), h("span", { class: "gt" }, labels[i] ? "+" : "−"), h("span", { class: "tg" }, c.tags[i]));
+      chip.addEventListener("click", () => { labels = labels.map((v, j) => (j === i ? 1 - v : v)); render(); });
+      return chip;
+    }), h("div", { class: "strip-legend small" }, `Soldan sağa skor azalıyor. Skoru ≥ ${f(t, 2)} olanlar (koyu çerçeveli) “pozitif” tahmin ediliyor.`));
+    const r = ml.roc(labels.map(Boolean));
+    const P = r.P, N = r.N;
+    const tpr = P ? c.TP / P : 0, fpr = N ? c.FP / N : 0;
+    put(out, h("div", { class: "two-col" },
+      h("div", {},
+        h("table", { class: "cm" }, h("tr", {}, h("th", {}), h("th", {}, "Tahmin +"), h("th", {}, "Tahmin −")),
+          h("tr", {}, h("th", {}, "Gerçek +"), h("td", { class: "d" }, `TP ${c.TP}`), h("td", { class: "o" }, `FN ${c.FN}`)),
+          h("tr", {}, h("th", {}, "Gerçek −"), h("td", { class: "o" }, `FP ${c.FP}`), h("td", { class: "d" }, `TN ${c.TN}`))),
+        table(["ölçüt", "hesap", "değer"], [
+          ["Precision", `${c.TP}/(${c.TP}+${c.FP})`, f(m.precision)], ["Recall (TPR)", `${c.TP}/(${c.TP}+${c.FN})`, f(m.recall)],
+          ["FPR", `${c.FP}/(${c.FP}+${c.TN})`, f(m.fpr)], ["Accuracy", `(${c.TP}+${c.TN})/${m.n}`, f(m.accuracy)], ["F1", `${2 * c.TP}/(${2 * c.TP}+${c.FP}+${c.FN})`, f(m.f1)]], { cls: "compact" })),
+      h("div", {},
+        lines({ series: [{ pts: r.table.map((q) => [q.FPR, q.TPR]), cls: "curve1", name: `ROC (AUC = ${f(r.auc)})`, color: "pos" }, { pts: [[fpr, tpr], [fpr, tpr]], cls: "curve2", dots: true, name: `şu anki eşik: (${f(fpr, 2)}, ${f(tpr, 2)})`, color: "neg" }, { pts: [[0, 0], [1, 1]], cls: "curve3", name: "rastgele", color: "s3" }], xlim: [0, 1], ylim: [0, 1], xstep: 0.25, ystep: 0.25, xlabel: "FPR", ylabel: "TPR" }),
+        h("p", { class: "small" }, t >= 0.99 ? "Hiç pozitif yok: TPR = FPR = 0 (sol alt köşe)." : t <= 0.01 ? "Herkes pozitif: TPR = FPR = 1 (sağ üst köşe)." : "Eşiği düşürdükçe nokta ROC eğrisi üzerinde sağa/yukarı ilerler."))));
+  }
+  body.append(th.el, strip, out);
+  render();
+  return el;
+}
+
+// ======================================================================= AdaBoost round by round
+export function adaboost(ds) {
+  const { el, body } = frame("AdaBoost tur tur: ağırlıklar (nokta büyüklüğü) hatalara nasıl akıyor?");
+  let start;
+  try { start = parsePts(ds.pts || "0 0 - A\n0 0.5 - B\n0 1 + C\n0.5 0 - D\n0.5 0.5 + E\n0.5 1 + F\n1 0.5 + G\n1 1 + H"); } catch (e) { return errorBox(e.message); }
+  const narr = h("div", { class: "narrate", "aria-live": "polite" });
+  const out = h("div", { class: "out" });
+  const count = h("span", { class: "count" });
+  let res = null, rounds = [], t = 0, pool = [];
+  const mode = seg([["+", "● + ekle"], ["-", "■ − ekle"]], "+");
+  const stumpOf = (name) => pool.find((p) => p.name === name);
+  const ed = pointEditor({ ...box(start, 0.25), points: start, getMode: mode.get, onChange: () => { data.set(pointsToText(ed.points)); t = 0; recompute(); },
+    layers: (api) => {
+      if (!res) return "";
+      if (t > rounds.length) return api.cells((a, b2) => (res.H([a, b2]) >= 0 ? 1 : -1), 40);
+      if (t === 0) return "";
+      const st = stumpOf(rounds[t - 1].best.name);
+      const g = (st.j === 0) ? [[1, 0], -st.th] : [[0, 1], -st.th];
+      const w = st.dir > 0 ? g[0] : g[0].map((v) => -v), b0 = st.dir > 0 ? g[1] : -g[1];
+      return api.halves(w, b0) + api.line(w, b0);
+    },
+    decorate: (e) => {
+      const d = {};
+      if (!res) return d;
+      const wts = t === 0 || t > rounds.length ? (t === 0 ? e.points.map(() => 1 / e.points.length) : rounds.at(-1).next || rounds.at(-1).w) : rounds[t - 1].w;
+      const n = e.points.length;
+      e.points.forEach((p, i) => {
+        const size = Math.max(0.55, Math.min(2.6, Math.sqrt(wts[i] * n)));
+        const wrong = t >= 1 && t <= rounds.length ? rounds[t - 1].wrong[i] : t > rounds.length ? Math.sign(res.score[i]) !== p.y : false;
+        d[p.name] = { size, cross: wrong, note: f(wts[i], 3) };
+      });
+      return d;
+    } });
+  const data = dataBox(pointsToText(start), (v) => { try { ed.set(parsePts(v)); t = 0; recompute(); } catch { /* typing */ } });
+  function recompute() {
+    const P = ed.points;
+    pool = [];
+    for (const j of [0, 1]) {
+      const v = ml.uniq(P.map((p) => p.x[j])).sort((a, b2) => a - b2);
+      for (let i = 0; i + 1 < v.length; i++) {
+        const th = (v[i] + v[i + 1]) / 2;
+        pool.push({ name: `x${j + 1} ≥ ${f(th)} → +`, j, th, dir: 1, f: (x) => (x[j] >= th ? 1 : -1) });
+        pool.push({ name: `x${j + 1} < ${f(th)} → +`, j, th, dir: -1, f: (x) => (x[j] < th ? 1 : -1) });
+      }
+    }
+    if (!pool.length || !P.some((p) => p.y > 0) || !P.some((p) => p.y < 0)) { res = null; put(narr, "İki sınıftan da nokta gerekli."); ed.redraw(); return; }
+    const r = ml.adaboost(P.map((p) => p.x), P.map((p) => p.y), pool, 6);
+    rounds = r.rounds.filter((x) => !x.stop);
+    const used = rounds.map((x) => ({ a: x.alpha, s: stumpOf(x.best.name) }));
+    res = { ...r, H: (x) => ml.sum(used.map((u) => u.a * u.s.f(x))) };
+    t = Math.min(t, rounds.length + 1);
+    show();
+  }
+  function show() {
+    count.textContent = t === 0 ? "başlangıç" : t > rounds.length ? "son oylama" : `tur ${t} / ${rounds.length}`;
+    ed.redraw();
+    const P = ed.points;
+    if (!res) return;
+    if (t === 0) put(narr, h("b", {}, "Başlangıç. "), `Bütün ${P.length} noktanın ağırlığı eşit: 1/${P.length} = ${f(1 / P.length)}. Ağırlık, “bu noktayı yanlış bilmek ne kadar pahalı?” demek; büyüklükler şimdilik aynı. İlk turda en az noktayı yanlış bilen tek sorulu kural (kütük) seçilecek.`);
+    else if (t <= rounds.length) {
+      const r = rounds[t - 1], wrongNames = P.filter((_, i) => r.wrong[i]).map((p) => p.name);
+      const alts = [...r.cands].sort((a, b2) => a.eps - b2.eps).slice(1, 3).map((c) => `${c.name} (ε = ${f(c.eps)})`).join(", ");
+      put(narr, h("b", {}, `Tur ${t}: `), `Ağırlıklı hatası en küçük kütük `, h("b", {}, r.best.name), ` — yanlış bildikleri ${wrongNames.join(", ") || "yok"}, bunların ağırlıkları toplamı ε = ${f(r.eps)}. (Rakipler: ${alts}.) `,
+        `Söz hakkı α = ½ ln((1 − ε)/ε) = ½ ln(${f((1 - r.eps) / r.eps)}) = `, h("b", {}, f(r.alpha)), ". ",
+        `Sonra yanlışların ağırlığı ×${f(r.factorWrong)}, doğrularınki ×${f(r.factorRight)} olur: yanlışlar birlikte ağırlığın yarısını taşır. Bir sonraki turda noktaların büyüklüğüne bakın.`);
+    } else {
+      const ok = P.filter((p, i) => Math.sign(res.score[i]) === p.y).length;
+      put(narr, h("b", {}, "Son oylama. "), `Her kütük kendi α'sı kadar oy verir: H(x) = sign(${rounds.map((r) => `${f(r.alpha)}·h${r.t}`).join(" + ")}). Renkli bölgeler birleşik kararın taraflarıdır. ${ok}/${P.length} nokta doğru.`);
+    }
+    put(out, t >= 1 && t <= rounds.length ? table(["nokta", "y", "kütük der", "doğru?", "ağırlık önce", "çarpan", "ağırlık sonra"], P.map((p, i) => { const r = rounds[t - 1]; return { row: [p.name, sgn(p.y), sgn(r.best.h[i]), r.wrong[i] ? h("span", { class: "bad" }, "hayır") : "evet", f(r.w[i]), r.wrong[i] ? `×${f(r.factorWrong)}` : `×${f(r.factorRight)}`, f(r.next[i])], cls: r.wrong[i] ? "hl" : "" }; }), { cls: "compact" })
+      : t > rounds.length ? table(["nokta", "y", ...rounds.map((r) => `h${r.t} (α ${f(r.alpha)})`), "Σ αh", "H"], P.map((p, i) => [p.name, sgn(p.y), ...rounds.map((r) => sgn(r.best.h[i])), f(res.score[i]), sgn(res.score[i] >= 0 ? 1 : -1)]), { cls: "compact" }) : null);
+  }
+  const go = (d) => { t = Math.max(0, Math.min(rounds.length + 1, t + d)); show(); };
+  body.append(h("div", { class: "stepbar" },
+    h("button", { type: "button", class: "btn small", onclick: () => { t = 0; show(); } }, "⏮ Baştan"),
+    h("button", { type: "button", class: "btn small", onclick: () => go(-1) }, "◀ Geri"),
+    h("button", { type: "button", class: "btn small primary", onclick: () => go(1) }, "Sonraki tur ▶"),
+    h("button", { type: "button", class: "btn small", onclick: () => { t = rounds.length + 1; show(); } }, "Son oylama ⏭"), count, mode.el),
+    narr, h("div", { class: "two-col" }, ed.el, out), data.el);
+  recompute();
+  return el;
+}

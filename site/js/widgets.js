@@ -5,6 +5,7 @@ import * as ml from "./lib/ml.js";
 import { scatter, lines } from "./lib/plot.js";
 import { figure } from "./figures.js";
 import * as I from "./interactive.js";
+import { GUIDE } from "./guides.js";
 
 const f = ml.fmt;
 const f2 = (x) => ml.fmt(x, 2);
@@ -20,7 +21,20 @@ export function mountAll(root) {
   for (const el of $$("[data-widget]", root)) {
     const make = W[el.dataset.widget];
     if (!make) { el.replaceWith(errorBox(`Bilinmeyen araç: ${el.dataset.widget}`)); continue; }
-    try { el.replaceWith(make(el.dataset, el)); } catch (e) { console.error(e); el.replaceWith(errorBox("Araç yüklenemedi: " + e.message)); }
+    try {
+      const made = make(el.dataset, el);
+      const g = GUIDE[el.dataset.widget];
+      const bodyEl = made.querySelector?.(":scope > .widget-body");
+      if (g && bodyEl && el.dataset.guide !== "off") {
+        const inSolution = !!el.closest("details.solution");
+        bodyEl.prepend(h("details", { class: "guide", open: !inSolution },
+          h("summary", {}, "🧭 Bu araç ne gösteriyor, nasıl kullanılır?"),
+          h("p", {}, g.what),
+          g.tryit?.length ? [h("p", {}, h("b", {}, "Şunu dene:")), h("ol", {}, g.tryit.map((t) => h("li", {}, t)))] : null,
+          g.see ? h("p", { class: "see" }, h("b", {}, "Ne görmelisin? "), g.see) : null));
+      }
+      el.replaceWith(made);
+    } catch (e) { console.error(e); el.replaceWith(errorBox("Araç yüklenemedi: " + e.message)); }
   }
 }
 
@@ -1200,3 +1214,5 @@ W.lineplay = I.lineplay;
 W.sigplay = I.sigplay;
 W.entplay = I.entplay;
 W.gdplay = I.gdplay;
+W.threshplay = I.threshplay;
+W.adaboost = I.adaboost;

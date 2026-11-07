@@ -105,8 +105,9 @@ export function pointEditor(opts) {
       const cx = X(p.x[0]), cy = Y(p.x[1]);
       const d = deco[p.name] || {};
       const cls = (p.y > 0 ? "pt-pos" : "pt-neg") + (d.dim ? " dim" : "") + (d.bad ? " bad" : "");
-      if (d.ring) s += `<circle cx="${cx}" cy="${cy}" r="11.5" class="${d.ring}"/>`;
-      s += p.y > 0 ? `<circle cx="${cx}" cy="${cy}" r="7" class="${cls}" data-name="${esc(p.name)}"/>` : `<rect x="${cx - 6.5}" y="${cy - 6.5}" width="13" height="13" class="${cls}" data-name="${esc(p.name)}"/>`;
+      if (d.ring) s += `<circle cx="${cx}" cy="${cy}" r="${11.5 * Math.max(1, d.size || 1)}" class="${d.ring}"/>`;
+      const r = 7 * (d.size || 1);
+      s += p.y > 0 ? `<circle cx="${cx}" cy="${cy}" r="${r}" class="${cls}" data-name="${esc(p.name)}"/>` : `<rect x="${cx - r + 0.5}" y="${cy - r + 0.5}" width="${2 * r - 1}" height="${2 * r - 1}" class="${cls}" data-name="${esc(p.name)}"/>`;
       if (d.cross) s += `<path d="M${cx - 9} ${cy - 9}L${cx + 9} ${cy + 9}M${cx + 9} ${cy - 9}L${cx - 9} ${cy + 9}" class="miss"/>`;
       if (opts.labels !== false) s += `<text x="${cx + 9}" y="${cy - 8}" class="lab">${esc(p.name)}${d.note ? ` <tspan class="note">${esc(d.note)}</tspan>` : ""}</text>`;
     }

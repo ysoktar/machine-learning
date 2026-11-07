@@ -13,10 +13,12 @@
 <body data-page="w4-linear">
 <main><div class="content">
 
+<!-- clarified -->
 <h1>Doğrusal modeller</h1>
 <p class="lead">Regresyondan sınıflandırmaya hepsi aynı kalıp: <span class="m">ŷ = f(wᵀx + b)</span>. En küçük kareler, gradyan inişi, lojistik regresyon, perceptron, softmax, ridge/lasso. Ara sınavın C bölümü (17 puan): <strong>bir lojistik regresyon ya da perceptron güncelleme adımı</strong>. Güncelleme kuralını ezbere bilin, her satırda z'yi açıkça yazın.</p>
 <!-- enriched -->
 <div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<p class="small"><b>Bu tablo nasıl kullanılır?</b> Sayfayı okumadan önce göz gezdir: neye odaklanacağını söyler. Terimleri henüz bilmiyorsan sorun değil; sayfanın sonunda geri dön ve her satırı kendin yapabiliyor musun diye kontrol et.</p>
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
 <tr><td>Perceptron epoch'u (C bölümü)</td><td>4–7 nokta, başlangıç w, b, η; her satırda z, ŷ, güncelleme; son ağırlıklarla karmaşıklık matrisi</td><td>her satırda z'yi açık yazmak; z = 0 → +1 kuralı; işaret</td></tr>
 <tr><td>Lojistik regresyon adımı (C)</td><td>tek örnek, w = 0; p, kayıp, gradyan, yeni w ve b; yeni p (tablo verilir)</td><td>w ← w − η(p − y)x; kaybın düştüğünü göstermek</td></tr>
@@ -32,6 +34,7 @@
 <div class="intuition"><div class="intuition-title">💡 Noktalardan geçen en iyi doğru</div><p>Evin metrekaresi ile fiyatı arasında kabaca doğrusal bir ilişki varsa, noktaların arasından bir doğru geçirip yeni bir evin fiyatını o doğrudan okuyabiliriz. Hangi doğru “en iyi”? Her noktanın doğruya dikey uzaklığı (hata) vardır; <strong>en küçük kareler</strong> bu hataların karelerinin toplamını en küçük yapan doğruyu seçer.</p><p>Formüldeki w₁ (eğim) “x bir birim artınca y ortalama ne kadar artar”, w₀ (kesişim) “x = 0 iken y”dir.</p></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>x = (1, 2, 3), y = (1, 2, 3). w₁ ve w₀?</p><details><summary>Cevabı göster</summary><p>x̄ = ȳ = 2; Σ(x − x̄)(y − ȳ) = 1 + 0 + 1 = 2; Σ(x − x̄)² = 2 → w₁ = <strong>1</strong>, w₀ = 2 − 1·2 = <strong>0</strong>. Doğru y = x: noktalar tam üstünde.</p></details></div>
 <p>Model <span class="m">ŷ = w₀ + w₁x₁ + … + w_dx_d</span>; x'in başına sabit 1 eklenirse w₀ ağırlık vektörüne girer: ŷ = wᵀx. Kayıp: MSE. “Doğrusal” <em>parametrelerde</em> doğrusal demektir: x², log x gibi türetilmiş öznitelikler kullanılabilir.</p>
 <div class="formula">w* = (XᵀX)⁻¹Xᵀy &nbsp;(normal denklemler) &nbsp;·&nbsp; tek değişken: w₁ = Σ(xᵢ − x̄)(yᵢ − ȳ) / Σ(xᵢ − x̄)², &nbsp; w₀ = ȳ − w₁x̄</div>
+<div class="read-formula"><b>Nasıl okunur?</b><ul><li>Sınavda kullanılan tek değişkenli biçimdir: önce ortalamaları (x̄, ȳ) bul; her nokta için (x − x̄) ve (y − ȳ) farklarını yaz.</li><li><b>w₁ (eğim)</b> = Σ(x farkı × y farkı) / Σ(x farkı)². x ile y birlikte artıyorsa pay pozitif, eğim pozitif.</li><li><b>w₀ (kesişim)</b> = ȳ − w₁x̄: doğru (x̄, ȳ) noktasından geçer.</li><li>Matris biçimi (XᵀX)⁻¹Xᵀy aynı şeyin çok öznitelikli hâlidir; elle hesaplanmaz.</li></ul></div>
 <div data-widget="lsq"></div>
 <ul>
 <li>XᵀX'in tersi alınabilmeli: n ≥ d, sütunlar doğrusal bağımsız. Maliyet O(nd² + d³): d binlere çıkınca pahalı → ridge (λI ekle) ya da gradyan inişi.</li>
@@ -42,6 +45,7 @@
 <h2>Gradyan inişi</h2>
 <div class="intuition"><div class="intuition-title">💡 Sisli dağdan inmek</div><p>Gözleriniz bağlı bir vadide en alçak noktayı arıyorsunuz. Yapabileceğiniz tek şey ayağınızın altındaki eğime bakıp yokuş aşağı küçük bir adım atmak, sonra tekrar bakmak. Gradyan inişi budur: kaybın eğimini (türevini) hesapla, eğimin tersi yönünde η kadar adım at.</p><p>Adım çok küçükse vadiye varmak çok uzun sürer; çok büyükse vadinin karşı yamacına sıçrar, giderek daha yükseğe savrulabilirsiniz (ıraksama).</p></div><div data-widget="fig" data-fig="bowl" data-caption="Kayıp eğrisinde gradyan inişi: küçük η emin adımlarla iner, büyük η minimumun iki yanına savrulur."></div>
 <div class="formula">w ← w − η ∇L(w), &nbsp;&nbsp; MSE için ∇L(w) = (2/n) Xᵀ(Xw − y)</div>
+<div class="read-formula"><b>Nasıl okunur?</b><ul><li>“←” “yeni değeri şu olsun” demek. ∇L(w) kaybın eğimi (türevi); η (eta) adım büyüklüğü.</li><li>Eğim pozitifse (sağa gidince kayıp artıyorsa) w küçülür, negatifse büyür: hep yokuş aşağı. <b>Eksi işareti</b> bu yüzden var; sınavda en sık unutulan şey.</li></ul></div>
 <p>Kayıp yüzeyinde en dik iniş yönünde küçük adımlar. MSE dışbükeydir: tek global minimum, uygun η ile yakınsama garantili. <strong>Küçük η</strong>: yavaş. <strong>Büyük η</strong>: minimumu aşar, salınır, ıraksar. Durma: kayıptaki değişim ε'dan küçük ya da iterasyon sayısı doldu. Neden kapalı çözüm yerine gradyan inişi? Büyük d/n'de (XᵀX)⁻¹ pahalı ya da bellek yetmez; lojistik regresyon ve sinir ağlarının kapalı çözümü <em>yoktur</em>.</p>
 <div data-widget="gdplay"></div>
 <p class="small">Aynı hesap sınav tablosu biçiminde (ŷ = w·x, iki nokta):</p>
@@ -76,12 +80,14 @@
 </ol></div>
 
 <div class="formula">p(y = 1 | x) = σ(wᵀx + b), &nbsp; σ(z) = 1/(1 + e⁻ᶻ)</div>
+<div class="read-formula"><b>Nasıl okunur?</b><ul><li>p(y = 1 | x): “bu özniteliklere (x) sahip örneğin sınıfının 1 olma olasılığı”. wᵀx, w·x ile aynı: iç çarpım.</li><li>Önce doğrusal skor z = w·x + b hesaplanır, sonra σ (sigmoid) onu 0–1 arasına sıkıştırır. e⁻ᶻ değerleri sınavda tabloyla verilir.</li></ul></div>
 <ul>
 <li>σ(0) = 0.5, σ(−z) = 1 − σ(z), <strong>σ′(z) = σ(z)(1 − σ(z)) ≤ 0.25</strong>.</li>
 <li>Karar p ≥ 0.5 ⇔ wᵀx + b ≥ 0: <strong>sınır yine doğrusal</strong>. Eşiği değiştirmek precision/recall dengesini değiştirir.</li>
 <li>log-odds: log(p/(1 − p)) = wᵀx + b. w_j = 0.7: x_j bir birim artınca odds e⁰·⁷ ≈ 2 katına çıkar (nedensellik değil, ilişki).</li>
 </ul>
 <div class="formula">L = −(1/n) Σ [ yᵢ log pᵢ + (1 − yᵢ) log(1 − pᵢ) ] &nbsp;&nbsp;&nbsp; ∂L/∂w = (1/n) Σ (pᵢ − yᵢ) xᵢ, &nbsp; ∂L/∂b = (1/n) Σ (pᵢ − yᵢ)</div>
+<div class="read-formula"><b>Nasıl okunur?</b><ul><li>Her örnek için yalnız bir terim çalışır: y = 1 ise −log p, y = 0 ise −log(1 − p). Yani “doğru sınıfa verdiğin olasılığın eksi logaritması”.</li><li>Gradyan (p − y)·x: tahmin hatası (p − y) çarpı girdi. p = 0.8, y = 1 ise hata −0.2: ağırlıklar x yönünde artırılır.</li></ul></div>
 <p><strong>Log-loss</strong> Bernoulli olabilirliğinin negatif logaritmasıdır. y = 1 iken kayıp −ln p: p → 0 iken sonsuza gider, “emin olup yanılmanın” bedeli sınırsızdır. Neden MSE değil? σ ile MSE dışbükey değildir ve emin yanlışları çok az cezalandırır (p = 0.88 iken y = 0: log-loss 2.12, kare hata 0.77). Kapalı çözüm yok: gradyan inişi ya da Newton (IRLS).</p>
 <div data-widget="sigplay"></div>
 <div data-widget="logstep"></div>
@@ -124,6 +130,7 @@
 <div class="card"><h3>Softmax (çok terimli LR)</h3><p>Sınıf başına bir w_k, tek model; olasılıkların toplamı 1; kayıp çapraz entropi −log p_y. Sinir ağının standart çıktı katmanı. K = 2 iken sigmoide indirgenir.</p></div>
 </div>
 <div class="formula">p(y = k | x) = exp(w_kᵀx) / Σⱼ exp(wⱼᵀx)</div>
+<div class="read-formula"><b>Nasıl okunur?</b><ul><li>Her sınıfın skoru zₖ = wₖ·x hesaplanır; e^{zₖ} hepsini pozitif yapar; toplama bölmek toplamı 1 yapar.</li><li>En büyük skorlu sınıf en büyük olasılığı alır. Kayıp: doğru sınıfın olasılığının −ln'i.</li></ul></div>
 <div data-widget="softmax"></div>
 
 <h2>Düzenlileştirme: ridge ve lasso</h2>
@@ -136,45 +143,32 @@
 </ul>
 
 <h2>Sınav tipi çözümlü problemler</h2>
+<p>Aşağıdaki problemler sınavdaki biçimdedir. Her birini önce kâğıtta çözmeye çalış (5–10 dakika), sonra “çözümü aç”a bas: çözümde her adımın <em>neden</em> öyle yapıldığı da yazıyor. Takılırsan sayfanın ilgili bölümüne dön.</p>
 <h3>Problem 1: perceptron, bir epoch ve yakınsama</h3>
-<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>Örnekler sırayla: P1 (1, 1) +1, P2 (2, 0) +1, P3 (0, 1) −1, P4 (−1, 0) −1, P5 (1, −1) +1. w = (0, 0), b = 0, η = 1; z ≥ 0 → +1. (a) Bir epoch tablosu. (b) Son ağırlıklarla karmaşıklık matrisi ve accuracy. (c) Veri doğrusal ayrılabilir mi, algoritma durur mu?</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><div class="table-wrap"><table class="simple compact"><thead><tr><th>#</th><th>x</th><th>y</th><th>z</th><th>ŷ</th><th>güncelleme?</th><th>w, b sonra</th></tr></thead><tbody>
-<tr><td>P1</td><td>(1, 1)</td><td>+1</td><td>0</td><td>+1</td><td>hayır</td><td>(0, 0), 0</td></tr>
-<tr><td>P2</td><td>(2, 0)</td><td>+1</td><td>0</td><td>+1</td><td>hayır</td><td>(0, 0), 0</td></tr>
-<tr class="hl"><td>P3</td><td>(0, 1)</td><td>−1</td><td>0</td><td>+1</td><td><strong>evet</strong>: w − (0, 1), b − 1</td><td>(0, −1), −1</td></tr>
-<tr><td>P4</td><td>(−1, 0)</td><td>−1</td><td>−1</td><td>−1</td><td>hayır</td><td>(0, −1), −1</td></tr>
-<tr><td>P5</td><td>(1, −1)</td><td>+1</td><td>0 + 1 − 1 = 0</td><td>+1</td><td>hayır</td><td>(0, −1), −1</td></tr></tbody></table></div>
-<p>(b) w = (0, −1), b = −1 ile: P1 z = −2 → −1 (FN), P2 z = −1 → −1 (FN), P3 −2 (TN), P4 −1 (TN), P5 z = 0 → +1 (TP). TP 1, FN 2, FP 0, TN 2; accuracy 3/5 = 0.6. Epoch P3'ü düzeltti ama P1, P2'yi bozdu: tek epoch nadiren yeter.</p>
-<p>(c) Evet: x₁ − 0.5x₂ − 0.25 ≥ 0 hepsini ayırır. Ayıran bir doğru varsa <strong>yakınsama teoremi</strong> sonlu sayıda güncellemede durmayı garanti eder: 2. epoch w = (1, −1), b = −1; 3. epoch w = (2, −1), b = −1; 4. epoch hatasız.</p>
-<div data-widget="perceptron" data-pts="1 1 +
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>Eğitim örnekleri sırayla: P1 = (1, 1) sınıf +1, P2 = (2, 0) +1, P3 = (0, 1) −1, P4 = (−1, 0) −1, P5 = (1, −1) +1. Başlangıç w = (0, 0), b = 0, öğrenme oranı η = 1. Kural: z = w·x + b ≥ 0 ise tahmin +1, değilse −1; yanlış tahminde w ← w + η·y·x ve b ← b + η·y. (a) Bir epoch'u tablo hâlinde uygulayın. (b) Epoch sonundaki ağırlıklarla bütün örnekleri sınıflayıp karmaşıklık matrisini ve accuracy'yi bulun. (c) Veri doğrusal ayrılabilir mi, algoritma bir gün durur mu?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Perceptron örnekleri sırayla dolaşır. Her örnekte önce z'yi hesaplar ve tahmin yapar; tahmin doğruysa hiçbir şeye dokunmaz, yanlışsa ağırlıkları o örneğin doğru tarafa geçeceği yöne kaydırır.</p><p>(a) Başta bütün ağırlıklar 0 olduğu için P1 ve P2'de z = 0 çıkar; kurala göre 0 da +1 sayılır ve ikisi de doğru tahmin edilir. P3'te de z = 0 ve tahmin +1, ama gerçek sınıf −1: ilk hata. Güncelleme w ← (0, 0) + 1·(−1)·(0, 1) = (0, −1) ve b ← 0 − 1 = −1 olur. P4'te z = 0·(−1) + (−1)·0 − 1 = −1, tahmin −1, doğru. P5'te z = 0·1 + (−1)·(−1) − 1 = 0, tahmin +1, doğru.</p><div class="table-wrap"><table class="simple compact"><thead><tr><th>örnek</th><th>z</th><th>tahmin</th><th>gerçek</th><th>güncelleme</th><th>sonra w, b</th></tr></thead><tbody>
+<tr><td>P1</td><td>0</td><td>+1</td><td>+1</td><td>yok</td><td>(0, 0), 0</td></tr><tr><td>P2</td><td>0</td><td>+1</td><td>+1</td><td>yok</td><td>(0, 0), 0</td></tr>
+<tr class="hl"><td>P3</td><td>0</td><td>+1</td><td>−1</td><td>w − (0, 1), b − 1</td><td>(0, −1), −1</td></tr>
+<tr><td>P4</td><td>−1</td><td>−1</td><td>−1</td><td>yok</td><td>(0, −1), −1</td></tr><tr><td>P5</td><td>0</td><td>+1</td><td>+1</td><td>yok</td><td>(0, −1), −1</td></tr></tbody></table></div><p>(b) Epoch sonundaki w = (0, −1), b = −1 ile örnekleri yeniden sınıflarız: P1 için z = −2 (tahmin −1, ama gerçek +1: FN), P2 için z = −1 (FN), P3 için z = −2 (TN), P4 için z = −1 (TN), P5 için z = 0 (TP). Sonuç TP 1, FN 2, FP 0, TN 2; accuracy 3/5 = 0.6. Güncelleme P3'ü düzeltti ama P1 ile P2'yi bozdu; tek epoch çoğu zaman yetmez.</p><p>(c) Veri doğrusal ayrılabilir; örneğin x₁ − 0.5x₂ − 0.25 = 0 doğrusu iki sınıfı ayırır. Ayıran bir doğru varsa perceptron yakınsama teoremi, algoritmanın sonlu sayıda güncellemeden sonra hatasız bir tur yapıp duracağını garanti eder. Burada 2. epoch sonunda w = (1, −1), b = −1; 3. epoch sonunda w = (2, −1), b = −1 olur ve 4. epoch hiç hata yapmaz. Aşağıdaki araçta bunu adım adım izleyebilirsiniz.</p><div data-widget="perceptron" data-pts="1 1 +
 2 0 +
 0 1 -
 -1 0 -
 1 -1 +" data-w="0 0" data-b="0" data-eta="1" data-epochs="5"></div></div></details>
-<h3>Problem 2: lojistik regresyon, y = 0 örneği</h3>
-<div class="problem"><div class="ptitle">Soru</div><p>w = (1, −1), b = 0, η = 0.5; tek örnek x = (2, 1), y = 0. (a) z, p ve kayıp. (b) gradyan. (c) yeni w, b. (d) yeni p'yi yaklaşık bulun (e⁻¹ = 0.368).</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>z = 2 − 1 + 0 = 1, p = σ(1) = 1/(1 + 0.368) = <strong>0.731</strong>. Gerçek y = 0 iken model %73 “1” diyor: kayıp −ln(1 − 0.731) = −ln 0.269 ≈ <strong>1.31</strong>.</li>
-<li>p − y = 0.731 → ∂L/∂w = 0.731·(2, 1) = (1.462, 0.731), ∂L/∂b = 0.731.</li>
-<li>w = (1, −1) − 0.5·(1.462, 0.731) = <strong>(0.269, −1.366)</strong>, b = 0 − 0.5·0.731 = <strong>−0.366</strong>.</li>
-<li>z′ = 0.538 − 1.366 − 0.366 = −1.194 → p′ ≈ σ(−1.2) = 1 − σ(1.2) ≈ 0.23. p 0.73'ten 0.23'e indi, kayıp ≈ 0.27: adım doğru yönde.</li></ol>
-<p class="small muted">y = 0 olduğunda p − y pozitiftir, ağırlıklar x yönünde <em>azalır</em>: işaret kuralını bu örnekle sınayın.</p>
-<div data-widget="logstep" data-x="2 1" data-w="1 -1" data-b="0" data-y="0" data-eta="0.5"></div></div></details>
+<h3>Problem 2: lojistik regresyon, y = 0 olan bir örnek</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>Ağırlıklar w = (1, −1), kesişim b = 0, öğrenme oranı η = 0.5. Tek bir eğitim örneği var: x = (2, 1), y = 0. (a) z, p ve kaybı hesaplayın. (b) Gradyanı bulun. (c) Bir gradyan adımından sonra w ve b ne olur? (d) Yeni p'yi yaklaşık bulun (e⁻¹ = 0.368).</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Lojistik regresyonda önce doğrusal skor z'yi, sonra sigmoid ile olasılık p'yi hesaplarız. Kayıp, doğru sınıfa verilen olasılığın negatif logaritmasıdır. Ağırlıkları güncellemek için (p − y)·x gradyanını kullanır ve onun tersi yönünde adım atarız.</p><p>(a) z = 1·2 + (−1)·1 + 0 = 1. p = σ(1) = 1/(1 + e⁻¹) = 1/1.368 ≈ <strong>0.731</strong>. Model bu örneğin sınıfının 1 olduğuna %73 inanıyor, ama gerçek sınıf 0. Bu yüzden kayıp büyük: −ln(1 − 0.731) = −ln 0.269 ≈ <strong>1.31</strong>.</p><p>(b) Tahmin hatası p − y = 0.731 − 0 = 0.731. Gradyan bu hatanın girdiyle çarpımıdır: ∂L/∂w = 0.731 × (2, 1) = (1.462, 0.731) ve ∂L/∂b = 0.731.</p><p>(c) Gradyanın tersi yönünde η = 0.5 kadar ilerleriz: w = (1, −1) − 0.5 × (1.462, 0.731) = <strong>(0.269, −1.366)</strong>, b = 0 − 0.5 × 0.731 = <strong>−0.366</strong>.</p><p>(d) Yeni skor z = 0.269·2 + (−1.366)·1 − 0.366 ≈ −1.19. σ(−1.19), yaklaşık 1 − σ(1.2) ≈ 0.23 eder. p 0.73'ten 0.23'e indi ve kayıp yaklaşık 0.27'ye düştü; yani adım doğru yönde atıldı. Gerçek sınıf 0 olduğunda p − y pozitif çıkar ve ağırlıklar x yönünde azalır; işaret kuralını bu örnekle sınayabilirsiniz.</p><div data-widget="logstep" data-x="2 1" data-w="1 -1" data-b="0" data-y="0" data-eta="0.5"></div></div></details>
 <h3>Problem 3: en küçük kareler</h3>
-<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>x = (1, 2, 3, 4), y = (2, 3, 5, 6). y = w₀ + w₁x'i bulun; tahminler, artıklar ve MSE.</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>x̄ = 2.5, ȳ = 4. Σ(x − x̄)(y − ȳ) = (−1.5)(−2) + (−0.5)(−1) + (0.5)(1) + (1.5)(2) = 3 + 0.5 + 0.5 + 3 = 7; Σ(x − x̄)² = 2.25 + 0.25 + 0.25 + 2.25 = 5. w₁ = 7/5 = <strong>1.4</strong>, w₀ = 4 − 1.4·2.5 = <strong>0.5</strong>. ŷ = 1.9, 3.3, 4.7, 6.1; artıklar 0.1, −0.3, 0.3, −0.1 (toplam 0 ✓); MSE = (0.01 + 0.09 + 0.09 + 0.01)/4 = <strong>0.05</strong>.</p></div></details>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>x = (1, 2, 3, 4) ve y = (2, 3, 5, 6) noktalarına y = w₀ + w₁x doğrusunu uydurun; tahminleri, artıkları ve MSE'yi bulun.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Tek değişkenli en küçük karelerde önce ortalamaları buluruz, sonra her noktanın ortalamadan farkını kullanarak eğimi hesaplarız.</p><p>x'lerin ortalaması 2.5, y'lerin ortalaması 4. Her nokta için (x − 2.5)(y − 4) çarpımları 3, 0.5, 0.5 ve 3; toplamı 7. (x − 2.5)² değerleri 2.25, 0.25, 0.25, 2.25; toplamı 5. Eğim w₁ = 7/5 = <strong>1.4</strong>. Kesişim, doğrunun ortalama noktasından geçmesi şartından bulunur: w₀ = 4 − 1.4 × 2.5 = <strong>0.5</strong>.</p><p>Doğru ŷ = 0.5 + 1.4x. Tahminler 1.9, 3.3, 4.7, 6.1; artıklar (y − ŷ) 0.1, −0.3, 0.3, −0.1. Artıkların toplamının 0 çıkması hesabın doğru olduğunu gösterir. MSE = (0.01 + 0.09 + 0.09 + 0.01)/4 = <strong>0.05</strong>.</p></div></details>
 <h3>Problem 4: gradyan inişi ve öğrenme oranı</h3>
-<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>ŷ = wx (bias yok), L(w) = (1/n)Σ(wxᵢ − yᵢ)², noktalar (1, 2) ve (2, 4). w = 0, η = 0.1 ile iki adım. Minimum nerede? η = 1.0 olsaydı?</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>∂L/∂w = (2/n)Σ(wxᵢ − yᵢ)xᵢ. w = 0: (2/2)[(−2)·1 + (−4)·2] = −10 → w = 0 − 0.1·(−10) = <strong>1.0</strong>. w = 1: (−1)·1 + (−2)·2 = −5 → w = <strong>1.5</strong>. Minimum w = 2 (iki nokta da y = 2x üzerinde, kayıp 0); her adım kalan uzaklığı yarıya indiriyor. η = 1: w = 10, sonra gradyan 40 → w = −30: <strong>ıraksar</strong>.</p></div></details>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>Model ŷ = wx (kesişim yok), kayıp L(w) = (1/n)Σ(wxᵢ − yᵢ)², veri iki nokta: (1, 2) ve (2, 4). w = 0'dan başlayıp η = 0.1 ile iki adım atın. Minimum nerededir? η = 1.0 olsaydı ne olurdu?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Gradyan inişinde her adımda kaybın eğimini (türevini) hesaplar, eğimin tersi yönünde η kadar ilerleriz. Bu kaybın türevi ∂L/∂w = (2/n)Σ(wxᵢ − yᵢ)xᵢ'dir.</p><p>w = 0 iken türev (2/2)[(0 − 2)·1 + (0 − 4)·2] = −10'dur. Eğim negatif olduğu için w'yi artırırız: w = 0 − 0.1 × (−10) = <strong>1.0</strong>. w = 1 iken türev (1 − 2)·1 + (2 − 4)·2 = −5; yeni w = 1 − 0.1 × (−5) = <strong>1.5</strong>.</p><p>İki nokta da y = 2x doğrusunun üzerinde olduğu için kayıp w = 2'de sıfırdır; minimum <strong>w = 2</strong>. Her adım kalan uzaklığı yarıya indiriyor (0 → 1 → 1.5 → …).</p><p>η = 1.0 olsaydı ilk adım w'yi 10'a götürürdü; orada türev 40 olduğu için sonraki adım w = −30 olurdu. Adımlar minimumun iki yanına giderek büyüyerek savrulur, yani yöntem <strong>ıraksar</strong>. Öğrenme oranı çok büyük seçilmiştir.</p></div></details>
 <h3>Problem 5: karar sınırı</h3>
-<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>w = (2, −1), b = −1. (a) Sınır doğrusu. (b) (1, 0), (0, 2), (2, 3)'ü sınıfla. (c) (1, 0)'ın sınıra uzaklığı. (d) w ve b'yi 3 ile çarparsak?</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>2x₁ − x₂ − 1 = 0 ⇔ x₂ = 2x₁ − 1 ((0.5, 0) ve (1, 1)'den geçer); w sağ alt (+) tarafı gösterir.</li>
-<li>(1, 0): 1 → +; (0, 2): −3 → −; (2, 3): 0 → sınırda, z ≥ 0 kuralıyla +.</li>
-<li>|1|/√5 = <strong>0.45</strong>.</li>
-<li>Sınır aynı nokta kümesi, uzaklıklar da aynı (formül ‖w‖'ye böler); yalnız skorların ölçeği değişir.</li></ol></div></details>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>Bir doğrusal sınıflandırıcının ağırlıkları w = (2, −1), kesişimi b = −1. (a) Karar sınırının denklemini yazın. (b) (1, 0), (0, 2) ve (2, 3) noktalarını sınıflayın. (c) (1, 0)'ın sınıra uzaklığı nedir? (d) w ile b'yi 3'le çarparsak ne değişir?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Doğrusal sınıflandırıcı her nokta için z = w·x + b skorunu hesaplar: z ≥ 0 ise +, değilse −. Sınır, z'nin tam sıfır olduğu noktalardır.</p><p>(a) Sınır 2x₁ − x₂ − 1 = 0, yani x₂ = 2x₁ − 1 doğrusudur; örneğin (0.5, 0) ve (1, 1) noktalarından geçer. w vektörü bu doğruya diktir ve + tarafı (sağ alt) gösterir.</p><p>(b) (1, 0) için z = 2 − 0 − 1 = 1 > 0, sınıf +. (0, 2) için z = 0 − 2 − 1 = −3, sınıf −. (2, 3) için z = 4 − 3 − 1 = 0; nokta tam sınırın üzerinde, z ≥ 0 kuralına göre +.</p><p>(c) Uzaklık |z| / ‖w‖'dir. ‖w‖ = √(4 + 1) = √5 ≈ 2.236, uzaklık 1/2.236 ≈ <strong>0.45</strong>.</p><p>(d) Denklemi 3'le çarpmak aynı doğruyu verir, bu yüzden sınır yerinden oynamaz. Uzaklık formülü de ‖w‖'ye böldüğü için uzaklıklar değişmez; yalnız z skorlarının büyüklüğü üç katına çıkar.</p></div></details>
 <h3>Problem 6: mantık kapısı ve XOR</h3>
-<div class="problem"><div class="ptitle">Soru</div><p>(a) NAND için (w₁, w₂, b) verin (z ≥ 0 → 1). (b) XOR'un tek nöronla yapılamayacağını gösterin.</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>AND (w = (1, 1), b = −1.5)'in işaretlerini çevirin: w = (−1, −1), <strong>b = 1.5</strong>. Denetim: (1, 1) → −0.5 → 0; diğerleri ≥ 0.5 → 1.</li>
-<li>XOR: (0,1) ve (1,0) → 1 ister: w₂ + b ≥ 0, w₁ + b ≥ 0; (0,0) → 0: b &lt; 0; (1,1) → 0: w₁ + w₂ + b &lt; 0. İlk ikisini topla: w₁ + w₂ + 2b ≥ 0 ⇒ w₁ + w₂ + b ≥ −b &gt; 0. Bu son koşulla çelişir. Gizli katman gerekir (8. hafta).</li></ol></div></details>
+<div class="problem"><div class="ptitle">Soru</div><p>Bir nöron, z = w₁x₁ + w₂x₂ + b ≥ 0 ise 1, değilse 0 veriyor (x₁, x₂ ∈ {0, 1}). (a) NAND kapısı için w₁, w₂ ve b verin. (b) XOR'un tek nöronla yapılamayacağını gösterin.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>(a) NAND, AND'in tersidir: yalnız iki girdi de 1 iken 0 verir. AND için w = (1, 1), b = −1.5 kullanılır; bütün işaretleri ters çevirince NAND elde edilir: w = (−1, −1), <strong>b = 1.5</strong>. Denetim: (1, 1) için z = −0.5 < 0, çıktı 0; diğer üç girdide z en az 0.5, çıktı 1.</p><p>(b) XOR'un (0, 1) ve (1, 0) için 1 vermesi gerekir; bu, w₂ + b ≥ 0 ve w₁ + b ≥ 0 demektir. (0, 0) için 0 vermesi b < 0, (1, 1) için 0 vermesi w₁ + w₂ + b < 0 demektir. İlk iki eşitsizliği toplarsak w₁ + w₂ + 2b ≥ 0, yani w₁ + w₂ + b ≥ −b elde ederiz. b negatif olduğu için −b pozitiftir; dolayısıyla w₁ + w₂ + b pozitif çıkar. Bu, son koşulla çelişir. Demek ki hiçbir w₁, w₂, b XOR'u veremez; bunun için gizli katmanlı bir ağ gerekir (8. hafta).</p></div></details>
 <h2>Sık hatalar</h2>
 <ul class="mistakes">
 <li>Perceptron'da z = 0'ı −1 saymak (kural z ≥ 0 → +1).</li>
@@ -188,6 +182,7 @@
 </ul>
 
 <h2>Hiperparametre satırları</h2>
+<p><b>Bu tablo nasıl okunur?</b> Her satır bir ayarın (hiperparametrenin) değeri <em>artırıldığında</em> ne olduğunu söyler. <b>Yanlılık</b> “model çok mu basit, sistematik hata yapıyor mu?”, <b>varyans</b> “model veriye göre çok mu oynuyor?”, <b>aşırı uyum riski</b> “ezberleme tehlikesi”. Kural: ayar modeli daha esnek yapıyorsa yanlılık ↓, varyans ↑, risk ↑; daha katı yapıyorsa tersi. Sınavda “X artarsa ne olur, neden?” diye tam bu biçimde sorulur. <span class="down">Yeşil</span> = azalır, <span class="up">kırmızı</span> = artar.</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Neden</th></tr></thead>
 <tbody>

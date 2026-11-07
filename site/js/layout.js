@@ -301,6 +301,49 @@ function buildPageNav(content, id) {
   spy();
 }
 
+
+/** "How to study this page" box: the order to follow and what the coloured boxes mean. */
+const HOWTO = {
+  week: {
+    title: "📖 Bu sayfa nasıl çalışılır? (önerilen sıra ve kutuların anlamı)",
+    steps: [
+      "<b>🎯 Sınav haritasına</b> 1 dakika göz at: bu haftadan ne sorulduğunu ve puanın nereden geldiğini söyler. Terimleri henüz bilmiyorsan sorun değil.",
+      "Bölümleri <b>yukarıdan aşağı</b> oku. Her bölüm önce sarı <b>💡 sezgi</b> kutusuyla başlar: önce fikri anla, formül sonra gelir.",
+      "Her formülün altındaki <b>“Nasıl okunur?”</b> satırları sembolleri tek tek açıklar. Altı <span class=\"term-demo\">noktalı çizili</span> bir kelimeye takılırsan üzerine gel ya da dokun: kısa tanımı çıkar.",
+      "Mor çerçeveli <b>🧭 araç kılavuzunu</b> okuyup aracı kullan: “Şunu dene” adımlarını yap, “Ne görmelisin?” cümlesini kendin gözlemle.",
+      "<b>✋ Hemen dene</b> sorularını cevabı açmadan çöz; yapamazsan bir önceki paragrafa dön.",
+      "<b>📝 Tarif</b> kutuları sınavda kâğıda nasıl yazacağını adım adım söyler; sınav tipi problemleri bu tariflerle çöz.",
+      "Son olarak <b>sık hatalar</b> listesini ve <b>sınama sorularını</b> yap. Sağdaki içindekiler nerede olduğunu gösterir; bitirince en üstteki “Bu sayfayı çalıştım”ı işaretle.",
+    ],
+  },
+  exam: {
+    title: "📖 Bu sayfa nasıl kullanılır?",
+    steps: [
+      "Önce soruyu kâğıtta kendin çöz (süre tut), sonra “çözüm”ü aç ve adım adım karşılaştır.",
+      "Takıldığın her adımın yanında ilgili haftanın sayfasına bağlantı var: oradaki 💡 sezgi ve 📝 tarif kutularına dön.",
+      "Çözüm içindeki araçlar aynı veriyle hazır gelir: bir sayıyı değiştirip sonucun nasıl değiştiğine bak.",
+    ],
+  },
+  tool: {
+    title: "📖 Bu sayfa nasıl kullanılır?",
+    steps: [
+      "Aracın üstündeki 🧭 kutusunu oku: ne yaptığını ve ne denemen gerektiğini söyler.",
+      "Cevabını önce kendin bul, sonra denetle; yanlışsa çözümü açmadan bir kez daha dene.",
+      "Bir türde üst üste 3 doğru yaptıysan o konu hazır; zayıf olduğun türe geç.",
+    ],
+  },
+};
+const HOWTO_KIND = { "sample-midterm": "exam", "exam-midterm": "exam", "exam-final": "exam", drill: "tool", hyper: "tool" };
+function buildHowto(id, info) {
+  const kind = HOWTO_KIND[id] || (info?.week ? "week" : null);
+  if (!kind) return null;
+  const k = HOWTO[kind];
+  const open = store.get("howto-open-" + kind, true);
+  const d = h("details", { class: "howto", open }, h("summary", {}, k.title), h("ol", {}, k.steps.map((st) => h("li", { html: st }))));
+  d.addEventListener("toggle", () => store.set("howto-open-" + kind, d.open));
+  return d;
+}
+
 async function init() {
   const id = document.body.dataset.page || "index";
   const info = pageInfo(id);
@@ -312,6 +355,8 @@ async function init() {
   const kicker = buildKicker(info);
   if (h1 && kicker) h1.before(kicker);
   if (h1 && id !== "index") ($(":scope > .lead", content) || h1).after(buildStudied(id));
+  const howto = buildHowto(id, info);
+  if (howto) ($(":scope > .studied", content) || h1).after(howto);
   const pager = buildPager(id);
   if (pager) content.append(pager);
   content.append(buildFooter());

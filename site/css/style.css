@@ -375,7 +375,9 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 .words { margin: 0.8rem 0 1.2rem; padding: 0.6rem 1rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); font-size: 0.93rem; }
 .words-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 650; margin-bottom: 0.2rem; }
 .words a { margin-right: 0.2rem; }
-.read-formula { font-size: 0.92rem; color: var(--text-2); margin: -0.4rem 0 0.8rem; }
+.read-formula { font-size: 0.92rem; color: var(--text-2); margin: -0.3rem 0 1rem; padding: 0.4rem 0.9rem; border-left: 3px solid var(--border-strong); }
+.read-formula ul { margin: 0.15rem 0 0; padding-left: 1.1rem; }
+.read-formula li { margin: 0.15rem 0; }
 .glossary dt { font-weight: 650; margin-top: 0.9rem; scroll-margin-top: calc(var(--header-h) + 20px); }
 .glossary dt .en { font-weight: 400; color: var(--muted); font-size: 0.88rem; margin-left: 0.3rem; }
 .glossary dd { margin: 0.15rem 0 0 0; padding-left: 0.9rem; border-left: 2px solid var(--border); }
@@ -427,3 +429,22 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 .goal.done { background: var(--good-wash); color: var(--good); font-weight: 600; }
 .plot .warrow { stroke: var(--accent); stroke-width: 2.5; }
 .data-box { margin-top: 0.6rem; }
+
+/* widget guides */
+.guide { margin: 0 0 0.8rem; padding: 0.55rem 0.8rem; border-radius: 8px; background: color-mix(in srgb, var(--s7) 7%, var(--surface)); border: 1px solid color-mix(in srgb, var(--s7) 25%, transparent); font-size: 0.92rem; }
+.guide > summary { cursor: pointer; font-weight: 650; color: var(--s7); }
+.guide p { margin: 0.35rem 0; }
+.guide ol { margin: 0.25rem 0; padding-left: 1.2rem; }
+.guide li { margin: 0.15rem 0; }
+.guide .see { margin-top: 0.4rem; }
+.score-strip { display: flex; flex-wrap: wrap; gap: 4px; margin: 0.4rem 0 0.6rem; }
+.chip-ex { display: flex; flex-direction: column; align-items: center; min-width: 3.2rem; padding: 3px 4px; border-radius: 7px; border: 2px solid transparent; font: inherit; font-size: 0.78rem; cursor: pointer; background: var(--surface-2); color: var(--text); opacity: 0.6; }
+.chip-ex.said-pos { border-color: var(--text); opacity: 1; }
+.chip-ex.is-pos .gt { color: var(--pos); font-weight: 700; } .chip-ex.is-neg .gt { color: var(--neg); font-weight: 700; }
+.chip-ex .sc { font-variant-numeric: tabular-nums; } .chip-ex .tg { font-size: 0.68rem; color: var(--text-2); }
+.strip-legend { flex-basis: 100%; color: var(--muted); margin-top: 2px; }
+.howto { margin: 0.6rem 0 1rem; padding: 0.55rem 0.9rem; border-radius: var(--radius); border: 1px solid var(--accent); background: var(--accent-wash); font-size: 0.93rem; }
+.howto > summary { cursor: pointer; font-weight: 650; color: var(--accent); }
+.howto ol { margin: 0.4rem 0 0.1rem; padding-left: 1.3rem; }
+.howto li { margin: 0.25rem 0; }
+.term-demo { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
