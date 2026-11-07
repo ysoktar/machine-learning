@@ -19,7 +19,10 @@ export const TERMS = [
 "def": "Modelin öğrendiği sayılardan biri: bir özniteliğin karara ne kadar ve hangi yönde katkı yaptığı. w = (2, −1) ise x₁ artınca skor artar, x₂ artınca azalır. (ŷ = w·x + b)",
 "id": "t-agirlik",
 "match": "ağırlık",
-"week": 4
+"week": 4,
+"skip": [
+"w6-ensembles"
+]
 },
 {
 "term": "Aktarımlı öğrenme",
@@ -362,7 +365,8 @@ export const TERMS = [
 "def": "Bütün olası örneklerden hangilerinin pozitif olduğunu söyleyen etiketleme; öğrenmeye çalıştığımız gerçek kural.",
 "id": "t-kavram",
 "match": "kavram",
-"week": 1
+"week": 1,
+"auto": false
 },
 {
 "term": "Kayıp",
@@ -495,7 +499,8 @@ export const TERMS = [
 "def": "Veri tablosundaki bir satır: bir müşteri, bir e-posta, bir gün. Model her örnek için bir tahmin yapar.",
 "id": "t-ornek-gozlem",
 "match": "örnek(?!le)",
-"week": 1
+"week": 1,
+"auto": false
 },
 {
 "term": "Öznitelik",
@@ -621,7 +626,8 @@ export const TERMS = [
 "def": "Modelin bir örnek için verdiği cevap; ŷ (y şapka) ile gösterilir. (ŷ)",
 "id": "t-tahmin",
 "match": "tahmin",
-"week": 1
+"week": 1,
+"lower": true
 },
 {
 "term": "Test kümesi",

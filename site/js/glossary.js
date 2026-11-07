@@ -12,8 +12,14 @@ const L = "\\p{L}\\p{N}";
  * jumps into the middle of a page still gets help. Terms taught in an earlier week are assumed known: on a later
  * page they are underlined only once.
  */
-export function annotateTerms(root, pageWeek = 0) {
-  const terms = [...TERMS].sort((a, b) => b.match.length - a.match.length);
+export function annotateTerms(root, pageWeek = 0, pageId = "") {
+  const terms = TERMS.filter((t) => t.auto !== false && !(t.skip || []).includes(pageId)).sort((a, b) => b.match.length - a.match.length);
+  // hand-marked uses: <span data-gl="t-…">word</span> where the automatic matcher could not know the meaning
+  for (const el of root.querySelectorAll("[data-gl]")) {
+    const t = TERMS.find((x) => x.id === el.dataset.gl);
+    if (!t) continue;
+    el.className = "term"; el.tabIndex = 0; el.dataset.term = t.term; el.dataset.def = t.def; el.dataset.id = t.id;
+  }
   const src = terms.map((t, i) => `(?<g${i}>(?:${t.match})[${L}'’]*)`).join("|");
   const re = new RegExp(`(?<![${L}])(?:${src})`, "giu");
   const known = (t) => pageWeek > 0 && t.week > 0 && t.week < pageWeek;
@@ -38,6 +44,7 @@ export function annotateTerms(root, pageWeek = 0) {
     for (const m of text.matchAll(re)) {
       const key = Object.keys(m.groups).find((g) => m.groups[g] !== undefined);
       const t = terms[Number(key.slice(1))];
+      if (t.lower && m[0][0] !== m[0][0].toLocaleLowerCase("tr")) continue;
       const seen = known(t) ? perPage : perSection;
       if (seen.has(t.id)) continue;
       seen.add(t.id);

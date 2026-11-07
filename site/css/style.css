@@ -460,3 +460,11 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 .ic-news { --ic: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2010v4h4l7%205V5L7%2010z%22/%3E%3Cpath%20d%3D%22M17%209a4%204%200%200%201%200%206%22/%3E%3C/svg%3E"); }
 .ic-clock { --ic: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2213%22%20r%3D%228%22/%3E%3Cpath%20d%3D%22M12%209v4l3%202M10%202h4%22/%3E%3C/svg%3E"); }
 .intuition-title .ic { color: var(--s4); } .tryit-title .ic { color: var(--s7); } .recipe-title .ic { color: var(--accent); } .callout.exam .ic { color: var(--s7); } .guide .ic { color: var(--s7); } .howto .ic { color: var(--accent); }
+.plot .fig-ok { fill: var(--good-wash); stroke: var(--good); }
+.plot .fig-bad { fill: var(--bad-wash); stroke: var(--bad); }
+.plot .fig-hl { fill: var(--warn-wash); stroke: var(--warn); stroke-width: 2.5; }
+.plot .fig-gray { fill: var(--muted); }
+.plot .fig-grid { stroke: var(--grid); }
+.plot .fig-proj { stroke: var(--muted); stroke-dasharray: 2 3; }
+.plot .fig-err { stroke: var(--bad); stroke-width: 2; }
+.plot .fig-dot { fill: var(--bad); }

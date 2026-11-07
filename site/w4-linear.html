@@ -13,6 +13,7 @@
 <body data-page="w4-linear">
 <main><div class="content">
 
+<!-- gaps -->
 <!-- clarified -->
 <h1>Doğrusal modeller</h1>
 <p class="lead">Regresyondan sınıflandırmaya hepsi aynı kalıp: <span class="m">ŷ = f(wᵀx + b)</span>. En küçük kareler, gradyan inişi, lojistik regresyon, perceptron, softmax, ridge/lasso. Ara sınavın C bölümü (17 puan): <strong>bir lojistik regresyon ya da perceptron güncelleme adımı</strong>. Güncelleme kuralını ezbere bilin, her satırda z'yi açıkça yazın.</p>
@@ -38,6 +39,7 @@
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>Sınavda kullanılan tek değişkenli biçimdir: önce ortalamaları (x̄, ȳ) bul; her nokta için (x − x̄) ve (y − ȳ) farklarını yaz.</li><li><b>w₁ (eğim)</b> = Σ(x farkı × y farkı) / Σ(x farkı)². x ile y birlikte artıyorsa pay pozitif, eğim pozitif.</li><li><b>w₀ (kesişim)</b> = ȳ − w₁x̄: doğru (x̄, ȳ) noktasından geçer.</li><li>Matris biçimi (XᵀX)⁻¹Xᵀy aynı şeyin çok öznitelikli hâlidir; elle hesaplanmaz.</li></ul></div>
 <div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>x = (1, 2, 3), y = (1, 2, 3). w₁ ve w₀?</p><details><summary>Cevabı göster</summary><p>x̄ = ȳ = 2; Σ(x − x̄)(y − ȳ) = 1 + 0 + 1 = 2; Σ(x − x̄)² = 2 → w₁ = <strong>1</strong>, w₀ = 2 − 1·2 = <strong>0</strong>. Doğru y = x: noktalar tam üstünde.</p></details></div>
 <div data-widget="lsq"></div>
+<div data-widget="fig" data-fig="residuals" data-caption="En küçük kareler doğrusu: kırmızı dikey çizgilerin (artıkların) karelerinin toplamını en küçük yapan doğru."></div>
 <p>Bu çözümün birkaç özelliğini bilmek işe yarar. Kesişim terimi varsa artıkların (y − ŷ) toplamı her zaman sıfırdır; bu, hesabınızı denetlemenin kolay bir yoludur. Matris biçimindeki formül, XᵀX'in tersi alınabildiği sürece çalışır; öznitelik sayısı çok büyükse bu hesap pahalılaşır ve onun yerine ridge (λI eklemek) ya da gradyan inişi kullanılır. Son olarak, neden kare hata kullandığımızın bir gerekçesi vardır: gürültünün normal (Gauss) dağıldığını varsayarsak, en küçük kareler en olası ağırlıkları verir (en büyük olabilirlik). Sınavda türetme istenmez; bu cümleyi bilmek yeter.</p>
 
 <h2>Gradyan inişi</h2>
@@ -115,6 +117,7 @@
 <li>ŷ = y ise “hayır”, ağırlıkları aynen aşağı taşıyın. ŷ ≠ y ise w ← w + η·y·x, b ← b + η·y.</li>
 <li>Epoch sonunda son ağırlıklarla <em>bütün</em> örnekleri yeniden sınıflayıp karmaşıklık matrisi isteniyorsa onu kurun (epoch sırasındaki tahminler değil!).</li>
 </ol><p class="small">η genelde 0.4 gibi seçilir ki sayılar 0.1'in katlarında kalsın; ondalıkları dikkatle taşıyın.</p></div>
+<div data-widget="fig" data-fig="percupdate" data-caption="Bir güncelleme: eski sınır w = (−1, 1), b = −1.5 iken (4, 4) noktası pozitif olduğu hâlde eksi tarafta kalıyor (z = −1.5). η = 0.1 ile w ← w + 0.1·(4, 4) = (−0.6, 1.4), b ← −1.5 + 0.1 = −1.4 olur; yeni sınır dönerek bu noktayı + tarafa alır ve burada bütün noktalar doğru tarafa geçer."></div>
 <p>Aşağıdaki araçta bu süreci adım adım izleyebilirsiniz. Varsayılan veri derste çözülen örnektir: w = (−0.5, 0.5), b = −0.7, η = 0.4. İlk epoch'ta 1., 2. ve 4. örneklerde güncelleme olur ve epoch sonunda w = (−0.1, 0.5), b = −1.1 bulunur. Bu ağırlıklarla 3. örnek hâlâ yanlış sınıflanıyor; tek epoch yetmiyor.</p>
 <div data-widget="perceptron"></div>
 <div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>w = (0, 0), b = 0, η = 1. Örnek x = (2, 1), y = −1. Ne olur?</p><details><summary>Cevabı göster</summary><p>z = 0 ≥ 0 → ŷ = +1, ama y = −1: <strong>yanlış</strong>. w ← (0, 0) + 1·(−1)·(2, 1) = <strong>(−2, −1)</strong>, b ← 0 − 1 = <strong>−1</strong>. Şimdi z = −4 − 1 − 1 = −6 → −1: düzeldi.</p></details></div>
@@ -127,6 +130,7 @@
 <p><strong>Softmax</strong> (çok terimli lojistik regresyon) ise tek bir modeldir: her sınıf için bir ağırlık vektörü vardır ve bütün sınıfların skorları toplamı 1 olan olasılıklara çevrilir:</p>
 <div class="formula">p(y = k | x) = exp(w_kᵀx) / Σⱼ exp(wⱼᵀx)</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>Her sınıfın skoru zₖ = wₖ·x hesaplanır; e^{zₖ} hepsini pozitif yapar; toplama bölmek toplamı 1 yapar.</li><li>En büyük skorlu sınıf en büyük olasılığı alır. Kayıp: doğru sınıfın olasılığının −ln'i.</li></ul></div>
+<div data-widget="fig" data-fig="softbars" data-caption="Softmax ham skorları (2, 1, 0) toplamı 1 olan olasılıklara (0.665, 0.245, 0.090) çevirir."></div>
 <p>Kayıp olarak doğru sınıfın olasılığının eksi logaritması (çapraz entropi) kullanılır. Sinir ağlarının çok sınıflı çıktı katmanı tam olarak budur. İki sınıf olduğunda softmax sigmoid'e indirgenir.</p>
 <div data-widget="softmax"></div>
 
@@ -134,6 +138,7 @@
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Büyük ağırlık neden kötü?</div><p>Çok büyük ağırlıklar, girdideki küçük bir değişimin tahmini çok oynatması demektir: model gürültüye aşırı duyarlıdır. Ridge ağırlıkların karelerini, lasso mutlak değerlerini cezalandırır. Lasso'nun farkı: önemsiz özniteliklerin ağırlığını tam sıfıra indirip onları modelden atabilir.</p></div>
 <p><strong>Ridge</strong> düzenlileştirmesi kayba ağırlıkların karelerinin toplamını ekler (λ‖w‖²). Ağırlıkları küçültür ama sıfıra indirmez. Kapalı bir çözümü vardır, (XᵀX + λI)⁻¹Xᵀy, ve XᵀX'in tersinin alınamadığı durumları da çözer.</p>
 <p><strong>Lasso</strong> ise ağırlıkların mutlak değerlerinin toplamını ekler (λΣ|wⱼ|). Önemli farkı, bazı ağırlıkları <strong>tam olarak sıfır</strong> yapmasıdır; böylece gereksiz öznitelikleri modelden atar (öznitelik seçimi yapar) ve modeli yorumlamayı kolaylaştırır. Kapalı bir çözümü yoktur. İkisinin karışımına elastic net denir.</p>
+<div data-widget="fig" data-fig="ridgelasso" data-caption="Kayıp eğrileri (elipsler) ile ceza bölgesinin ilk değdiği nokta çözümdür. Lasso'nun elmasının köşeleri eksenlerin üstünde olduğu için çözüm sık sık bir ağırlığı tam sıfır yapar."></div>
 <p>İki pratik not: Aynı cezalar lojistik regresyonda da kullanılır ve scikit-learn'de ceza gücü <strong>C = 1/λ</strong> ile verilir, yani büyük C daha az düzenlileştirme demektir. Cezadan önce öznitelikler mutlaka ölçeklenmelidir, çünkü ceza her ağırlığa aynı biçimde uygulanır ama bir ağırlığın büyüklüğü özniteliğin birimine bağlıdır (TL cinsinden gelirin ağırlığı doğal olarak çok küçüktür).</p>
 
 <h2>Sınav tipi çözümlü problemler</h2>

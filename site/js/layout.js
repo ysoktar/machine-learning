@@ -372,7 +372,7 @@ async function init() {
   }
   if (id !== "sozluk") {
     const { annotateTerms, installTermPopover } = await import("./glossary.js");
-    annotateTerms(content, info?.week || 0);
+    annotateTerms(content, info?.week || 0, id);
     installTermPopover();
   }
   buildPageNav(content, id);

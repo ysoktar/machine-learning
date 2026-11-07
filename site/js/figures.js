@@ -149,6 +149,226 @@ export const FIG = {
   },
 };
 
+
+// ---------------------------------------------------------------- figures added for the gaps found in the audit
+const pt = (x, y, cls, r = 6) => cls === "pos" ? `<circle cx="${x}" cy="${y}" r="${r}" class="pt-pos"/>` : cls === "neg" ? `<rect x="${x - r + 0.5}" y="${y - r + 0.5}" width="${2 * r - 1}" height="${2 * r - 1}" class="pt-neg"/>` : `<circle cx="${x}" cy="${y}" r="${r}" class="fig-gray"/>`;
+Object.assign(FIG, {
+  cm: () => svg(470, 290, `
+    ${T(285, 18, "Modelin tahmini", { anchor: "middle" })}
+    ${T(205, 42, "Pozitif dedi", { anchor: "middle", cls: "fig-sub" })}${T(365, 42, "Negatif dedi", { anchor: "middle", cls: "fig-sub" })}
+    <text x="22" y="165" class="lab" transform="rotate(-90 22 165)" text-anchor="middle">Gerçek sınıf</text>
+    ${T(80, 112, "Gerçekte", { anchor: "middle", cls: "fig-sub" })}${T(80, 127, "pozitif", { anchor: "middle", cls: "fig-sub" })}${T(80, 212, "Gerçekte", { anchor: "middle", cls: "fig-sub" })}${T(80, 227, "negatif", { anchor: "middle", cls: "fig-sub" })}
+    <rect x="125" y="52" width="160" height="100" class="fig-ok"/><rect x="285" y="52" width="160" height="100" class="fig-bad"/>
+    <rect x="125" y="152" width="160" height="100" class="fig-bad"/><rect x="285" y="152" width="160" height="100" class="fig-ok"/>
+    ${T(205, 95, "TP", { anchor: "middle", size: 20 })}${T(205, 117, "doğru pozitif", { anchor: "middle", cls: "fig-sub" })}${T(205, 132, "hastaya “hasta”", { anchor: "middle", cls: "fig-sub" })}
+    ${T(365, 95, "FN", { anchor: "middle", size: 20 })}${T(365, 117, "kaçırılan", { anchor: "middle", cls: "fig-sub" })}${T(365, 132, "hastaya “sağlıklı”", { anchor: "middle", cls: "fig-sub" })}
+    ${T(205, 195, "FP", { anchor: "middle", size: 20 })}${T(205, 217, "yanlış alarm", { anchor: "middle", cls: "fig-sub" })}${T(205, 232, "sağlıklıya “hasta”", { anchor: "middle", cls: "fig-sub" })}
+    ${T(365, 195, "TN", { anchor: "middle", size: 20 })}${T(365, 217, "doğru negatif", { anchor: "middle", cls: "fig-sub" })}${T(365, 232, "sağlıklıya “sağlıklı”", { anchor: "middle", cls: "fig-sub" })}
+    ${T(285, 278, "yeşil köşegen: doğru tahminler · kırmızı: hatalar", { anchor: "middle", cls: "fig-sub" })}`, "Karmaşıklık matrisi"),
+
+  cmread: () => {
+    const cell = (x, y, t, n, cls) => `<rect x="${x}" y="${y}" width="80" height="56" class="${cls}"/>${T(x + 40, y + 26, t, { anchor: "middle" })}${T(x + 40, y + 44, n, { anchor: "middle", cls: "fig-sub" })}`;
+    const m = (ox, hl, title, formula) => `${T(ox + 80, 18, title, { anchor: "middle" })}
+      ${cell(ox, 30, "TP", "4", hl.includes("TP") ? "fig-hl" : "fig-box")}${cell(ox + 80, 30, "FN", "2", hl.includes("FN") ? "fig-hl" : "fig-box")}
+      ${cell(ox, 86, "FP", "1", hl.includes("FP") ? "fig-hl" : "fig-box")}${cell(ox + 80, 86, "TN", "3", hl.includes("TN") ? "fig-hl" : "fig-box")}
+      ${T(ox + 80, 166, formula, { anchor: "middle", cls: "fig-sub" })}`;
+    return svg(560, 180, m(10, ["TP", "FP"], "Precision: sol sütun", "TP / (TP + FP) = 4/5 = 0.80") + m(200, ["TP", "FN"], "Recall: üst satır", "TP / (TP + FN) = 4/6 = 0.67") + m(390, ["TP", "TN"], "Accuracy: köşegen", "(TP + TN) / n = 7/10 = 0.70"), "Ölçütlerin matristeki yeri");
+  },
+
+  onehot: () => svg(470, 190, `${DEFS}
+    ${T(60, 20, "şehir", { anchor: "middle" })}
+    ${["Ankara", "İzmir", "Ankara", "İstanbul"].map((c, i) => box(10, 30 + i * 36, 100, 30, c, "fig-box")).join("")}
+    ${arrow(118, 95, 170, 95)}
+    ${["Ankara", "İzmir", "İstanbul"].map((c, j) => T(225 + j * 85, 20, c, { anchor: "middle", size: 11 })).join("")}
+    ${[[1, 0, 0], [0, 1, 0], [1, 0, 0], [0, 0, 1]].map((r, i) => r.map((v, j) => box(185 + j * 85, 30 + i * 36, 80, 30, String(v), v ? "fig-box3" : "fig-box")).join("")).join("")}
+    ${T(300, 182, "her şehir için bir 0/1 sütunu; her satırda tam bir tane 1", { anchor: "middle", cls: "fig-sub" })}`, "One-hot kodlama"),
+
+  pcaaxes: () => {
+    const P = [[1, 2], [2, 3], [3, 3], [4, 5], [5, 4], [6, 7]];
+    const S = 42, ox = 40, oy = 330, X = (v) => ox + v * S, Y = (v) => oy - v * S;
+    const m = [3.5, 4], v1 = [0.72, 0.69], v2 = [-0.69, 0.72];
+    let s = `${DEFS}`;
+    for (let i = 0; i <= 8; i++) s += `<line x1="${X(i)}" y1="${Y(0)}" x2="${X(i)}" y2="${Y(8)}" class="fig-grid"/><line x1="${X(0)}" y1="${Y(i)}" x2="${X(8)}" y2="${Y(i)}" class="fig-grid"/>`;
+    s += `<line x1="${X(m[0] - v1[0] * 4.5)}" y1="${Y(m[1] - v1[1] * 4.5)}" x2="${X(m[0] + v1[0] * 4.5)}" y2="${Y(m[1] + v1[1] * 4.5)}" class="line accent" marker-end="url(#ah)"/>`;
+    s += `<line x1="${X(m[0] - v2[0] * 1.3)}" y1="${Y(m[1] - v2[1] * 1.3)}" x2="${X(m[0] + v2[0] * 1.3)}" y2="${Y(m[1] + v2[1] * 1.3)}" class="line dash" marker-end="url(#ah)"/>`;
+    for (const [a, b] of P) {
+      const t = (a - m[0]) * v1[0] + (b - m[1]) * v1[1];
+      s += `<line x1="${X(a)}" y1="${Y(b)}" x2="${X(m[0] + t * v1[0])}" y2="${Y(m[1] + t * v1[1])}" class="fig-proj"/>` + pt(X(a), Y(b), "pos");
+    }
+    s += pt(X(m[0]), Y(m[1]), "q", 4) + T(X(m[0]) + 8, Y(m[1]) + 16, "ortalama", { cls: "fig-sub" });
+    s += T(X(6.9), Y(7.6), "PC1: en çok yayılma (%95)", { cls: "fig-sub" }) + T(X(1.4), Y(5.6), "PC2: dik yön (%5)", { cls: "fig-sub" });
+    return svg(400, 350, s, "PCA eksenleri");
+  },
+
+  rocex: () => lines({ series: [
+    { pts: [[0, 0], [0, 0.25], [0, 0.5], [0.25, 0.5], [0.25, 0.75], [0.5, 0.75], [0.5, 1], [0.75, 1], [1, 1]], cls: "curve1", dots: true, name: "model (AUC = 0.81)", color: "pos" },
+    { pts: [[0, 0], [1, 1]], cls: "curve3", name: "rastgele tahmin (AUC = 0.5)", color: "s3" },
+  ], xlim: [0, 1], ylim: [0, 1], xstep: 0.25, ystep: 0.25, xlabel: "FPR (yanlış alarm oranı)", ylabel: "TPR (recall)", aria: "Örnek ROC" }),
+
+  residuals: () => {
+    const P = [[1, 2], [2, 3], [3, 5], [4, 6]], f = (x) => 0.5 + 1.4 * x;
+    const S = 70, ox = 40, oy = 300, X = (v) => ox + v * S, Y = (v) => oy - v * 40;
+    let s = "";
+    for (let i = 0; i <= 5; i++) s += `<line x1="${X(i)}" y1="${Y(0)}" x2="${X(i)}" y2="${Y(7)}" class="fig-grid"/>${T(X(i), Y(0) + 15, i, { anchor: "middle", cls: "fig-sub" })}`;
+    for (let j = 0; j <= 7; j++) s += `<line x1="${X(0)}" y1="${Y(j)}" x2="${X(5)}" y2="${Y(j)}" class="fig-grid"/>${T(X(0) - 8, Y(j) + 4, j, { anchor: "end", cls: "fig-sub" })}`;
+    s += `<line x1="${X(0)}" y1="${Y(f(0))}" x2="${X(5)}" y2="${Y(f(5))}" class="line accent"/>`;
+    for (const [a, b] of P) s += `<line x1="${X(a)}" y1="${Y(b)}" x2="${X(a)}" y2="${Y(f(a))}" class="fig-err"/>` + pt(X(a), Y(b), "pos") + T(X(a) + 8, (Y(b) + Y(f(a))) / 2 + 4, `y − ŷ = ${(b - f(a)).toFixed(1)}`, { cls: "fig-sub" });
+    s += T(X(3.4), Y(6.6), "ŷ = 0.5 + 1.4x", { cls: "fig-sub" }) + T(X(5), Y(0) + 30, "x", { anchor: "end" }) + T(X(0) - 30, Y(7), "y");
+    return svg(440, 340, s, "Artıklar");
+  },
+
+  fitpanels: () => {
+    const P = [[0.05, 0.3], [0.15, 0.9], [0.25, 1.0], [0.35, 0.55], [0.45, 0.2], [0.55, -0.45], [0.65, -0.9], [0.75, -1.0], [0.85, -0.55], [0.95, 0.1]];
+    const panel = (ox, title, fn, sub) => {
+      const X = (v) => ox + 10 + v * 130, Y = (v) => 110 - v * 55;
+      let s = `<rect x="${ox}" y="30" width="150" height="160" rx="8" class="fig-box"/>${T(ox + 75, 20, title, { anchor: "middle" })}${T(ox + 75, 210, sub, { anchor: "middle", cls: "fig-sub" })}`;
+      for (const [a, b] of P) s += pt(X(a), Y(b), "pos", 3.5);
+      const pts = Array.from({ length: 81 }, (_, i) => { const x = i / 80; return `${X(x)},${Math.max(32, Math.min(188, Y(fn(x))))}`; }).join(" ");
+      return s + `<polyline points="${pts}" class="curve2"/>`;
+    };
+    const wig = (x) => P.reduce((acc, [xi, yi], i) => acc + yi * P.reduce((m, [xj], j) => (j === i ? m : (m * (x - xj)) / (xi - xj)), 1), 0);
+    return svg(500, 225, panel(5, "yetersiz uyum", () => 0, "çok basit: deseni kaçırır") + panel(175, "iyi uyum", (x) => Math.sin(2 * Math.PI * x), "deseni yakalar, gürültüyü değil") + panel(345, "aşırı uyum", wig, "her noktadan geçer, savrulur"), "Uyum türleri");
+  },
+
+  percupdate: () => {
+    // old w = (−1, 1), b = −1.5 misclassifies (4, 4); update with η = 0.1: w = (−0.6, 1.4), b = −1.4 separates all six points
+    const S = 52, ox = 40, oy = 290, X = (v) => ox + v * S, Y = (v) => oy - v * S;
+    const line = (w, b, cls) => { const x0 = -0.5, x1 = 6; return `<line x1="${X(x0)}" y1="${Y(-(w[0] * x0 + b) / w[1])}" x2="${X(x1)}" y2="${Y(-(w[0] * x1 + b) / w[1])}" class="${cls}"/>`; };
+    let s = `${DEFS}<defs><clipPath id="pclip"><rect x="${X(0)}" y="${Y(5)}" width="${X(5.5) - X(0)}" height="${Y(0) - Y(5)}"/></clipPath></defs>`;
+    for (let i = 0; i <= 5; i++) s += `<line x1="${X(i)}" y1="${Y(0)}" x2="${X(i)}" y2="${Y(5)}" class="fig-grid"/>${T(X(i), Y(0) + 15, i, { anchor: "middle", cls: "fig-sub" })}`;
+    for (let j = 0; j <= 5; j++) s += `<line x1="${X(0)}" y1="${Y(j)}" x2="${X(5.5)}" y2="${Y(j)}" class="fig-grid"/>${T(X(0) - 8, Y(j) + 4, j, { anchor: "end", cls: "fig-sub" })}`;
+    s += `<g clip-path="url(#pclip)">${line([-1, 1], -1.5, "line ghost")}${line([-0.6, 1.4], -1.4, "line accent")}</g>`;
+    for (const [a, c] of [[1, 3], [2, 3.5]]) s += pt(X(a), Y(c), "pos");
+    for (const [a, c] of [[1, 1], [3, 1], [4, 2]]) s += pt(X(a), Y(c), "neg");
+    s += pt(X(4), Y(4), "pos", 7) + `<circle cx="${X(4)}" cy="${Y(4)}" r="12" class="cur"/>`;
+    s += T(X(4), Y(3.45), "(4, 4): pozitif ama", { anchor: "middle", cls: "fig-sub" }) + T(X(4), Y(3.2), "eski sınırın eksi tarafında", { anchor: "middle", cls: "fig-sub" });
+    s += T(X(1.15), Y(1.9), "eski sınır", { cls: "fig-sub" }) + T(X(4.6), Y(2.95), "yeni sınır", { cls: "fig-sub" });
+    return svg(360, 320, s, "Perceptron güncellemesi");
+  },
+
+  softbars: () => {
+    const z = [2, 1, 0], e = z.map(Math.exp), sm = e.reduce((a, b) => a + b), p = e.map((v) => v / sm);
+    let s = "";
+    z.forEach((v, i) => {
+      const x = 40 + i * 140;
+      s += `<rect x="${x}" y="${150 - v * 30}" width="40" height="${v * 30 + 1}" class="fig-box"/>${T(x + 20, 140 - v * 30, `z = ${v}`, { anchor: "middle", cls: "fig-sub" })}`;
+      s += `<rect x="${x + 50}" y="${150 - p[i] * 120}" width="40" height="${p[i] * 120}" class="fig-box3"/>${T(x + 70, 140 - p[i] * 120, `p = ${p[i].toFixed(3)}`, { anchor: "middle", cls: "fig-sub" })}`;
+      s += T(x + 45, 172, `sınıf ${i + 1}`, { anchor: "middle" });
+    });
+    return svg(450, 190, `<line x1="20" y1="150" x2="430" y2="150" class="fig-arrow"/>` + s + T(225, 14, "gri: ham skorlar · mavi: softmax olasılıkları (toplam 1)", { anchor: "middle", cls: "fig-sub" }), "Softmax");
+  },
+
+  ridgelasso: () => {
+    const panel = (ox, title, shape, sub) => {
+      const cx = ox + 110, cy = 130;
+      let s = `<line x1="${ox + 10}" y1="${cy}" x2="${ox + 210}" y2="${cy}" class="fig-arrow"/><line x1="${cx}" y1="30" x2="${cx}" y2="230" class="fig-arrow"/>${T(ox + 205, cy - 6, "w₁", { anchor: "end", cls: "fig-sub" })}${T(cx + 6, 40, "w₂", { cls: "fig-sub" })}`;
+      for (const r of [30, 55, 80]) s += `<ellipse cx="${cx + 85}" cy="${cy - 75}" rx="${r * 1.15}" ry="${r * 0.7}" transform="rotate(-25 ${cx + 85} ${cy - 75})" class="fig-ring"/>`;
+      const [l1, l2] = sub;
+      s += shape(cx, cy) + T(ox + 110, 18, title, { anchor: "middle" }) + T(ox + 110, 248, l1, { anchor: "middle", cls: "fig-sub" }) + T(ox + 110, 262, l2, { anchor: "middle", cls: "fig-sub" });
+      return s;
+    };
+    const circle = (cx, cy) => `<circle cx="${cx}" cy="${cy}" r="48" class="fig-box2"/><circle cx="${cx + 33}" cy="${cy - 35}" r="5" class="fig-dot"/>`;
+    const diamond = (cx, cy) => `<polygon points="${cx},${cy - 58} ${cx + 58},${cy} ${cx},${cy + 58} ${cx - 58},${cy}" class="fig-box2"/><circle cx="${cx}" cy="${cy - 58}" r="5" class="fig-dot"/>`;
+    return svg(460, 272, panel(5, "Ridge: ‖w‖² ≤ t (daire)", circle, ["çözüm yuvarlak kenarda:", "ağırlıklar küçülür, sıfır olmaz"]) + panel(235, "Lasso: |w₁| + |w₂| ≤ t (elmas)", diamond, ["çözüm köşede: w₁ = 0,", "öznitelik modelden atılır"]), "Ridge ve lasso");
+  },
+
+  threshline: () => {
+    const v = [[2, "E"], [3, "E"], [5, "H"], [7, "H"], [8, "E"]], X = (x) => 40 + (x - 1) * 50;
+    let s = `<line x1="${X(1)}" y1="80" x2="${X(9)}" y2="80" class="fig-arrow"/>`;
+    for (let i = 1; i <= 9; i++) s += `<line x1="${X(i)}" y1="76" x2="${X(i)}" y2="84" class="fig-arrow"/>${T(X(i), 100, i, { anchor: "middle", cls: "fig-sub" })}`;
+    for (const [x, c] of v) s += pt(X(x), 60, c === "E" ? "pos" : "neg", 8) + T(X(x), 40, c === "E" ? "Evet" : "Hayır", { anchor: "middle", cls: "fig-sub" });
+    for (const [t, good] of [[2.5, 0], [4, 1], [6, 0], [7.5, 1]]) s += `<line x1="${X(t)}" y1="25" x2="${X(t)}" y2="120" class="${good ? "line accent" : "line ghost"}"/>${T(X(t), 138, `t = ${t}`, { anchor: "middle", cls: "fig-sub" })}`;
+    return svg(470, 160, s + T(235, 156, "renkli: sınıfın değiştiği aday eşikler (bakmak yeterli) · gri: değişmeyenler", { anchor: "middle", cls: "fig-sub" }), "Eşik adayları");
+  },
+
+  regstep: () => {
+    const P = [[1, 1], [2, 2], [3, 2], [4, 9], [5, 10], [6, 12]];
+    const X = (x) => 40 + x * 55, Y = (y) => 220 - y * 15;
+    let s = "";
+    for (let j = 0; j <= 12; j += 3) s += `<line x1="${X(0.5)}" y1="${Y(j)}" x2="${X(6.5)}" y2="${Y(j)}" class="fig-grid"/>${T(X(0.5) - 6, Y(j) + 4, j, { anchor: "end", cls: "fig-sub" })}`;
+    s += `<polyline points="${X(0.6)},${Y(5 / 3)} ${X(3.5)},${Y(5 / 3)} ${X(3.5)},${Y(31 / 3)} ${X(6.4)},${Y(31 / 3)}" class="curve2"/>`;
+    s += `<line x1="${X(3.5)}" y1="${Y(13)}" x2="${X(3.5)}" y2="${Y(0)}" class="line ghost"/>${T(X(3.5) + 4, Y(12.5), "x ≤ 3.5 ?", { cls: "fig-sub" })}`;
+    for (const [a, b] of P) s += pt(X(a), Y(b), "pos", 5) + T(X(a), Y(0) + 16, a, { anchor: "middle", cls: "fig-sub" });
+    s += T(X(1.5), Y(5 / 3) - 8, "sol yaprak: ortalama 1.67", { cls: "fig-sub" }) + T(X(4), Y(31 / 3) - 8, "sağ yaprak: ortalama 10.33", { cls: "fig-sub" });
+    return svg(440, 250, s, "Regresyon ağacı");
+  },
+
+  prune: () => lines({ series: [
+    { pts: [[1, 0.70], [3, 0.80], [5, 0.86], [7, 0.90], [10, 0.92], [15, 0.95], [20, 0.97], [30, 0.99], [40, 1.0]], cls: "curve1", name: "eğitim doğruluğu", color: "pos" },
+    { pts: [[1, 0.68], [3, 0.78], [5, 0.85], [7, 0.90], [10, 0.89], [15, 0.87], [20, 0.86], [30, 0.83], [40, 0.82]], cls: "curve2", name: "doğrulama doğruluğu", color: "neg" },
+  ], xlim: [0, 40], ylim: [0.6, 1], xstep: 10, ystep: 0.1, xlabel: "yaprak sayısı", ylabel: "doğruluk", aria: "Budama" }),
+
+  bootstrap: () => {
+    const orig = [1, 2, 3, 4, 5], samples = [[1, 1, 2, 4, 5], [2, 3, 3, 4, 4], [1, 2, 2, 5, 5]];
+    let s = `${DEFS}${T(20, 22, "orijinal veri")}`;
+    orig.forEach((v, i) => { s += box(120 + i * 52, 6, 44, 28, String(v), "fig-box"); });
+    samples.forEach((sm, k) => {
+      const y = 70 + k * 58;
+      s += T(20, y + 20, `örneklem ${k + 1}`);
+      sm.forEach((v, i) => { s += box(120 + i * 52, y, 44, 28, String(v), "fig-box2"); });
+      const out = orig.filter((v) => !sm.includes(v));
+      s += T(395, y + 13, "torba dışı:", { cls: "fig-sub" }) + T(395, y + 28, out.join(", "), { cls: "fig-sub" });
+    });
+    return svg(470, 250, s + T(235, 246, "yerine koyarak çekiliş: bazı örnekler birden çok, bazıları hiç seçilmez", { anchor: "middle", cls: "fig-sub" }), "Bootstrap");
+  },
+
+  adaweights: () => {
+    const names = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    const rounds = [[1 / 8, 1 / 8, 1 / 8, 1 / 8, 1 / 8, 1 / 8, 1 / 8, 1 / 8], [1 / 14, 0.5, 1 / 14, 1 / 14, 1 / 14, 1 / 14, 1 / 14, 1 / 14], [0.042, 0.292, 0.25, 0.25, 0.042, 0.042, 0.042, 0.042]];
+    const wrong = [[], ["B"], ["C", "D"]];
+    let s = "";
+    rounds.forEach((w, r) => {
+      const ox = 10 + r * 155;
+      s += T(ox + 70, 18, ["başta (eşit)", "1. turdan sonra", "2. turdan sonra"][r], { anchor: "middle" });
+      w.forEach((v, i) => {
+        const hgt = v * 260, x = ox + i * 17;
+        s += `<rect x="${x}" y="${180 - hgt}" width="13" height="${hgt}" class="${wrong[r].includes(names[i]) ? "fig-bad" : "fig-box3"}"/>${T(x + 6.5, 196, names[i], { anchor: "middle", cls: "fig-sub" })}`;
+      });
+    });
+    return svg(470, 220, s + T(235, 215, "kırmızı: bir önceki turda yanlış bilinen müşteriler; ağırlıkları büyür", { anchor: "middle", cls: "fig-sub" }), "AdaBoost ağırlıkları");
+  },
+
+  gbstages: () => lines({ series: [
+    { pts: [[1, 1], [2, 3], [3, 5], [4, 7]], cls: "curve3", dots: true, name: "gerçek y", color: "s3" },
+    { pts: [[0.6, 4], [4.4, 4]], cls: "curve1", name: "F₀ = 4 (ortalama)", color: "pos" },
+    { pts: [[0.6, 3], [2.5, 3], [2.5, 5], [4.4, 5]], cls: "curve2", name: "F₁ = F₀ + 0.5·kütük", color: "neg" },
+    { pts: [[0.6, 2.5], [1.5, 2.5], [1.5, 3.5], [2.5, 3.5], [2.5, 4.5], [3.5, 4.5], [3.5, 5.5], [4.4, 5.5]], cls: "curve1", name: "F₂ (her tur hatanın bir kısmını kapatır)", color: "pos" },
+  ], xlim: [0.5, 4.5], ylim: [0, 8], xstep: 1, ystep: 2, xlabel: "x", ylabel: "tahmin", aria: "Gradyan artırma" }),
+
+  kerneltrick: () => {
+    const xs = [-3, -2.5, -2, 2, 2.5, 3], inner = [-1, -0.5, 0, 0.5, 1];
+    const p1 = (x) => 30 + (x + 3.5) * 28;
+    let s = `${DEFS}${T(118, 18, "1 boyut: tek eşikle ayrılmaz", { anchor: "middle" })}<line x1="20" y1="90" x2="215" y2="90" class="fig-arrow"/>`;
+    for (const x of xs) s += pt(p1(x), 90, "neg");
+    for (const x of inner) s += pt(p1(x), 90, "pos");
+    s += T(118, 120, "x", { anchor: "middle", cls: "fig-sub" }) + arrow(225, 90, 255, 90) + T(240, 80, "φ(x) = (x, x²)", { anchor: "middle", cls: "fig-sub" });
+    const X = (x) => 270 + (x + 3.5) * 26, Y = (y) => 200 - y * 17;
+    s += T(360, 18, "2 boyut: bir doğruyla ayrılır", { anchor: "middle" }) + `<line x1="265" y1="${Y(0)}" x2="455" y2="${Y(0)}" class="fig-arrow"/><line x1="${X(0)}" y1="${Y(10)}" x2="${X(0)}" y2="${Y(0)}" class="fig-arrow"/>`;
+    for (const x of xs) s += pt(X(x), Y(x * x), "neg");
+    for (const x of inner) s += pt(X(x), Y(x * x), "pos");
+    s += `<line x1="265" y1="${Y(2.5)}" x2="455" y2="${Y(2.5)}" class="line accent"/>` + T(450, Y(2.5) - 6, "x² = 2.5", { anchor: "end", cls: "fig-sub" }) + T(X(0) + 6, Y(9.5), "x²", { cls: "fig-sub" });
+    return svg(470, 215, s, "Çekirdek hilesi");
+  },
+
+  workflow: () => {
+    const steps = ["Problem", "Veri", "Öznitelikler", "Model", "Değerlendirme", "Kullanım"];
+    let s = DEFS;
+    steps.forEach((t, i) => { const x = 8 + i * 77; s += box(x, 30, 70, 40, t, i === 1 || i === 2 ? "fig-box2" : "fig-box"); if (i < 5) s += arrow(x + 70, 50, x + 77, 50); });
+    return svg(470, 110, s + T(235, 95, "renkli adımlar: zamanın çoğunun geçtiği yer (veriyi anlamak ve hazırlamak)", { anchor: "middle", cls: "fig-sub" }), "İş akışı");
+  },
+
+  learntypes: () => {
+    const rnd = ml.rng(5);
+    const panel = (ox, title, body, sub) => `<rect x="${ox}" y="28" width="148" height="140" rx="8" class="fig-box"/>${T(ox + 74, 18, title, { anchor: "middle" })}${body}${T(ox + 74, 186, sub, { anchor: "middle", cls: "fig-sub" })}`;
+    let a = "", b = "";
+    for (let i = 0; i < 7; i++) { a += pt(20 + rnd() * 50, 50 + rnd() * 100, "pos", 5); a += pt(90 + rnd() * 50, 50 + rnd() * 100, "neg", 5); }
+    a += `<line x1="80" y1="40" x2="82" y2="160" class="line dash"/>`;
+    for (const [cx, cy] of [[200, 70], [270, 90], [225, 140]]) for (let i = 0; i < 6; i++) b += pt(cx + (rnd() - 0.5) * 34, cy + (rnd() - 0.5) * 30, "gray", 4.5);
+    const c = `${DEFS}${box(330, 50, 60, 34, "ajan", "fig-box2")}${box(400, 120, 60, 34, "ortam", "fig-box3")}${arrow(392, 72, 425, 118)}${arrow(405, 137, 365, 88)}${T(420, 92, "eylem", { cls: "fig-sub" })}${T(318, 125, "ödül", { cls: "fig-sub" })}`;
+    return svg(470, 200, panel(5, "gözetimli", a, "etiketli örnekler, sınır öğren") + panel(160, "gözetimsiz", b, "etiket yok, grupları bul") + c + `<rect x="315" y="28" width="150" height="140" rx="8" class="fig-box" style="fill:none"/>` + T(390, 18, "pekiştirmeli", { anchor: "middle" }) + T(390, 186, "dene, ödüle göre davran", { anchor: "middle", cls: "fig-sub" }), "Öğrenme türleri");
+  },
+});
+
 export function figure(ds) {
   const make = FIG[ds.fig];
   if (!make) return h("p", { class: "err" }, "Bilinmeyen şekil: " + ds.fig);

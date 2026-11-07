@@ -13,6 +13,7 @@
 <body data-page="w3-knn">
 <main><div class="content">
 
+<!-- gaps -->
 <!-- clarified -->
 <h1>Gözetimli öğrenme, kNN ve model seçimi</h1>
 <p class="lead">Veriden fonksiyona: neyi, hangi ölçüte göre, hangi varsayım altında öğreniyoruz? Kayıp ve risk, i.i.d. varsayımı, taban çizgisi, k en yakın komşu, yanlılık-varyans ayrışımı, düzenlileştirme ve veri sızıntısı. Ara sınavda kNN elle hesap (kare uzaklıklarla sıralama) ve “k artarsa?” sorusu kesin gibi.</p>
@@ -56,6 +57,11 @@
 <li>Küçükten büyüğe sırala; k. sırada eşitlik varsa yaz ve kuralını belirt.</li>
 <li>İlk k komşunun oyunu say → karar. Her k için ayrı satır yazın.</li>
 </ol><p class="small">Karekök almayın: Öklid'de d² ile sıralama aynıdır.</p></div>
+<p><b>Elle bir örnek.</b> Sekiz eğitim noktası ve bir sorgu q = (4, 3) olsun. Her noktanın q'ya kare uzaklığını hesaplayıp sıralıyoruz:</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>sıra</th><th>nokta</th><th>d² = (x₁ − 4)² + (x₂ − 3)²</th><th>sınıf</th></tr></thead><tbody>
+<tr class="hl"><td>1</td><td>E (4, 4)</td><td>0 + 1 = 1</td><td>−</td></tr><tr class="hl"><td>2</td><td>D (3, 2)</td><td>1 + 1 = 2</td><td>+</td></tr><tr class="hl"><td>3</td><td>C (2, 3)</td><td>4 + 0 = 4</td><td>+</td></tr>
+<tr><td>4</td><td>F (6, 4)</td><td>4 + 1 = 5</td><td>−</td></tr><tr><td>5</td><td>B (2, 1)</td><td>4 + 4 = 8</td><td>+</td></tr><tr><td>6</td><td>A (1, 2)</td><td>9 + 1 = 10</td><td>+</td></tr><tr><td>7</td><td>G (7, 1)</td><td>9 + 4 = 13</td><td>−</td></tr><tr><td>8</td><td>H (7, 6)</td><td>9 + 9 = 18</td><td>−</td></tr></tbody></table></div>
+<p>k = 1'de yalnız en yakın nokta E sayılır ve karar −'dir. k = 3'te E, D ve C sayılır: iki artı, bir eksi, karar +'dır. k = 5'te ilk beş noktada üç artı, iki eksi var, karar yine +'dır. Aynı sorgu için k'ya göre kararın değişebildiğine dikkat edin.</p>
 <p>Aşağıdaki araçta sorguyu sürükleyip k'yı değiştirerek kararın nasıl oluştuğunu izleyebilirsiniz. Varsayılan veride q = (4, 3) için k = 1'de en yakın tek komşu E (−) olduğu için karar −'dir; k = 3'te E, D ve C'ye bakılır ve iki artıya karşı bir eksiyle karar +'ya döner.</p>
 <div data-widget="knn"></div>
 <div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>Komşular (d² ile) sıralı: A(+), B(−), C(−), D(+), E(+). k = 1, 3, 5 kararları?</p><details><summary>Cevabı göster</summary><p>k = 1: A → <strong>+</strong>; k = 3: A, B, C → 1 artı 2 eksi → <strong>−</strong>; k = 5: 3 artı 2 eksi → <strong>+</strong>. k değiştikçe karar değişebilir: k'yı doğrulamayla seçeriz.</p></details></div>
@@ -82,6 +88,7 @@
 <h2>Aşırı uyum, yetersiz uyum, yanlılık-varyans</h2>
 <div data-widget="fig" data-fig="dartboard" data-caption="Hedefin ortası doğru cevap. Yanlılık: atışların ortalaması merkezden ne kadar uzak. Varyans: atışlar ne kadar dağınık."></div>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Hedef tahtası</div><p>Aynı modeli farklı eğitim kümeleriyle defalarca eğittiğimizi düşünün; her eğitim tahtaya bir atış. <strong>Yanlılık</strong> atışların ortalamasının merkezden uzaklığıdır: model sistematik olarak yanılıyor (çok basit model, örneğin eğriye doğru uydurmak). <strong>Varyans</strong> atışların dağınıklığıdır: model veriye göre çok oynuyor (çok esnek model). İkisini birden küçük tutmak isteriz ama genelde biri azalırken öteki artar.</p></div>
+<div data-widget="fig" data-fig="fitpanels" data-caption="Yetersiz uyumda model deseni kaçırır (yüksek yanlılık); aşırı uyumda gürültüyü de ezberler (yüksek varyans)."></div><div data-widget="fig" data-fig="bvcurve" data-caption="Karmaşıklık arttıkça yanlılık düşer, varyans artar; toplam hata önce düşer sonra yükselir."></div>
 <p>Bu fikrin matematiksel ifadesi, beklenen test hatasının üç parçaya ayrılmasıdır:</p>
 <div class="formula">E[(y − ĥ(x))²] = (f(x) − E[ĥ(x)])² + E[(ĥ(x) − E[ĥ(x)])²] + σ² &nbsp;=&nbsp; yanlılık² + varyans + gürültü</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>Sol taraf: beklenen (ortalama) test hatası. E[…] “farklı eğitim kümeleriyle defalarca eğitseydik ortalaması” demek; ĥ öğrenilen model, f gerçek fonksiyon.</li><li><b>Yanlılık²</b>: modellerin ortalaması gerçek f'ten ne kadar uzak? <b>Varyans</b>: modeller kendi ortalamalarının etrafında ne kadar dağınık? <b>σ²</b>: etiketlerdeki rastgele gürültü; hiçbir model azaltamaz.</li><li>Sınavda türetme istenmez; üç terimin adını ve anlamını bilmek yeter.</li></ul></div>

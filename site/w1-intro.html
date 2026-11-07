@@ -13,6 +13,7 @@
 <body data-page="w1-intro">
 <main><div class="content">
 
+<!-- gaps -->
 <!-- clarified -->
 <h1>Giriş ve temel kavramlar</h1>
 <p class="lead">Makine öğrenmesi nedir, klasik programlamadan farkı ne, hangi türleri var ve “öğrenmek” neden aslında bir hipotez uzayında arama yapmaktır? Bu haftanın asıl mesajı: <strong>amaç eğitim verisini ezberlemek değil, görülmemiş veride iyi olmak (genelleme)</strong>.</p>
@@ -47,6 +48,7 @@
 <h2>Öğrenme türleri</h2>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Fark nerede?</div><p><strong>Gözetimli</strong>: öğretmen var; her örneğin doğru cevabı (etiketi) verilir. <strong>Gözetimsiz</strong>: öğretmen yok; yalnız örnekler var, model içlerindeki yapıyı (gruplar, örüntüler) kendisi bulur. <strong>Pekiştirmeli</strong>: doğru cevap söylenmez ama yaptığı şeyin sonunda bir ödül ya da ceza gelir; bisiklete binmeyi düşe kalka öğrenmek gibi.</p><p>Gözetimli öğrenmede soru şudur: tahmin edilen şey bir <em>kategori</em> mi (spam/değil, hangi rakam: <strong>sınıflandırma</strong>) yoksa bir <em>sayı</em> mı (fiyat, sıcaklık, kaç gün: <strong>regresyon</strong>)?</p></div>
 <p>Üç türü bir tabloda karşılaştıralım:</p>
+<div data-widget="fig" data-fig="learntypes" data-caption="Üç öğrenme türü: etiketli örneklerden sınır öğrenmek, etiketsiz veride grup bulmak, ödülle davranış öğrenmek."></div>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Tür</th><th>Elimizdeki veri</th><th>Alt problemler</th><th>Örnek</th></tr></thead>
 <tbody>
@@ -59,6 +61,7 @@
 
 <h2>Tipik bir makine öğrenmesi akışı</h2>
 <p>Bir makine öğrenmesi projesi genelde altı adımda ilerler. Önce <strong>problem</strong> tanımlanır: görev nedir, başarı hangi ölçüyle ölçülecek? Sonra <strong>veri</strong> toplanır, temizlenir ve incelenir. Üçüncü adımda veri modele uygun <strong>özniteliklere</strong> dönüştürülür: kategoriler kodlanır, sayılar ölçeklenir, gereksiz sütunlar atılır. Dördüncü adımda <strong>model</strong> seçilir ve eğitilir; ayarları doğrulama verisiyle yapılır. Beşinci adımda model ayrılmış test verisinde yalnız bir kez <strong>değerlendirilir</strong> ve hataları incelenir. Son adımda model <strong>kullanıma alınır</strong> ve zamanla bozulup bozulmadığı izlenir.</p>
+<div data-widget="fig" data-fig="workflow" data-caption="Bir makine öğrenmesi projesinin adımları."></div>
 <p>Uygulamada zamanın büyük kısmı ikinci ve üçüncü adımlarda geçer. Modelin kendisi birkaç satır koddur; asıl iş veriyi anlamak, hazırlamak ve doğru değerlendirmektir.</p>
 
 <h2>Öğrenme = hipotez uzayında arama</h2>
@@ -99,7 +102,7 @@
 <li><strong>Ø içermeyen kaç hipotez?</strong> Her öznitelik için 2 değer + “?” = 3 seçenek: 3 × 3 = <strong>9 hipotez</strong>: ⟨G, Var⟩, ⟨G, Yok⟩, ⟨G, ?⟩, ⟨Y, Var⟩, ⟨Y, Yok⟩, ⟨Y, ?⟩, ⟨?, Var⟩, ⟨?, Yok⟩, ⟨?, ?⟩. Bunların her biri farklı bir gün kümesine Evet der.</li>
 <li><strong>Ø içerenler</strong> (⟨Ø, Var⟩, ⟨G, Ø⟩, ⟨Ø, Ø⟩…) yazılış olarak farklı ama hepsi aynı şeyi söyler: “hiçbir gün Evet değil”. Anlam olarak tek bir hipotezdir, <strong>1</strong> kez sayılır.</li>
 <li>Toplam <strong>anlamca farklı hipotez</strong> = 9 + 1 = <strong>10</strong>.</li>
-<li><strong>Kaç olası “kavram” var?</strong> Kavram, günlerin hangilerinin Evet olduğunu söyleyen herhangi bir etiketleme. 4 günün her biri bağımsız olarak Evet ya da Hayır olabilir: 2⁴ = <strong>16 kavram</strong>. Hipotez dilimiz bunların yalnız 10'unu yazabiliyor. Örneğin “(G, Var) ya da (Y, Yok) günleri Evet” kavramı VE'li bir kuralla yazılamaz.</li>
+<li><strong>Kaç olası “kavram” var?</strong> <span data-gl="t-kavram">Kavram</span>, günlerin hangilerinin Evet olduğunu söyleyen herhangi bir etiketleme. 4 günün her biri bağımsız olarak Evet ya da Hayır olabilir: 2⁴ = <strong>16 kavram</strong>. Hipotez dilimiz bunların yalnız 10'unu yazabiliyor. Örneğin “(G, Var) ya da (Y, Yok) günleri Evet” kavramı VE'li bir kuralla yazılamaz.</li>
 </ol>
 <div class="callout"><div class="callout-title">Genel formül (kᵢ: i. özniteliğin değer sayısı)</div>
 <ul>
@@ -123,6 +126,7 @@
 <div data-widget="fig" data-fig="bvcurve" data-caption="Model karmaşıklaştıkça yanlılık düşer, varyans artar; toplam hata önce düşer sonra yükselir. Amaç aradaki tatlı nokta."></div>
 <p>Bu ilişkiyi klasik bir deneyle görelim. Bir sinüs eğrisinden gürültüyle 10 nokta üretip bunlara farklı derecelerde polinomlar uyduruyoruz. 0. ve 1. derece polinomlar (sabit ve doğru) eğrinin şeklini yakalayamaz; eğitim ve test hataları ikisi de yüksektir, buna <strong>yetersiz uyum</strong> denir. 3. derece polinom eğriyi iyi yakalar ve test hatası en düşük olan odur. 9. derece polinom ise 10 noktanın hepsinden tam geçer; eğitim hatası sıfırdır ama noktaların arasında savrulur ve test hatası çok büyür, buna <strong>aşırı uyum</strong> denir. Aşağıdaki araçta dereceyi kendiniz değiştirebilirsiniz.</p>
 <div data-widget="polyfit"></div>
+<div data-widget="fig" data-fig="fitpanels" data-caption="Aynı 10 nokta, üç model: çok basit, uygun, çok esnek."></div>
 <p>Aşırı uyuma karşı, polinomun derecesini değiştirmeden de önlem alınabilir: daha çok veri toplamak, büyük katsayıları cezalandırmak (düzenlileştirme), bir doğrulama kümesiyle en iyi noktada durmak ya da birden çok modelin ortalamasını almak. Örneğin aynı 9. derece polinom 100 noktayla eğitilseydi her gürültülü noktadan geçemezdi; model daha kararlı olur ve test hatası gürültü düzeyine yaklaşırdı.</p>
 
 <h2>Dönemin tekrar eden sorusu: hiperparametre tablosu</h2>

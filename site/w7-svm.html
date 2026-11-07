@@ -13,6 +13,7 @@
 <body data-page="w7-svm">
 <main><div class="content">
 
+<!-- gaps -->
 <!-- clarified -->
 <h1>Destek vektör makineleri</h1>
 <p class="lead">Ayrılabilir veride sonsuz sayıda ayırıcı doğru vardır; SVM en geniş “sokağı” açanı seçer. Marj, destek vektörleri, 2B'de elle w ve b, yumuşak marj ve C, menteşe kaybı, çekirdek hilesi. Ara sınavın E bölümü (17 puan): <strong>2B'de destek vektörlerini bul, w ve b'yi hesapla</strong>.</p>
@@ -63,6 +64,7 @@
 
 <h2>Çekirdek hilesi</h2>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Kâğıdı bükmek</div><p>Bir sınıfın noktaları ortada, ötekininki çevresinde bir halka olsun: hiçbir doğru ayıramaz. Ama her noktaya “merkeze uzaklığın karesi” diye üçüncü bir öznitelik eklersek ortadakiler aşağıda, halkadakiler yukarıda kalır ve bir düzlemle ayrılırlar. Çekirdek hilesi bu yeni öznitelikleri hiç hesaplamadan, yalnız noktalar arası “benzerlik” fonksiyonuyla aynı sonucu verir.</p></div>
+<div data-widget="fig" data-fig="kerneltrick" data-caption="Sol: ortadaki pozitifler tek bir eşikle ayrılamaz. Sağ: her noktaya x² özniteliği eklenince bir doğruyla ayrılırlar. Çekirdek bu dönüşümü açıkça yapmadan aynı sonucu verir."></div>
 <p>Bunun neden mümkün olduğunu SVM'nin ikil biçimi açıklar: hem eğitim hem tahmin, verileri yalnız iki nokta arasındaki iç çarpımlar (xᵢ·xⱼ) üzerinden kullanır. Her iç çarpımı K(xᵢ, xⱼ) = φ(xᵢ)·φ(xⱼ) biçiminde bir çekirdek fonksiyonuyla değiştirmek, verileri φ'nin tanımladığı yüksek boyutlu uzaya taşıyıp orada doğrusal SVM eğitmekle aynı şeydir; ama φ'yi hiç hesaplamamız gerekmez. Sık kullanılan çekirdekler şunlardır:</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Çekirdek</th><th>K(x, z)</th><th>Parametresi</th><th>Ne zaman?</th></tr></thead>
