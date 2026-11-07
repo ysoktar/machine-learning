@@ -15,6 +15,16 @@
 
 <h1>Doğrusal modeller</h1>
 <p class="lead">Regresyondan sınıflandırmaya hepsi aynı kalıp: <span class="m">ŷ = f(wᵀx + b)</span>. En küçük kareler, gradyan inişi, lojistik regresyon, perceptron, softmax, ridge/lasso. Ara sınavın C bölümü (17 puan): <strong>bir lojistik regresyon ya da perceptron güncelleme adımı</strong>. Güncelleme kuralını ezbere bilin, her satırda z'yi açıkça yazın.</p>
+<!-- enriched -->
+<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
+<tr><td>Perceptron epoch'u (C bölümü)</td><td>4–7 nokta, başlangıç w, b, η; her satırda z, ŷ, güncelleme; son ağırlıklarla karmaşıklık matrisi</td><td>her satırda z'yi açık yazmak; z = 0 → +1 kuralı; işaret</td></tr>
+<tr><td>Lojistik regresyon adımı (C)</td><td>tek örnek, w = 0; p, kayıp, gradyan, yeni w ve b; yeni p (tablo verilir)</td><td>w ← w − η(p − y)x; kaybın düştüğünü göstermek</td></tr>
+<tr><td>En küçük kareler</td><td>4–5 nokta; w₁, w₀, ŷ, MSE, R²</td><td>x − x̄, y − ȳ sütunlarıyla tablo</td></tr>
+<tr><td>Karar sınırı / mantık kapısı</td><td>w, b verilir: doğruyu çiz, noktaları sınıfla, uzaklık; AND/OR için (w, b) bul; XOR neden olmaz</td><td>doğru denklemi x₂ = …; kısa XOR kanıtı</td></tr>
+<tr><td>Kavram</td><td>log-loss neden, MSE ↔ Gauss, batch/SGD, öğrenme oranı, ridge/lasso, OvR/softmax</td><td>iki cümlelik gerekçe</td></tr>
+</tbody></table></div><p class="small">C bölümü 17 puan: bir lojistik regresyon ya da perceptron güncelleme adımı. Güncelleme kuralını ezbere bilin.</p></div>
+
 
 <h2>Doğrusal regresyon ve en küçük kareler</h2>
 <p>Model <span class="m">ŷ = w₀ + w₁x₁ + … + w_dx_d</span>; x'in başına sabit 1 eklenirse w₀ ağırlık vektörüne girer: ŷ = wᵀx. Kayıp: MSE. “Doğrusal” <em>parametrelerde</em> doğrusal demektir: x², log x gibi türetilmiş öznitelikler kullanılabilir.</p>
@@ -48,6 +58,15 @@
 <p>AND: w = (1, 1), b = −1.5. OR: w = (1, 1), b = −0.5. NAND: AND'in işaretlerini çevir, w = (−1, −1), b = 1.5. <strong>XOR tek bir doğruyla ayrılamaz</strong>: (0,1) ve (1,0) pozitif, (0,0) ve (1,1) negatif; w₁ + b ≥ 0 ile w₂ + b ≥ 0 toplanınca w₁ + w₂ + 2b ≥ 0 çıkar, bu b &lt; 0 ve w₁ + w₂ + b &lt; 0 ile çelişir. Gizli katman gerekir (8. hafta).</p>
 
 <h2>Lojistik regresyon</h2>
+<div class="recipe"><div class="recipe-title">📝 Lojistik regresyon adımı: 6 satır</div><ol>
+<li>z = w·x + b</li>
+<li>p = σ(z) = 1/(1 + e⁻ᶻ) (tablodan; σ(0) = 0.5, σ(−z) = 1 − σ(z))</li>
+<li>kayıp = −[y ln p + (1 − y) ln(1 − p)]</li>
+<li>gradyan: ∂L/∂w = (p − y)·x, ∂L/∂b = p − y</li>
+<li>w ← w − η·(p − y)·x, b ← b − η·(p − y)  (<strong>eksi</strong>!)</li>
+<li>yeni z ve p; kayıp düştü mü? (düşmediyse η çok büyük ya da işaret hatası)</li>
+</ol></div>
+
 <div class="formula">p(y = 1 | x) = σ(wᵀx + b), &nbsp; σ(z) = 1/(1 + e⁻ᶻ)</div>
 <ul>
 <li>σ(0) = 0.5, σ(−z) = 1 − σ(z), <strong>σ′(z) = σ(z)(1 − σ(z)) ≤ 0.25</strong>.</li>
@@ -70,6 +89,14 @@
 </tbody></table></div></div>
 
 <h2>Perceptron</h2>
+<div class="recipe"><div class="recipe-title">📝 Perceptron epoch'u sınavda nasıl yazılır?</div><ol>
+<li>Tablo başlığı: # · x · y · z = w·x + b · ŷ · hata? · yeni w · yeni b.</li>
+<li>Her satırda z'yi <strong>sayılarla</strong> yazın (ör. −0.5·2 + 0.5·3 − 0.7 = −0.2).</li>
+<li>ŷ = +1 eğer z ≥ 0 (sıfır dahil!), değilse −1.</li>
+<li>ŷ = y ise “hayır”, ağırlıkları aynen aşağı taşıyın. ŷ ≠ y ise w ← w + η·y·x, b ← b + η·y.</li>
+<li>Epoch sonunda son ağırlıklarla <em>bütün</em> örnekleri yeniden sınıflayıp karmaşıklık matrisi isteniyorsa onu kurun (epoch sırasındaki tahminler değil!).</li>
+</ol><p class="small">η genelde 0.4 gibi seçilir ki sayılar 0.1'in katlarında kalsın; ondalıkları dikkatle taşıyın.</p></div>
+
 <ol>
 <li>w, b verilen değerlerle (ya da 0) başlar; η öğrenme oranı.</li>
 <li>Her (xᵢ, yᵢ) için sırayla: z = wᵀxᵢ + b; <strong>z ≥ 0 ise ŷ = +1</strong>, değilse −1.</li>
@@ -95,6 +122,58 @@
 <li><strong>Lasso</strong>: L(w) + λ‖w‖₁; bazı katsayıları <strong>tam 0</strong> yapar (L1 topunun köşeleri) → öznitelik seçimi, seyrek ve yorumlanabilir model. Kapalı çözümü yok.</li>
 <li>Elastic net: ikisinin karışımı. Aynı cezalar lojistik regresyonda da var; scikit-learn'de <strong>C = 1/λ</strong>: büyük C daha <em>az</em> düzenlileştirme.</li>
 <li>Öznitelikleri <strong>ölçekleyin</strong>: ceza her katsayıya aynı uygulanır, ama katsayının büyüklüğü özniteliğin birimine bağlıdır (TL cinsinden gelirin katsayısı küçüktür).</li>
+</ul>
+
+<h2>Sınav tipi çözümlü problemler</h2>
+<h3>Problem 1: perceptron, bir epoch ve yakınsama</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>Örnekler sırayla: P1 (1, 1) +1, P2 (2, 0) +1, P3 (0, 1) −1, P4 (−1, 0) −1, P5 (1, −1) +1. w = (0, 0), b = 0, η = 1; z ≥ 0 → +1. (a) Bir epoch tablosu. (b) Son ağırlıklarla karmaşıklık matrisi ve accuracy. (c) Veri doğrusal ayrılabilir mi, algoritma durur mu?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><div class="table-wrap"><table class="simple compact"><thead><tr><th>#</th><th>x</th><th>y</th><th>z</th><th>ŷ</th><th>güncelleme?</th><th>w, b sonra</th></tr></thead><tbody>
+<tr><td>P1</td><td>(1, 1)</td><td>+1</td><td>0</td><td>+1</td><td>hayır</td><td>(0, 0), 0</td></tr>
+<tr><td>P2</td><td>(2, 0)</td><td>+1</td><td>0</td><td>+1</td><td>hayır</td><td>(0, 0), 0</td></tr>
+<tr class="hl"><td>P3</td><td>(0, 1)</td><td>−1</td><td>0</td><td>+1</td><td><strong>evet</strong>: w − (0, 1), b − 1</td><td>(0, −1), −1</td></tr>
+<tr><td>P4</td><td>(−1, 0)</td><td>−1</td><td>−1</td><td>−1</td><td>hayır</td><td>(0, −1), −1</td></tr>
+<tr><td>P5</td><td>(1, −1)</td><td>+1</td><td>0 + 1 − 1 = 0</td><td>+1</td><td>hayır</td><td>(0, −1), −1</td></tr></tbody></table></div>
+<p>(b) w = (0, −1), b = −1 ile: P1 z = −2 → −1 (FN), P2 z = −1 → −1 (FN), P3 −2 (TN), P4 −1 (TN), P5 z = 0 → +1 (TP). TP 1, FN 2, FP 0, TN 2; accuracy 3/5 = 0.6. Epoch P3'ü düzeltti ama P1, P2'yi bozdu: tek epoch nadiren yeter.</p>
+<p>(c) Evet: x₁ − 0.5x₂ − 0.25 ≥ 0 hepsini ayırır. Ayıran bir doğru varsa <strong>yakınsama teoremi</strong> sonlu sayıda güncellemede durmayı garanti eder: 2. epoch w = (1, −1), b = −1; 3. epoch w = (2, −1), b = −1; 4. epoch hatasız.</p>
+<div data-widget="perceptron" data-pts="1 1 +
+2 0 +
+0 1 -
+-1 0 -
+1 -1 +" data-w="0 0" data-b="0" data-eta="1" data-epochs="5"></div></div></details>
+<h3>Problem 2: lojistik regresyon, y = 0 örneği</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>w = (1, −1), b = 0, η = 0.5; tek örnek x = (2, 1), y = 0. (a) z, p ve kayıp. (b) gradyan. (c) yeni w, b. (d) yeni p'yi yaklaşık bulun (e⁻¹ = 0.368).</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>z = 2 − 1 + 0 = 1, p = σ(1) = 1/(1 + 0.368) = <strong>0.731</strong>. Gerçek y = 0 iken model %73 “1” diyor: kayıp −ln(1 − 0.731) = −ln 0.269 ≈ <strong>1.31</strong>.</li>
+<li>p − y = 0.731 → ∂L/∂w = 0.731·(2, 1) = (1.462, 0.731), ∂L/∂b = 0.731.</li>
+<li>w = (1, −1) − 0.5·(1.462, 0.731) = <strong>(0.269, −1.366)</strong>, b = 0 − 0.5·0.731 = <strong>−0.366</strong>.</li>
+<li>z′ = 0.538 − 1.366 − 0.366 = −1.194 → p′ ≈ σ(−1.2) = 1 − σ(1.2) ≈ 0.23. p 0.73'ten 0.23'e indi, kayıp ≈ 0.27: adım doğru yönde.</li></ol>
+<p class="small muted">y = 0 olduğunda p − y pozitiftir, ağırlıklar x yönünde <em>azalır</em>: işaret kuralını bu örnekle sınayın.</p>
+<div data-widget="logstep" data-x="2 1" data-w="1 -1" data-b="0" data-y="0" data-eta="0.5"></div></div></details>
+<h3>Problem 3: en küçük kareler</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>x = (1, 2, 3, 4), y = (2, 3, 5, 6). y = w₀ + w₁x'i bulun; tahminler, artıklar ve MSE.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>x̄ = 2.5, ȳ = 4. Σ(x − x̄)(y − ȳ) = (−1.5)(−2) + (−0.5)(−1) + (0.5)(1) + (1.5)(2) = 3 + 0.5 + 0.5 + 3 = 7; Σ(x − x̄)² = 2.25 + 0.25 + 0.25 + 2.25 = 5. w₁ = 7/5 = <strong>1.4</strong>, w₀ = 4 − 1.4·2.5 = <strong>0.5</strong>. ŷ = 1.9, 3.3, 4.7, 6.1; artıklar 0.1, −0.3, 0.3, −0.1 (toplam 0 ✓); MSE = (0.01 + 0.09 + 0.09 + 0.01)/4 = <strong>0.05</strong>.</p></div></details>
+<h3>Problem 4: gradyan inişi ve öğrenme oranı</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>ŷ = wx (bias yok), L(w) = (1/n)Σ(wxᵢ − yᵢ)², noktalar (1, 2) ve (2, 4). w = 0, η = 0.1 ile iki adım. Minimum nerede? η = 1.0 olsaydı?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>∂L/∂w = (2/n)Σ(wxᵢ − yᵢ)xᵢ. w = 0: (2/2)[(−2)·1 + (−4)·2] = −10 → w = 0 − 0.1·(−10) = <strong>1.0</strong>. w = 1: (−1)·1 + (−2)·2 = −5 → w = <strong>1.5</strong>. Minimum w = 2 (iki nokta da y = 2x üzerinde, kayıp 0); her adım kalan uzaklığı yarıya indiriyor. η = 1: w = 10, sonra gradyan 40 → w = −30: <strong>ıraksar</strong>.</p></div></details>
+<h3>Problem 5: karar sınırı</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>w = (2, −1), b = −1. (a) Sınır doğrusu. (b) (1, 0), (0, 2), (2, 3)'ü sınıfla. (c) (1, 0)'ın sınıra uzaklığı. (d) w ve b'yi 3 ile çarparsak?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>2x₁ − x₂ − 1 = 0 ⇔ x₂ = 2x₁ − 1 ((0.5, 0) ve (1, 1)'den geçer); w sağ alt (+) tarafı gösterir.</li>
+<li>(1, 0): 1 → +; (0, 2): −3 → −; (2, 3): 0 → sınırda, z ≥ 0 kuralıyla +.</li>
+<li>|1|/√5 = <strong>0.45</strong>.</li>
+<li>Sınır aynı nokta kümesi, uzaklıklar da aynı (formül ‖w‖'ye böler); yalnız skorların ölçeği değişir.</li></ol></div></details>
+<h3>Problem 6: mantık kapısı ve XOR</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>(a) NAND için (w₁, w₂, b) verin (z ≥ 0 → 1). (b) XOR'un tek nöronla yapılamayacağını gösterin.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>AND (w = (1, 1), b = −1.5)'in işaretlerini çevirin: w = (−1, −1), <strong>b = 1.5</strong>. Denetim: (1, 1) → −0.5 → 0; diğerleri ≥ 0.5 → 1.</li>
+<li>XOR: (0,1) ve (1,0) → 1 ister: w₂ + b ≥ 0, w₁ + b ≥ 0; (0,0) → 0: b &lt; 0; (1,1) → 0: w₁ + w₂ + b &lt; 0. İlk ikisini topla: w₁ + w₂ + 2b ≥ 0 ⇒ w₁ + w₂ + b ≥ −b &gt; 0. Bu son koşulla çelişir. Gizli katman gerekir (8. hafta).</li></ol></div></details>
+<h2>Sık hatalar</h2>
+<ul class="mistakes">
+<li>Perceptron'da z = 0'ı −1 saymak (kural z ≥ 0 → +1).</li>
+<li>Doğru sınıflanan örnekte de güncelleme yapmak.</li>
+<li>Perceptron güncellemesinde y'yi unutmak: w ← w + η<strong>y</strong>x (negatif örnekte çıkarılır).</li>
+<li>Lojistik adımda w ← w <strong>+</strong> η(p − y)x yazmak (eksi olmalı).</li>
+<li>Epoch sonundaki karmaşıklık matrisini epoch içindeki tahminlerden kurmak (son ağırlıklarla yeniden sınıflayın).</li>
+<li>Sigmoid değerini tablodan yanlış okumak: σ(z) = 1/(1 + e⁻ᶻ); e⁻ᶻ tabloda, σ değil.</li>
+<li>Lasso/ridge farkında “ikisi de sıfıra indirir” demek (yalnız lasso).</li>
+<li>scikit-learn'de C'yi λ sanmak: C = 1/λ, büyük C az düzenlileştirme.</li>
 </ul>
 
 <h2>Hiperparametre satırları</h2>

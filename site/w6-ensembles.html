@@ -15,6 +15,16 @@
 
 <h1>Topluluk yöntemleri</h1>
 <p class="lead">Birçok zayıf ya da kararsız modelin oyu, tek bir iyi modelden daha iyi olabilir. Bagging ve rastgele orman <strong>varyansı</strong>, boosting <strong>yanlılığı</strong> azaltır. Ara sınavda: bootstrap/OOB hesabı, AdaBoost ağırlık güncellemesi (küçük örnek), gradyan artırmanın sezgisi, kısa kavram soruları.</p>
+<!-- enriched -->
+<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
+<tr><td>Çoğunluk oyu</td><td>n bağımsız sınıflandırıcı, doğruluk p; topluluk hatası</td><td>“en az ⌈n/2⌉ yanılmalı” + binom terimleri</td></tr>
+<tr><td>Bootstrap / OOB</td><td>(1 − 1/n)ⁿ; verilen örneklemlerden OOB kümeleri ve OOB hatası</td><td>her ağaç için OOB kümesini yazmak; yalnız görmeyen ağaçların oyu</td></tr>
+<tr><td>AdaBoost turu</td><td>eşit ağırlıklar, bir kütük k örnekte yanılıyor: ε, α, yeni ağırlıklar; 2. tur seçim</td><td>α = ½ ln((1−ε)/ε); kestirme çarpanlar; ağırlıklı hata ile seçim</td></tr>
+<tr><td>Gradyan artırma adımı</td><td>4 nokta, η, kütük; F₀, kalıntılar, F₁, MSE</td><td>yaprak ortalamaları ve η çarpanı</td></tr>
+<tr><td>Kavram (4 p)</td><td>bagging vs boosting; RF'nin iki mekanizması; ağaç sayısı ve aşırı uyum; stacking sızıntısı</td><td>mekanizmayı adlandırıp bir cümleyle açıklamak</td></tr>
+</tbody></table></div></div>
+
 
 <h2>Kalabalığın bilgeliği</h2>
 <p>Her biri %80 doğru, <em>bağımsız</em> hata yapan 3 sınıflandırıcının çoğunluk oyu: en az 2'si yanılmalı → 3·0.2²·0.8 + 0.2³ = 0.104 (hata %20'den %10'a). 5 üyeyle 0.058. İki varsayım: üyeler %50'den iyi ve <strong>bağımsız</strong>. Pratikte bozulan bağımsızlıktır: aynı veriyle eğitilen modeller aynı zor örneklerde yanılır. Topluluk yöntemlerinin bütün işi <strong>çeşitlilik</strong> üretmektir (bootstrap örneklemleri, rastgele öznitelikler, yeniden ağırlıklandırma).</p>
@@ -45,6 +55,14 @@
 <div class="callout exam"><div class="callout-title">Örnek sınav sorusu</div><p>“Rastgele orman neden tek bir derin ağaçtan daha az aşırı uyar? İki mekanizma.” (1) <strong>Bagging</strong>: her ağaç farklı bootstrap örnekleminde; ortalama almak varyansı düşürür. (2) <strong>Rastgele öznitelik alt kümesi</strong>: ağaçları ilişkisizleştirir, ortalamanın varyans azaltımını büyütür. “Ağaç sayısı arttıkça doğrulama hatası?” → azalır ve platoya oturur, yükselmez.</p></div>
 
 <h2>AdaBoost</h2>
+<div class="recipe"><div class="recipe-title">📝 AdaBoost turu kâğıtta</div><ol>
+<li>Her aday kütük için yanlış örnekleri listeleyin; ε = yanlışların <strong>ağırlıkları toplamı</strong> (ilk turda sayı/n).</li>
+<li>En küçük ε'lu kütüğü seçin (ilk turdan sonra sayı değil ağırlık belirler!).</li>
+<li>α = ½ ln((1 − ε)/ε). ln tablosu verilir (ln 3 = 1.099, ln 7 = 1.946…).</li>
+<li>Yeni ağırlık: yanlışlar × 1/(2ε), doğrular × 1/(2(1 − ε)). Denetim: yanlışların toplamı 0.5, doğruların toplamı 0.5.</li>
+<li>Son kural: H(x) = sign(Σ αₜhₜ(x)); her örnek için Σαh tablosu.</li>
+</ol></div>
+
 <ol>
 <li>Ağırlıklar eşit: wᵢ = 1/n.</li>
 <li>Her tur t: ağırlıklı hatası <span class="m">εₜ = Σ<sub>yanlış</sub> wᵢ</span> en küçük kütüğü hₜ seç.</li>
@@ -63,6 +81,40 @@
 
 <h2>Stacking</h2>
 <p>Seviye-0 modellerin tahminleri meta-modelin öznitelikleri olur. <strong>Sızıntı riski</strong>: seviye-0 modeller eğitildikleri veride tahmin yaparsa meta-model ezberlenmiş, iyimser tahminlerden öğrenir. Çözüm: meta-öznitelikleri <strong>katlar dışı</strong> (out-of-fold) üret (her tahmin o satırı görmemiş bir modelden). Daha basit alternatifler: olasılıkların (ağırlıklı) ortalaması, çoğunluk oyu.</p>
+
+<h2>Sınav tipi çözümlü problemler</h2>
+<h3>Problem 1: kalabalığın bilgeliği</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H6)</span></div><p>Her biri %80 doğru ve bağımsız hata yapan (a) 3, (b) 5 sınıflandırıcının çoğunluk oyu hatası? (C(5,3) = 10, C(5,4) = 5). (c) Pratikte hangi varsayım bozulur?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>En az 2'si yanılmalı: 3·0.2²·0.8 + 0.2³ = 0.096 + 0.008 = <strong>0.104</strong>.</li>
+<li>En az 3'ü: 10·0.2³·0.8² + 5·0.2⁴·0.8 + 0.2⁵ = 0.0512 + 0.0064 + 0.0003 = <strong>0.058</strong>.</li>
+<li><strong>Bağımsızlık</strong>: aynı veriyle eğitilen modeller aynı zor örneklerde yanılır; gerçek kazanç binomun söylediğinden küçüktür. Topluluk yöntemleri çeşitlilik üretmek için vardır.</li></ol></div></details>
+<h3>Problem 2: OOB hatası</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H6)</span></div><p>Örnekler 1–5, etiketler +, +, −, −, +. Üç bootstrap örneklemi ve ağaçların tahminleri (her ağaç her örneği sınıflıyor):</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>ağaç</th><th>örneklem</th><th>1, 2, 3, 4, 5 için tahmin</th></tr></thead><tbody>
+<tr><td>T1</td><td>1, 1, 2, 4, 5</td><td>+, +, −, −, +</td></tr><tr><td>T2</td><td>2, 3, 3, 4, 4</td><td>+, +, −, −, −</td></tr><tr><td>T3</td><td>1, 2, 2, 5, 5</td><td>+, +, +, −, +</td></tr></tbody></table></div>
+<p>Beraberlikte negatif. (a) Her ağacın OOB örnekleri. (b) OOB tahminleri ve OOB hatası. (c) Üç ağacın eğitim hatası; neden farklı?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>OOB(T1) = {3}, OOB(T2) = {1, 5}, OOB(T3) = {3, 4}.</li>
+<li>1: yalnız T2 → + ✓. 2: hiç OOB değil → tahmin yok. 3: T1 −, T3 + → beraberlik → − ✓. 4: T3 → − ✓. 5: T2 → − ✗. OOB hatası 1/4 = <strong>0.25</strong> (2 atlanır).</li>
+<li>Üçünün çoğunluğu: +, +, −, −, + → eğitim hatası <strong>0</strong>. Eğitim oyunda ağaçlar ezberledikleri örnekleri notluyor; OOB yalnız görmeyen ağaçları kullanır: dürüst kestirim.</li></ol></div></details>
+<h3>Problem 3: AdaBoost iki tur</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H6)</span></div><p>10 örnek, eşit ağırlık 0.1; en iyi kütük 2 örnekte (1 ve 2) yanılıyor. (a) ε₁, α₁. (b) Yeni ağırlıklar. (c) 2. turda h_A örnek 1 ve 3'te, h_B örnek 3, 4, 5, 6'da yanılıyor: hangisi seçilir, α₂? (ln 4 = 1.386, ln 3 = 1.099)</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>ε₁ = 0.2, α₁ = ½ ln(0.8/0.2) = ½ ln 4 = <strong>0.693</strong> (e^α = 2).</li>
+<li>Yanlış: 0.1·2 = 0.2; doğru: 0.1·0.5 = 0.05; Z = 2·0.2 + 8·0.05 = 0.8. Normalleştirilmiş: yanlışlar <strong>0.25</strong>, doğrular <strong>0.0625</strong>. Kestirme: × 1/(2·0.2) = × 2.5 ve × 1/(2·0.8) = × 0.625. Yanlışların toplamı 0.5 ✓.</li>
+<li>ε(h_A) = 0.25 + 0.0625 = 0.3125; ε(h_B) = 4·0.0625 = 0.25 → <strong>h_B</strong>, dört hatasına rağmen (ağır örnek 1'i doğru biliyor). α₂ = ½ ln(0.75/0.25) = ½ ln 3 = <strong>0.549</strong>. 1. turun kütüğü artık işe yaramaz: hatası tam 0.5, α = 0.</li></ol></div></details>
+<h3>Problem 4: gradyan artırma, bir adım</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H6)</span></div><p>x = 1, 2, 3, 4; y = 1, 3, 5, 7; η = 0.5. (a) F₀ ve kalıntılar. (b) x ≤ 2.5 kütüğünü kalıntılara uydurun, F₁. (c) MSE önce ve sonra. (d) Sonraki kalıntılar; neden “küçük η + çok ağaç”?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>F₀ = ȳ = 4; kalıntılar −3, −1, 1, 3.</li><li>Sol yaprak ort(−3, −1) = −2, sağ ort(1, 3) = 2 → F₁ = 4 + 0.5·(−2, −2, 2, 2) = <strong>(3, 3, 5, 5)</strong>.</li>
+<li>MSE: (9 + 1 + 1 + 9)/4 = 5 → (4 + 0 + 0 + 4)/4 = <strong>2</strong>.</li>
+<li>Yeni kalıntılar −2, 0, 0, 2; aynı kütük −1, +1 → F₂ = (2.5, 3.5, 4.5, 5.5), MSE 1.25. η = 1 olsaydı ilk tur (2, 2, 6, 6)'ya sıçrar, aynı kütük sonra hiçbir şey ekleyemezdi. Küçük adımlar kalıntının gürültüsüne hemen uymaz, daha pürüzsüz yaklaşır; tur sayısı erken durdurmayla seçilir.</li></ol></div></details>
+<h2>Sık hatalar</h2>
+<ul class="mistakes">
+<li>α'da ½'yi unutmak; ln yerine log₁₀ kullanmak.</li>
+<li>İkinci turda kütüğü hata <em>sayısına</em> göre seçmek.</li>
+<li>Ağırlıkları normalleştirmeyi unutmak (toplam 1 olmalı).</li>
+<li>OOB tahmininde örneği görmüş ağaçların oyunu da saymak.</li>
+<li>“Ağaç sayısı arttıkça RF aşırı uyar” demek (platoya iner).</li>
+<li>Bagging'in yanlılığı azalttığını söylemek (varyansı azaltır; boosting yanlılığı).</li>
+</ul>
 
 <h2>Hiperparametre satırları</h2>
 <div class="table-wrap"><table class="simple">

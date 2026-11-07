@@ -194,20 +194,109 @@ export function enhanceQuizzes(root = document) {
 
 const slug = (s) => s.toLocaleLowerCase("tr").replace(/ı/g, "i").replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ş/g, "s").replace(/ö/g, "o").replace(/ç/g, "c")
   .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "bolum";
-function buildToc(content, id) {
-  const hs = $$(":scope > h2", content);
+const tocText = (hd) => (hd.dataset.toc || hd.textContent).replace(/\s+/g, " ").trim();
+
+/**
+ * In-page navigation, built after the widgets are mounted:
+ *   - "Bu sayfada" under the introduction (the page's sections)
+ *   - "Bu bölümde" at the start of a section with several sub-sections
+ *   - a table of contents that stays in view: a right-hand column on wide screens, a bar under the header otherwise;
+ *     the section being read is highlighted and its sub-sections open
+ */
+function buildPageNav(content, id) {
+  const all = $$(":scope > h2, :scope > h3", content);
   const used = new Set($$("[id]").map((e) => e.id));
-  for (const hd of $$(":scope > h2, :scope > h3", content)) {
+  for (const hd of all) {
     if (hd.id) continue;
-    let base = slug(hd.textContent), s = base, k = 2;
+    const base = slug(tocText(hd));
+    let s = base, k = 2;
     while (used.has(s)) s = `${base}-${k++}`;
     hd.id = s; used.add(s);
   }
-  if (id === "index" || hs.length < 3 || $(".page-toc", content)) return;
-  const toc = h("nav", { class: "page-toc", "aria-label": "Bu sayfada" }, h("div", { class: "page-toc-title" }, "Bu sayfada"),
-    h("ol", {}, hs.map((hd) => h("li", {}, h("a", { href: `#${hd.id}` }, hd.dataset.toc || hd.textContent)))));
-  const anchor = $(":scope > .studied", content) || $(":scope > .lead", content) || $(":scope > h1", content);
-  anchor.after(toc);
+  const tree = [];
+  for (const hd of all) {
+    if (hd.tagName === "H2") tree.push({ hd, subs: [] });
+    else if (tree.length) tree[tree.length - 1].subs.push(hd);
+  }
+  if (id === "index" || tree.length < 3) return;
+  const link = (hd, cls) => h("a", { href: `#${hd.id}`, class: cls || null, "data-target": hd.id }, tocText(hd));
+
+  if (!$(".page-toc", content)) {
+    const toc = h("nav", { class: "page-toc", "aria-label": "Bu sayfada" }, h("div", { class: "page-toc-title" }, "Bu sayfada"),
+      h("ol", {}, tree.map((t) => h("li", {}, link(t.hd)))));
+    ($(":scope > .studied", content) || $(":scope > .lead", content) || $(":scope > h1", content)).after(toc);
+  }
+  for (const t of tree) {
+    if (t.subs.length < 3 || t.hd.nextElementSibling?.classList.contains("section-toc")) continue;
+    t.hd.after(h("nav", { class: "section-toc", "aria-label": `${tocText(t.hd)}: bu bölümde` }, h("span", { class: "page-toc-title" }, "Bu bölümde"), t.subs.map((s) => link(s))));
+  }
+
+  const info = pageInfo(id);
+  const i = ALL.findIndex((p) => p.id === id);
+  const prev = ALL[i - 1], next = ALL[i + 1];
+  const top = () => h("a", { href: "#", class: "toc-top", onclick: (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); } }, "↑ Sayfanın başı");
+  const railPager = () => h("nav", { class: "toc-pager", "aria-label": "Önceki ve sonraki sayfa" },
+    prev ? h("a", { href: href(prev.id), class: "prev" }, h("span", { class: "dir" }, "← Önceki"), h("span", {}, prev.title)) : null,
+    next ? h("a", { href: href(next.id), class: "next" }, h("span", { class: "dir" }, "Sonraki →"), h("span", {}, next.title)) : null);
+  const makeList = () => h("ol", { class: "toc-list" }, tree.map((t) => {
+    const li = h("li", { "data-section": t.hd.id });
+    const row = h("div", { class: "toc-row" }, link(t.hd, "toc-h2"));
+    if (t.subs.length) {
+      const chev = h("button", { type: "button", class: "toc-chev", "aria-label": `${tocText(t.hd)}: alt başlıkları aç/kapat`, "aria-expanded": "false" }, h("span", { "aria-hidden": "true" }, "▸"));
+      chev.addEventListener("click", (e) => { e.stopPropagation(); li.dataset.user = li.classList.contains("open") ? "closed" : "open"; spy(); });
+      row.append(chev);
+      li.append(row, h("ol", { class: "toc-subs" }, t.subs.map((s) => h("li", {}, link(s, "toc-h3")))));
+    } else li.append(row);
+    return li;
+  }));
+  const rail = h("aside", { class: "toc-rail", "aria-label": "İçindekiler" },
+    info ? h("div", { class: "toc-rail-head" }, info.week ? h("span", { class: "toc-rail-ch" }, `${info.week}. hafta`) : null, h("span", { class: "toc-rail-title" }, info.title)) : null,
+    h("div", { class: "page-toc-title" }, "İçindekiler"), makeList(), top(), railPager());
+  const main = content.closest(".main");
+  main.classList.add("has-rail");
+  main.append(rail);
+
+  const label = h("span", { class: "toc-current" });
+  const toggle = h("button", { type: "button", class: "toc-toggle", "aria-expanded": "false" }, h("span", { class: "toc-bar-title" }, "Bu sayfada"), label, h("span", { class: "toc-caret", "aria-hidden": "true" }, "▾"));
+  const panel = h("div", { class: "toc-panel", hidden: true }, makeList(), top(), railPager());
+  const bar = h("div", { class: "toc-bar" }, toggle, panel);
+  const setOpen = (open) => { panel.hidden = !open; toggle.setAttribute("aria-expanded", String(open)); };
+  toggle.addEventListener("click", () => { setOpen(panel.hidden); if (!panel.hidden) spy(); });
+  panel.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
+  document.addEventListener("click", (e) => { if (!e.target.closest(".toc-bar")) setOpen(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+  document.body.append(bar);
+
+  const offset = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) + 64;
+  let ticking = false;
+  const follow = (box) => {
+    const active = $$("a.current", box).pop();
+    if (!active || box.scrollHeight <= box.clientHeight) return;
+    const r = active.getBoundingClientRect(), rr = box.getBoundingClientRect();
+    if (r.top < rr.top + 30 || r.bottom > rr.bottom - 30) box.scrollTop += r.top - rr.top - rr.height / 2;
+  };
+  function spy() {
+    ticking = false;
+    const lim = offset();
+    let cur = null, curSub = null;
+    for (const t of tree) if (t.hd.getBoundingClientRect().top <= lim) { cur = t; curSub = null; for (const s of t.subs) if (s.getBoundingClientRect().top <= lim) curSub = s; }
+    for (const list of [rail, panel]) {
+      for (const li of $$(":scope .toc-list > li", list)) {
+        const reading = !!cur && li.dataset.section === cur.hd.id;
+        const open = li.dataset.user === "open" || (reading && li.dataset.user !== "closed");
+        li.classList.toggle("open", open);
+        li.querySelector(".toc-chev")?.setAttribute("aria-expanded", String(open));
+        if (!reading && li.dataset.user === "closed") delete li.dataset.user;
+      }
+      for (const a of $$("a[data-target]", list)) a.classList.toggle("current", a.dataset.target === (curSub || cur?.hd)?.id || (a.dataset.target === cur?.hd.id && a.classList.contains("toc-h2")));
+    }
+    label.textContent = cur ? tocText(curSub || cur.hd) : "";
+    bar.classList.toggle("show", window.scrollY > 280);
+    follow(rail);
+    if (!panel.hidden) follow(panel);
+  }
+  window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(spy); } }, { passive: true });
+  spy();
 }
 
 async function init() {
@@ -229,12 +318,12 @@ async function init() {
   layout.append(main);
   document.body.prepend(h("a", { class: "skip-link", href: "#content" }, "İçeriğe geç"), buildHeader(), h("div", { class: "scrim", onclick: () => document.body.classList.remove("nav-open") }));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.body.classList.remove("nav-open"); });
-  buildToc(content, id);
   enhanceQuizzes(content);
   if ($("[data-widget]", content)) {
     const { mountAll } = await import("./widgets.js");
     mountAll(content);
   }
+  buildPageNav(content, id);
   const cur = $(".sidebar [aria-current]"), side = $(".sidebar");
   if (cur && side) side.scrollTop = Math.max(0, cur.offsetTop - side.clientHeight / 2);
   if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }

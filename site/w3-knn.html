@@ -15,6 +15,15 @@
 
 <h1>Gözetimli öğrenme, kNN ve model seçimi</h1>
 <p class="lead">Veriden fonksiyona: neyi, hangi ölçüte göre, hangi varsayım altında öğreniyoruz? Kayıp ve risk, i.i.d. varsayımı, taban çizgisi, k en yakın komşu, yanlılık-varyans ayrışımı, düzenlileştirme ve veri sızıntısı. Ara sınavda kNN elle hesap (kare uzaklıklarla sıralama) ve “k artarsa?” sorusu kesin gibi.</p>
+<!-- enriched -->
+<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
+<tr><td>kNN elle</td><td>6–8 nokta ve bir sorgu; k = 1, 3, 5 kararları; bazen Manhattan ya da z-score sonrası</td><td>d² tablosu + sıralama + beraberliği fark etmek</td></tr>
+<tr><td>LOO ile k seçimi</td><td>küçük veri; her noktayı dışarıda bırakıp k = 1 ve 3 için tahmin</td><td>her satırın komşularını yazmak; doğruluk oranını hesaplamak</td></tr>
+<tr><td>Rejim tanısı</td><td>eğitim/doğrulama hataları verilir: yetersiz, aşırı, makul?</td><td>rejim + ne değiştirilir</td></tr>
+<tr><td>Kavram (4 p)</td><td>k artarsa yanlılık/varyans; k = 1 ve k = n; sızıntı örneği; i.i.d.; 0-1 kaybı</td><td>tek cümlelik gerekçe</td></tr>
+</tbody></table></div></div>
+
 
 <h2>Denetimli öğrenme çerçevesi</h2>
 <ul>
@@ -56,6 +65,13 @@
 <p>Yukarıdaki varsayılan veride q = (4, 3): k = 1 → E (−); k = 3 → E, D, C → 2 artı, 1 eksi → <strong>+</strong>; k = 5 → +. k = 1 tek bir uzaktaki komşuya teslim oldu, k = 3 yerel çoğunluğu gördü. Manhattan'a geçin: C ile D eşitlenir, A ile B eşitlenir.</p>
 
 <h3>Ölçekleme komşuluğu değiştirir</h3>
+<div class="recipe"><div class="recipe-title">📝 kNN sorusu: 4 adım</div><ol>
+<li>Öznitelikler farklı ölçekteyse ve μ, σ verilmişse <strong>önce z-score</strong> (sorgu dahil, eğitimin μ, σ'sıyla).</li>
+<li>Her nokta için d² = Σ(xⱼ − qⱼ)² (Öklid) ya da L1 = Σ|xⱼ − qⱼ| tablosu.</li>
+<li>Küçükten büyüğe sırala; k. sırada eşitlik varsa yaz ve kuralını belirt.</li>
+<li>İlk k komşunun oyunu say → karar. Her k için ayrı satır yazın.</li>
+</ol><p class="small">Karekök almayın: Öklid'de d² ile sıralama aynıdır.</p></div>
+
 <p>Yaş (onlarca) ve gelir (on binlerce TL) aynı uzaklıkta ham hâliyle toplanırsa gelir yaşı “yutar”: 29 yaş daha yaşlı ama gelir farkı 1000 TL olan müşteri en yakın komşu çıkar. z-score sonrası iki öznitelik eşit söz sahibi olur ve karar değişebilir. Sınavda μ ve σ verilir; z değerlerini 2 ondalıkla hesaplayıp d²'ye göre sıralamak yeter.</p>
 
 <h3>k seçimi</h3>
@@ -110,6 +126,45 @@
 </tbody></table></div>
 <p>Belirti: “gerçek olamayacak kadar iyi” bir skor ve şüpheli biçimde baskın bir öznitelik. <strong>Güvenilir protokol</strong>: test kümesini en başta ayır ve kilitle → Pipeline → hiperparametre ızgarası + k-katlı CV (ortalama ± std) → en iyi ayarı bütün eğitim verisine uydur → testi bir kez raporla. Rapor biçimi: “5 katlı CV F1 = 0.84 ± 0.03; test F1 = 0.82”.</p>
 <div class="callout exam"><div class="callout-title">Örnek sınav sorusu: CV'de iyi, testte kötü</div><p>5 katlı CV ile seçilen model ayrı test kümesinde çok daha kötü. Üç olası neden: (1) sızıntı (ön işleme CV dışında yapıldı, gruplar/zaman katlara bölündü); (2) çok sayıda ayar denenip CV'ye aşırı uyuldu (seçim yanlılığı; iç içe CV kullanılmalı); (3) test kümesi farklı dağılımdan (dağılım kayması) ya da çok küçük/gürültülü.</p></div>
+
+<h2>Sınav tipi çözümlü problemler</h2>
+<h3>Problem 1: kNN, iki uzaklık</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H3)</span></div><p>A(1,1)+, B(2,2)+, C(1,3)+, D(5,4)−, E(6,2)−, F(4,5)−; sorgu q = (3,3). (a) d² ile sırala. (b) k = 1, 3, 5 kararları. (c) Manhattan ile sırala; k = 3 kararı değişir mi?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>d²: A 4+4 = 8, B 1+1 = 2, C 4+0 = 4, D 4+1 = 5, E 9+1 = 10, F 1+4 = 5 → B (2), C (4), D = F (5), A (8), E (10).</li>
+<li>k = 1: B → <strong>+</strong>. k = 3: B, C ve D/F'den biri (ikisi de −): + + − → <strong>+</strong> (eşitlik kararı etkilemiyor). k = 5: B, C, D, F, A → 3+, 2− → <strong>+</strong>.</li>
+<li>L1: A 4, B 2, C 2, D 3, E 4, F 3 → B = C (2), D = F (3), A = E (4). k = 3: B, C + D/F → <strong>+</strong>, değişmez. Ama her düzeyde eşitlik var: bir kural (en küçük ad, rastgele, hepsini al) yazılmalı.</li></ol></div></details>
+<h3>Problem 2: ölçekleme kararı değiştirir</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H3)</span></div><p>P (yaş 30, gelir 40.000), R (60, 41.000), S (32, 70.000); sorgu q = (31, 42.000). (a) Ham Öklid'de en yakın kim? (b) z-score sonrası (yaş μ = 40, σ = 12; gelir μ = 50.000, σ = 15.000)? (c) Neden farklı?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>Ham d²: P = 1 + 2000² ≈ 4.0·10⁶, R = 29² + 1000² ≈ 1.0·10⁶, S = 1 + 28000². <strong>R</strong> en yakın, 29 yaş büyük olmasına rağmen.</li>
+<li>z: q = (−0.75, −0.53), P = (−0.83, −0.67) → d² ≈ 0.025; R = (1.67, −0.6) → 5.85; S = (−0.67, 1.33) → 3.49. <strong>P</strong> en yakın.</li>
+<li>Ham birimlerde gelir on binlerle, yaş onlarla ölçülür: gelir farkı yaşı “yutar”. z-score ikisine eşit söz hakkı verir.</li></ol></div></details>
+<h3>Problem 3: LOO ile k seç</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(3. hafta derste)</span></div><p>A(1,2)+, B(2,2)+, C(1,4)+, D(6,3)+, E(4,2)−, F(4,5)−, G(5,3)−, H(4,4)−. Doğrulama kümesi yok. LOO ile k = 1 ve k = 3'ün doğruluğunu bulun, k'yı seçin.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Her nokta için kalan 7 noktadaki komşular (d²):</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>nokta</th><th>en yakın → k=1</th><th>3 komşu → k=3</th></tr></thead><tbody>
+<tr><td>A +</td><td>B(1) → + ✓</td><td>B, C, E → + ✓</td></tr><tr><td>B +</td><td>A(1) → + ✓</td><td>A, E, C → + ✓</td></tr><tr><td>C +</td><td>A(4) → + ✓</td><td>A, B, H → + ✓</td></tr>
+<tr><td>D +</td><td>G(1) → − ✗</td><td>G, E, H → − ✗</td></tr><tr><td>E −</td><td>G(2) → − ✓</td><td>G, B, H → − ✓</td></tr><tr><td>F −</td><td>H(1) → − ✓</td><td>H, G, D → − ✓</td></tr>
+<tr><td>G −</td><td>D(1) → + ✗</td><td>D, E, H → − ✓</td></tr><tr><td>H −</td><td>F(1) → − ✓</td><td>F, G, E → − ✓</td></tr></tbody></table></div>
+<p>k = 1: 6/8 = 0.75; k = 3: 7/8 = <strong>0.875 → k = 3</strong>. D bir aykırı nokta (etiket gürültüsü gibi); k = 1'de G'yi de yanlışa sürükler, k = 3 bunu yumuşatır.</p></div></details>
+<h3>Problem 4: rejimi tanı</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H3)</span></div><p>Aynı model ailesinin üç ayarı (eğitim / doğrulama hatası): (i) 0.30 / 0.31, (ii) 0.05 / 0.28, (iii) 0.12 / 0.14. Rejimleri adlandırın; (i) ve (ii)'de ne değiştirirsiniz?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ul><li>(i) <strong>Yetersiz uyum</strong> (yanlılık): ikisi de yüksek ve yakın → daha esnek model (k↓, derece↑, λ↓), daha iyi öznitelik. Daha çok veri işe yaramaz.</li>
+<li>(ii) <strong>Aşırı uyum</strong> (varyans): büyük açık → esnekliği azalt (k↑, λ↑, budama), daha çok veri, düzenlileştirme.</li>
+<li>(iii) Makul: küçük açık, ikisi de düşük.</li></ul></div></details>
+<h3>Problem 5: Loan verisinde kategorik kNN</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(3. hafta derste)</span></div><p>Yeni başvuru q = (yaşlı, işi yok, evi yok, iyi kredi notu). Hamming uzaklığıyla (farklı öznitelik sayısı) Loan tablosundaki uzaklıklar: d = 1 olanlar 2, 7, 12, 13, 15 (Hayır, Hayır, Evet, Evet, Hayır). (a) k = 1 kararı? Sorun var mı? (b) k = 5?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>(a) d = 1'de 5 aday var: k = 1 <strong>tanımsız</strong>; bir beraberlik kuralı gerekir (rastgele, en küçük ID → 2 → Hayır, ya da hepsini al).</li>
+<li>(b) k = 5 tam bu beşidir: 3 Hayır, 2 Evet → <strong>Hayır</strong>. “Evi yok → Hayır” tek öznitelik kuralı da aynı şeyi söylüyor; hangisinin daha iyi olduğunu ancak LOO/CV söyler.</li></ol></div></details>
+<h2>Sık hatalar</h2>
+<ul class="mistakes">
+<li>k = 1'in eğitim doğruluğuna (hep %100) bakıp k seçmek.</li>
+<li>Ölçek farkı olan özniteliklerde z-score yapmadan uzaklık hesaplamak.</li>
+<li>Sorguyu z-score'larken test/sorgu değerlerinden yeni μ, σ hesaplamak.</li>
+<li>Manhattan'da da d² ile sıralamak (L1'de kare alınmaz).</li>
+<li>k. sıradaki eşitliği görmezden gelmek: yazın ve kuralı belirtin.</li>
+<li>“Daha çok veri” her soruna çare sanmak: yetersiz uyumda (yanlılık) işe yaramaz.</li>
+<li>Yanlılığı “hata”, varyansı “gürültü” ile karıştırmak: gürültü σ² ayrı, azaltılamaz terimdir.</li>
+</ul>
 
 <h2>Hiperparametre satırları</h2>
 <div class="table-wrap"><table class="simple">

@@ -15,6 +15,15 @@
 
 <h1>Derin öğrenme pratiği ve CNN</h1>
 <p class="lead">Ara sınav haftası (9 Kasım). Derslerin konusu: derin ağları eğitmenin püf noktaları (ilklendirme, kaybolan/patlayan gradyan, dropout, toplu normalleştirme, veri çoğaltma, öğrenme oranı çizelgesi) ve evrişimli sinir ağları. Finalde: <strong>elle 1B/2B evrişim, çıktı boyutu ve parametre sayma</strong>.</p>
+<!-- enriched -->
+<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
+<tr><td>1B evrişim</td><td>10 elemanlı sinyal, kutu ya da kenar filtresi; dolgusuz/sıfır/same dolgu, adım 1/2</td><td>her çıktı hücresinin toplamını yazmak; çıktı uzunluğu</td></tr>
+<tr><td>2B evrişim</td><td>4×4–6×6 görüntü, 3×3 filtre, dolgu ve adım</td><td>pencereyi göstermek, eleman eleman çarpım toplamı</td></tr>
+<tr><td>Çıktı boyutu ve parametre</td><td>girdi H×W×C, F filtre k_h×k_w, adım, dolgu</td><td>⌊(n + 2p − k)/s⌋ + 1 her eksen için; F·k_h·k_w·C ağırlık + F bias</td></tr>
+<tr><td>Kavram</td><td>MLP görüntüde neden verimsiz; dropout, BN, erken durdurma, ilklendirme; aktarımlı öğrenme</td><td>mekanizma + fayda</td></tr>
+</tbody></table></div><p class="small">Ara sınavda yok; finalde.</p></div>
+
 
 <h2>Derin ağları eğitmek</h2>
 <div class="table-wrap"><table class="simple">
@@ -59,6 +68,33 @@
 <ul>
 <li><strong>LeNet</strong> (rakamlar; conv-pool-conv-pool-FC), <strong>AlexNet</strong> (2012; ReLU, dropout, GPU, büyük veri), <strong>VGG</strong> (üst üste 3×3), <strong>ResNet</strong> (artık bağlantı <span class="m">y = F(x) + x</span>: gradyan kısa yoldan akar, yüzlerce katman eğitilebilir).</li>
 <li><strong>Aktarımlı öğrenme</strong>: ImageNet'te ön eğitilmiş ağın erken katmanları genel desenleri (kenar, doku) öğrenmiştir; bunlar tıbbi görüntü gibi çok farklı alanlarda da işe yarar. Az veride çoğu katmanı dondurup yalnız yeni sınıflandırıcı başını eğit; çok veride daha çok katmanı küçük η ile ince ayarla. Ön eğitilmiş modelin son katmandan önceki çıktısı bir <strong>gömme</strong> (embedding) olarak başka modellere girdi yapılabilir.</li>
+</ul>
+
+<h2>Sınav tipi çözümlü problemler</h2>
+<h3>Problem 1: 1B evrişim, dolgu ve adım</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(9. hafta derste)</span></div><p>f = (4, 3, 2, −5, 3, 5, 2, 5, 5, 6), kutu filtre g = (⅓, ⅓, ⅓). (a) Dolgusuz, adım 1. (b) Aynı, adım 2. (c) Sıfır dolgu 1, adım 1: uzunluk ve ilk/son hücre.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>Uzunluk 10 − 3 + 1 = 8: 3, 0, 0, 1, 10/3, 4, 4, 16/3 (örn. ilk (4 + 3 + 2)/3 = 3, ikinci (3 + 2 − 5)/3 = 0).</li>
+<li>Adım 2: ⌊(10 − 3)/2⌋ + 1 = 4 hücre: 1., 3., 5., 7. pencereler → 3, 0, 10/3, 4.</li>
+<li>Dolgu 1: (10 + 2 − 3)/1 + 1 = 10 (“same”). İlk hücre (0 + 4 + 3)/3 = 7/3, son (5 + 6 + 0)/3 = 11/3: kenarlar kısmen sıfır görür.</li></ol></div></details>
+<h3>Problem 2: 2B evrişim</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(9. hafta derste)</span></div><p>I = [[1, 2, 0, 1], [0, 1, 3, 1], [2, 1, 0, 0], [1, 0, 1, 2]], dikey kenar filtresi K = [[1, 0, −1], [1, 0, −1], [1, 0, −1]], dolgu 0, adım 1. Çıktıyı bulun.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Çıktı (4 − 3)/1 + 1 = 2 → 2×2. Her hücre = pencerenin sol sütun toplamı − sağ sütun toplamı:</p>
+<ul><li>(0,0): pencere satırları [1,2,0], [0,1,3], [2,1,0] → (1 + 0 + 2) − (0 + 3 + 0) = <strong>0</strong></li><li>(0,1): [2,0,1], [1,3,1], [1,0,0] → (2 + 1 + 1) − (1 + 1 + 0) = <strong>2</strong></li>
+<li>(1,0): [0,1,3], [2,1,0], [1,0,1] → (0 + 2 + 1) − (3 + 0 + 1) = <strong>−1</strong></li><li>(1,1): [1,3,1], [1,0,0], [0,1,2] → (1 + 1 + 0) − (1 + 0 + 2) = <strong>−1</strong></li></ul>
+<p>Parlaklık sağa doğru artıyorsa yanıt negatif, azalıyorsa pozitif. Dolgu 1 ile çıktı 4×4 olur (yukarıdaki araca girin).</p></div></details>
+<h3>Problem 3: katman boyutları ve parametreler</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(geçmiş final listesi)</span></div><p>Girdi 128×128×16; 64 tane 3×7 filtre, adım (2, 3), dolgu (1, 2). Çıktı boyutu, ağırlık ve bias sayısı?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Yükseklik ⌊(128 + 2 − 3)/2⌋ + 1 = ⌊63.5⌋ + 1 = 64; genişlik ⌊(128 + 4 − 7)/3⌋ + 1 = ⌊41.67⌋ + 1 = 42 → <strong>64×42×64</strong>. Ağırlık 64·3·7·16 = <strong>21,504</strong>; bias <strong>64</strong> (filtre başına bir).</p></div></details>
+<h3>Problem 4: küçük CNN'de parametre sayma</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(9. hafta derste)</span></div><p>3×32×32 girdi → Conv 3→16 (3×3, p = 1) → MaxPool 2×2 → Conv 16→32 (3×3, p = 1) → MaxPool 2×2 → Flatten → Linear →10. Her katmanın çıktısı ve parametre sayısı? En çok parametre nerede?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Conv1: 16×32×32, (3·3·3 + 1)·16 = 448. Pool: 16×16×16, 0. Conv2: 32×16×16, (3·3·16 + 1)·32 = 4,640. Pool: 32×8×8, 0. Flatten 2048 → Linear: 2048·10 + 10 = 20,490. Toplam <strong>25,578</strong>; yaklaşık %80'i tam bağlı katmanda. Havuzlamanın parametresi yoktur.</p></div></details>
+<h2>Sık hatalar</h2>
+<ul class="mistakes">
+<li>Çıktı boyutunda tabanı (⌊ ⌋) almayı unutmak ya da +1'i atlamak.</li>
+<li>Parametre sayısında girdi kanalı C'yi unutmak; bias'ı kanal başına değil filtre başına sayın.</li>
+<li>Parametre sayısının görüntü boyutuna bağlı olduğunu sanmak (evrişimde değildir; tam bağlı katmanda bağlıdır).</li>
+<li>Havuzlamaya parametre yazmak.</li>
+<li>Dikdörtgen filtre / farklı adımda iki ekseni aynı sayıyla hesaplamak.</li>
 </ul>
 
 <h2>Hiperparametre satırları</h2>

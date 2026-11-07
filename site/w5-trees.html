@@ -15,6 +15,15 @@
 
 <h1>Karar ağaçları</h1>
 <p class="lead">Kökten yaprağa her yol bir “eğer … ve … ise → sınıf” kuralıdır. ID3 her düğümde düzensizliği (entropiyi) en çok azaltan özniteliği seçer. Ara sınavın B bölümü (17 puan) ve örnek sınavın 1. sorusu: <strong>6–8 satırlık tabloda tam ID3 hesabı</strong>. Puanın çoğu ara adımlardadır: tabloyu düzgün kurun, log değerlerini tablodan alıp yazın, 3 ondalık taşıyın, son ağacı dallardaki değerlerle çizin.</p>
+<!-- enriched -->
+<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
+<tr><td>Tam ID3 (ana soru, B bölümü)</td><td>6–8 satır, 2–3 kategorik öznitelik, log₂ tablosu verilir</td><td>H(D), her öznitelik için dal tablosu ve IG, kök, alt dallarda yineleme, ağacın çizimi</td></tr>
+<tr><td>Gini ile kök</td><td>aynı veri, “Gini kullanın”</td><td>ağırlıklı Gini tablosu, en küçük değer</td></tr>
+<tr><td>Sürekli eşik</td><td>5–7 sayısal değer + etiket</td><td>sıralama, aday eşikler (sınıf değişen orta noktalar), en iyi eşiğin IG'si</td></tr>
+<tr><td>Kısa kavram (4 p)</td><td>ön/sonradan budama farkı; IG neden çok değerli özniteliği kayırır; aynı öznitelik iki kez</td><td>kazanç oranıyla açıklama; 2–3 cümle</td></tr>
+</tbody></table></div><p class="small">Puanın çoğu ara adımlarda: tabloyu düzgün kurun, log değerlerini tablodan alıp yazın, 3 ondalık taşıyın, son ağacı dallardaki değerlerle çizin.</p></div>
+
 
 <h2>Entropi ve bilgi kazancı</h2>
 <div class="formula">H(D) = −Σ pᵢ log₂ pᵢ &nbsp;&nbsp;&nbsp; IG(D, A) = H(D) − Σ<sub>v</sub> (|D_v| / |D|) · H(D_v)</div>
@@ -29,6 +38,15 @@
 −log₂: 1/2 → 1, 1/3 → 1.585, 2/3 → 0.585, 1/4 → 2, 3/4 → 0.415, 2/5 → 1.322, 3/5 → 0.737, 1/7 → 2.807, 2/7 → 1.807, 3/7 → 1.222, 4/7 → 0.807. <a href="cheatsheet.html#log2-tablosu">Tam tablo</a>.</p></div>
 
 <h2>ID3 adım adım</h2>
+<div class="recipe"><div class="recipe-title">📝 ID3 sorusu kâğıtta: şablon</div><ol>
+<li>Sınıf sayılarını yazın: örn. 5 Evet / 2 Hayır → H(D) = −(5/7)log₂(5/7) − (2/7)log₂(2/7) = (5/7)(0.485) + (2/7)(1.807).</li>
+<li>Her öznitelik için bir tablo: <em>dal (değer) · n · Evet/Hayır · H(dal)</em>. Saf dalın H'si 0, 50/50 dalınki 1.</li>
+<li>Ağırlıklı H = Σ (n_dal/n)·H(dal). IG = H(D) − ağırlıklı H.</li>
+<li>En büyük IG kök olur. <strong>Saf</strong> dallar yaprak (sınıfı yazın).</li>
+<li>Karışık her dalda yalnız o dalın örnekleri ve <em>kalan</em> özniteliklerle 1–4'ü tekrarlayın.</li>
+<li>Ağacı çizin: düğümde öznitelik, dalda değer (ve sayılar), yaprakta sınıf. İstenirse yeni bir örneği ağaçta yürüterek sınıflayın.</li>
+</ol><p class="small">Kısa yol: bir öznitelik bütün dalları saf yapıyorsa IG = H(D) (en büyük olası); hesaplamadan kök seçilebilir, ama tabloyu yine yazın.</p></div>
+
 <p>Aşağıdaki araç her düğüm için sınavdaki tabloyu (dal, n, sınıf sayıları, H, ağırlıklı H, IG) kurar ve son ağacı çizer. Kendi tablonuzu yapıştırın. Varsayılan veri önceki dönemin alıştırma listesindeki Boy/Saç/Göz sorusu.</p>
 <div data-widget="id3"></div>
 <p>Çözüm: H(D) = H(3/8) = 0.954. IG(Boy) = 0.003, IG(Saç) = 0.454, IG(Göz) = 0.348 → <strong>kök Saç</strong>. kızıl → + (saf), koyu → − (saf), sarı {+, −, +, −}: Göz'ün kazancı 1.0 (mavi → +, kahve → −), Boy'unki 0. Ağaç: Saç? koyu → −; kızıl → +; sarı → Göz? (mavi → +, kahve → −). Boy hiç kullanılmadı.</p>
@@ -65,6 +83,51 @@
 <div class="card"><h3>Zayıf yönler</h3><p><strong>Yüksek varyans / kararsızlık</strong>: tek bir etiket değişince bambaşka ağaç çıkabilir. Eksene paralel sınırlar (çapraz bir doğruyu basamaklarla taklit eder). Çare: çok ağacın ortalaması (6. hafta).</p></div>
 </div>
 <p><strong>Ağaç iyi, doğrusal kötü</strong> (ya da tersi) olabilir mi? Evet: XOR ya da “içi pozitif bir kare” gibi eksenlere hizalı ama doğrusal olmayan bir yapıda ağaç kusursuz, doğrusal model rastgele kalır. Tersi: sınıfları ayıran sınır çapraz bir doğruysa (x₁ + x₂ &gt; 1) doğrusal model tek doğruyla çözer, ağaç çok sayıda basamağa ihtiyaç duyar ve az veride kötü genelleşir.</p>
+
+<h2>Sınav tipi çözümlü problemler</h2>
+<h3>Problem 1: kafe verisi, tam ID3</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H5)</span></div><p>Bir kafe müşterinin tatlı sipariş edip etmediğini kaydediyor:</p>
+<div class="table-wrap"><table class="simple compact center"><thead><tr><th>#</th><th>Kiminle</th><th>Zaman</th><th>Acelesi var mı?</th><th>Tatlı?</th></tr></thead><tbody>
+<tr><td>1</td><td>yalnız</td><td>öğle</td><td>hayır</td><td>Evet</td></tr><tr><td>2</td><td>yalnız</td><td>öğle</td><td>evet</td><td>Hayır</td></tr><tr><td>3</td><td>yalnız</td><td>akşam</td><td>hayır</td><td>Evet</td></tr><tr><td>4</td><td>yalnız</td><td>akşam</td><td>evet</td><td>Hayır</td></tr><tr><td>5</td><td>arkadaşlarla</td><td>öğle</td><td>hayır</td><td>Evet</td></tr><tr><td>6</td><td>arkadaşlarla</td><td>öğle</td><td>evet</td><td>Evet</td></tr><tr><td>7</td><td>arkadaşlarla</td><td>akşam</td><td>hayır</td><td>Evet</td></tr></tbody></table></div>
+<p>(a) H(D). (b) Her öznitelik için kazanç; kök. (c) Ağacı tamamlayın. (d) (arkadaşlarla, akşam, acelesi var) için tahmin.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p><strong>(a)</strong> 5 Evet / 2 Hayır: H(D) = H(2/7) = <strong>0.863</strong>.</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Öznitelik</th><th>Dallar: n (E/H) H</th><th>Ağırlıklı H</th><th>IG</th></tr></thead><tbody>
+<tr><td>Kiminle</td><td>yalnız 4 (2/2) 1.000 · arkadaşlarla 3 (3/0) 0</td><td>(4/7)·1 = 0.571</td><td>0.292</td></tr>
+<tr><td>Zaman</td><td>öğle 4 (3/1) 0.811 · akşam 3 (2/1) 0.918</td><td>0.464 + 0.393 = 0.857</td><td>0.006</td></tr>
+<tr class="hl"><td>Acele</td><td>hayır 4 (4/0) 0 · evet 3 (1/2) 0.918</td><td>(3/7)·0.918 = 0.393</td><td><strong>0.470</strong></td></tr></tbody></table></div>
+<p><strong>(b)</strong> Kök: <strong>Acele</strong>. Zaman neredeyse işe yaramaz (0.006).</p>
+<p><strong>(c)</strong> “hayır” dalı {1, 3, 5, 7} hepsi Evet → yaprak. “evet” dalı {2, 4, 6}: 1 E / 2 H, H = 0.918. Kiminle: yalnız {2, 4} 0/2 → 0; arkadaşlarla {6} 1/0 → 0; IG = 0.918. Zaman: öğle {2, 6} 1/1 → 1, akşam {4} → 0; ağırlıklı 0.667, IG = 0.251. Kiminle seçilir.</p>
+<div class="tree">Acele? [5/2]
+    hayır: → Evet [4/0]
+    evet: Kiminle? [1/2]
+        yalnız: → Hayır [0/2]
+        arkadaşlarla: → Evet [1/0]</div>
+<p><strong>(d)</strong> acele = evet → Kiminle = arkadaşlarla → <strong>Evet</strong>. (Zaman hiç kullanılmadı.)</p></div></details>
+<h3>Problem 2: aynı veride Gini</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H5)</span></div><p>Problem 1'in verisinde Gini(D) ve her özniteliğin ağırlıklı Gini'sini bulun. Gini aynı kökü seçer mi?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Gini(D) = 1 − (5/7)² − (2/7)² = 1 − 0.510 − 0.082 = <strong>0.408</strong>. Acele: (4/7)·0 + (3/7)·(1 − 1/9 − 4/9) = (3/7)·0.444 = <strong>0.190</strong>. Kiminle: (4/7)·0.5 + 0 = 0.286. Zaman: (4/7)·(1 − 9/16 − 1/16) + (3/7)·0.444 = 0.214 + 0.190 = 0.405. En küçük: <strong>Acele</strong>, entropiyle aynı kök (azalma 0.218).</p></div></details>
+<h3>Problem 3: kimlik sütunu ve kazanç oranı</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H5)</span></div><p>Problem 1'e her müşteriye farklı değer veren “müşteri no” sütunu ekleniyor. (a) Kazancı? (b) Bölme bilgisi ve kazanç oranı (log₂7 = 2.807)? (c) C4.5 neden kazanç oranı kullanır?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>Her dal tek örnekli ve saf: ağırlıklı H = 0, IG = H(D) = <strong>0.863</strong> (en büyük olası!).</li>
+<li>SplitInfo = −Σ(1/7)log₂(1/7) = log₂7 = 2.807; GR = 0.863/2.807 = <strong>0.307</strong>. Karşılaştırma: Acele SI = H(3/7) = 0.985, GR = 0.470/0.985 = 0.477 → Acele kazanır.</li>
+<li>IG çok değerli öznitelikleri kayırır: veriyi küçük saf parçalara bölüp hiçbir şeye genellenmeyen öznitelikler yüksek kazanç alır. Bölme bilgisine bölmek dal sayısını cezalandırır.</li></ol></div></details>
+<h3>Problem 4: tek etiket değişince</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H5)</span></div><p>Problem 1'de 6. müşterinin etiketi “Hayır” olsun. Kökü yeniden hesaplayın (Acele ve Kiminle yeter). Ne değişti, ağaçların hangi özelliğini gösterir?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Artık 4 E / 3 H, H(D) = H(3/7) = 0.985. Acele: hayır 4 (4/0) 0, evet 3 (0/3) 0 → IG = 0.985: kusursuz kök, ağaç tek bölme. Kiminle: yalnız 4 (2/2) 1, arkadaşlarla 3 (2/1) 0.918 → IG = 0.020. Tek etiket değişti, ağaç derinlik 2'den 1'e indi ve (arkadaşlarla, akşam, acele) için tahmin Evet'ten Hayır'a döndü. Ağaçlar <strong>yüksek varyanslıdır</strong> (kararsız); çaresi çok ağacın ortalaması: bagging, rastgele orman (6. hafta).</p></div></details>
+<h3>Problem 5: cep bankası (iki öznitelik, üç değer)</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(5. hafta derste)</span></div><p>8 müşteri: Bakiye (düşük/orta/yüksek), Yaş (genç/orta yaşlı/yaşlı), Mevduat aldı mı? A düşük-genç H, B düşük-orta H, C düşük-yaşlı E, D orta-genç H, E orta-orta E, F orta-yaşlı E, G yüksek-orta E, H yüksek-yaşlı E. Kökü seçin, ağacı kurun; (yüksek, genç) için karar.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>H(D) = H(3/8) = 0.954. <strong>Yaş</strong>: genç {A, D} 0/2 → 0; orta {B, E, G} 2/1 → 0.918; yaşlı {C, F, H} 3/0 → 0 → ağırlıklı (3/8)·0.918 = 0.344, IG = <strong>0.610</strong>. <strong>Bakiye</strong>: düşük {A, B, C} 1/2 → 0.918; orta {D, E, F} 2/1 → 0.918; yüksek {G, H} 2/0 → 0 → ağırlıklı 0.689, IG = 0.266. Kök <strong>Yaş</strong>. Orta yaş dalında yalnız bakiye kalır: düşük → B (Hayır), orta/yüksek → E, G (Evet): saf. (yüksek, genç): genç → <strong>Hayır</strong> (bakiye hiç sorulmaz).</p>
+<p class="small muted">Kısa yol: veriyi 3×3 ızgaraya yerleştirin, satırları (yaş) ve sütunları (bakiye) sayın; hangi bölme daha çok saf satır/sütun bırakıyorsa onun kazancı büyüktür.</p></div></details>
+<h2>Sık hatalar</h2>
+<ul class="mistakes">
+<li>Ağırlıklı entropide n_dal/n çarpanını unutmak.</li>
+<li>Alt dalda bütün verinin entropisiyle (H(D)) hesap yapmak: o dalın kendi H'si kullanılır.</li>
+<li>Bilgi kazancında en küçüğü seçmek (en büyük seçilir); Gini'de ise <em>ağırlıklı Gini</em> en küçük olan seçilir.</li>
+<li>Kökte kullanılan kategorik özniteliği alt dalda yeniden aday yapmak.</li>
+<li>log₂ değerlerini tablodan almayıp ezberden yanlış yazmak; 0·log 0 için “tanımsız” demek (0'dır).</li>
+<li>Sürekli eşiği değerin kendisine koymak (orta nokta alınır).</li>
+<li>Ağacı çizerken dal değerlerini ya da yaprak sınıflarını yazmamak.</li>
+</ul>
 
 <h2>Hiperparametre satırları</h2>
 <div class="table-wrap"><table class="simple">

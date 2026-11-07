@@ -15,6 +15,15 @@
 
 <h1>Giriş ve temel kavramlar</h1>
 <p class="lead">Makine öğrenmesi nedir, klasik programlamadan farkı ne, hangi türleri var ve “öğrenmek” neden aslında bir hipotez uzayında arama yapmaktır? Bu haftanın asıl mesajı: <strong>amaç eğitim verisini ezberlemek değil, görülmemiş veride iyi olmak (genelleme)</strong>.</p>
+<!-- enriched -->
+<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
+<tr><td>T, E, P ve öğrenme türü</td><td>“Spam filtresi / film önerisi / satranç programı için görev, deneyim, başarım ölçüsü ve öğrenme türünü yazın.”</td><td>üçünü de somut yazmak (P ölçülebilir olmalı) + türü doğru adlandırmak</td></tr>
+<tr><td>Hipotez sayma</td><td>“EnjoySport'a bir öznitelik eklenirse kaç örnek, kaç anlamca farklı hipotez?”</td><td>formülü yazıp çarpımı açık göstermek: 1 + ∏(kᵢ + 1)</td></tr>
+<tr><td>Find-S izleme</td><td>4 örnekli tablo; her adımdan sonraki hipotez</td><td>negatif örnekte “değişmez” yazmak, ? koymayı doğru yerde yapmak</td></tr>
+<tr><td>Aşırı/yetersiz uyum yorumu</td><td>eğitim/test hatası tablosu (polinom derecesi)</td><td>rejimi adlandırıp bir çare söylemek</td></tr>
+</tbody></table></div><p class="small">Bu hafta genelde kısa (4 puanlık) kavram sorusu olarak gelir; hiperparametre tablosunun ilk satırları da buradan başlar.</p></div>
+
 
 <h2>Tanım: T, E, P</h2>
 <p>Mitchell'in (1997) tanımı sınavda doğrudan kullanılır: bir program, <strong>T</strong> görevindeki <strong>P</strong> ile ölçülen başarımı <strong>E</strong> deneyimiyle artıyorsa öğreniyordur.</p>
@@ -83,6 +92,46 @@
 <tr><td>Düzenlileştirme gücü λ</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>katsayılar küçülür, model basitleşir</td></tr>
 </tbody></table></div>
 <p><strong>Yanlılık</strong>: modelin basitliğinden gelen sistematik hata (küçük M). <strong>Varyans</strong>: eğitim verisi biraz değişince modelin ne kadar oynadığı (büyük M). Bütün satırlar: <a href="hyper.html">hiperparametre tablosu</a>.</p>
+
+<h2>Sınav tipi çözümlü problemler</h2>
+<p>Her problemi önce kâğıtta çözün; çözümde her adımın <em>neden</em> öyle yapıldığı yazıyor.</p>
+<h3>Problem 1: T, E, P</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(1. hafta derste çözülen)</span></div><p>Üç sistem için görevi, deneyimi ve başarım ölçüsünü yazın; öğrenme türünü belirtin: (a) plaka tanıyan kamera, (b) izleme geçmişinden film önerisi (açık puan yok), (c) satrancı sıfırdan, kendine karşı oynayarak öğrenen program.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol>
+<li><strong>(a)</strong> T: görüntüdeki plaka metnini okumak. E: plaka metni etiketlenmiş görüntüler. P: karakter (ya da plaka) doğruluğu. <strong>Gözetimli</strong> (etiket var).</li>
+<li><strong>(b)</strong> T: kullanıcıya filmleri sıralamak. E: izleme geçmişi (örtük geri bildirim). P: önerilenlerin tıklanma/izlenme oranı. Açık etiket olmadığı için gözetimsiz/örtük geri bildirimli; benzer kullanıcıları ya da filmleri bulmak kümeleme mantığıdır.</li>
+<li><strong>(c)</strong> T: oyunu kazanmak. E: kendine karşı oynanan oyunlar ve sonuçları (ödül). P: kazanma oranı. <strong>Pekiştirmeli</strong>: doğru hamle etiketi yok, yalnız oyun sonunda ödül var.</li>
+</ol>
+<p class="small muted">Puan ipucu: P'yi “iyi çalışması” gibi muğlak değil, <em>ölçülebilir</em> bir sayı olarak yazın.</p></div></details>
+<h3>Problem 2: hipotez uzayını say</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(1. hafta derste çözülen)</span></div><p>EnjoySport'a 7. öznitelik olarak “Dalga” (Düşük / Yüksek) ekleniyor. (a) Kaç farklı gün (örnek) vardır? (b) Kaç anlamca farklı hipotez? (c) Olası kavram sayısı ve hipotez dilinin bunun ne kadarını ifade ettiği?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol>
+<li><strong>Örnek sayısı</strong>: her özniteliğin değer sayılarının çarpımı. Asıl 96 gün × 2 = <strong>192</strong>.</li>
+<li><strong>Hipotez</strong>: her öznitelik ya bir değerini ya “?” alır → (değer sayısı + 1). 3+1 = 4 ve altı tane 2+1 = 3: 4·3⁶ = 4·729 = 2916. Ø içeren bütün hipotezler aynı (boş) kavram → <strong>+1</strong>: <strong>2917</strong>.</li>
+<li><strong>Kavram</strong>: her gün bağımsız olarak evet/hayır → 2¹⁹² kavram. 2917 bunun yanında yok denecek kadar küçük: VE'li dil çok kısıtlayıcı, yani <strong>güçlü bir tümevarımsal yanlılık</strong>. Bu kısıt olmasa sonlu sayıda örnek seçimi daraltamazdı.</li>
+</ol></div></details>
+<h3>Problem 3: Find-S</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H1)</span></div><p>Öznitelikler Hava (Güneşli/Yağmurlu), Sıcaklık (Ilık/Soğuk), Rüzgâr (Kuvvetli/Zayıf). Örnekler sırayla: 1) Güneşli Ilık Kuvvetli Evet, 2) Güneşli Ilık Zayıf Evet, 3) Yağmurlu Soğuk Kuvvetli Hayır, 4) Güneşli Soğuk Kuvvetli Evet. Her adımdaki hipotezi yazın; (Yağmurlu, Ilık, Zayıf) için tahmin nedir? Dört örnekle tutarlı başka bir VE'li hipotez var mı?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><div class="table-wrap"><table class="simple compact"><thead><tr><th>Adım</th><th>Hipotez</th><th>Neden</th></tr></thead><tbody>
+<tr><td>h₀</td><td>⟨Ø, Ø, Ø⟩</td><td>en özel başlangıç</td></tr>
+<tr><td>h₁</td><td>⟨Güneşli, Ilık, Kuvvetli⟩</td><td>ilk pozitifin kendisi</td></tr>
+<tr><td>h₂</td><td>⟨Güneşli, Ilık, ?⟩</td><td>Rüzgâr farklı → ?</td></tr>
+<tr><td>h₃</td><td>⟨Güneşli, Ilık, ?⟩</td><td>negatif: Find-S kullanmaz</td></tr>
+<tr><td>h₄</td><td>⟨Güneşli, ?, ?⟩</td><td>Sıcaklık farklı → ?</td></tr></tbody></table></div>
+<p>(Yağmurlu, Ilık, Zayıf): Hava kısıtı tutmuyor → <strong>Hayır</strong>. VE'li dilde başka tutarlı hipotez yok: daha genel ⟨?, ?, ?⟩ 3. (negatif) örneği kabul eder, daha özel olan bir pozitifi reddeder. Dil dışında “Güneşli VEYA Ilık” da dört örneğe uyar ama VE ile yazılamaz: hangi tutarlı hipotezlerin <em>düşünülebildiğini</em> dil (yanlılık) belirler.</p></div></details>
+<h3>Problem 4: eğitim/test hatasını yorumla</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H1)</span></div><p>10 gürültülü sinüs noktasına M = 0, 1, 3, 9 dereceli polinomlar uyduruldu. Eğitim hataları 0.60, 0.42, 0.08, 0.00; test hataları 0.62, 0.45, 0.10, 0.90. (a) Hangileri yetersiz, hangisi aşırı uyuyor, hangisini seçersiniz? (b) Aynı M = 9 ile 100 nokta olunca test hatası 0.12'ye düşüyor: neden? (c) M'yi değiştirmeden iki çare.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>(a) M = 0, 1 <strong>yetersiz uyum</strong>: iki hata da yüksek ve birbirine yakın. M = 9 <strong>aşırı uyum</strong>: eğitim 0, test 0.90 (dev açık). Seçim <strong>M = 3</strong>: en düşük test hatası.</li>
+<li>(b) 100 noktada 9. derece polinom her gürültülü noktadan geçemez; eğitim verisi modeli sabitler, <strong>varyans düşer</strong>, test hatası gürültü düzeyine yaklaşır.</li>
+<li>(c) Düzenlileştirme (büyük katsayıları cezalandır), daha çok veri, doğrulama kümesi ile seçim/erken durdurma, birden çok modelin ortalaması.</li></ol></div></details>
+<h2>Sık hatalar</h2>
+<ul class="mistakes">
+<li>Hipotez sayarken Ø'lu hipotezleri ayrı ayrı saymak (hepsi tek bir boş kavramdır: <strong>+1</strong>).</li>
+<li>Örnek sayısıyla hipotez sayısını karıştırmak: örnek = ∏kᵢ, hipotez = 1 + ∏(kᵢ + 1).</li>
+<li>Find-S'te negatif örnekte hipotezi değiştirmek.</li>
+<li>Pekiştirmeli öğrenmeyi “etiketli veri” ile tanımlamak: etiket yok, <em>ödül</em> var.</li>
+<li>Kalan süre ya da sayı tahminini sınıflandırma sanmak: sürekli/sayısal hedef → regresyon.</li>
+</ul>
 
 <h2>Sınama soruları</h2>
 <div class="quiz" data-answer="3"><p>Hangisi makine öğrenmesiyle değil, klasik programlamayla çözülmeli?</p><ol>

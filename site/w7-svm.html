@@ -15,6 +15,16 @@
 
 <h1>Destek vektör makineleri</h1>
 <p class="lead">Ayrılabilir veride sonsuz sayıda ayırıcı doğru vardır; SVM en geniş “sokağı” açanı seçer. Marj, destek vektörleri, 2B'de elle w ve b, yumuşak marj ve C, menteşe kaybı, çekirdek hilesi. Ara sınavın E bölümü (17 puan): <strong>2B'de destek vektörlerini bul, w ve b'yi hesapla</strong>.</p>
+<!-- enriched -->
+<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
+<tr><td>2B'de destek vektörleri, w ve b (E bölümü)</td><td>3–5 nokta; çiz, destek vektörlerini seç, kanonik denklemleri çöz, marjı yaz</td><td>denklemleri açık yazmak + diğer noktaları denetlemek</td></tr>
+<tr><td>Marj / uzaklık / menteşe</td><td>w, b verilir: ‖w‖, marj, bir noktanın f(x)'i, uzaklığı, ξ ve konumu</td><td>y·f(x)'e göre konumu doğru söylemek</td></tr>
+<tr><td>Yumuşak marj karşılaştırması</td><td>iki aday (w, b): her noktanın ξ'si, ½‖w‖² + CΣξ, C = 1 ve 10</td><td>C'nin etkisini yorumlamak</td></tr>
+<tr><td>Çekirdek değeri</td><td>polinom (x·z)² ve açık φ ile denetim; RBF farklı γ</td><td>φ(x)·φ(z) = K(x, z) göstermek</td></tr>
+<tr><td>Kavram (4 p)</td><td>C ve γ etkisi; çekirdek hilesi; VC boyutu; SVM vs LR; sert vs yumuşak marj</td><td>marj/destek vektörü/yanlılık/varyans dörtlüsü</td></tr>
+</tbody></table></div></div>
+
 
 <h2>Marj ve geometri</h2>
 <p>Ayırıcı <span class="m">w·x + b = 0</span>. <strong>Kanonik biçim</strong>: w ve b'nin ölçeği, sınıra en yakın noktalarda |w·x + b| = 1 olacak şekilde sabitlenir. O zaman:</p>
@@ -71,6 +81,44 @@
 <tr><td>Tercih</td><td>belirgin marj, n'ye göre yüksek boyut (metin), doğrusal olmayan sınır</td><td>olasılık ve yorumlanabilir katsayı gerekiyorsa, çok büyük veri</td></tr>
 </tbody></table></div>
 <p>Çok sınıflı SVM: one-vs-rest ya da one-vs-one (scikit-learn SVC OvO kullanır). Köprü: SVM, sabit (çekirdekle tanımlı) özniteliklerin üstünde marjı en büyükleyen bir perceptron gibidir; MLP ise öznitelikleri de öğrenir.</p>
+
+<h2>Sınav tipi çözümlü problemler</h2>
+<h3>Problem 1: marj ve konum</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H7)</span></div><p>Kanonik biçimde w = (1, 2), b = −3. (a) ‖w‖, marj, sokak genişliği. (b) x = (2, 2) için f(x) ve uzaklık; sokağın içinde mi? (c) Şu noktaların y·f ve menteşe kaybı: (2,2) y = +1; (1,1) y = +1; (3,0) y = −1; (0,2) y = −1. Hangileri destek vektörü olabilir? (√5 = 2.236)</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>‖w‖ = √5 = 2.236; marj 1/‖w‖ = <strong>0.447</strong>; sokak 2/‖w‖ = 0.894.</li><li>f(2,2) = 2 + 4 − 3 = 3; uzaklık 3/2.236 = <strong>1.342</strong>; f &gt; 1 → sokağın <strong>dışında</strong>, pozitif tarafta.</li></ol>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>nokta</th><th>y</th><th>f</th><th>y·f</th><th>ξ = max(0, 1 − yf)</th><th>konum</th></tr></thead><tbody>
+<tr><td>(2, 2)</td><td>+1</td><td>3</td><td>3</td><td>0</td><td>sokağın dışı</td></tr><tr><td>(1, 1)</td><td>+1</td><td>0</td><td>0</td><td>1</td><td>tam sınırda</td></tr><tr><td>(3, 0)</td><td>−1</td><td>0</td><td>0</td><td>1</td><td>tam sınırda</td></tr><tr><td>(0, 2)</td><td>−1</td><td>1</td><td>−1</td><td>2</td><td>yanlış tarafta</td></tr></tbody></table></div>
+<p>Destek vektörleri y·f ≤ 1 olanlar (α &gt; 0): son üçü; (2, 2) değil.</p></div></details>
+<h3>Problem 2: sert marj elle + ikil katsayılar</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H7)</span></div><p>Pozitifler (2, 1), (3, 2); negatifler (0, 1), (1, 0). (a) Destek vektörlerini tahmin edin. (b) w, b'yi bulun. (c) Sınır, ‖w‖, marj. (d) Kalan noktayı denetleyin. (e) w = Σαᵢyᵢxᵢ ve Σαᵢyᵢ = 0 ile α'ları bulun.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>Sınıflar arası en yakın çift (2, 1)–(1, 0), yön (1, 1). Sokağa değen adaylar: (2, 1) pozitif; (1, 0) ve (0, 1) negatif. (3, 2) uzak görünüyor.</li>
+<li>2w₁ + w₂ + b = 1; w₁ + b = −1; w₂ + b = −1. Son ikisinden w₁ = w₂ = w; 3w + b = 1 ve w + b = −1 → w = 1, b = −2. <strong>w = (1, 1), b = −2</strong>.</li>
+<li>x₁ + x₂ = 2; ‖w‖ = √2 = 1.414; marj <strong>0.707</strong>, sokak 1.414.</li>
+<li>(3, 2): f = 3 ≥ 1 ✓, destek vektörü değil.</li>
+<li>Σαy = 0: α₁ = α₃ + α₄ ((2,1) için α₁, (0,1) α₃, (1,0) α₄). w: α₁(2, 1) − α₃(0, 1) − α₄(1, 0) = (1, 1) → 2α₁ − α₄ = 1, α₁ − α₃ = 1. Çözüm <strong>α₁ = 1, α₃ = 0, α₄ = 1</strong>. (0, 1) sokağın kenarında ama ağırlığı 0 (dejenere destek vektörü); (3, 2) ve (0, 1) silinse çözüm değişmez, (2, 1) ya da (1, 0) silinse değişir.</li></ol>
+<div data-widget="hardsvm" data-pts="2 1 +
+3 2 +
+0 1 -
+1 0 -"></div></div></details>
+<h3>Problem 3: yumuşak marj, C'nin etkisi</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H7)</span></div><p>Negatifler (0, 0), (1, 1); pozitifler (3, 0), (3, 3) ve aykırı pozitif (1.5, 2). Adaylar H1: w = (1, 0), b = −2; H2: w = (2, 2), b = −5. (a) Her noktanın ξ'si. (b) ½‖w‖² + CΣξ, C = 1 ve C = 10. (c) Hangisi kazanır, C hakkında ne söyler?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>H1 (f = x₁ − 2): (0,0) yf = 2, (1,1) 1, (3,0) 1, (3,3) 1 → ξ = 0; (1.5, 2) yf = −0.5 → <strong>ξ = 1.5</strong>. H2 (f = 2x₁ + 2x₂ − 5): bütün ξ = 0.</li>
+<li>H1: ½·1 = 0.5, Σξ = 1.5 → C = 1: <strong>2.0</strong>; C = 10: <strong>15.5</strong>. H2: ½·8 = 4, Σξ = 0 → C = 1 ve 10: <strong>4.0</strong>.</li>
+<li>C = 1: H1 (geniş marj 1, tek ucuz ihlal). C = 10: H2 (ihlal pahalı, dar marj 0.354, her şeyi ayırır). Küçük C marjı hata pahasına satın alır; büyük C sert marja yaklaşır ve aykırı noktayı izler.</li></ol></div></details>
+<h3>Problem 4: çekirdek elle</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H7)</span></div><p>(a) x = (1, 1), z = (2, 0) için (x·z)²'yi hesaplayın ve φ(v) = (v₁², √2v₁v₂, v₂²) ile denetleyin. (b) ‖x − z‖² = 1 için RBF, γ = 0.5 ve γ = 2 (e⁻⁰·⁵ = 0.607, e⁻² = 0.135). (c) İkil biçim çekirdeği neden mümkün kılar?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>x·z = 2 → K = <strong>4</strong>. φ(x) = (1, 1.414, 1), φ(z) = (4, 0, 0) → φ(x)·φ(z) = 4 ✓: 3 boyutlu uzaydaki iç çarpım φ hiç hesaplanmadan bulundu.</li>
+<li>γ = 0.5: <strong>0.607</strong>; γ = 2: <strong>0.135</strong>. Büyük γ benzerliği hızla söndürür: her destek vektörü yalnız yakın çevresini etkiler.</li>
+<li>İkil biçimde eğitim ve tahmin veriyi yalnız xᵢ·xⱼ iç çarpımlarıyla kullanır; her birini K(xᵢ, xⱼ) = φ(xᵢ)·φ(xⱼ) ile değiştirmek φ uzayında doğrusal SVM eğitmektir.</li></ol></div></details>
+<h2>Sık hatalar</h2>
+<ul class="mistakes">
+<li>Destek vektörlerini seçip çözdükten sonra diğer noktaları denetlememek (y·f ≥ 1 olmalı).</li>
+<li>Negatif destek vektöründe w·x + b = <strong>−1</strong> yerine +1 yazmak.</li>
+<li>Marjı 2/‖w‖ yazmak: marj 1/‖w‖, 2/‖w‖ sokak genişliği.</li>
+<li>C'nin yönünü ters söylemek: büyük C → dar marj, az destek vektörü, düşük yanlılık, yüksek varyans.</li>
+<li>Ölçeklemeden RBF kullanmak.</li>
+<li>ξ'yi yanlış tarafta olmayan noktalar için hep 0 sanmak: sokağın içindeki doğru taraftaki noktada 0 &lt; ξ &lt; 1.</li>
+</ul>
 
 <h2>Hiperparametre satırları</h2>
 <div class="table-wrap"><table class="simple">
