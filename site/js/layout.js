@@ -82,7 +82,7 @@ function buildHeader() {
   brand.append(h("span", { class: "brand-title" }, "Yapay Öğrenme"), h("span", { class: "brand-sub" }, "BİL/YAP 470 · çalışma sitesi"));
   const left = untilMidterm();
   const pill = left
-    ? h("a", { class: "exam-pill", href: "exam-midterm.html", title: "Ara sınav: 9 Kasım 2026 Pazartesi, 16:30" }, "⏱ ", h("span", { class: "long" }, "Ara sınava "), left.d > 0 ? `${left.d} g ${left.h} sa` : `${left.h} sa ${left.m} dk`)
+    ? h("a", { class: "exam-pill", href: "exam-midterm.html", title: "Ara sınav: 9 Kasım 2026 Pazartesi, 16:30" }, h("span", { class: "ic ic-clock", "aria-hidden": "true" }), h("span", { class: "long" }, "Ara sınava "), left.d > 0 ? `${left.d} g ${left.h} sa` : `${left.h} sa ${left.m} dk`)
     : h("a", { class: "exam-pill", href: "exam-final.html", title: "Final: 7–18 Aralık" }, "Final: 7–18 Aralık");
   const gh = h("a", { class: "icon-btn", href: REPO, target: "_blank", rel: "noopener", title: "GitHub'daki kaynak kod", "aria-label": "GitHub'daki kaynak kod" });
   gh.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg>';
@@ -305,29 +305,29 @@ function buildPageNav(content, id) {
 /** "How to study this page" box: the order to follow and what the coloured boxes mean. */
 const HOWTO = {
   week: {
-    title: "📖 Bu sayfa nasıl çalışılır? (önerilen sıra ve kutuların anlamı)",
+    title: "<span class='ic ic-book' aria-hidden='true'></span>Bu sayfa nasıl çalışılır? (önerilen sıra ve kutuların anlamı)",
     steps: [
-      "<b>🎯 Sınav haritasına</b> 1 dakika göz at: bu haftadan ne sorulduğunu ve puanın nereden geldiğini söyler. Terimleri henüz bilmiyorsan sorun değil.",
-      "Bölümleri <b>yukarıdan aşağı</b> oku. Her bölüm önce sarı <b>💡 sezgi</b> kutusuyla başlar: önce fikri anla, formül sonra gelir.",
+      "<b><span class='ic ic-target' aria-hidden='true'></span>Sınav haritasına</b> 1 dakika göz at: bu haftadan ne sorulduğunu ve puanın nereden geldiğini söyler. Terimleri henüz bilmiyorsan sorun değil.",
+      "Bölümleri <b>yukarıdan aşağı</b> oku. Her bölüm önce sarı <b><span class='ic ic-idea' aria-hidden='true'></span>sezgi</b> kutusuyla başlar: önce fikri anla, formül sonra gelir.",
       "Her formülün altındaki <b>“Nasıl okunur?”</b> satırları sembolleri tek tek açıklar. Altı <span class=\"term-demo\">noktalı çizili</span> bir kelimeye takılırsan üzerine gel ya da dokun: kısa tanımı çıkar.",
-      "Mor çerçeveli <b>🧭 araç kılavuzunu</b> okuyup aracı kullan: “Şunu dene” adımlarını yap, “Ne görmelisin?” cümlesini kendin gözlemle.",
-      "<b>✋ Hemen dene</b> sorularını cevabı açmadan çöz; yapamazsan bir önceki paragrafa dön.",
-      "<b>📝 Tarif</b> kutuları sınavda kâğıda nasıl yazacağını adım adım söyler; sınav tipi problemleri bu tariflerle çöz.",
+      "Mor çerçeveli <b><span class='ic ic-guide' aria-hidden='true'></span>araç kılavuzunu</b> okuyup aracı kullan: “Şunu dene” adımlarını yap, “Ne görmelisin?” cümlesini kendin gözlemle.",
+      "<b><span class='ic ic-try' aria-hidden='true'></span>Hemen dene</b> sorularını cevabı açmadan çöz; yapamazsan bir önceki paragrafa dön.",
+      "<b><span class='ic ic-recipe' aria-hidden='true'></span>Tarif</b> kutuları sınavda kâğıda nasıl yazacağını adım adım söyler; sınav tipi problemleri bu tariflerle çöz.",
       "Son olarak <b>sık hatalar</b> listesini ve <b>sınama sorularını</b> yap. Sağdaki içindekiler nerede olduğunu gösterir; bitirince en üstteki “Bu sayfayı çalıştım”ı işaretle.",
     ],
   },
   exam: {
-    title: "📖 Bu sayfa nasıl kullanılır?",
+    title: "<span class='ic ic-book' aria-hidden='true'></span>Bu sayfa nasıl kullanılır?",
     steps: [
       "Önce soruyu kâğıtta kendin çöz (süre tut), sonra “çözüm”ü aç ve adım adım karşılaştır.",
-      "Takıldığın her adımın yanında ilgili haftanın sayfasına bağlantı var: oradaki 💡 sezgi ve 📝 tarif kutularına dön.",
+      "Takıldığın her adımın yanında ilgili haftanın sayfasına bağlantı var: oradaki <span class='ic ic-idea' aria-hidden='true'></span>sezgi ve <span class='ic ic-recipe' aria-hidden='true'></span>tarif kutularına dön.",
       "Çözüm içindeki araçlar aynı veriyle hazır gelir: bir sayıyı değiştirip sonucun nasıl değiştiğine bak.",
     ],
   },
   tool: {
-    title: "📖 Bu sayfa nasıl kullanılır?",
+    title: "<span class='ic ic-book' aria-hidden='true'></span>Bu sayfa nasıl kullanılır?",
     steps: [
-      "Aracın üstündeki 🧭 kutusunu oku: ne yaptığını ve ne denemen gerektiğini söyler.",
+      "Aracın üstündeki <span class='ic ic-guide' aria-hidden='true'></span>kutusunu oku: ne yaptığını ve ne denemen gerektiğini söyler.",
       "Cevabını önce kendin bul, sonra denetle; yanlışsa çözümü açmadan bir kez daha dene.",
       "Bir türde üst üste 3 doğru yaptıysan o konu hazır; zayıf olduğun türe geç.",
     ],
@@ -339,7 +339,7 @@ function buildHowto(id, info) {
   if (!kind) return null;
   const k = HOWTO[kind];
   const open = store.get("howto-open-" + kind, true);
-  const d = h("details", { class: "howto", open }, h("summary", {}, k.title), h("ol", {}, k.steps.map((st) => h("li", { html: st }))));
+  const d = h("details", { class: "howto", open }, h("summary", { html: k.title }), h("ol", {}, k.steps.map((st) => h("li", { html: st }))));
   d.addEventListener("toggle", () => store.set("howto-open-" + kind, d.open));
   return d;
 }
@@ -372,7 +372,7 @@ async function init() {
   }
   if (id !== "sozluk") {
     const { annotateTerms, installTermPopover } = await import("./glossary.js");
-    annotateTerms(content);
+    annotateTerms(content, info?.week || 0);
     installTermPopover();
   }
   buildPageNav(content, id);

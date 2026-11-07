@@ -17,7 +17,7 @@
 <h1>Karar ağaçları</h1>
 <p class="lead">Kökten yaprağa her yol bir “eğer … ve … ise → sınıf” kuralıdır. ID3 her düğümde düzensizliği (entropiyi) en çok azaltan özniteliği seçer. Ara sınavın B bölümü (17 puan) ve örnek sınavın 1. sorusu: <strong>6–8 satırlık tabloda tam ID3 hesabı</strong>. Puanın çoğu ara adımlardadır: tabloyu düzgün kurun, log değerlerini tablodan alıp yazın, 3 ondalık taşıyın, son ağacı dallardaki değerlerle çizin.</p>
 <!-- enriched -->
-<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
 <p class="small"><b>Bu tablo nasıl kullanılır?</b> Sayfayı okumadan önce göz gezdir: neye odaklanacağını söyler. Terimleri henüz bilmiyorsan sorun değil; sayfanın sonunda geri dön ve her satırı kendin yapabiliyor musun diye kontrol et.</p>
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
 <tr><td>Tam ID3 (ana soru, B bölümü)</td><td>6–8 satır, 2–3 kategorik öznitelik, log₂ tablosu verilir</td><td>H(D), her öznitelik için dal tablosu ve IG, kök, alt dallarda yineleme, ağacın çizimi</td></tr>
@@ -30,22 +30,21 @@
 
 
 <h2>Entropi ve bilgi kazancı</h2>
-<div data-widget="fig" data-fig="tree" data-caption="Bir karar ağacı: her düğüm bir soru, her dal bir cevap, her yaprak bir karar."></div><div class="intuition"><div class="intuition-title">💡 “20 soru” oyunu</div><p>Karar ağacı, “20 soru” oyunu gibi sorular sorarak karar verir: “Acele var mı? Hayır → tatlı alır. Evet → Kiminle? Yalnız → almaz…”. İyi bir oyuncu ilk soruyu öyle seçer ki cevap, olasılıkları olabildiğince “saf” gruplara ayırsın. Ağaç da böyle yapar; “saflığı” ölçmek için <strong>entropi</strong> kullanır.</p><p>Entropi bir grubun ne kadar karışık olduğunu söyler: grupta herkes aynı sınıftaysa 0 (hiç belirsizlik yok), yarı yarıyaysa 1 bit (en belirsiz). Bir soru sorup grubu bölünce dalların ortalama entropisi düşer; bu düşüş <strong>bilgi kazancıdır</strong>. En çok kazandıran soru önce sorulur.</p></div><div data-widget="fig" data-fig="entropy" data-caption="İki sınıfta entropi ve Gini: p = 0.5'te en büyük (en karışık), p = 0 ya da 1'de sıfır (saf)."></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>Bir düğümde 2 Evet, 2 Hayır var. Entropi? 4 Evet, 0 Hayır olsaydı?</p><details><summary>Cevabı göster</summary><p>2/2: yarı yarıya → <strong>1</strong> bit. 4/0: saf → <strong>0</strong>. Bir soru 2/2'lik düğümü iki saf dala ayırabilseydi kazancı 1 − 0 = 1 olurdu (en iyisi).</p></details></div>
+<div data-widget="fig" data-fig="tree" data-caption="Bir karar ağacı: her düğüm bir soru, her dal bir cevap, her yaprak bir karar."></div>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>“20 soru” oyunu</div><p>Karar ağacı, “20 soru” oyunu gibi sorular sorarak karar verir: “Acele var mı? Hayır → tatlı alır. Evet → Kiminle? Yalnız → almaz…”. İyi bir oyuncu ilk soruyu öyle seçer ki cevap, olasılıkları olabildiğince “saf” gruplara ayırsın. Ağaç da böyle yapar; “saflığı” ölçmek için <strong>entropi</strong> kullanır.</p><p>Entropi bir grubun ne kadar karışık olduğunu söyler: grupta herkes aynı sınıftaysa 0 (hiç belirsizlik yok), yarı yarıyaysa 1 bit (en belirsiz). Bir soru sorup grubu bölünce dalların ortalama entropisi düşer; bu düşüş <strong>bilgi kazancıdır</strong>. En çok kazandıran soru önce sorulur.</p></div>
+<p>Bir düğümün entropisi ve bir bölmenin bilgi kazancı şöyle hesaplanır:</p>
 <div class="formula">H(D) = −Σ pᵢ log₂ pᵢ &nbsp;&nbsp;&nbsp; IG(D, A) = H(D) − Σ<sub>v</sub> (|D_v| / |D|) · H(D_v)</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>pᵢ: i. sınıfın düğümdeki oranı (örn. 5 Evet / 2 Hayır → 5/7 ve 2/7). −log₂ pᵢ değerleri tablodan okunur.</li><li><b>H(D)</b>: her sınıf için “oran × (−log₂ oran)”, sonra topla.</li><li><b>IG(D, A)</b>: A özniteliğiyle bölmeden önceki entropi eksi bölmeden sonraki dalların <em>ağırlıklı ortalama</em> entropisi. |D_v|/|D| = dalın payı (o dala düşen örnek sayısı / toplam).</li></ul></div>
-<ul>
-<li>İki sınıfta H ∈ [0, 1]: saf düğüm 0, 50/50 düğüm 1 bit. <strong>0 · log 0 = 0</strong> (p log p → 0; olmayan sınıf belirsizlik katmaz).</li>
-<li>Bilgi kazancı = bölmeden önceki entropi − bölmeden sonraki <em>ağırlıklı</em> entropi. En büyük IG kök olur; sonra her dalda kalan özniteliklerle özyinelenir.</li>
-<li>Duruş: düğüm saf, öznitelik kalmadı ya da hiçbir bölme kazanç getirmiyor (çoğunluk sınıfı yaprağı).</li>
-</ul>
+<div data-widget="fig" data-fig="entropy" data-caption="İki sınıfta entropi ve Gini: p = 0.5'te en büyük (en karışık), p = 0 ya da 1'de sıfır (saf)."></div>
+<p>İki sınıflı bir düğümde entropi 0 ile 1 arasındadır: bütün örnekler aynı sınıftaysa 0, sınıflar yarı yarıyaysa 1 bit. Bir sınıfın hiç bulunmadığı durumda 0·log 0 terimi 0 kabul edilir; olmayan bir sınıf belirsizliğe katkı yapmaz. Bilgi kazancı, bölmeden önceki entropiden bölmeden sonraki dalların ağırlıklı ortalama entropisini çıkarır; her dalın ağırlığı, o dala düşen örneklerin payıdır. Kazancı en büyük öznitelik kök olur.</p>
+<div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>Bir düğümde 2 Evet, 2 Hayır var. Entropi? 4 Evet, 0 Hayır olsaydı?</p><details><summary>Cevabı göster</summary><p>2/2: yarı yarıya → <strong>1</strong> bit. 4/0: saf → <strong>0</strong>. Bir soru 2/2'lik düğümü iki saf dala ayırabilseydi kazancı 1 − 0 = 1 olurdu (en iyisi).</p></details></div>
 <div data-widget="entplay"></div>
 <div class="callout tip"><div class="callout-title">Sık kullanılan değerler (sınavda tablo verilir)</div>
-<p>H(1/2) = 1 · H(1/3) = 0.918 · H(1/4) = 0.811 · H(2/5) = 0.971 · H(1/5) = 0.722 · H(2/7) = 0.863 · H(3/7) = 0.985 · H(3/8) = 0.954 · H(1/6) = 0.650<br>
-−log₂: 1/2 → 1, 1/3 → 1.585, 2/3 → 0.585, 1/4 → 2, 3/4 → 0.415, 2/5 → 1.322, 3/5 → 0.737, 1/7 → 2.807, 2/7 → 1.807, 3/7 → 1.222, 4/7 → 0.807. <a href="cheatsheet.html#log2-tablosu">Tam tablo</a>.</p></div>
+<p>İki sınıflı entropi: H(1/2) = 1, H(1/3) = 0.918, H(1/4) = 0.811, H(2/5) = 0.971, H(1/5) = 0.722, H(2/7) = 0.863, H(3/7) = 0.985, H(3/8) = 0.954, H(1/6) = 0.650. Logaritmalar: −log₂ ½ = 1, −log₂ ⅓ = 1.585, −log₂ ⅔ = 0.585, −log₂ ¼ = 2, −log₂ ¾ = 0.415, −log₂ ⅖ = 1.322, −log₂ ⅗ = 0.737. <a href="cheatsheet.html#log2-tablosu">Tam tablo</a>.</p></div>
 
 <h2>ID3 adım adım</h2>
-<div class="intuition"><div class="intuition-title">💡 Algoritma tek cümleyle</div><p>Bütün sorular (öznitelikler) için “bu soruyu sorsam belirsizlik ne kadar azalır?” hesapla, en çok azaltanı sor, her cevap dalında kalan örneklerle aynı şeyi tekrarla; bir dal saflaşınca (hepsi aynı sınıf) yaprak yap.</p></div>
-<div class="recipe"><div class="recipe-title">📝 ID3 sorusu kâğıtta: şablon</div><ol>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Algoritma tek cümleyle</div><p>Bütün sorular (öznitelikler) için “bu soruyu sorsam belirsizlik ne kadar azalır?” hesapla, en çok azaltanı sor, her cevap dalında kalan örneklerle aynı şeyi tekrarla; bir dal saflaşınca (hepsi aynı sınıf) yaprak yap.</p></div>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>ID3 sorusu kâğıtta: şablon</div><ol>
 <li>Sınıf sayılarını yazın: örn. 5 Evet / 2 Hayır → H(D) = −(5/7)log₂(5/7) − (2/7)log₂(2/7) = (5/7)(0.485) + (2/7)(1.807).</li>
 <li>Her öznitelik için bir tablo: <em>dal (değer) · n · Evet/Hayır · H(dal)</em>. Saf dalın H'si 0, 50/50 dalınki 1.</li>
 <li>Ağırlıklı H = Σ (n_dal/n)·H(dal). IG = H(D) − ağırlıklı H.</li>
@@ -53,47 +52,41 @@
 <li>Karışık her dalda yalnız o dalın örnekleri ve <em>kalan</em> özniteliklerle 1–4'ü tekrarlayın.</li>
 <li>Ağacı çizin: düğümde öznitelik, dalda değer (ve sayılar), yaprakta sınıf. İstenirse yeni bir örneği ağaçta yürüterek sınıflayın.</li>
 </ol><p class="small">Kısa yol: bir öznitelik bütün dalları saf yapıyorsa IG = H(D) (en büyük olası); hesaplamadan kök seçilebilir, ama tabloyu yine yazın.</p></div>
-
-<p>Aşağıdaki araç her düğüm için sınavdaki tabloyu (dal, n, sınıf sayıları, H, ağırlıklı H, IG) kurar ve son ağacı çizer. Kendi tablonuzu yapıştırın. Varsayılan veri önceki dönemin alıştırma listesindeki Boy/Saç/Göz sorusu.</p>
+<p>Aşağıdaki araç bu adımların her birini sınavdaki tablo biçiminde gösterir. Varsayılan veri, önceki dönemin alıştırma listesindeki Boy/Saç/Göz sorusudur.</p>
 <div data-widget="id3"></div>
-<p>Çözüm: H(D) = H(3/8) = 0.954. IG(Boy) = 0.003, IG(Saç) = 0.454, IG(Göz) = 0.348 → <strong>kök Saç</strong>. kızıl → + (saf), koyu → − (saf), sarı {+, −, +, −}: Göz'ün kazancı 1.0 (mavi → +, kahve → −), Boy'unki 0. Ağaç: Saç? koyu → −; kızıl → +; sarı → Göz? (mavi → +, kahve → −). Boy hiç kullanılmadı.</p>
-<div class="callout"><div class="callout-title">İkinci örnek: kredi (Loan) verisi, 15 başvuru</div><p>9 Evet / 6 Hayır, H(D) = 0.971. IG: Yaş 0.083, İşi var 0.324, <strong>Evi var 0.420</strong>, Kredi notu 0.363 → kök Evi var. Evi var = evet → 6/6 Evet (saf). Evi yok dalında (3 Evet / 6 Hayır) İşi var'ın kazancı 0.918: iki dal da saf. Derinlik 2. Kendiniz denemek için aracın veri kutusuna yapıştırın.</p></div>
-
+<p>Bu verinin çözümü şöyle ilerler. 3 artı ve 5 eksi olduğu için H(D) = H(3/8) = 0.954'tür. Üç özniteliğin kazancı Boy için 0.003, Saç için 0.454, Göz için 0.348 çıkar; kök <strong>Saç</strong> olur. Saçı kızıl olanlar (hepsi +) ve koyu olanlar (hepsi −) saf dallardır ve hemen yaprak olur. Sarı saçlıların dalında iki artı iki eksi vardır; burada Göz'ün kazancı 1, Boy'unki 0'dır, bu yüzden Göz'e göre bölünür: mavi gözlüler +, kahverengi gözlüler −. Ağaçta Boy hiç kullanılmaz.</p>
+<div class="callout"><div class="callout-title">İkinci örnek: 15 kredi başvurusu</div><p>Başvuruların 9'u onaylanmış, 6'sı reddedilmiş; H(D) = 0.971. Dört özniteliğin kazancı Yaş için 0.083, İşi var için 0.324, Evi var için 0.420 ve Kredi notu için 0.363'tür; kök <strong>Evi var</strong> olur. Evi olan 6 başvurunun hepsi onaylandığı için o dal yapraktır. Evi olmayan 9 başvuruda (3 onay, 6 ret) İşi var özniteliğinin kazancı 0.918'dir ve iki dalı da saf yapar. Sonuç iki seviyeli bir ağaçtır.</p></div>
 <h3>Kazanç oranı (C4.5)</h3>
-<p>IG çok değerli öznitelikleri kayırır: her müşteriye ayrı değer veren “müşteri no” sütunu veriyi tek örnekli saf parçalara böler, IG = H(D) (en büyük olası) ama hiçbir şeye genellenmez. C4.5 kazancı <strong>bölme bilgisine</strong> böler:</p>
+<p>Bilgi kazancının bir zayıflığı vardır: çok sayıda farklı değeri olan öznitelikleri kayırır. Her müşteriye ayrı bir değer veren “müşteri no” sütununu düşünün: bu sütuna göre bölünce her dalda tek kişi kalır, her dal saftır ve kazanç olabilecek en büyük değeri alır; ama bu sütun yeni bir müşteri hakkında hiçbir şey söylemez. C4.5 algoritması bu yüzden kazancı <strong>bölme bilgisine</strong> böler:</p>
 <div class="formula">SplitInfo(A) = −Σ (|D_v|/|D|) log₂(|D_v|/|D|) &nbsp;&nbsp; GainRatio = IG / SplitInfo</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>SplitInfo, verinin dallara nasıl dağıldığının entropisidir (sınıflara değil, <em>dal büyüklüklerine</em> bakar). Çok sayıda küçük dal → büyük SplitInfo.</li><li>Kazancı buna bölmek, veriyi gereksiz parçalayan öznitelikleri cezalandırır.</li></ul></div>
-<p>7 farklı değerli kimlik sütununda SplitInfo = log₂ 7 = 2.807, GR = 0.863/2.807 = 0.307; anlamlı bir öznitelik (IG 0.470, SI 0.985) GR = 0.477 ile kazanır. Araçta ölçütü “kazanç oranı” yapın.</p>
-
+<p>Yedi farklı değerli bir kimlik sütununda bölme bilgisi log₂7 = 2.807'dir ve kazanç oranı 0.863/2.807 = 0.307'ye düşer; gerçekten anlamlı bir öznitelik (kazancı 0.470, bölme bilgisi 0.985) 0.477'lik oranla onu geçer. Araçta ölçütü “kazanç oranı” yaparak bunu deneyebilirsiniz.</p>
 <h3>Gini safsızlığı (CART)</h3>
+<p>CART algoritması entropi yerine Gini safsızlığını kullanır:</p>
 <div class="formula">Gini(D) = 1 − Σ pᵢ² &nbsp;&nbsp;(iki sınıfta en çok 0.5)</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>Sınıf oranlarının karelerini topla, 1'den çıkar. Saf düğüm 0, yarı yarıya düğüm 0.5. Log gerektirmediği için elle daha hızlı.</li></ul></div>
-<p>Ağırlıklı Gini'si <em>en küçük</em> olan (yani azalması en büyük) bölme seçilir. Çoğu veride entropiyle aynı kökü seçer; hesabı log gerektirmez. CART her zaman <strong>ikili</strong> bölme yapar.</p>
+<p>Bu kez ağırlıklı Gini'si <em>en küçük</em> olan bölme seçilir (yani safsızlığı en çok azaltan). Çoğu veride entropiyle aynı kökü seçer ve logaritma gerektirmediği için elle daha hızlıdır. CART her zaman iki dala ayırır.</p>
 
 <h2>Sayısal öznitelikte eşik</h2>
-<div class="intuition"><div class="intuition-title">💡 Sayıları nasıl sorarız?</div><p>“Rüzgâr hızı kaç?” sorusunun sonsuz cevabı var; ağaç bunun yerine evet/hayır sorusu sorar: “rüzgâr ≤ 20 mi?”. Hangi eşik? Değerleri sırala, ardışık iki değerin ortasını aday yap, her adayın kazancını hesapla. Sınıfın değişmediği yere eşik koymak hiçbir şey kazandırmaz, o yüzden yalnız sınıfın değiştiği yerlere bakmak yeter.</p></div>
-<p>Değerleri sırala; ardışık değerlerin orta noktaları aday eşiktir; her “x ≤ t” için IG hesapla. Kısayol: en iyi eşik hep <strong>sınıfın değiştiği</strong> yerlerden biridir, yalnız onlara bakmak yeter.</p>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Sayıları nasıl sorarız?</div><p>“Rüzgâr hızı kaç?” sorusunun sonsuz cevabı var; ağaç bunun yerine evet/hayır sorusu sorar: “rüzgâr ≤ 20 mi?”. Hangi eşik? Değerleri sırala, ardışık iki değerin ortasını aday yap, her adayın kazancını hesapla. Sınıfın değişmediği yere eşik koymak hiçbir şey kazandırmaz, o yüzden yalnız sınıfın değiştiği yerlere bakmak yeter.</p></div>
+<p>Yöntem şöyledir: değerleri küçükten büyüğe sıralayın, ardışık iki değerin ortasını aday eşik olarak alın ve her aday için “x ≤ eşik” bölmesinin kazancını hesaplayın. Kısa yol olarak yalnız sınıfın değiştiği yerlerdeki orta noktalara bakmak yeter, çünkü en iyi eşik her zaman bunlardan biridir.</p>
 <div data-widget="threshold"></div>
-<p>Varsayılan: hesap tutarı 2, 3, 5, 7, 8 ve bahşiş E, E, H, H, E. Sınıf 3–5 arasında (t = 4) ve 7–8 arasında (t = 7.5) değişir. t = 4: sol {E, E} saf, sağ {H, H, E} H = 0.918, ağırlıklı 0.551, IG = 0.420. t = 7.5: IG 0.171. En iyi: tutar ≤ 4.</p>
-<div class="callout exam"><div class="callout-title">Aynı öznitelik bir yolda iki kez kullanılabilir mi?</div><p><strong>Kategorik</strong> (her değere bir dal): hayır, anlamsız; o dalda öznitelik artık tek değerlidir, kazancı 0. <strong>Sayısal</strong> (ikili eşik): evet; “x ≤ 5” dalında “x ≤ 2.5” ile yeniden bölmek bir aralığı daha da daraltır.</p></div>
+<p>Varsayılan örnekte hesap tutarları 2, 3, 5, 7, 8 ve bahşiş durumu Evet, Evet, Hayır, Hayır, Evet. Sınıf 3 ile 5 arasında (eşik 4) ve 7 ile 8 arasında (eşik 7.5) değişiyor. Eşik 4'te sol dal (2 ve 3) saftır, sağ dal (5, 7, 8) bir Evet iki Hayır içerir ve entropisi 0.918'dir; ağırlıklı entropi 0.551, kazanç 0.420 olur. Eşik 7.5'in kazancı yalnız 0.171'dir. En iyi bölme “tutar ≤ 4”tür.</p>
+<div class="callout exam"><div class="callout-title">Aynı öznitelik bir yolda iki kez kullanılabilir mi?</div><p>Kategorik bir öznitelik (her değerine bir dal açılan) aynı yolda ikinci kez kullanılmaz: o dalda özniteliğin zaten tek bir değeri kalmıştır ve kazancı sıfırdır. Sayısal bir öznitelik ise kullanılabilir, çünkü her bölme yalnız bir eşiktir: “x ≤ 5” dalında “x ≤ 2.5” diye yeniden bölmek aralığı daha da daraltır.</p></div>
 
 <h2>CART ve regresyon ağaçları</h2>
-<p>Regresyon ağacında her yaprak bir sabit (dalın ortalaması) tahmin eder; bölme ölçütü SSE (kareler toplamı) azalması. Çok derin bir regresyon ağacı her yaprakta bir örnekle eğitim noktalarından (gürültüleri dahil) geçen bir <strong>merdiven</strong>dir.</p>
+<p>Tahmin edilen şey bir sayıysa ağaç yine aynı biçimde kurulur, ama iki şey değişir. Her yaprak, o yapraktaki örneklerin ortalamasını tahmin eder. Bölme ölçütü olarak entropi yerine kareler toplamındaki (SSE) azalma kullanılır: en iyi bölme, iki tarafı kendi içinde en tutarlı yapan bölmedir. Çok derin bir regresyon ağacı her yaprakta tek örnek bırakarak eğitim noktalarından (gürültüleriyle birlikte) geçen bir merdiven fonksiyonuna dönüşür; bu da aşırı uyumdur.</p>
 <div data-widget="regtree"></div>
 
 <h2>Aşırı uyum ve budama</h2>
-<div class="intuition"><div class="intuition-title">💡 Çok soru sormanın tehlikesi</div><p>Yeterince soru sorarsanız her örneği ayrı bir yaprağa koyabilirsiniz: eğitim hatası 0. Ama son sorular genelde gürültüye göre sorulmuştur (“bu müşteri salı günü geldi”); yeni müşteride işe yaramaz. Budama, ağacı genellemeye yetecek kadar küçük tutmaktır.</p></div>
-<ul>
-<li>Saf yapraklara kadar büyüyen ağaç eğitim verisini ezberler; sınırlar eksenlere paralel basamaklardır.</li>
-<li><strong>Ön budama</strong> (erken durdurma): max_depth, min_samples_leaf, min_impurity_decrease. Ucuz (ağaç hiç büyümez) ama <strong>XOR tuzağı</strong>: XOR'da tek başına hiçbir özniteliğin kazancı yoktur (her bölme 50/50 çocuk bırakır), “en az şu kadar kazanç” kuralı ilk bölmeyi reddeder; oysa ikinci bölme veriyi kusursuz ayırırdı.</li>
-<li><strong>Sonradan budama</strong>: önce tam ağaç, sonra doğrulama ya da maliyet-karmaşıklıkla geri kes. Sonradan yararlı olacak bir bölmeyi kaçırmaz.</li>
-<li><strong>Maliyet-karmaşıklık budaması</strong>: R_α(T) = R(T) + α·|T| (|T|: yaprak sayısı). α CV ile seçilir: örn. α = 0 (40 yaprak) doğrulama 0.82, α = 0.03 (7 yaprak) 0.90, α = 0.1 (3 yaprak) 0.85 → α = 0.03.</li>
-</ul>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Çok soru sormanın tehlikesi</div><p>Yeterince soru sorarsanız her örneği ayrı bir yaprağa koyabilirsiniz: eğitim hatası 0. Ama son sorular genelde gürültüye göre sorulmuştur (“bu müşteri salı günü geldi”); yeni müşteride işe yaramaz. Budama, ağacı genellemeye yetecek kadar küçük tutmaktır.</p></div>
+<p>Ağacın büyümesini sınırlamanın iki yolu vardır. <strong>Ön budama</strong>, ağaç büyürken bir koşulla durmaktır: en büyük derinlik, bir yaprakta en az kaç örnek olacağı ya da bir bölmenin en az ne kadar kazanç getirmesi gerektiği. Ucuzdur, çünkü ağaç hiç büyümez. Ama bir tuzağı vardır: XOR benzeri verilerde tek başına hiçbir bölme kazanç getirmez (her bölme yarı yarıya dallar bırakır), bu yüzden “en az şu kadar kazanç” kuralı ilk bölmeyi reddeder; oysa iki bölme birlikte veriyi kusursuz ayırırdı.</p>
+<p><strong>Sonradan budama</strong> önce ağacı tam büyütür, sonra işe yaramayan dalları keser. Daha sonra işe yarayacak bir bölmeyi kaçırmaz. En yaygın biçimi maliyet-karmaşıklık budamasıdır: ağacın hatasına yaprak sayısıyla orantılı bir ceza eklenir, R_α(T) = R(T) + α·|T|, ve α çapraz doğrulamayla seçilir. Örneğin α = 0 (40 yaprak) doğrulamada 0.82, α = 0.03 (7 yaprak) 0.90, α = 0.1 (3 yaprak) 0.85 veriyorsa α = 0.03 seçilir.</p>
 <div class="two-col">
-<div class="card"><h3>Güçlü yönler</h3><p>Yorumlanabilir (kurallar), ölçekleme gerekmez, kategorik ve sayısal veriyi birlikte işler, etkileşimleri yakalar, hızlı.</p></div>
-<div class="card"><h3>Zayıf yönler</h3><p><strong>Yüksek varyans / kararsızlık</strong>: tek bir etiket değişince bambaşka ağaç çıkabilir. Eksene paralel sınırlar (çapraz bir doğruyu basamaklarla taklit eder). Çare: çok ağacın ortalaması (6. hafta).</p></div>
+<div class="card"><h3>Güçlü yönleri</h3><p>Ağaçlar kurallar hâlinde okunabildiği için yorumlanabilir. Ölçekleme gerektirmezler, kategorik ve sayısal veriyi birlikte işlerler, öznitelikler arasındaki etkileşimleri yakalarlar ve hızlıdırlar.</p></div>
+<div class="card"><h3>Zayıf yönleri</h3><p>En önemli zayıflıkları kararsızlıktır (yüksek varyans): tek bir etiket değişince bambaşka bir ağaç çıkabilir. Sınırları eksenlere paraleldir, bu yüzden çapraz bir doğruyu ancak çok sayıda basamakla taklit edebilirler. Çaresi birçok ağacın ortalamasını almaktır (6. hafta).</p></div>
 </div>
-<p><strong>Ağaç iyi, doğrusal kötü</strong> (ya da tersi) olabilir mi? Evet: XOR ya da “içi pozitif bir kare” gibi eksenlere hizalı ama doğrusal olmayan bir yapıda ağaç kusursuz, doğrusal model rastgele kalır. Tersi: sınıfları ayıran sınır çapraz bir doğruysa (x₁ + x₂ &gt; 1) doğrusal model tek doğruyla çözer, ağaç çok sayıda basamağa ihtiyaç duyar ve az veride kötü genelleşir.</p>
+<p>Bir veride ağaç çok iyi, doğrusal model çok kötü olabilir mi? Evet: XOR ya da “içi pozitif bir kare” gibi eksenlere hizalı ama doğrusal olmayan bir yapıda ağaç birkaç bölmeyle kusursuz sonuç verir, doğrusal model ise rastgele düzeyde kalır. Tersi de olabilir: sınıfları ayıran sınır çapraz bir doğruysa doğrusal model tek doğruyla çözer, ağaç ise onu çok sayıda basamakla taklit etmek zorunda kalır ve az veride kötü genelleşir.</p>
 
 <h2>Sınav tipi çözümlü problemler</h2>
 <p>Aşağıdaki problemler sınavdaki biçimdedir. Her birini önce kâğıtta çözmeye çalış (5–10 dakika), sonra “çözümü aç”a bas: çözümde her adımın <em>neden</em> öyle yapıldığı da yazıyor. Takılırsan sayfanın ilgili bölümüne dön.</p>

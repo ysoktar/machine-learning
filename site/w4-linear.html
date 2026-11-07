@@ -17,7 +17,7 @@
 <h1>Doğrusal modeller</h1>
 <p class="lead">Regresyondan sınıflandırmaya hepsi aynı kalıp: <span class="m">ŷ = f(wᵀx + b)</span>. En küçük kareler, gradyan inişi, lojistik regresyon, perceptron, softmax, ridge/lasso. Ara sınavın C bölümü (17 puan): <strong>bir lojistik regresyon ya da perceptron güncelleme adımı</strong>. Güncelleme kuralını ezbere bilin, her satırda z'yi açıkça yazın.</p>
 <!-- enriched -->
-<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
 <p class="small"><b>Bu tablo nasıl kullanılır?</b> Sayfayı okumadan önce göz gezdir: neye odaklanacağını söyler. Terimleri henüz bilmiyorsan sorun değil; sayfanın sonunda geri dön ve her satırı kendin yapabiliyor musun diye kontrol et.</p>
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
 <tr><td>Perceptron epoch'u (C bölümü)</td><td>4–7 nokta, başlangıç w, b, η; her satırda z, ŷ, güncelleme; son ağırlıklarla karmaşıklık matrisi</td><td>her satırda z'yi açık yazmak; z = 0 → +1 kuralı; işaret</td></tr>
@@ -31,46 +31,58 @@
 
 
 <h2>Doğrusal regresyon ve en küçük kareler</h2>
-<div class="intuition"><div class="intuition-title">💡 Noktalardan geçen en iyi doğru</div><p>Evin metrekaresi ile fiyatı arasında kabaca doğrusal bir ilişki varsa, noktaların arasından bir doğru geçirip yeni bir evin fiyatını o doğrudan okuyabiliriz. Hangi doğru “en iyi”? Her noktanın doğruya dikey uzaklığı (hata) vardır; <strong>en küçük kareler</strong> bu hataların karelerinin toplamını en küçük yapan doğruyu seçer.</p><p>Formüldeki w₁ (eğim) “x bir birim artınca y ortalama ne kadar artar”, w₀ (kesişim) “x = 0 iken y”dir.</p></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>x = (1, 2, 3), y = (1, 2, 3). w₁ ve w₀?</p><details><summary>Cevabı göster</summary><p>x̄ = ȳ = 2; Σ(x − x̄)(y − ȳ) = 1 + 0 + 1 = 2; Σ(x − x̄)² = 2 → w₁ = <strong>1</strong>, w₀ = 2 − 1·2 = <strong>0</strong>. Doğru y = x: noktalar tam üstünde.</p></details></div>
-<p>Model <span class="m">ŷ = w₀ + w₁x₁ + … + w_dx_d</span>; x'in başına sabit 1 eklenirse w₀ ağırlık vektörüne girer: ŷ = wᵀx. Kayıp: MSE. “Doğrusal” <em>parametrelerde</em> doğrusal demektir: x², log x gibi türetilmiş öznitelikler kullanılabilir.</p>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Noktalardan geçen en iyi doğru</div><p>Evin metrekaresi ile fiyatı arasında kabaca doğrusal bir ilişki varsa, noktaların arasından bir doğru geçirip yeni bir evin fiyatını o doğrudan okuyabiliriz. Hangi doğru “en iyi”? Her noktanın doğruya dikey uzaklığı (hata) vardır; <strong>en küçük kareler</strong> bu hataların karelerinin toplamını en küçük yapan doğruyu seçer.</p><p>Formüldeki w₁ (eğim) “x bir birim artınca y ortalama ne kadar artar”, w₀ (kesişim) “x = 0 iken y”dir.</p></div>
+<p>Doğrusal regresyon modeli, her özniteliği bir ağırlıkla çarpıp toplar ve bir sabit ekler: ŷ = w₀ + w₁x₁ + … + w_dx_d. Kısaca ŷ = w·x + b da yazılır; burada w ağırlıklar, b (ya da w₀) kesişimdir. Modelin hatası ortalama kare hatayla (MSE) ölçülür. “Doğrusal” sözcüğü parametrelere göre doğrusal demektir; x², log x gibi türetilmiş öznitelikler eklenerek eğriler de uydurulabilir.</p>
+<p>MSE'yi en küçük yapan ağırlıkların kapalı bir formülü vardır. Sınavda tek değişkenli biçimi kullanılır:</p>
 <div class="formula">w* = (XᵀX)⁻¹Xᵀy &nbsp;(normal denklemler) &nbsp;·&nbsp; tek değişken: w₁ = Σ(xᵢ − x̄)(yᵢ − ȳ) / Σ(xᵢ − x̄)², &nbsp; w₀ = ȳ − w₁x̄</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>Sınavda kullanılan tek değişkenli biçimdir: önce ortalamaları (x̄, ȳ) bul; her nokta için (x − x̄) ve (y − ȳ) farklarını yaz.</li><li><b>w₁ (eğim)</b> = Σ(x farkı × y farkı) / Σ(x farkı)². x ile y birlikte artıyorsa pay pozitif, eğim pozitif.</li><li><b>w₀ (kesişim)</b> = ȳ − w₁x̄: doğru (x̄, ȳ) noktasından geçer.</li><li>Matris biçimi (XᵀX)⁻¹Xᵀy aynı şeyin çok öznitelikli hâlidir; elle hesaplanmaz.</li></ul></div>
+<div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>x = (1, 2, 3), y = (1, 2, 3). w₁ ve w₀?</p><details><summary>Cevabı göster</summary><p>x̄ = ȳ = 2; Σ(x − x̄)(y − ȳ) = 1 + 0 + 1 = 2; Σ(x − x̄)² = 2 → w₁ = <strong>1</strong>, w₀ = 2 − 1·2 = <strong>0</strong>. Doğru y = x: noktalar tam üstünde.</p></details></div>
 <div data-widget="lsq"></div>
-<ul>
-<li>XᵀX'in tersi alınabilmeli: n ≥ d, sütunlar doğrusal bağımsız. Maliyet O(nd² + d³): d binlere çıkınca pahalı → ridge (λI ekle) ya da gradyan inişi.</li>
-<li>Geometri: ŷ, y'nin X'in sütun uzayına dik izdüşümüdür; artık vektörü her sütuna diktir. Bias terimi varsa <strong>artıkların toplamı 0</strong> (iyi bir denetim).</li>
-<li><strong>Neden kare hata?</strong> Gürültü Gauss ise (y = wᵀx + ε, ε ~ N(0, σ²)) en küçük kareler en büyük olabilirlik (ML) tahminidir. Laplace gürültü → MAE; Bernoulli etiket → log-loss. (Türetme istenmez; iki cümle yeter.)</li>
-</ul>
+<p>Bu çözümün birkaç özelliğini bilmek işe yarar. Kesişim terimi varsa artıkların (y − ŷ) toplamı her zaman sıfırdır; bu, hesabınızı denetlemenin kolay bir yoludur. Matris biçimindeki formül, XᵀX'in tersi alınabildiği sürece çalışır; öznitelik sayısı çok büyükse bu hesap pahalılaşır ve onun yerine ridge (λI eklemek) ya da gradyan inişi kullanılır. Son olarak, neden kare hata kullandığımızın bir gerekçesi vardır: gürültünün normal (Gauss) dağıldığını varsayarsak, en küçük kareler en olası ağırlıkları verir (en büyük olabilirlik). Sınavda türetme istenmez; bu cümleyi bilmek yeter.</p>
 
 <h2>Gradyan inişi</h2>
-<div class="intuition"><div class="intuition-title">💡 Sisli dağdan inmek</div><p>Gözleriniz bağlı bir vadide en alçak noktayı arıyorsunuz. Yapabileceğiniz tek şey ayağınızın altındaki eğime bakıp yokuş aşağı küçük bir adım atmak, sonra tekrar bakmak. Gradyan inişi budur: kaybın eğimini (türevini) hesapla, eğimin tersi yönünde η kadar adım at.</p><p>Adım çok küçükse vadiye varmak çok uzun sürer; çok büyükse vadinin karşı yamacına sıçrar, giderek daha yükseğe savrulabilirsiniz (ıraksama).</p></div><div data-widget="fig" data-fig="bowl" data-caption="Kayıp eğrisinde gradyan inişi: küçük η emin adımlarla iner, büyük η minimumun iki yanına savrulur."></div>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Sisli dağdan inmek</div><p>Gözleriniz bağlı bir vadide en alçak noktayı arıyorsunuz. Yapabileceğiniz tek şey ayağınızın altındaki eğime bakıp yokuş aşağı küçük bir adım atmak, sonra tekrar bakmak. Gradyan inişi budur: kaybın eğimini (türevini) hesapla, eğimin tersi yönünde η kadar adım at.</p><p>Adım çok küçükse vadiye varmak çok uzun sürer; çok büyükse vadinin karşı yamacına sıçrar, giderek daha yükseğe savrulabilirsiniz (ıraksama).</p></div>
 <div class="formula">w ← w − η ∇L(w), &nbsp;&nbsp; MSE için ∇L(w) = (2/n) Xᵀ(Xw − y)</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>“←” “yeni değeri şu olsun” demek. ∇L(w) kaybın eğimi (türevi); η (eta) adım büyüklüğü.</li><li>Eğim pozitifse (sağa gidince kayıp artıyorsa) w küçülür, negatifse büyür: hep yokuş aşağı. <b>Eksi işareti</b> bu yüzden var; sınavda en sık unutulan şey.</li></ul></div>
-<p>Kayıp yüzeyinde en dik iniş yönünde küçük adımlar. MSE dışbükeydir: tek global minimum, uygun η ile yakınsama garantili. <strong>Küçük η</strong>: yavaş. <strong>Büyük η</strong>: minimumu aşar, salınır, ıraksar. Durma: kayıptaki değişim ε'dan küçük ya da iterasyon sayısı doldu. Neden kapalı çözüm yerine gradyan inişi? Büyük d/n'de (XᵀX)⁻¹ pahalı ya da bellek yetmez; lojistik regresyon ve sinir ağlarının kapalı çözümü <em>yoktur</em>.</p>
+<div data-widget="fig" data-fig="bowl" data-caption="Kayıp eğrisinde gradyan inişi: küçük η emin adımlarla iner, büyük η minimumun iki yanına savrulur."></div>
+<p>MSE gibi “kâse biçimli” (dışbükey) kayıplarda tek bir en düşük nokta vardır ve uygun bir öğrenme oranıyla gradyan inişi oraya mutlaka ulaşır. Öğrenme oranı küçükse adımlar yavaş ilerler; büyükse minimumun iki yanına savrulur ve hatta giderek uzaklaşabilir (ıraksama). Durmak için kayıptaki değişim çok küçülene ya da belirlenen adım sayısı dolana kadar beklenir.</p>
+<p>Kapalı bir formül varken neden gradyan inişi kullanırız? Çünkü öznitelik ya da örnek sayısı çok büyükken matris tersi almak çok pahalıdır ve lojistik regresyon ile sinir ağları gibi modellerin kapalı bir çözümü hiç yoktur.</p>
 <div data-widget="gdplay"></div>
-<p class="small">Aynı hesap sınav tablosu biçiminde (ŷ = w·x, iki nokta):</p>
 <div data-widget="gd"></div>
+<p>Gradyanı her adımda kaç örnekle hesapladığımıza göre üç çeşit gradyan inişi vardır:</p>
 <div class="table-wrap"><table class="simple">
-<thead><tr><th></th><th>Batch</th><th>Stokastik (SGD)</th><th>Mini-batch</th></tr></thead>
+<thead><tr><th></th><th>Batch (yığın)</th><th>Stokastik (SGD)</th><th>Mini-batch</th></tr></thead>
 <tbody>
-<tr><td>Her adımda</td><td>n örneğin hepsi</td><td>rastgele tek örnek</td><td>B örnek (32–512)</td></tr>
-<tr><td>Adım maliyeti</td><td>O(nd)</td><td>O(d)</td><td>O(Bd)</td></tr>
-<tr><td>Gradyan gürültüsü</td><td>yok, kayıp düzgün azalır</td><td>yüksek (yerel minimumdan kaçmaya yarar)</td><td>orta</td></tr>
-<tr><td>Kullanım</td><td>küçük veri</td><td>akan veri, online</td><td>derin ağlar (GPU'da vektörize, standart)</td></tr>
+<tr><td>Her adımda kullanılan</td><td>bütün örnekler</td><td>rastgele tek örnek</td><td>32–512 örnek</td></tr>
+<tr><td>Bir adımın maliyeti</td><td>yüksek</td><td>çok düşük</td><td>orta</td></tr>
+<tr><td>Gradyanın gürültüsü</td><td>yok, kayıp düzgün azalır</td><td>yüksek (bu, yerel minimumlardan kaçmaya da yarar)</td><td>orta</td></tr>
+<tr><td>Nerede kullanılır?</td><td>küçük veri</td><td>akan veri, çevrimiçi öğrenme</td><td>derin öğrenmenin standart yöntemi</td></tr>
 </tbody></table></div>
-<p>SGD ve mini-batch'te her epoch başında veri karıştırılır. Öznitelikler ölçeklenmezse kayıp yüzeyi uzun ince bir vadi olur ve gradyan inişi zikzak çizerek yavaşlar.</p>
+<p>SGD ve mini-batch'te her epoch'tan önce veri karıştırılır. Öznitelikler ölçeklenmemişse kayıp yüzeyi uzun ince bir vadiye dönüşür ve gradyan inişi zikzak çizerek yavaşlar; bu da ölçeklemenin bir başka nedenidir.</p>
 
 <h2>Doğrusal sınıflandırıcı ve karar sınırı</h2>
-<div class="intuition"><div class="intuition-title">💡 Bir doğruyla ayırmak</div><p>İki sınıfın noktaları düzlemde dağılmış olsun. Doğrusal sınıflandırıcı aralarına bir doğru çeker: bir yanı “+”, öbür yanı “−”. Matematikte bu doğru w·x + b = 0'dır; bir nokta için w·x + b'yi hesaplayınca işareti hangi tarafta olduğunu, büyüklüğü (‖w‖'ye bölününce) doğruya ne kadar uzak olduğunu söyler.</p></div><div data-widget="fig" data-fig="neuron" data-caption="Bütün doğrusal modeller aynı iskelettir: girdileri ağırlıklarla çarpıp topla, bias ekle, sonra bir fonksiyondan geçir."></div>
-<p><span class="m">ŷ = sign(wᵀx + b)</span>; sınır <span class="m">wᵀx + b = 0</span> (2B'de doğru, d boyutta hiperdüzlem). w sınıra diktir ve pozitif tarafı gösterir; b sınırı kaydırır. Bir noktanın sınıra uzaklığı <span class="m">|wᵀx + b| / ‖w‖</span>.</p>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Bir doğruyla ayırmak</div><p>İki sınıfın noktaları düzlemde dağılmış olsun. Doğrusal sınıflandırıcı aralarına bir doğru çeker: bir yanı “+”, öbür yanı “−”. Matematikte bu doğru w·x + b = 0'dır; bir nokta için w·x + b'yi hesaplayınca işareti hangi tarafta olduğunu, büyüklüğü (‖w‖'ye bölününce) doğruya ne kadar uzak olduğunu söyler.</p></div>
+<div data-widget="fig" data-fig="neuron" data-caption="Bütün doğrusal modeller aynı iskelettir: girdileri ağırlıklarla çarpıp topla, bias ekle, sonra bir fonksiyondan geçir."></div>
+<p>Doğrusal sınıflandırıcı, skorun işaretine bakar: ŷ = sign(w·x + b). Skorun tam sıfır olduğu noktalar <strong>karar sınırını</strong> oluşturur; iki boyutta bu bir doğru, daha çok boyutta bir düzlemdir (hiperdüzlem). w vektörü sınıra diktir ve pozitif tarafı gösterir; b sınırı kendine paralel kaydırır. Bir noktanın sınıra uzaklığı |w·x + b| / ‖w‖ ile hesaplanır.</p>
+<p>Aşağıdaki oyunda w₁, w₂ ve b'yi kaydırıcılarla değiştirerek bu üç cümleyi kendiniz görebilirsiniz.</p>
 <div data-widget="lineplay"></div>
 <h3>Mantık kapıları ve XOR</h3>
+<p>İkili girdilerle çalışan tek bir nöron, bazı mantık kapılarını bir doğruyla ayırarak hesaplayabilir. AND kapısı için w = (1, 1), b = −1.5 yeter: yalnız iki girdi de 1 olduğunda skor pozitif olur. OR için b = −0.5 yeterlidir; NAND için AND'in bütün işaretleri ters çevrilir. Ama XOR (girdiler farklıysa 1) hiçbir doğruyla ayrılamaz: (0, 1) ile (1, 0) bir tarafta, (0, 0) ile (1, 1) öbür tarafta olmalıdır ve bu iki çift çapraz durduğu için tek bir doğru ikisini birden ayıramaz. Bunun cebirsel kanıtı aşağıdaki problemlerde var; çözümü için gizli katmanlı bir ağ gerekir (8. hafta).</p>
 <div data-widget="gates"></div>
-<p>AND: w = (1, 1), b = −1.5. OR: w = (1, 1), b = −0.5. NAND: AND'in işaretlerini çevir, w = (−1, −1), b = 1.5. <strong>XOR tek bir doğruyla ayrılamaz</strong>: (0,1) ve (1,0) pozitif, (0,0) ve (1,1) negatif; w₁ + b ≥ 0 ile w₂ + b ≥ 0 toplanınca w₁ + w₂ + 2b ≥ 0 çıkar, bu b &lt; 0 ve w₁ + w₂ + b &lt; 0 ile çelişir. Gizli katman gerekir (8. hafta).</p>
 
 <h2>Lojistik regresyon</h2>
-<div class="intuition"><div class="intuition-title">💡 Skordan olasılığa</div><p>Doğrusal skor z = w·x + b −∞ ile +∞ arasında herhangi bir sayı olabilir; oysa “e-posta spam mi?” sorusuna 0 ile 1 arasında bir olasılık istiyoruz. Sigmoid fonksiyonu her sayıyı (0, 1) aralığına sıkıştırır: büyük pozitif skor → 1'e yakın, büyük negatif → 0'a yakın, 0 → tam 0.5.</p><p>Eğitmek için bir kayıp gerekir: <strong>log-loss</strong>, doğru sınıfa verdiğiniz olasılığın negatif logaritmasıdır. Doğruya 0.9 verdiyseniz kayıp küçük (0.105), 0.01 verdiyseniz çok büyük (4.6): emin olup yanılmak ağır cezalandırılır.</p></div><div data-widget="fig" data-fig="sigmoid" data-caption="Sigmoid: z = 0'da 0.5, büyük z'de 1'e, küçük z'de 0'a yaklaşır."></div><div data-widget="fig" data-fig="logloss" data-caption="Log-loss: doğru sınıfa verilen olasılık 0'a yaklaştıkça kayıp sonsuza gider."></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>z = 0 iken p kaç, y = 1 ise kayıp ne?</p><details><summary>Cevabı göster</summary><p>p = σ(0) = <strong>0.5</strong>; kayıp −ln 0.5 = ln 2 = <strong>0.693</strong>. Model kararsız; gradyan adımı p'yi 1'e doğru itecek.</p></details></div>
-<div class="recipe"><div class="recipe-title">📝 Lojistik regresyon adımı: 6 satır</div><ol>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Skordan olasılığa</div><p>Doğrusal skor z = w·x + b −∞ ile +∞ arasında herhangi bir sayı olabilir; oysa “e-posta spam mi?” sorusuna 0 ile 1 arasında bir olasılık istiyoruz. Sigmoid fonksiyonu her sayıyı (0, 1) aralığına sıkıştırır: büyük pozitif skor → 1'e yakın, büyük negatif → 0'a yakın, 0 → tam 0.5.</p><p>Eğitmek için bir kayıp gerekir: <strong>log-loss</strong>, doğru sınıfa verdiğiniz olasılığın negatif logaritmasıdır. Doğruya 0.9 verdiyseniz kayıp küçük (0.105), 0.01 verdiyseniz çok büyük (4.6): emin olup yanılmak ağır cezalandırılır.</p></div>
+<div class="formula">p(y = 1 | x) = σ(wᵀx + b), &nbsp; σ(z) = 1/(1 + e⁻ᶻ)</div>
+<div class="read-formula"><b>Nasıl okunur?</b><ul><li>p(y = 1 | x): “bu özniteliklere (x) sahip örneğin sınıfının 1 olma olasılığı”. wᵀx, w·x ile aynı: iç çarpım.</li><li>Önce doğrusal skor z = w·x + b hesaplanır, sonra σ (sigmoid) onu 0–1 arasına sıkıştırır. e⁻ᶻ değerleri sınavda tabloyla verilir.</li></ul></div>
+<div data-widget="fig" data-fig="sigmoid" data-caption="Sigmoid: z = 0'da 0.5, büyük z'de 1'e, küçük z'de 0'a yaklaşır."></div>
+<p>Sigmoid'in üç özelliği hesaplarda sık kullanılır: σ(0) = 0.5; σ(−z) = 1 − σ(z), yani negatif bir skorun olasılığı simetrik olarak bulunur; türevi σ(z)(1 − σ(z)) en çok 0.25'tir. Model, p ≥ 0.5 olduğunda pozitif der; bu w·x + b ≥ 0 demek olduğu için lojistik regresyonun karar sınırı yine bir doğrudur. Eşik 0.5 yerine başka bir değer seçilirse precision ile recall arasındaki denge değişir. Ağırlıklar şöyle yorumlanır: bir öznitelik bir birim artınca “olasılık oranı” (p/(1 − p)) e^w katına çıkar; bu bir ilişkidir, neden-sonuç değildir.</p>
+<p>Modeli eğitmek için log-loss (çapraz entropi) kaybı kullanılır ve gradyanı çok sade bir biçim alır:</p>
+<div class="formula">L = −(1/n) Σ [ yᵢ log pᵢ + (1 − yᵢ) log(1 − pᵢ) ] &nbsp;&nbsp;&nbsp; ∂L/∂w = (1/n) Σ (pᵢ − yᵢ) xᵢ, &nbsp; ∂L/∂b = (1/n) Σ (pᵢ − yᵢ)</div>
+<div class="read-formula"><b>Nasıl okunur?</b><ul><li>Her örnek için yalnız bir terim çalışır: y = 1 ise −log p, y = 0 ise −log(1 − p). Yani “doğru sınıfa verdiğin olasılığın eksi logaritması”.</li><li>Gradyan (p − y)·x: tahmin hatası (p − y) çarpı girdi. p = 0.8, y = 1 ise hata −0.2: ağırlıklar x yönünde artırılır.</li></ul></div>
+<div data-widget="fig" data-fig="logloss" data-caption="Log-loss: doğru sınıfa verilen olasılık 0'a yaklaştıkça kayıp sonsuza gider."></div>
+<p>Neden kare hata değil de log-loss? İki nedeni var. Sigmoid'le birlikte kare hata dışbükey olmaz, yani gradyan inişi kötü bir yerde takılabilir; log-loss ise dışbükeydir. Ayrıca kare hata emin olup yanılmayı yeterince cezalandırmaz: model 0.88 dediğinde gerçek sınıf 0 ise kare hata yalnız 0.77, log-loss ise 2.12'dir. Lojistik regresyonun kapalı bir çözümü yoktur; gradyan inişiyle eğitilir.</p>
+<div data-widget="sigplay"></div>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Lojistik regresyon adımı: 6 satır</div><ol>
 <li>z = w·x + b</li>
 <li>p = σ(z) = 1/(1 + e⁻ᶻ) (tablodan; σ(0) = 0.5, σ(−z) = 1 − σ(z))</li>
 <li>kayıp = −[y ln p + (1 − y) ln(1 − p)]</li>
@@ -78,69 +90,51 @@
 <li>w ← w − η·(p − y)·x, b ← b − η·(p − y)  (<strong>eksi</strong>!)</li>
 <li>yeni z ve p; kayıp düştü mü? (düşmediyse η çok büyük ya da işaret hatası)</li>
 </ol></div>
-
-<div class="formula">p(y = 1 | x) = σ(wᵀx + b), &nbsp; σ(z) = 1/(1 + e⁻ᶻ)</div>
-<div class="read-formula"><b>Nasıl okunur?</b><ul><li>p(y = 1 | x): “bu özniteliklere (x) sahip örneğin sınıfının 1 olma olasılığı”. wᵀx, w·x ile aynı: iç çarpım.</li><li>Önce doğrusal skor z = w·x + b hesaplanır, sonra σ (sigmoid) onu 0–1 arasına sıkıştırır. e⁻ᶻ değerleri sınavda tabloyla verilir.</li></ul></div>
-<ul>
-<li>σ(0) = 0.5, σ(−z) = 1 − σ(z), <strong>σ′(z) = σ(z)(1 − σ(z)) ≤ 0.25</strong>.</li>
-<li>Karar p ≥ 0.5 ⇔ wᵀx + b ≥ 0: <strong>sınır yine doğrusal</strong>. Eşiği değiştirmek precision/recall dengesini değiştirir.</li>
-<li>log-odds: log(p/(1 − p)) = wᵀx + b. w_j = 0.7: x_j bir birim artınca odds e⁰·⁷ ≈ 2 katına çıkar (nedensellik değil, ilişki).</li>
-</ul>
-<div class="formula">L = −(1/n) Σ [ yᵢ log pᵢ + (1 − yᵢ) log(1 − pᵢ) ] &nbsp;&nbsp;&nbsp; ∂L/∂w = (1/n) Σ (pᵢ − yᵢ) xᵢ, &nbsp; ∂L/∂b = (1/n) Σ (pᵢ − yᵢ)</div>
-<div class="read-formula"><b>Nasıl okunur?</b><ul><li>Her örnek için yalnız bir terim çalışır: y = 1 ise −log p, y = 0 ise −log(1 − p). Yani “doğru sınıfa verdiğin olasılığın eksi logaritması”.</li><li>Gradyan (p − y)·x: tahmin hatası (p − y) çarpı girdi. p = 0.8, y = 1 ise hata −0.2: ağırlıklar x yönünde artırılır.</li></ul></div>
-<p><strong>Log-loss</strong> Bernoulli olabilirliğinin negatif logaritmasıdır. y = 1 iken kayıp −ln p: p → 0 iken sonsuza gider, “emin olup yanılmanın” bedeli sınırsızdır. Neden MSE değil? σ ile MSE dışbükey değildir ve emin yanlışları çok az cezalandırır (p = 0.88 iken y = 0: log-loss 2.12, kare hata 0.77). Kapalı çözüm yok: gradyan inişi ya da Newton (IRLS).</p>
-<div data-widget="sigplay"></div>
 <div data-widget="logstep"></div>
-<p>Varsayılan değerler sınav kalıbıdır: x = (1, 2), y = 1, w = 0, b = 0, η = 0.4 → p = 0.5, kayıp ln 2 = 0.693; gradyan (−0.5, −1), b için −0.5; yeni w = (0.2, 0.4), b = 0.2; yeni z = 1.2, p = σ(1.2) = 0.769, kayıp 0.263. <strong>Gradyan adımı kaybı düşürmeli</strong>; düşürmüyorsa η çok büyük. İşaret hatasına dikkat: w ← w <em>−</em> η·(p − y)x.</p>
-<div class="callout"><div class="callout-title">Aynı kalıp: hata × girdi</div>
+<p>Yukarıdaki araçtaki varsayılan değerler sınavda çıkan kalıptır: x = (1, 2), y = 1, w = 0, b = 0, η = 0.4. Başta z = 0 ve p = 0.5 olduğu için kayıp ln 2 = 0.693'tür. Gradyan (p − y)·x = (−0.5, −1) çıkar; bunun tersi yönünde adım atınca w = (0.2, 0.4), b = 0.2 olur. Yeni skor 1.2, yeni olasılık 0.769, yeni kayıp 0.263'tür: adım kaybı düşürdü. Adım kaybı düşürmüyorsa ya öğrenme oranı çok büyüktür ya da işaret yanlış alınmıştır.</p>
+<div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>z = 0 iken p kaç, y = 1 ise kayıp ne?</p><details><summary>Cevabı göster</summary><p>p = σ(0) = <strong>0.5</strong>; kayıp −ln 0.5 = ln 2 = <strong>0.693</strong>. Model kararsız; gradyan adımı p'yi 1'e doğru itecek.</p></details></div>
+<div class="callout"><div class="callout-title">Üç modelin ortak kalıbı: hata çarpı girdi</div>
+<p>Doğrusal regresyon, lojistik regresyon ve perceptron'un güncelleme kuralları aynı biçimdedir: (tahmin − gerçek) × girdi. Değişen yalnız tahminin nasıl üretildiğidir.</p>
 <div class="table-wrap"><table class="simple compact">
 <thead><tr><th></th><th>Doğrusal regresyon</th><th>Lojistik regresyon</th><th>Perceptron</th></tr></thead>
 <tbody>
-<tr><td>Çıktı</td><td>wᵀx + b</td><td>σ(wᵀx + b)</td><td>sign(wᵀx + b)</td></tr>
-<tr><td>Kayıp</td><td>MSE</td><td>log-loss</td><td>yanlışlarda −y(wᵀx + b)</td></tr>
-<tr><td>Gradyan / güncelleme</td><td>(ŷ − y)x</td><td>(p − y)x</td><td>hatada w += ηyx</td></tr>
-<tr><td>Kapalı çözüm</td><td>evet</td><td>hayır</td><td>hayır</td></tr>
+<tr><td>Çıktı</td><td>w·x + b (bir sayı)</td><td>σ(w·x + b) (olasılık)</td><td>sign(w·x + b) (±1)</td></tr>
+<tr><td>Kayıp</td><td>MSE</td><td>log-loss</td><td>yalnız yanlış örneklerde</td></tr>
+<tr><td>Güncelleme</td><td>(ŷ − y)·x</td><td>(p − y)·x</td><td>yanlışsa w += η·y·x</td></tr>
+<tr><td>Kapalı çözüm</td><td>var</td><td>yok</td><td>yok</td></tr>
 <tr><td>Olasılık verir mi?</td><td>hayır</td><td>evet</td><td>hayır</td></tr>
 </tbody></table></div></div>
 
 <h2>Perceptron</h2>
-<div class="intuition"><div class="intuition-title">💡 Hatadan öğrenen doğru</div><p>Perceptron en basit öğrenme kuralıdır: örnekleri tek tek dolaş; doğru sınıflıyorsan hiçbir şey yapma; yanlış sınıflıyorsan doğruyu o örneğin doğru tarafa geçeceği yöne biraz çevir. “Biraz çevirmek” = ağırlıklara η·y·x eklemek: pozitif örnek kaçırıldıysa ağırlıklar örneğe doğru, negatif örneğe yanlışlıkla + dendiyse örnekten uzağa itilir.</p></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>w = (0, 0), b = 0, η = 1. Örnek x = (2, 1), y = −1. Ne olur?</p><details><summary>Cevabı göster</summary><p>z = 0 ≥ 0 → ŷ = +1, ama y = −1: <strong>yanlış</strong>. w ← (0, 0) + 1·(−1)·(2, 1) = <strong>(−2, −1)</strong>, b ← 0 − 1 = <strong>−1</strong>. Şimdi z = −4 − 1 − 1 = −6 → −1: düzeldi.</p></details></div>
-<div class="recipe"><div class="recipe-title">📝 Perceptron epoch'u sınavda nasıl yazılır?</div><ol>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Hatadan öğrenen doğru</div><p>Perceptron en basit öğrenme kuralıdır: örnekleri tek tek dolaş; doğru sınıflıyorsan hiçbir şey yapma; yanlış sınıflıyorsan doğruyu o örneğin doğru tarafa geçeceği yöne biraz çevir. “Biraz çevirmek” = ağırlıklara η·y·x eklemek: pozitif örnek kaçırıldıysa ağırlıklar örneğe doğru, negatif örneğe yanlışlıkla + dendiyse örnekten uzağa itilir.</p></div>
+<p>Algoritmanın kuralı kısa ve ezberlenmesi gereken bir kuraldır. Ağırlıklar verilen başlangıç değerleriyle (çoğu zaman sıfırla) başlar. Örnekler sırayla işlenir; her örnek için z = w·x + b hesaplanır ve <strong>z ≥ 0 ise tahmin +1</strong>, değilse −1 olur (sıfırın +1 sayıldığına dikkat edin). Tahmin doğruysa hiçbir şey değişmez. Yanlışsa ağırlıklar w ← w + η·y·x, kesişim b ← b + η·y olarak güncellenir. Verinin üzerinden bir kez geçmeye bir <strong>epoch</strong> denir; bir epoch hiç hata yapmadan tamamlanınca algoritma durur.</p>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Perceptron epoch'u sınavda nasıl yazılır?</div><ol>
 <li>Tablo başlığı: # · x · y · z = w·x + b · ŷ · hata? · yeni w · yeni b.</li>
 <li>Her satırda z'yi <strong>sayılarla</strong> yazın (ör. −0.5·2 + 0.5·3 − 0.7 = −0.2).</li>
 <li>ŷ = +1 eğer z ≥ 0 (sıfır dahil!), değilse −1.</li>
 <li>ŷ = y ise “hayır”, ağırlıkları aynen aşağı taşıyın. ŷ ≠ y ise w ← w + η·y·x, b ← b + η·y.</li>
 <li>Epoch sonunda son ağırlıklarla <em>bütün</em> örnekleri yeniden sınıflayıp karmaşıklık matrisi isteniyorsa onu kurun (epoch sırasındaki tahminler değil!).</li>
 </ol><p class="small">η genelde 0.4 gibi seçilir ki sayılar 0.1'in katlarında kalsın; ondalıkları dikkatle taşıyın.</p></div>
-
-<ol>
-<li>w, b verilen değerlerle (ya da 0) başlar; η öğrenme oranı.</li>
-<li>Her (xᵢ, yᵢ) için sırayla: z = wᵀxᵢ + b; <strong>z ≥ 0 ise ŷ = +1</strong>, değilse −1.</li>
-<li>Yanlışsa: <strong>w ← w + η·y·xᵢ, b ← b + η·y</strong>. Doğruysa hiçbir şey.</li>
-<li>Verinin üzerinden bir geçiş = 1 epoch. Hata kalmayınca dur.</li>
-</ol>
+<p>Aşağıdaki araçta bu süreci adım adım izleyebilirsiniz. Varsayılan veri derste çözülen örnektir: w = (−0.5, 0.5), b = −0.7, η = 0.4. İlk epoch'ta 1., 2. ve 4. örneklerde güncelleme olur ve epoch sonunda w = (−0.1, 0.5), b = −1.1 bulunur. Bu ağırlıklarla 3. örnek hâlâ yanlış sınıflanıyor; tek epoch yetmiyor.</p>
 <div data-widget="perceptron"></div>
-<p>Varsayılan veri derste çözülen örnektir: w = (−0.5, 0.5), b = −0.7, η = 0.4. 1. epoch'ta 1., 2. ve 4. örneklerde güncelleme olur; sonunda w = (−0.1, 0.5), b = −1.1; son ağırlıklarla 3. örnek hâlâ yanlış (TP 3, FN 1, FP 0, TN 3; accuracy 0.857). Epoch sayısını artırıp yakınsamasını izleyin.</p>
-<div class="callout"><div class="callout-title">Yakınsama teoremi ve sıra etkisi</div><p>Veri doğrusal ayrılabiliyorsa perceptron sonlu sayıda güncellemede ayıran bir sınır bulur; ayrılamıyorsa döngü hiç bitmez (epoch sınırı koyun). Bulduğu sınır ayıranlardan <em>biridir</em>, en iyisi değil (SVM, 7. hafta). Aynı veri farklı sırayla verilirse farklı sonuca gider: her epoch başında karıştırın.</p></div>
-<div class="callout exam"><div class="callout-title">İkinci tip: bias ağırlık vektörünün içinde</div><p>Bazı sorularda x₀ = 1 eklenir ve w = (w₀, w₁, …) tek vektördür; güncelleme <span class="m">wⱼ ← wⱼ + η(y − ŷ)xⱼ</span> biçimindedir. Hatada y − ŷ = ±2 olduğundan bu, bizim kuralda 2η'ya denktir (η = 0.1 ↔ 0.2). Aracı bu tip için kullanmak isterseniz η'yı iki katı girin; b, w₀'dır. z = 0 iken ŷ = +1 kuralını unutmayın: çoğu zaman sonucu o belirler.</p></div>
+<div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>w = (0, 0), b = 0, η = 1. Örnek x = (2, 1), y = −1. Ne olur?</p><details><summary>Cevabı göster</summary><p>z = 0 ≥ 0 → ŷ = +1, ama y = −1: <strong>yanlış</strong>. w ← (0, 0) + 1·(−1)·(2, 1) = <strong>(−2, −1)</strong>, b ← 0 − 1 = <strong>−1</strong>. Şimdi z = −4 − 1 − 1 = −6 → −1: düzeldi.</p></details></div>
+<div class="callout"><div class="callout-title">Yakınsama ve örneklerin sırası</div><p>Veri bir doğruyla ayrılabiliyorsa perceptron sonlu sayıda güncellemeden sonra mutlaka hatasız bir epoch yapar (yakınsama teoremi). Ayrılamıyorsa hiç durmaz, bu yüzden bir epoch sınırı konur. Bulduğu sınır, ayıran sınırlardan herhangi biridir, en iyisi değildir; en geniş aralıklı sınırı SVM bulur (7. hafta). Aynı veri farklı sırayla verilirse farklı bir sınır bulunabilir; bu yüzden pratikte her epoch'tan önce örnekler karıştırılır.</p></div>
+<div class="callout exam"><div class="callout-title">İkinci soru tipi: kesişim ağırlık vektörünün içinde</div><p>Bazı sorularda girdinin başına sabit x₀ = 1 eklenir ve kesişim ağırlık vektörünün ilk elemanı (w₀) olarak yazılır. Güncelleme kuralı da wⱼ ← wⱼ + η(y − ŷ)xⱼ biçiminde verilir. Yanlış tahminde y − ŷ değeri ±2 olduğu için bu kural, bizim kuralımızda öğrenme oranını iki katına çıkarmakla aynı şeydir (η = 0.1 yazıyorsa bizim kuralla 0.2). Bu tip soruda da z = 0 iken tahminin +1 olduğunu unutmayın; çoğu zaman sonucu bu belirler.</p></div>
 
 <h2>Çok sınıflı sınıflandırma</h2>
-<div class="two-col">
-<div class="card"><h3>One-vs-rest (OvR)</h3><p>K sınıf için K ikili model (“k mı, değil mi?”); tahmin en yüksek skor. Basit, paralel eğitilir; ama skorlar birbiriyle tam karşılaştırılabilir olmayabilir ve her ikili eğitim kümesi dengesizdir. (One-vs-one: her sınıf çifti için bir model, K(K−1)/2 model, oylama.)</p></div>
-<div class="card"><h3>Softmax (çok terimli LR)</h3><p>Sınıf başına bir w_k, tek model; olasılıkların toplamı 1; kayıp çapraz entropi −log p_y. Sinir ağının standart çıktı katmanı. K = 2 iken sigmoide indirgenir.</p></div>
-</div>
+<p>Lojistik regresyon ve perceptron iki sınıf için tasarlanmıştır. Üç ya da daha çok sınıf varsa iki yaklaşım kullanılır.</p>
+<p><strong>Birine karşı geri kalanlar (one-vs-rest)</strong> yaklaşımında her sınıf için ayrı bir ikili model eğitilir (“bu örnek A mı, değil mi?”) ve tahmin olarak en yüksek skoru veren modelin sınıfı seçilir. Basittir ve modeller paralel eğitilebilir; ama farklı modellerin skorları birbiriyle tam karşılaştırılabilir değildir ve her ikili problem dengesizdir (bir sınıfa karşı geri kalan bütün sınıflar). Her sınıf çifti için ayrı model eğitilip oylama yapılan <strong>bire karşı bir</strong> (one-vs-one) yaklaşımı da vardır.</p>
+<p><strong>Softmax</strong> (çok terimli lojistik regresyon) ise tek bir modeldir: her sınıf için bir ağırlık vektörü vardır ve bütün sınıfların skorları toplamı 1 olan olasılıklara çevrilir:</p>
 <div class="formula">p(y = k | x) = exp(w_kᵀx) / Σⱼ exp(wⱼᵀx)</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>Her sınıfın skoru zₖ = wₖ·x hesaplanır; e^{zₖ} hepsini pozitif yapar; toplama bölmek toplamı 1 yapar.</li><li>En büyük skorlu sınıf en büyük olasılığı alır. Kayıp: doğru sınıfın olasılığının −ln'i.</li></ul></div>
+<p>Kayıp olarak doğru sınıfın olasılığının eksi logaritması (çapraz entropi) kullanılır. Sinir ağlarının çok sınıflı çıktı katmanı tam olarak budur. İki sınıf olduğunda softmax sigmoid'e indirgenir.</p>
 <div data-widget="softmax"></div>
 
 <h2>Düzenlileştirme: ridge ve lasso</h2>
-<div class="intuition"><div class="intuition-title">💡 Büyük ağırlık neden kötü?</div><p>Çok büyük ağırlıklar, girdideki küçük bir değişimin tahmini çok oynatması demektir: model gürültüye aşırı duyarlıdır. Ridge ağırlıkların karelerini, lasso mutlak değerlerini cezalandırır. Lasso'nun farkı: önemsiz özniteliklerin ağırlığını tam sıfıra indirip onları modelden atabilir.</p></div>
-<ul>
-<li><strong>Ridge</strong>: L(w) + λ‖w‖²; kapalı çözüm (XᵀX + λI)⁻¹Xᵀy (tersi alınamama sorununu da çözer). Katsayıları küçültür, sıfıra indirmez.</li>
-<li><strong>Lasso</strong>: L(w) + λ‖w‖₁; bazı katsayıları <strong>tam 0</strong> yapar (L1 topunun köşeleri) → öznitelik seçimi, seyrek ve yorumlanabilir model. Kapalı çözümü yok.</li>
-<li>Elastic net: ikisinin karışımı. Aynı cezalar lojistik regresyonda da var; scikit-learn'de <strong>C = 1/λ</strong>: büyük C daha <em>az</em> düzenlileştirme.</li>
-<li>Öznitelikleri <strong>ölçekleyin</strong>: ceza her katsayıya aynı uygulanır, ama katsayının büyüklüğü özniteliğin birimine bağlıdır (TL cinsinden gelirin katsayısı küçüktür).</li>
-</ul>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Büyük ağırlık neden kötü?</div><p>Çok büyük ağırlıklar, girdideki küçük bir değişimin tahmini çok oynatması demektir: model gürültüye aşırı duyarlıdır. Ridge ağırlıkların karelerini, lasso mutlak değerlerini cezalandırır. Lasso'nun farkı: önemsiz özniteliklerin ağırlığını tam sıfıra indirip onları modelden atabilir.</p></div>
+<p><strong>Ridge</strong> düzenlileştirmesi kayba ağırlıkların karelerinin toplamını ekler (λ‖w‖²). Ağırlıkları küçültür ama sıfıra indirmez. Kapalı bir çözümü vardır, (XᵀX + λI)⁻¹Xᵀy, ve XᵀX'in tersinin alınamadığı durumları da çözer.</p>
+<p><strong>Lasso</strong> ise ağırlıkların mutlak değerlerinin toplamını ekler (λΣ|wⱼ|). Önemli farkı, bazı ağırlıkları <strong>tam olarak sıfır</strong> yapmasıdır; böylece gereksiz öznitelikleri modelden atar (öznitelik seçimi yapar) ve modeli yorumlamayı kolaylaştırır. Kapalı bir çözümü yoktur. İkisinin karışımına elastic net denir.</p>
+<p>İki pratik not: Aynı cezalar lojistik regresyonda da kullanılır ve scikit-learn'de ceza gücü <strong>C = 1/λ</strong> ile verilir, yani büyük C daha az düzenlileştirme demektir. Cezadan önce öznitelikler mutlaka ölçeklenmelidir, çünkü ceza her ağırlığa aynı biçimde uygulanır ama bir ağırlığın büyüklüğü özniteliğin birimine bağlıdır (TL cinsinden gelirin ağırlığı doğal olarak çok küçüktür).</p>
 
 <h2>Sınav tipi çözümlü problemler</h2>
 <p>Aşağıdaki problemler sınavdaki biçimdedir. Her birini önce kâğıtta çözmeye çalış (5–10 dakika), sonra “çözümü aç”a bas: çözümde her adımın <em>neden</em> öyle yapıldığı da yazıyor. Takılırsan sayfanın ilgili bölümüne dön.</p>

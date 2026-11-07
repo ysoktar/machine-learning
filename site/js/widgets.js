@@ -28,7 +28,7 @@ export function mountAll(root) {
       if (g && bodyEl && el.dataset.guide !== "off") {
         const inSolution = !!el.closest("details.solution");
         bodyEl.prepend(h("details", { class: "guide", open: !inSolution },
-          h("summary", {}, "🧭 Bu araç ne gösteriyor, nasıl kullanılır?"),
+          h("summary", {}, h("span", { class: "ic ic-guide", "aria-hidden": "true" }), "Bu araç ne gösteriyor, nasıl kullanılır?"),
           h("p", {}, g.what),
           g.tryit?.length ? [h("p", {}, h("b", {}, "Şunu dene:")), h("ol", {}, g.tryit.map((t) => h("li", {}, t)))] : null,
           g.see ? h("p", { class: "see" }, h("b", {}, "Ne görmelisin? "), g.see) : null));

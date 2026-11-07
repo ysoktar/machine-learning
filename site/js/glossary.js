@@ -7,23 +7,40 @@ const SKIP = "h1, h2, h3, h4, a, code, pre, button, summary, textarea, input, se
 // a term may take Turkish suffixes (entropisi, marjı, kNN'de…) but must start at a word boundary
 const L = "\\p{L}\\p{N}";
 
-export function annotateTerms(root, used = new Set()) {
+/**
+ * Underline glossary terms. A term is underlined at its first use in every section (h2) of the page, so a reader who
+ * jumps into the middle of a page still gets help. Terms taught in an earlier week are assumed known: on a later
+ * page they are underlined only once.
+ */
+export function annotateTerms(root, pageWeek = 0) {
   const terms = [...TERMS].sort((a, b) => b.match.length - a.match.length);
   const src = terms.map((t, i) => `(?<g${i}>(?:${t.match})[${L}'’]*)`).join("|");
   const re = new RegExp(`(?<![${L}])(?:${src})`, "giu");
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-    acceptNode: (n) => (n.nodeValue.trim() && !n.parentElement.closest(SKIP) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
+  const known = (t) => pageWeek > 0 && t.week > 0 && t.week < pageWeek;
+  const perPage = new Set();
+  let perSection = new Set();
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => {
+      if (n.nodeType === 1) {
+        if (n.tagName === "H2") return NodeFilter.FILTER_ACCEPT;
+        return n.matches(SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP;
+      }
+      return n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    },
   });
-  const nodes = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode);
-  for (const node of nodes) {
+  const items = [];
+  while (walker.nextNode()) items.push(walker.currentNode);
+  for (const node of items) {
+    if (node.nodeType === 1) { perSection = new Set(); continue; }
+    if (node.parentElement.closest("h1, h2, h3, h4")) continue;
     const text = node.nodeValue, parts = [];
     let last = 0;
     for (const m of text.matchAll(re)) {
       const key = Object.keys(m.groups).find((g) => m.groups[g] !== undefined);
       const t = terms[Number(key.slice(1))];
-      if (used.has(t.id)) continue;
-      used.add(t.id);
+      const seen = known(t) ? perPage : perSection;
+      if (seen.has(t.id)) continue;
+      seen.add(t.id);
       const span = document.createElement("span");
       span.className = "term";
       span.tabIndex = 0;
@@ -36,7 +53,6 @@ export function annotateTerms(root, used = new Set()) {
     }
     if (parts.length) node.replaceWith(...parts, text.slice(last));
   }
-  return used;
 }
 
 /** One shared popover: hover or focus shows it, tap toggles it, Escape closes it. */

@@ -16,7 +16,7 @@
 <h1>Yapay sinir ağları</h1>
 <p class="lead">Algılayıcıdan çok katmanlı ağa (MLP): XOR, etkinleştirme işlevleri, sign/step nöronlarıyla Boole ifadesi ve bölge tasarımı, ileri yayılım, geri yayılım (elle gradyan), SGD/momentum/Adam, evrensel yaklaşım. <strong>Ara sınavda yok</strong> (8. haftanın iki dersi sınavdan önce ama kapsam 1–7); finalin ağırlıklı konularından.</p>
 <!-- enriched -->
-<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
 <tr><td>Boole ifadesi için MLP</td><td>4–8 girdili ifade, step etkinleştirme: mimariyi çiz, bütün ağırlık ve eşikleri yaz</td><td>her terim/parantez için doğru nöron + çıktıda AND/OR eşiği</td></tr>
 <tr><td>Bölge için MLP</td><td>düzlemde bölgeler/noktalar; sign gizli, step çıktı</td><td>her kenar için doğru yönlü sign nöronu + çıktı eşiği k − 0.5</td></tr>
@@ -28,7 +28,7 @@
 
 
 <h2>Algılayıcıdan MLP'ye</h2>
-<div class="intuition"><div class="intuition-title">💡 Neden katman?</div><p>Tek bir nöron yalnız bir doğru çizebilir; XOR gibi problemlerde bu yetmez. Birkaç nöronu yan yana koyarsak her biri ayrı bir doğru çizer (“en az biri 1 mi?”, “ikisi de 1 mi?”); bir sonraki nöron bu cevapları birleştirir. Gizli katman, problemi çözülebilir yeni özniteliklere çevirir; ağ bu öznitelikleri kendisi öğrenir.</p></div><div data-widget="fig" data-fig="mlp" data-caption="2-2-1 ağı: iki girdi, iki gizli nöron, bir çıktı. Her ok bir ağırlık."></div>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden katman?</div><p>Tek bir nöron yalnız bir doğru çizebilir; XOR gibi problemlerde bu yetmez. Birkaç nöronu yan yana koyarsak her biri ayrı bir doğru çizer (“en az biri 1 mi?”, “ikisi de 1 mi?”); bir sonraki nöron bu cevapları birleştirir. Gizli katman, problemi çözülebilir yeni özniteliklere çevirir; ağ bu öznitelikleri kendisi öğrenir.</p></div><div data-widget="fig" data-fig="mlp" data-caption="2-2-1 ağı: iki girdi, iki gizli nöron, bir çıktı. Her ok bir ağırlık."></div>
 <p>Tek nöron = doğrusal model + doğrusal olmayan etkinleştirme: <span class="m">ŷ = g(w·x + b)</span>. Nöronları katmanlara dizip bağlayınca <strong>çok katmanlı algılayıcı</strong>: <span class="m">h = g(Wx + b), ŷ = σ(v·h + c)</span>. Gizli katman girdiyi yeni bir öznitelik uzayına taşır; elle öznitelik mühendisliği yerine bu dönüşüm veriden öğrenilir. Tam bağlı (dense) katmanda her nöron önceki katmanın bütün çıktılarına bağlıdır.</p>
 <h3>XOR: iki gizli nöronla</h3>
 <div class="table-wrap"><table class="simple compact center">
@@ -37,7 +37,7 @@
 <p>Gizli katman (0,1) ve (1,0)'ı (h₁, h₂) = (1, 0)'a taşır; orada tek doğruyla ayrılır. step(z) = 1 ⇔ z &gt; 0.</p>
 
 <h2>Etkinleştirme işlevleri</h2>
-<div class="intuition"><div class="intuition-title">💡 Neden doğrusal olmayan bir fonksiyon?</div><p>Gizli nöronlar yalnız toplama-çarpma yapsaydı, iki doğrusal katman üst üste yine tek bir doğrusal fonksiyon olurdu: ne kadar katman eklerseniz ekleyin XOR'u çözemezdiniz. Etkinleştirme fonksiyonu (ReLU, tanh, sigmoid) her katmana “bükülme” katar.</p></div>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden doğrusal olmayan bir fonksiyon?</div><p>Gizli nöronlar yalnız toplama-çarpma yapsaydı, iki doğrusal katman üst üste yine tek bir doğrusal fonksiyon olurdu: ne kadar katman eklerseniz ekleyin XOR'u çözemezdiniz. Etkinleştirme fonksiyonu (ReLU, tanh, sigmoid) her katmana “bükülme” katar.</p></div>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>İşlev</th><th>g(z)</th><th>g′(z)</th><th>Aralık</th><th>Nerede</th><th>Sorun</th></tr></thead>
 <tbody>
@@ -95,7 +95,7 @@ Aracı bu ifadelerle ve geçmiş final listesindekilerle deneyin: <code>(x1 ∧ 
 <p>Birden çok bölgenin birleşimi (“1 ya da 4. bölge”): her bölge için bir VE nöronu (ikinci gizli katman) ve çıktıda VEYA; ya da bölgeler doğruların işaret örüntüsüyle tanımlanıyorsa her örüntü için bir “tam örüntü” nöronu. Step gizli birimlerle (0/1) aynı tasarımda eşikler değişir: k koşul için step(Σh − k + 0.5).</p>
 
 <h2>İleri yayılım ve geri yayılım</h2>
-<div class="intuition"><div class="intuition-title">💡 Suçu paylaştırmak</div><p>Ağ yanlış bir tahmin yaptı; hangi ağırlık ne kadar suçlu? Geri yayılım hatayı çıktıdan başlayıp geriye doğru dağıtır: çıktı nöronunun hatası, ona bağlanan her gizli nörona “ağırlığı kadar” pay edilir; gizli nöron o sırada etkin değilse (ReLU'da z ≤ 0) hiç pay almaz. Her ağırlık kendi payı × kendi girdisi kadar düzeltilir.</p></div>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Suçu paylaştırmak</div><p>Ağ yanlış bir tahmin yaptı; hangi ağırlık ne kadar suçlu? Geri yayılım hatayı çıktıdan başlayıp geriye doğru dağıtır: çıktı nöronunun hatası, ona bağlanan her gizli nörona “ağırlığı kadar” pay edilir; gizli nöron o sırada etkin değilse (ReLU'da z ≤ 0) hiç pay almaz. Her ağırlık kendi payı × kendi girdisi kadar düzeltilir.</p></div>
 <p>2-2-1 ağı: gizli <span class="m">zⱼ = wⱼ₁x₁ + wⱼ₂x₂ + bⱼ, hⱼ = g(zⱼ)</span>; çıktı <span class="m">u = v₁h₁ + v₂h₂ + c, ŷ = σ(u)</span>; kayıp BCE. Geri yayılım zincir kuralını çıktıdan girdiye doğru, ara sonuçları yeniden kullanarak uygular (delta kuralı):</p>
 <div class="formula left">δ_out = ŷ − y &nbsp;·&nbsp; ∂L/∂vⱼ = δ_out·hⱼ &nbsp;·&nbsp; δⱼ = δ_out·vⱼ·g′(zⱼ) &nbsp;·&nbsp; ∂L/∂wⱼᵢ = δⱼ·xᵢ &nbsp;·&nbsp; θ ← θ − η·∂L/∂θ</div>
 <div data-widget="mlp"></div>

@@ -220,15 +220,15 @@ export function perceptron(ds) {
   playBtn.addEventListener("click", () => {
     if (timer) { stop(); return; }
     if (t >= steps.length - 1) t = 0;
-    playBtn.textContent = "❚❚ Durdur";
+    playBtn.textContent = "■ Durdur";
     timer = setInterval(() => { if (t >= steps.length - 1) stop(); else go(1); }, 1100);
   });
   const bar = h("div", { class: "stepbar" },
-    h("button", { type: "button", class: "btn small", onclick: () => { stop(); t = 0; show(); } }, "⏮ Baştan"),
+    h("button", { type: "button", class: "btn small", onclick: () => { stop(); t = 0; show(); } }, "|◀ Baştan"),
     h("button", { type: "button", class: "btn small", onclick: () => { stop(); go(-1); } }, "◀ Geri"),
     h("button", { type: "button", class: "btn small primary", onclick: () => { stop(); go(1); } }, "İleri ▶"),
     playBtn,
-    h("button", { type: "button", class: "btn small", onclick: () => { stop(); t = steps.length - 1; show(); } }, "Sona ⏭"), count);
+    h("button", { type: "button", class: "btn small", onclick: () => { stop(); t = steps.length - 1; show(); } }, "Sona ▶|"), count);
   for (const i of [wIn, bIn, eIn, epIn]) i.addEventListener("input", () => { t = 0; recompute(); });
   body.append(h("div", { class: "controls" }, h("label", {}, "w ", wIn), h("label", {}, "b ", bIn), h("label", {}, "η ", eIn), h("label", {}, "en çok epoch ", epIn), two ? mode.el : null),
     bar, narr, two ? h("div", { class: "two-col" }, ed.el, out) : out, data.el);
@@ -462,10 +462,10 @@ export function adaboost(ds) {
   }
   const go = (d) => { t = Math.max(0, Math.min(rounds.length + 1, t + d)); show(); };
   body.append(h("div", { class: "stepbar" },
-    h("button", { type: "button", class: "btn small", onclick: () => { t = 0; show(); } }, "⏮ Baştan"),
+    h("button", { type: "button", class: "btn small", onclick: () => { t = 0; show(); } }, "|◀ Baştan"),
     h("button", { type: "button", class: "btn small", onclick: () => go(-1) }, "◀ Geri"),
     h("button", { type: "button", class: "btn small primary", onclick: () => go(1) }, "Sonraki tur ▶"),
-    h("button", { type: "button", class: "btn small", onclick: () => { t = rounds.length + 1; show(); } }, "Son oylama ⏭"), count, mode.el),
+    h("button", { type: "button", class: "btn small", onclick: () => { t = rounds.length + 1; show(); } }, "Son oylama ▶|"), count, mode.el),
     narr, h("div", { class: "two-col" }, ed.el, out), data.el);
   recompute();
   return el;

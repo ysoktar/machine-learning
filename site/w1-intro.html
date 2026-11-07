@@ -17,7 +17,7 @@
 <h1>Giriş ve temel kavramlar</h1>
 <p class="lead">Makine öğrenmesi nedir, klasik programlamadan farkı ne, hangi türleri var ve “öğrenmek” neden aslında bir hipotez uzayında arama yapmaktır? Bu haftanın asıl mesajı: <strong>amaç eğitim verisini ezberlemek değil, görülmemiş veride iyi olmak (genelleme)</strong>.</p>
 <!-- enriched -->
-<div class="callout exam"><div class="callout-title">🎯 Sınavda bu haftadan ne çıkar?</div>
+<div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
 <p class="small"><b>Bu tablo nasıl kullanılır?</b> Sayfayı okumadan önce göz gezdir: neye odaklanacağını söyler. Terimleri henüz bilmiyorsan sorun değil; sayfanın sonunda geri dön ve her satırı kendin yapabiliyor musun diye kontrol et.</p>
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
 <tr><td>T, E, P ve öğrenme türü</td><td>“Spam filtresi / film önerisi / satranç programı için görev, deneyim, başarım ölçüsü ve öğrenme türünü yazın.”</td><td>üçünü de somut yazmak (P ölçülebilir olmalı) + türü doğru adlandırmak</td></tr>
@@ -30,48 +30,39 @@
 
 
 <h2>Tanım: T, E, P</h2>
-<div class="intuition"><div class="intuition-title">💡 Önce bir benzetme</div><p>Bir çocuğa kedi ile köpeği ayırt etmeyi öğretirken ona “kulakları sivri, bıyıkları uzunsa kedidir” gibi kurallar yazmazsınız; yüzlerce resim gösterip “bu kedi, bu köpek” dersiniz. Çocuk kuralı kendisi çıkarır ve <em>daha önce hiç görmediği</em> bir kediyi de tanır. Makine öğrenmesi tam olarak budur: <strong>kuralı programcı yazmaz, örneklerden (veriden) bilgisayar çıkarır</strong>.</p><p>“Öğreniyor” demek için üç şeyi belirtmek gerekir: ne yapıyor (görev, T), neyden öğreniyor (deneyim, E) ve iyi yaptığını nasıl ölçüyoruz (başarım, P). Deneyim arttıkça ölçülen başarım artıyorsa sistem öğreniyordur.</p></div>
-<p>Mitchell'in (1997) tanımı sınavda doğrudan kullanılır: bir program, <strong>T</strong> görevindeki <strong>P</strong> ile ölçülen başarımı <strong>E</strong> deneyimiyle artıyorsa öğreniyordur.</p>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Önce bir benzetme</div><p>Bir çocuğa kedi ile köpeği ayırt etmeyi öğretirken ona “kulakları sivri, bıyıkları uzunsa kedidir” gibi kurallar yazmazsınız; yüzlerce resim gösterip “bu kedi, bu köpek” dersiniz. Çocuk kuralı kendisi çıkarır ve <em>daha önce hiç görmediği</em> bir kediyi de tanır. Makine öğrenmesi tam olarak budur: <strong>kuralı programcı yazmaz, örneklerden (veriden) bilgisayar çıkarır</strong>.</p><p>“Öğreniyor” demek için üç şeyi belirtmek gerekir: ne yapıyor (görev, T), neyden öğreniyor (deneyim, E) ve iyi yaptığını nasıl ölçüyoruz (başarım, P). Deneyim arttıkça ölçülen başarım artıyorsa sistem öğreniyordur.</p></div>
+<p>Bu fikri ilk kez açıkça tanımlayan Tom Mitchell'in (1997) tanımı sınavda doğrudan kullanılır: bir program, <strong>T</strong> görevindeki ve <strong>P</strong> ölçüsüyle ölçülen başarımı <strong>E</strong> deneyimiyle artıyorsa öğreniyordur. Aşağıdaki tabloda dört sistem bu üç soruyla tarif ediliyor.</p>
 <div class="table-wrap"><table class="simple">
-<thead><tr><th>Sistem</th><th>Görev T</th><th>Deneyim E</th><th>Başarım P</th><th>Tür</th></tr></thead>
+<thead><tr><th>Sistem</th><th>Görev (T)</th><th>Deneyim (E)</th><th>Başarım (P)</th><th>Tür</th></tr></thead>
 <tbody>
-<tr><td>Spam filtresi</td><td>e-postayı spam / değil diye ayır</td><td>kullanıcıların etiketlediği e-postalar</td><td>yeni e-postalarda doğru sınıflama oranı (ve yanlış alarm oranı)</td><td>gözetimli, sınıflandırma</td></tr>
-<tr><td>Daire fiyatı</td><td>fiyat tahmini</td><td>geçmiş satışlar (m², kat, semt, fiyat)</td><td>yeni dairelerde MSE / MAE</td><td>gözetimli, regresyon</td></tr>
-<tr><td>Müşteri gruplama</td><td>benzer davranışlı grupları bul</td><td>etiketsiz alışveriş geçmişi</td><td>küme içi uzaklık / kampanya yanıtı</td><td>gözetimsiz, kümeleme</td></tr>
-<tr><td>Yürümeyi öğrenen robot</td><td>düşmeden ilerle</td><td>kendi denemeleri + ödül</td><td>bölüm başına toplanan ödül</td><td>pekiştirmeli</td></tr>
+<tr><td>Spam filtresi</td><td>e-postayı spam ya da değil diye ayırmak</td><td>kullanıcıların etiketlediği e-postalar</td><td>yeni e-postalarda doğru sınıflama oranı</td><td>gözetimli, sınıflandırma</td></tr>
+<tr><td>Daire fiyatı</td><td>fiyatı tahmin etmek</td><td>geçmiş satışlar (metrekare, kat, semt, fiyat)</td><td>yeni dairelerde ortalama hata</td><td>gözetimli, regresyon</td></tr>
+<tr><td>Müşteri gruplama</td><td>benzer davranışlı müşteri grupları bulmak</td><td>etiketsiz alışveriş geçmişi</td><td>grupların içindeki benzerlik</td><td>gözetimsiz, kümeleme</td></tr>
+<tr><td>Yürümeyi öğrenen robot</td><td>düşmeden ilerlemek</td><td>kendi denemeleri ve aldığı ödüller</td><td>bir denemede toplanan ödül</td><td>pekiştirmeli</td></tr>
 </tbody></table></div>
-
 <h3>Kural mı, veri mi?</h3>
-<div class="two-col">
-<div class="card"><h3>Klasik programlama</h3><p>Girdi: veri + <strong>kurallar</strong> → çıktı: cevaplar. Kuralı insan yazar. Vergi hesabı, sıralama algoritması: kural kesin ve tam olarak bilinir.</p></div>
-<div class="card"><h3>Makine öğrenmesi</h3><p>Girdi: veri + <strong>cevaplar (etiketler)</strong> → çıktı: kurallar (model). El yazısı “7”yi tanımak, dolandırıcılık tespiti: kural yazılamaz ya da sürekli değişir, ama bol veri vardır.</p></div>
-</div>
-<p>Yapay zekâ ⊃ makine öğrenmesi ⊃ derin öğrenme ⊃ büyük dil modelleri (LLM).</p>
+<p>Klasik programlamada programcı kuralı yazar; bilgisayar bu kuralı veriye uygulayıp cevabı üretir. Vergi hesabı ya da bir listeyi sıralamak böyledir: kural kesin ve eksiksiz bilinir. Makine öğrenmesinde ise elimizde veri ve doğru cevaplar (etiketler) vardır; kuralı (modeli) bilgisayar bu örneklerden çıkarır. El yazısıyla yazılmış bir “7”yi tanımak ya da sahte bir kredi kartı işlemini yakalamak böyledir: kuralı yazmak imkânsız ya da kural sürekli değişiyor, ama çok sayıda örnek var.</p>
+<p>Kavramların birbirine göre yeri de sık sorulur: yapay zekâ akıllı davranış üreten bütün yöntemleri kapsar; makine öğrenmesi bunların veriden öğrenen kısmıdır; derin öğrenme çok katmanlı sinir ağlarıyla öğrenen bir makine öğrenmesi koludur; büyük dil modelleri de dil verisinde çok büyük ölçekte eğitilmiş derin öğrenme modelleridir.</p>
 
 <h2>Öğrenme türleri</h2>
-<div class="intuition"><div class="intuition-title">💡 Fark nerede?</div><p><strong>Gözetimli</strong>: öğretmen var; her örneğin doğru cevabı (etiketi) verilir. <strong>Gözetimsiz</strong>: öğretmen yok; yalnız örnekler var, model içlerindeki yapıyı (gruplar, örüntüler) kendisi bulur. <strong>Pekiştirmeli</strong>: doğru cevap söylenmez ama yaptığı şeyin sonunda bir ödül ya da ceza gelir; bisiklete binmeyi düşe kalka öğrenmek gibi.</p><p>Gözetimli öğrenmede soru şudur: tahmin edilen şey bir <em>kategori</em> mi (spam/değil, hangi rakam: <strong>sınıflandırma</strong>) yoksa bir <em>sayı</em> mı (fiyat, sıcaklık, kaç gün: <strong>regresyon</strong>)?</p></div><div class="tryit"><div class="tryit-title">✋ Hemen dene</div><p>“Bir müşterinin önümüzdeki ay kaç TL harcayacağını tahmin et” hangi tür? Peki “müşteri gelecek ay aboneliğini iptal eder mi?”</p><details><summary>Cevabı göster</summary><p>İlki <strong>regresyon</strong> (sayı tahmini), ikincisi <strong>sınıflandırma</strong> (evet/hayır). İkisi de geçmiş müşterilerin bilinen sonuçlarıyla eğitildiği için gözetimli.</p></details></div>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Fark nerede?</div><p><strong>Gözetimli</strong>: öğretmen var; her örneğin doğru cevabı (etiketi) verilir. <strong>Gözetimsiz</strong>: öğretmen yok; yalnız örnekler var, model içlerindeki yapıyı (gruplar, örüntüler) kendisi bulur. <strong>Pekiştirmeli</strong>: doğru cevap söylenmez ama yaptığı şeyin sonunda bir ödül ya da ceza gelir; bisiklete binmeyi düşe kalka öğrenmek gibi.</p><p>Gözetimli öğrenmede soru şudur: tahmin edilen şey bir <em>kategori</em> mi (spam/değil, hangi rakam: <strong>sınıflandırma</strong>) yoksa bir <em>sayı</em> mı (fiyat, sıcaklık, kaç gün: <strong>regresyon</strong>)?</p></div>
+<p>Üç türü bir tabloda karşılaştıralım:</p>
 <div class="table-wrap"><table class="simple">
-<thead><tr><th>Tür</th><th>Veri</th><th>Alt problemler</th><th>Örnek</th></tr></thead>
+<thead><tr><th>Tür</th><th>Elimizdeki veri</th><th>Alt problemler</th><th>Örnek</th></tr></thead>
 <tbody>
-<tr><td><strong>Gözetimli</strong> (denetimli)</td><td>etiketli çiftler (x, y)</td><td><strong>sınıflandırma</strong>: y ayrık (spam mı?) · <strong>regresyon</strong>: y sürekli (ev fiyatı)</td><td>tümör iyi/kötü huylu; yarın kaç bisiklet kiralanır</td></tr>
-<tr><td><strong>Gözetimsiz</strong></td><td>yalnız x, etiket yok</td><td>kümeleme (k-ortalamalar), boyut indirgeme (PCA), yoğunluk kestirimi, anomali tespiti</td><td>aynı olayı anlatan haberleri grupla</td></tr>
-<tr><td><strong>Pekiştirmeli</strong></td><td>eylem → ödül sinyali</td><td>deneme-yanılmayla politika öğrenme</td><td>oyun oynayan ajan, robot, LLM hizalama (RLHF)</td></tr>
+<tr><td><strong>Gözetimli</strong></td><td>girdiler ve doğru cevapları (etiketli çiftler)</td><td><strong>sınıflandırma</strong> (cevap bir kategori) ve <strong>regresyon</strong> (cevap bir sayı)</td><td>tümör iyi huylu mu kötü huylu mu; yarın kaç bisiklet kiralanacak</td></tr>
+<tr><td><strong>Gözetimsiz</strong></td><td>yalnız girdiler, etiket yok</td><td>kümeleme, boyut indirgeme (PCA), anomali tespiti</td><td>aynı olayı anlatan haberleri gruplamak</td></tr>
+<tr><td><strong>Pekiştirmeli</strong></td><td>yapılan eylemler ve sonlarında gelen ödüller</td><td>deneme yanılmayla bir davranış politikası öğrenmek</td><td>oyun oynayan bir program, yürümeyi öğrenen robot</td></tr>
 </tbody></table></div>
-<div class="callout exam"><div class="callout-title">Sınav kalıbı</div><p>“Gözetimli öğrenmenin iki tahmin türünü yazın, her birine bir örnek verin” ve “gözetimli ile gözetimsiz farkı nedir, gözetimsiz bir model ve kullanım senaryosu verin” geçmiş alıştırma listelerinde var. Kalan süre/sayı tahmini (kaç gün sonra bozulur?) <em>regresyondur</em>; 5 kategoriden birini seçmek çok sınıflı <em>sınıflandırmadır</em>.</p></div>
+<div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>“Bir müşterinin önümüzdeki ay kaç TL harcayacağını tahmin et” hangi tür? Peki “müşteri gelecek ay aboneliğini iptal eder mi?”</p><details><summary>Cevabı göster</summary><p>İlki <strong>regresyon</strong> (sayı tahmini), ikincisi <strong>sınıflandırma</strong> (evet/hayır). İkisi de geçmiş müşterilerin bilinen sonuçlarıyla eğitildiği için gözetimli.</p></details></div>
+<div class="callout exam"><div class="callout-title">Sınav kalıbı</div><p>“Gözetimli öğrenmenin iki tahmin türünü yazın ve her birine bir örnek verin” ve “gözetimli ile gözetimsiz öğrenmenin farkı nedir, gözetimsiz bir model ve bir kullanım senaryosu verin” soruları geçmiş alıştırma listelerinde var. Dikkat: bir makinenin kaç gün sonra bozulacağını tahmin etmek bir sayı tahminidir, yani regresyondur; bir destek talebini beş kategoriden birine atamak ise çok sınıflı sınıflandırmadır.</p></div>
 
 <h2>Tipik bir makine öğrenmesi akışı</h2>
-<ol>
-<li><strong>Problem</strong>: görev, metrik, başarı ölçütü.</li>
-<li><strong>Veri</strong>: toplama, temizleme, keşif.</li>
-<li><strong>Öznitelikler</strong>: kodlama, ölçekleme, seçim.</li>
-<li><strong>Model</strong>: seçim, eğitim, hiperparametre ayarı (doğrulama kümesinde).</li>
-<li><strong>Değerlendirme</strong>: test kümesinde <em>bir kez</em>, hata analizi.</li>
-<li><strong>Yayına alma</strong>: izleme, güncelleme.</li>
-</ol>
-<p>Zamanın çoğu 2. ve 3. adımda geçer: model birkaç satır koddur, asıl iş veriyi anlamak ve doğru değerlendirmektir.</p>
+<p>Bir makine öğrenmesi projesi genelde altı adımda ilerler. Önce <strong>problem</strong> tanımlanır: görev nedir, başarı hangi ölçüyle ölçülecek? Sonra <strong>veri</strong> toplanır, temizlenir ve incelenir. Üçüncü adımda veri modele uygun <strong>özniteliklere</strong> dönüştürülür: kategoriler kodlanır, sayılar ölçeklenir, gereksiz sütunlar atılır. Dördüncü adımda <strong>model</strong> seçilir ve eğitilir; ayarları doğrulama verisiyle yapılır. Beşinci adımda model ayrılmış test verisinde yalnız bir kez <strong>değerlendirilir</strong> ve hataları incelenir. Son adımda model <strong>kullanıma alınır</strong> ve zamanla bozulup bozulmadığı izlenir.</p>
+<p>Uygulamada zamanın büyük kısmı ikinci ve üçüncü adımlarda geçer. Modelin kendisi birkaç satır koddur; asıl iş veriyi anlamak, hazırlamak ve doğru değerlendirmektir.</p>
 
 <h2>Öğrenme = hipotez uzayında arama</h2>
-<div class="intuition"><div class="intuition-title">💡 Hipotez ne demek?</div><p>Hipotez, “şu koşullarda cevap Evet'tir” diyen bir tahmin kuralıdır. Öğrenme algoritması bir kural <em>ailesi</em> seçer (örneğin “öznitelik kısıtlarının VE'si” ya da “bir doğru”) ve bu ailenin içinden veriye en uygun olanı arar. Ailenin bütün üyelerine <strong>hipotez uzayı</strong> denir.</p><p>Aile ne kadar zenginse veriye o kadar iyi uyabilir; ama çok zengin bir aile her şeyi, gürültüyü bile açıklayabilir ve yeni veride işe yaramaz. Bu gerginlik dersin her haftasında karşımıza çıkacak.</p></div>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Hipotez ne demek?</div><p>Hipotez, “şu koşullarda cevap Evet'tir” diyen bir tahmin kuralıdır. Öğrenme algoritması bir kural <em>ailesi</em> seçer (örneğin “öznitelik kısıtlarının VE'si” ya da “bir doğru”) ve bu ailenin içinden veriye en uygun olanı arar. Ailenin bütün üyelerine <strong>hipotez uzayı</strong> denir.</p><p>Aile ne kadar zenginse veriye o kadar iyi uyabilir; ama çok zengin bir aile her şeyi, gürültüyü bile açıklayabilir ve yeni veride işe yaramaz. Bu gerginlik dersin her haftasında karşımıza çıkacak.</p></div>
 <h3>Örnek problem: EnjoySport</h3>
 <p>Tom Mitchell'in kitabındaki klasik örnek: Aldo adlı biri hangi günlerde su sporundan keyif alıyor? Her gün 6 öznitelikle anlatılıyor; her özniteliğin alabileceği değerler sabit:</p>
 <div class="table-wrap"><table class="simple compact">
@@ -128,22 +119,23 @@
 <p><strong>Tümevarımsal öğrenme varsayımı:</strong> yeterince büyük bir eğitim kümesinde hedefe iyi yaklaşan bir hipotez, görülmemiş örneklerde de iyi yaklaşır.</p></div>
 
 <h2>Ezber mi, öğrenme mi? Genelleme</h2>
-<div class="intuition"><div class="intuition-title">💡 Sınav benzetmesi</div><p>Geçen yılın sorularını cevaplarıyla ezberleyen öğrenci o sorularda 100 alır (<strong>eğitim hatası 0</strong>) ama yeni sorularda kötü yapar: <strong>aşırı uyum</strong>. Hiç çalışmayan öğrenci ikisinde de kötüdür: <strong>yetersiz uyum</strong>. Konuyu anlayan öğrenci yeni sorularda da iyidir: <strong>genelleme</strong>.</p><p>Bu yüzden bir modeli asla eğitildiği veriyle değerlendirmeyiz; ayrı tuttuğumuz, modelin hiç görmediği verilerle ölçeriz (2. hafta).</p></div><div data-widget="fig" data-fig="bvcurve" data-caption="Model karmaşıklaştıkça yanlılık düşer, varyans artar; toplam hata önce düşer sonra yükselir. Amaç aradaki tatlı nokta."></div>
-<p>Klasik deney: <span class="m">sin(2πx)</span> eğrisinden gürültüyle 10 nokta, bunlara M dereceli polinom uyduruyoruz. M = 0–1 <strong>yetersiz uyum</strong> (iki hata da yüksek), M = 3 eğriyi yakalar (en düşük test hatası), M = 9 bütün noktalardan geçer: eğitim hatası 0, test hatası patlar: <strong>aşırı uyum</strong>.</p>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Sınav benzetmesi</div><p>Geçen yılın sorularını cevaplarıyla ezberleyen öğrenci o sorularda 100 alır (<strong>eğitim hatası 0</strong>) ama yeni sorularda kötü yapar: <strong>aşırı uyum</strong>. Hiç çalışmayan öğrenci ikisinde de kötüdür: <strong>yetersiz uyum</strong>. Konuyu anlayan öğrenci yeni sorularda da iyidir: <strong>genelleme</strong>.</p><p>Bu yüzden bir modeli asla eğitildiği veriyle değerlendirmeyiz; ayrı tuttuğumuz, modelin hiç görmediği verilerle ölçeriz (2. hafta).</p></div>
+<div data-widget="fig" data-fig="bvcurve" data-caption="Model karmaşıklaştıkça yanlılık düşer, varyans artar; toplam hata önce düşer sonra yükselir. Amaç aradaki tatlı nokta."></div>
+<p>Bu ilişkiyi klasik bir deneyle görelim. Bir sinüs eğrisinden gürültüyle 10 nokta üretip bunlara farklı derecelerde polinomlar uyduruyoruz. 0. ve 1. derece polinomlar (sabit ve doğru) eğrinin şeklini yakalayamaz; eğitim ve test hataları ikisi de yüksektir, buna <strong>yetersiz uyum</strong> denir. 3. derece polinom eğriyi iyi yakalar ve test hatası en düşük olan odur. 9. derece polinom ise 10 noktanın hepsinden tam geçer; eğitim hatası sıfırdır ama noktaların arasında savrulur ve test hatası çok büyür, buna <strong>aşırı uyum</strong> denir. Aşağıdaki araçta dereceyi kendiniz değiştirebilirsiniz.</p>
 <div data-widget="polyfit"></div>
-<p>Aşırı uyuma karşı (M'yi değiştirmeden): daha çok veri, düzenlileştirme (büyük katsayıları cezalandırmak), doğrulama kümesiyle model seçimi / erken durdurma, birden çok modelin ortalaması (6. hafta). Aynı M = 9 ile 100 nokta olsa polinom her gürültülü noktadan geçemez, varyans düşer ve test hatası gürültü düzeyine yaklaşır.</p>
+<p>Aşırı uyuma karşı, polinomun derecesini değiştirmeden de önlem alınabilir: daha çok veri toplamak, büyük katsayıları cezalandırmak (düzenlileştirme), bir doğrulama kümesiyle en iyi noktada durmak ya da birden çok modelin ortalamasını almak. Örneğin aynı 9. derece polinom 100 noktayla eğitilseydi her gürültülü noktadan geçemezdi; model daha kararlı olur ve test hatası gürültü düzeyine yaklaşırdı.</p>
 
 <h2>Dönemin tekrar eden sorusu: hiperparametre tablosu</h2>
-<div class="intuition"><div class="intuition-title">💡 Neden her hafta aynı tablo?</div><p>Her modelde “ne kadar esnek olsun?” sorusunu ayarlayan bir düğme vardır: kNN'de k, ağaçta derinlik, SVM'de C. Bu düğmelere <strong>hiperparametre</strong> denir (model onları öğrenmez, biz seçeriz). Düğmeyi esnekliğe doğru çevirince model eğitim verisine daha çok uyar (yanlılık ↓) ama daha kararsız olur (varyans ↑). Bu tek fikri bilen kişi tablonun bütün satırlarını çıkarabilir.</p></div>
-<p>Her haftanın sonunda o haftanın modeli için aynı tablo doldurulur ve sınavda aynı biçimde sorulur: <em>“X artarsa yanlılık, varyans ve aşırı uyum riski nasıl değişir, neden?”</em></p>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden her hafta aynı tablo?</div><p>Her modelde “ne kadar esnek olsun?” sorusunu ayarlayan bir düğme vardır: kNN'de k, ağaçta derinlik, SVM'de C. Bu düğmelere <strong>hiperparametre</strong> denir (model onları öğrenmez, biz seçeriz). Düğmeyi esnekliğe doğru çevirince model eğitim verisine daha çok uyar (yanlılık ↓) ama daha kararsız olur (varyans ↑). Bu tek fikri bilen kişi tablonun bütün satırlarını çıkarabilir.</p></div>
+<p>Bu haftanın modeli (polinom uydurma) için tablo şöyledir:</p>
 <div class="table-wrap"><table class="simple">
-<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum riski</th><th>Neden</th></tr></thead>
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum riski</th><th>Neden?</th></tr></thead>
 <tbody>
-<tr><td>Polinom derecesi M</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>daha esnek eğri gürültüye de uyar</td></tr>
-<tr><td>Eğitim örneği sayısı n</td><td>değişmez</td><td class="down">azalır</td><td class="down">azalır</td><td>veri modeli sabitler; doğruyu sinüse çeviremez</td></tr>
-<tr><td>Düzenlileştirme gücü λ</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>katsayılar küçülür, model basitleşir</td></tr>
+<tr><td>Polinom derecesi</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>daha esnek bir eğri gürültüye de uyar</td></tr>
+<tr><td>Eğitim örneği sayısı</td><td>değişmez</td><td class="down">azalır</td><td class="down">azalır</td><td>daha çok veri modeli sabitler; ama bir doğruyu sinüse çeviremez</td></tr>
+<tr><td>Düzenlileştirme gücü λ</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>katsayılar küçülür, model sadeleşir</td></tr>
 </tbody></table></div>
-<p><strong>Yanlılık</strong>: modelin basitliğinden gelen sistematik hata (küçük M). <strong>Varyans</strong>: eğitim verisi biraz değişince modelin ne kadar oynadığı (büyük M). Bütün satırlar: <a href="hyper.html">hiperparametre tablosu</a>.</p>
+<p>Buradaki iki kavramı tekrar edelim. <strong>Yanlılık</strong>, modelin basitliğinden gelen sistematik hatadır (bir sinüse doğru uydurmak gibi). <strong>Varyans</strong>, eğitim verisi biraz değişince modelin ne kadar değiştiğidir (9. derece polinom gibi). Bütün dönemin satırları <a href="hyper.html">hiperparametre tablosu</a> sayfasında toplu hâlde ve alıştırmalı olarak var.</p>
 
 <h2>Sınav tipi çözümlü problemler</h2>
 <p>Aşağıdaki problemler sınavdaki biçimdedir. Her birini önce kâğıtta çözmeye çalış (5–10 dakika), sonra “çözümü aç”a bas: çözümde her adımın <em>neden</em> öyle yapıldığı da yazıyor. Takılırsan sayfanın ilgili bölümüne dön.</p>
