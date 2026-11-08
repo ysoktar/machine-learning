@@ -185,7 +185,7 @@
 <li data-why="Ölçekleyici test satırlarını görmüş olur.">Bütün veride <code>scaler.fit</code>, sonra bölmek</li>
 <li data-why="Test satırları doldurma ortalamasına katkı yapar.">Eksik değerleri bütün verinin ortalamasıyla doldurup sonra bölmek</li>
 <li data-why="Test kümesi bir karar için kullanıldı; raporlanan sayı iyimser.">k'yı test başarımına göre seçip o başarımı raporlamak</li>
-<li data-why="">Önce bölmek, <code>scaler.fit(X_train)</code>, sonra <code>scaler.transform(X_test)</code></li></ol></div>
+<li data-why="">Önce bölmek, <code>scaler.fit(X_train)</code>, sonra <code>scaler.transform(X_test)</code></li></ol><div class="explain">Sızıntı, test verisinden gelen bir bilginin eğitime karışmasıdır. Dördüncü şıkta ölçekleyicinin en küçük, en büyük ya da ortalama değerleri yalnızca eğitim kümesinden öğrenilir ve test kümesine aynen uygulanır. Test verisi hiçbir hesaba katılmadığı için sızıntı yoktur. Diğer üç şıkta ise test verisi ya ön işlemeye ya da model seçimine karışıyor.</div></div>
 
 <div class="quiz" data-answer="1"><p>TP = 8, FN = 2, FP = 20, TN = 470. F1 kaçtır?</p><ol>
 <li data-why="">16/38 ≈ 0.42</li>
@@ -205,7 +205,7 @@
 <li data-why="Fark A'nın std'sinden küçük; A kararsız.">A açıkça daha iyi, A seçilir</li>
 <li data-why="">Ortalamalar arasındaki fark A'nın std'sinden küçük; kararlılık önemliyse B daha güvenli</li>
 <li data-why="Std, katlar arası dalgalanmayı ölçer; görmezden gelinmez.">Std önemsizdir, yalnız ortalamaya bakılır</li>
-<li data-why="Test kümesi model seçmek için kullanılmaz.">Kararı test kümesinde ikisini deneyip verin</li></ol></div>
+<li data-why="Test kümesi model seçmek için kullanılmaz.">Kararı test kümesinde ikisini deneyip verin</li></ol><div class="explain">A'nın ortalaması yalnızca 0.02 daha yüksek, ama katlar arasındaki dalgalanması (0.09) bu farktan çok daha büyük. Yani farkın şanstan gelmiş olması çok olası. B ise her katta neredeyse aynı sonucu veriyor. Bu yüzden A'nın açıkça daha iyi olduğu söylenemez; tutarlılık isteniyorsa B daha güvenli bir seçimdir. Test kümesi ise model seçiminde kullanılmaz.</div></div>
 
 <div class="quiz" data-answer="3"><p>4 noktada PCA: kovaryans S = [[5/3, 4/3], [4/3, 5/3]]. PC1'in açıkladığı varyans oranı?</p><ol>
 <li data-why="Bu λ₂/iz: (1/3)/(10/3).">%10</li>

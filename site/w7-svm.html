@@ -126,7 +126,7 @@
 <li data-why="Sokak genişliği 2/‖w‖ = 0.894; marj bunun yarısı.">marj 0.894; nokta sokağın içinde</li>
 <li data-why="">marj 1/√5 = 0.447; f(2,2) = 3 &gt; 1 olduğu için nokta sokağın dışındadır; uzaklık 3/√5 = 1.342</li>
 <li data-why="f = 2 + 4 − 3 = 3.">marj 0.447; nokta sınırın üstünde</li>
-<li data-why="‖w‖ = √5.">marj 1/3</li></ol></div>
+<li data-why="‖w‖ = √5.">marj 1/3</li></ol><div class="explain">Kanonik biçimde marj 1/‖w‖'dir; ‖w‖ = √(1 + 4) = √5 olduğundan marj 1/√5 ≈ 0.447 olur. Noktayı yerine koyunca f(2,2) = 1·2 + 2·2 − 3 = 3 bulunur. Bu değer 1'den büyük olduğu için nokta sokağın dışında, pozitif taraftadır. Sınıra uzaklığı |f|/‖w‖ = 3/√5 ≈ 1.342'dir.</div></div>
 
 <div class="quiz" data-answer="4"><p>Pozitifler (2,1), (3,2); negatifler (0,1), (1,0). Sert marj çözümü?</p><ol>
 <li data-why="(3,2)'de f = 3: sokağın dışında, destek vektörü değil.">w = (1, 1), b = −2 ve bütün noktalar destek vektörü</li>
@@ -139,25 +139,25 @@
 <li data-why="">Marj genişler, destek vektörü sayısı artar, aşırı uyum eğilimi azalır</li>
 <li data-why="Ters yön.">Marj daralır, destek vektörü azalır</li>
 <li data-why="C doğrudan marjı belirler.">Yalnız eğitim süresi değişir</li>
-<li data-why="Küçük C ihlali ucuzlatır; sert marja C → ∞ yaklaşır.">Sert marja yaklaşılır</li></ol></div>
+<li data-why="Küçük C ihlali ucuzlatır; sert marja C → ∞ yaklaşır.">Sert marja yaklaşılır</li></ol><div class="explain">C, marjı ihlal eden her noktanın bedelidir. C küçülünce ihlaller ucuzlar; model birkaç noktayı yanlış tarafta ya da sokağın içinde bırakmayı kabul eder ve karşılığında daha geniş bir sokak seçer. Sokak genişleyince içine daha çok nokta düşer, bu yüzden destek vektörü sayısı artar ve model aykırı noktalara daha az uyar.</div></div>
 
 <div class="quiz" data-answer="3"><p>x = (1, 1), z = (2, 0) için K = (x·z)² kaçtır ve neyi gösterir?</p><ol>
 <li data-why="x·z = 2, kare 4.">2; iç çarpımın kendisi</li>
 <li data-why="Bu RBF olurdu.">e⁻²</li>
 <li data-why="">4; φ(v) = (v₁², √2v₁v₂, v₂²) ile φ(x)·φ(z) = 4: φ hesaplanmadan aynı sonuç</li>
-<li data-why="Çekirdek simetriktir.">K(x, z) ≠ K(z, x) olduğundan tanımsız</li></ol></div>
+<li data-why="Çekirdek simetriktir.">K(x, z) ≠ K(z, x) olduğundan tanımsız</li></ol><div class="explain">Önce iç çarpımı bulalım: x·z = 1·2 + 1·0 = 2, karesi 4 olur. Aynı sonucu noktaları φ(v) = (v₁², √2v₁v₂, v₂²) ile üç boyuta taşıyıp orada iç çarpım alarak da buluruz: φ(x) = (1, √2, 1), φ(z) = (4, 0, 0) ve iç çarpımları 4'tür. Çekirdek hilesi tam olarak budur: yüksek boyutlu iç çarpım, noktalar hiç taşınmadan hesaplanır.</div></div>
 
 <div class="quiz" data-answer="2"><p>RBF-SVM eğitimde %100, testte %60. İlk ne denenir?</p><ol>
 <li data-why="Büyük γ dar tümsekler = daha çok ezber.">γ'yı büyütmek</li>
 <li data-why="">γ'yı (ve/veya C'yi) küçültmek; ölçeklemeyi denetlemek</li>
 <li data-why="Daha çok kapasite aşırı uyumu kötüleştirir.">Polinom çekirdeğe geçip d'yi büyütmek</li>
-<li data-why="Test kümesi ayar için kullanılmaz.">Test kümesinde C ızgarası denemek</li></ol></div>
+<li data-why="Test kümesi ayar için kullanılmaz.">Test kümesinde C ızgarası denemek</li></ol><div class="explain">Eğitimde kusursuz, testte zayıf bir model aşırı uyum yapıyor. RBF çekirdeğinde büyük γ her noktanın etki alanını daraltır ve sınırın tek tek noktaların etrafında adacıklar çizmesine yol açar. γ'yı küçültmek sınırı yumuşatır; C'yi küçültmek de ihlallere izin vererek modeli sadeleştirir. Ölçekleme yapılmamışsa uzaklıklar bozulacağı için önce onu denetlemek gerekir.</div></div>
 
 <div class="quiz" data-answer="4"><p>Düzlemdeki doğruların VC boyutu neden 4 değil?</p><ol>
 <li data-why="3 nokta (doğrusal olmayan) bütün 8 biçimde ayrılabilir.">3 nokta bile parçalanamaz</li>
 <li data-why="VC boyutu en az bir nokta kümesinin parçalanabilmesine bakar.">Bütün 4'lü kümeler doğrusal olduğu için</li>
 <li data-why="VC boyutu parametre sayısıyla bire bir aynı olmak zorunda değildir.">Doğrunun 2 parametresi olduğu için</li>
-<li data-why="">Hiçbir 4 nokta kümesi parçalanamaz: örn. çaprazlar aynı sınıf (XOR) etiketlemesi tek doğruyla ayrılmaz</li></ol></div>
+<li data-why="">Hiçbir 4 nokta kümesi parçalanamaz: örn. çaprazlar aynı sınıf (XOR) etiketlemesi tek doğruyla ayrılmaz</li></ol><div class="explain">Bir model ailesinin VC boyutu, her türlü etiketlemesini ayırabildiği en büyük nokta kümesinin boyudur. Düzlemdeki doğrular, aynı doğru üzerinde olmayan 3 noktanın bütün 8 etiketlemesini ayırabilir. Ama 4 nokta nasıl yerleştirilirse yerleştirilsin, en az bir etiketleme tek doğruyla ayrılamaz; örneğin dörtgenin çapraz köşelerine aynı etiket verilirse (XOR). Bu yüzden VC boyutu 3'tür.</div></div>
 
 </div></main>
 </body>

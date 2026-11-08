@@ -133,31 +133,31 @@
 <li data-why="Boosting genelde sığ ağaç/kütük kullanır.">Bagging kütük, boosting derin ağaç kullanır</li>
 <li data-why="">Bagging modelleri paralel ve bağımsız örneklemlerde eğitip ortalar (varyans↓); boosting sıralı eğitir, her model öncekilerin hatalarına odaklanır (yanlılık↓)</li>
 <li data-why="İkisi de sınıflandırma ve regresyonda kullanılır.">Bagging yalnız regresyon, boosting yalnız sınıflandırma içindir</li>
-<li data-why="Bootstrap bagging'e özgüdür; AdaBoost ağırlıklandırır.">İkisi de bootstrap örneklemi kullanır, fark yoktur</li></ol></div>
+<li data-why="Bootstrap bagging'e özgüdür; AdaBoost ağırlıklandırır.">İkisi de bootstrap örneklemi kullanır, fark yoktur</li></ol><div class="explain">Bagging aynı türden modelleri, birbirinden bağımsız bootstrap örneklemlerinde aynı anda eğitir ve tahminlerinin ortalamasını alır; ortalama almak dalgalanmayı, yani varyansı azaltır. Boosting ise modelleri sırayla eğitir: her yeni model, öncekilerin yanlış yaptığı örneklere daha çok ağırlık verir. Böylece zayıf modeller birleşip güçlü bir model oluşturur ve yanlılık azalır.</div></div>
 
 <div class="quiz" data-answer="3"><p>n = 4 örnekli bootstrap'te belirli bir örneğin dışarıda kalma olasılığı?</p><ol>
 <li data-why="Bu limit değeri (n → ∞).">0.368</li>
 <li data-why="1/4 bir çekilişte seçilme olasılığı.">0.25</li>
 <li data-why="">(3/4)⁴ = 81/256 ≈ 0.316</li>
-<li data-why="Bu dahil olma olasılığına yakın.">0.684</li></ol></div>
+<li data-why="Bu dahil olma olasılığına yakın.">0.684</li></ol><div class="explain">Bootstrap'te her çekilişte belirli bir örneğin seçilmeme olasılığı 1 − 1/4 = 3/4'tür. Dört çekiliş birbirinden bağımsız olduğundan örneğin hiç seçilmeme olasılığı (3/4)⁴ = 81/256 ≈ 0.316 olur. 0.368 değeri n çok büyükken ulaşılan sınırdır, n = 4 için geçerli değildir.</div></div>
 
 <div class="quiz" data-answer="1"><p>AdaBoost turunda ε = 0.25. α ve yanlış örneklerin çarpanı? (ln 3 = 1.099)</p><ol>
 <li data-why="">α = ½ ln 3 = 0.549; yanlışlar × 1/(2·0.25) = × 2</li>
 <li data-why="½ unutuldu.">α = ln 3 = 1.099; yanlışlar × 3</li>
 <li data-why="Yanlışların ağırlığı artar, azalmaz.">α = 0.549; yanlışlar × 0.5</li>
-<li data-why="α = 0 yalnız ε = 0.5'te.">α = 0; ağırlıklar değişmez</li></ol></div>
+<li data-why="α = 0 yalnız ε = 0.5'te.">α = 0; ağırlıklar değişmez</li></ol><div class="explain">Formül α = ½ ln((1 − ε)/ε) olduğundan α = ½ ln(0.75/0.25) = ½ ln 3 = 0.549 çıkar. Normalleştirmeden sonra yanlış sınıflanan örneklerin ağırlığı 1/(2ε) ile çarpılmış olur; ε = 0.25 için bu çarpan 2'dir. Böylece yanlışların toplam ağırlığı tam yarıya (0.5) çıkar.</div></div>
 
 <div class="quiz" data-answer="4"><p>Rastgele ormanda ağaç sayısı 100'den 1000'e çıkarılırsa?</p><ol>
 <li data-why="Daha çok ağaç ortalamayı kararlı kılar; aşırı uyum artmaz.">Aşırı uyum belirgin biçimde artar</li>
 <li data-why="Yanlılık ağaç sayısıyla değişmez.">Yanlılık belirgin biçimde azalır</li>
 <li data-why="Hata platoya iner, yükselmez.">Doğrulama hatası önce düşer sonra yükselir</li>
-<li data-why="">Doğrulama hatası düşüp bir platoya oturur; bedel eğitim/tahmin süresi ve bellek</li></ol></div>
+<li data-why="">Doğrulama hatası düşüp bir platoya oturur; bedel eğitim/tahmin süresi ve bellek</li></ol><div class="explain">Rastgele ormanda her ağaç ayrı ayrı eğitilir ve tahminlerin ortalaması alınır. Ağaç eklemek ortalamayı daha kararlı yapar ama modeli daha esnek yapmaz; bu yüzden aşırı uyum artmaz. Hata bir noktadan sonra pek değişmez ve bir platoda kalır. Ödenen bedel daha uzun eğitim ve tahmin süresi ile daha çok bellektir.</div></div>
 
 <div class="quiz" data-answer="2"><p>Stacking'te meta-model nasıl sızıntısız eğitilir?</p><ol>
 <li data-why="Bu tam olarak sızıntıdır.">Seviye-0 modellerin eğitim verisindeki tahminleriyle</li>
 <li data-why="">Katlar dışı (out-of-fold) tahminlerle: her satırın tahmini o satırı görmemiş modelden</li>
 <li data-why="Test kümesi eğitimde kullanılmaz.">Test kümesindeki tahminlerle</li>
-<li data-why="Meta-modelin verisi tahminlerdir.">Ham özniteliklerle</li></ol></div>
+<li data-why="Meta-modelin verisi tahminlerdir.">Ham özniteliklerle</li></ol><div class="explain">Meta-model, temel modellerin tahminlerini girdi olarak kullanır. Bu tahminler temel modellerin eğitimde gördüğü satırlardan gelirse gerçekte olduğundan çok iyi görünür ve meta-model yanlış şeyi öğrenir. Katlar dışı tahminde her satırın tahmini, o satırı eğitimde hiç görmemiş bir modelden gelir; böylece meta-model, temel modellerin yeni veride gerçekte nasıl davrandığını öğrenir.</div></div>
 
 </div></main>
 </body>

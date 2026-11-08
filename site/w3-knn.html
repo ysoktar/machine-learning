@@ -180,19 +180,19 @@
 <li data-why="k'yı küçültmek esnekliği artırır, aşırı uyumu kötüleştirir.">k'yı küçültmek</li>
 <li data-why="">k'yı büyütmek (ve/veya ilgisiz öznitelikleri atmak, veri eklemek)</li>
 <li data-why="Test kümesi ayar için kullanılmaz.">Test kümesinde birkaç k denemek</li>
-<li data-why="Büyük açık aşırı uyum gösterir; model zaten çok esnek.">Daha esnek bir model ailesine geçmek</li></ol></div>
+<li data-why="Büyük açık aşırı uyum gösterir; model zaten çok esnek.">Daha esnek bir model ailesine geçmek</li></ol><div class="explain">Eğitim hatası düşük, doğrulama hatası yüksekse model eğitim verisini ezberliyor, yani varyans yüksek. kNN'de k büyüdükçe karar daha çok komşunun ortalamasına dayanır, sınır yumuşar ve ezber azalır. İlgisiz öznitelikleri atmak ve veri eklemek de varyansı düşürür. k'yı küçültmek ise modeli daha da esnek yapar ve durumu kötüleştirir.</div></div>
 
 <div class="quiz" data-answer="1"><p>Öğrenme eğrisinde eğitim ve doğrulama hataları erkenden buluşuyor ve ikisi de yüksek kalıyor. Hangi terim baskın, ne yapılmalı?</p><ol>
 <li data-why="">Yanlılık; daha esnek model / daha iyi öznitelik</li>
 <li data-why="Eğriler buluştuğu için veri eklemek hatayı düşürmez.">Varyans; daha çok veri</li>
 <li data-why="Gürültüyü bilemeyiz; önce yanlılığı azaltmayı deneriz.">Gürültü; yapılacak bir şey yok</li>
-<li data-why="Düzenlileştirme modeli daha da basitleştirir.">Yanlılık; λ'yı artırmak</li></ol></div>
+<li data-why="Düzenlileştirme modeli daha da basitleştirir.">Yanlılık; λ'yı artırmak</li></ol><div class="explain">İki eğrinin erkenden buluşması daha fazla verinin işe yaramayacağını gösterir. İkisinin de yüksek kalması modelin eğitim verisini bile iyi açıklayamadığı, yani yanlılığın baskın olduğu anlamına gelir. Çare modeli daha esnek yapmak ya da daha bilgilendirici öznitelikler eklemektir. λ'yı artırmak modeli daha da katılaştırır, ters yönde çalışır.</div></div>
 
 <div class="quiz" data-answer="4"><p>“Müşteri kaybını tahmin et” problemine “hesap kapanış tarihi” özniteliği eklendi ve doğrulama F1'i 0.99 oldu. Bu ne tür bir sızıntıdır?</p><ol>
 <li data-why="Ön işleme sızıntısı, ölçekleme/PCA'nın bütün veride yapılmasıdır.">Ön işleme sızıntısı</li>
 <li data-why="Bölme sızıntısı, aynı grubun iki tarafta olmasıdır.">Bölme sızıntısı</li>
 <li data-why="Bu, test kümesine aşırı uyumdur.">Analist sızıntısı</li>
-<li data-why="">Hedef sızıntısı: öznitelik yalnızca zaten ayrılmış müşterilerde var</li></ol></div>
+<li data-why="">Hedef sızıntısı: öznitelik yalnızca zaten ayrılmış müşterilerde var</li></ol><div class="explain">“Hesap kapanış tarihi” yalnızca müşteri ayrıldıktan sonra oluşan bir bilgidir; yani hedefin kendisini dolaylı olarak içerir. Tahmin anında bu bilgi elimizde olmayacağı için 0.99'luk başarım gerçek değildir. Hedefin sonucundan türeyen özniteliklere hedef sızıntısı denir.</div></div>
 
 <div class="quiz" data-answer="2"><p>Neden 0-1 kaybı gradyan inişiyle doğrudan optimize edilmez?</p><ol>
 <li data-why="0-1 kaybı dışbükey değildir, ama asıl sorun türevidir.">Çünkü dışbükeydir</li>

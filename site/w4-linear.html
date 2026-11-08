@@ -196,25 +196,25 @@
 <li data-why="z = 0 ≥ 0 olduğundan tahmin +1: yanlış, güncelleme var.">z = 0, tahmin −1, güncelleme yok</li>
 <li data-why="">z = 0 olduğundan ŷ = +1 olur ve bu yanlıştır; güncellemeden sonra w = (0, −1), b = −1</li>
 <li data-why="Güncelleme w + η·y·x: y = −1 olduğu için çıkarılır.">w = (0, 1), b = 1</li>
-<li data-why="Perceptron yalnız yanlışlarda günceller ama burada yanlış var.">Perceptron doğru sınıflanan örnekte de günceller</li></ol></div>
+<li data-why="Perceptron yalnız yanlışlarda günceller ama burada yanlış var.">Perceptron doğru sınıflanan örnekte de günceller</li></ol><div class="explain">Başlangıçta w ve b sıfır olduğu için z = 0·0 + 0·1 + 0 = 0 çıkar. Kural z ≥ 0 iken +1 dediğinden tahmin +1 olur, ama gerçek etiket −1'dir; yani hata vardır ve güncelleme yapılır. Güncelleme w ← w + ηyx = (0, 0) + 1·(−1)·(0, 1) = (0, −1) ve b ← b + ηy = 0 − 1 = −1 verir.</div></div>
 
 <div class="quiz" data-answer="3"><p>Doğrusal ayrılabilir veride, düzenlileştirmesiz lojistik regresyonun ağırlıklarına ne olur?</p><ol>
 <li data-why="Perceptron'un aksine LR, bütün örnekler doğru olsa da kaybı azaltmaya devam eder.">Perceptron gibi ilk ayıran sınırda durur</li>
 <li data-why="Sınır yönü sabitlenir ama ‖w‖ büyümeye devam eder.">Sıfıra yakınsar</li>
 <li data-why="">‖w‖ sınırsız büyür (p'ler 0/1'e yaklaştıkça kayıp hep azalır); çözüm tek değildir, düzenlileştirme gerekir</li>
-<li data-why="Log-loss dışbükeydir ama burada sonlu minimum yoktur.">Tek bir sonlu optimuma yakınsar</li></ol></div>
+<li data-why="Log-loss dışbükeydir ama burada sonlu minimum yoktur.">Tek bir sonlu optimuma yakınsar</li></ol><div class="explain">Veri doğrusal ayrılabiliyorsa, ayıran bir w bulunduğunda w'yi büyütmek bütün olasılıkları 0'a ya da 1'e daha çok yaklaştırır ve log-loss her seferinde biraz daha azalır. Kaybın ulaşılabilen bir minimumu olmadığı için ‖w‖ durmadan büyür. Düzenlileştirme büyük ağırlıkları cezalandırarak bu büyümeyi durdurur ve tek bir çözüm verir.</div></div>
 
 <div class="quiz" data-answer="1"><p>Skor z = 2 için p = σ(2) = 0.88. Gerçek etiket y = 0 ise log-loss kaçtır? (ln 0.12 = −2.12)</p><ol>
 <li data-why="">2.12</li>
 <li data-why="Bu y = 1 için: −ln 0.88.">0.13</li>
 <li data-why="Bu kare hata: 0.88².">0.77</li>
-<li data-why="−ln(1 − 0.88) = −ln 0.12.">0.88</li></ol></div>
+<li data-why="−ln(1 − 0.88) = −ln 0.12.">0.88</li></ol><div class="explain">Gerçek etiket y = 0 olduğu için log-loss'un yalnızca −ln(1 − p) terimi kalır. 1 − p = 1 − 0.88 = 0.12 olduğundan kayıp −ln 0.12 = 2.12 olur. Model yanlış sınıfa yüksek olasılık verdiği için kayıp büyüktür.</div></div>
 
 <div class="quiz" data-answer="4"><p>Lasso'yu ridge'den ayıran özellik hangisi?</p><ol>
 <li data-why="Ridge'in kapalı çözümü vardır, lasso'nun yoktur.">Lasso'nun kapalı çözümü vardır</li>
 <li data-why="İkisi de ölçeklemeye duyarlıdır.">Lasso ölçeklemeye duyarsızdır</li>
 <li data-why="İkisinde de λ büyüdükçe katsayılar küçülür.">Lasso λ büyüdükçe katsayıları büyütür</li>
-<li data-why="">Bazı katsayıları tam sıfır yaparak öznitelik seçer</li></ol></div>
+<li data-why="">Bazı katsayıları tam sıfır yaparak öznitelik seçer</li></ol><div class="explain">Lasso ceza olarak katsayıların mutlak değerlerini (L1) toplar. Bu cezanın sıfırda köşesi olduğu için çözüm sıklıkla bazı katsayıları tam olarak sıfıra iter ve o öznitelikler modelden çıkar. Ridge ise kareleri (L2) cezalandırır; katsayıları küçültür ama genellikle tam sıfır yapmaz.</div></div>
 
 <div class="quiz" data-answer="2"><p>Gradyan inişinde, ŷ = wx, noktalar (1, 2) ve (2, 4), w = 0, η = 1.0. İlk adım?</p><ol>
 <li data-why="Bu η = 0.1 ile elde edilir.">w = 1.0</li>
@@ -227,7 +227,7 @@
 <li data-why="Bu z değeridir; ‖w‖'ye bölmek gerekir.">1</li>
 <li data-why="‖w‖ = √(4 + 1).">1/√3</li>
 <li data-why="">1/√5 ≈ 0.45</li>
-<li data-why="w ve b'yi 3'le çarpmak uzaklığı değiştirmez.">w'nin ölçeğine bağlı olduğu için belirsiz</li></ol></div>
+<li data-why="w ve b'yi 3'le çarpmak uzaklığı değiştirmez.">w'nin ölçeğine bağlı olduğu için belirsiz</li></ol><div class="explain">Bir noktanın w·x + b = 0 sınırına uzaklığı |w·x + b| / ‖w‖ formülüyle bulunur. Burada w·x + b = 2·1 + (−1)·0 − 1 = 1 ve ‖w‖ = √(4 + 1) = √5 olduğundan uzaklık 1/√5 ≈ 0.45 çıkar. Paydaya ‖w‖ girdiği için sonuç w'nin ölçeğinden bağımsızdır.</div></div>
 
 </div></main>
 </body>
