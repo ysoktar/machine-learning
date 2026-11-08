@@ -156,7 +156,7 @@
 <li><strong>(c) Kavram sayısı</strong>: 192 günün her biri bağımsız olarak Evet ya da Hayır olabilir: 2¹⁹² kavram. Hipotez dili bunlardan yalnız 2917 tanesini yazabilir: oran neredeyse sıfır. Yorum: VE'li kural dili çok kısıtlayıcıdır, yani <strong>güçlü bir tümevarımsal yanlılığa</strong> sahiptir; ama bu kısıt sayesinde birkaç örnek adayları eleyebilir. Hiç kısıt olmasaydı (2¹⁹² kavramın hepsi aday olsaydı) görülmemiş bir gün için hiçbir tahmin yapılamazdı.</li>
 </ol></div></details>
 <h3>Problem 3: Find-S</h3>
-<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H1)</span></div><p>Öznitelikler Hava (Güneşli/Yağmurlu), Sıcaklık (Ilık/Soğuk) ve Rüzgâr (Kuvvetli/Zayıf). Eğitim örnekleri sırayla: 1) Güneşli, Ilık, Kuvvetli → Evet; 2) Güneşli, Ilık, Zayıf → Evet; 3) Yağmurlu, Soğuk, Kuvvetli → Hayır; 4) Güneşli, Soğuk, Kuvvetli → Evet. Find-S'i adım adım uygulayın. Son hipotez (Yağmurlu, Ilık, Zayıf) günü için ne der? Dört örnekle tutarlı başka bir VE'li hipotez var mı?</p></div>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H1)</span></div><p>Öznitelikler Hava (Güneşli/Yağmurlu), Sıcaklık (Ilık/Soğuk) ve Rüzgâr (Kuvvetli/Zayıf). Eğitim örnekleri sırayla: 1) Güneşli, Ilık, Kuvvetli bir gün, etiketi Evet; 2) Güneşli, Ilık, Zayıf bir gün, etiketi Evet; 3) Yağmurlu, Soğuk, Kuvvetli bir gün, etiketi Hayır; 4) Güneşli, Soğuk, Kuvvetli bir gün, etiketi Evet. Find-S'i adım adım uygulayın. Son hipotez (Yağmurlu, Ilık, Zayıf) günü için ne der? Dört örnekle tutarlı başka bir VE'li hipotez var mı?</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Find-S, hiçbir güne Evet demeyen en dar hipotezle başlar ve yalnız Evet etiketli örneklere bakar. Her Evet örneğinde, hipotezin o örneğe uymayan koşullarını gevşetir (“?” yapar); böylece hipotez, gördüğü bütün pozitif günleri kapsayacak kadar genişler ama gereğinden fazla genişlemez.</p><div class="table-wrap"><table class="simple compact"><thead><tr><th>Adım</th><th>Hipotez</th><th>Ne oldu?</th></tr></thead><tbody>
 <tr><td>Başlangıç</td><td>⟨Ø, Ø, Ø⟩</td><td>Hiçbir gün Evet değil.</td></tr>
 <tr><td>1. örnek (Evet)</td><td>⟨Güneşli, Ilık, Kuvvetli⟩</td><td>İlk pozitif örneğin kendisi alınır.</td></tr>
@@ -172,7 +172,7 @@
 <li>Örnek sayısıyla hipotez sayısını karıştırmak: örnek = ∏kᵢ, hipotez = 1 + ∏(kᵢ + 1).</li>
 <li>Find-S'te negatif örnekte hipotezi değiştirmek.</li>
 <li>Pekiştirmeli öğrenmeyi “etiketli veri” ile tanımlamak: etiket yok, <em>ödül</em> var.</li>
-<li>Kalan süre ya da sayı tahminini sınıflandırma sanmak: sürekli/sayısal hedef → regresyon.</li>
+<li>Kalan süre ya da sayı tahminini sınıflandırma sanmak: hedef sürekli ya da sayısal bir değerse problem regresyondur.</li>
 </ul>
 
 <h2>Kendini sına: kısa sorular</h2>

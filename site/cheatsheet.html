@@ -49,7 +49,7 @@
 <tr><td>Sigmoid</td><td class="m">σ(z) = 1/(1+e⁻ᶻ), σ(−z) = 1 − σ(z), σ′ = σ(1−σ) ≤ 0.25</td></tr>
 <tr><td>Log-loss</td><td class="m">−[y ln p + (1−y) ln(1−p)]</td></tr>
 <tr><td>LR gradyanı</td><td class="m">∂L/∂w = (p − y)x, ∂L/∂b = p − y</td></tr>
-<tr><td>Perceptron</td><td class="m">z ≥ 0 → +1; hatada w ← w + ηyx, b ← b + ηy</td></tr>
+<tr><td>Perceptron</td><td class="m">z ≥ 0 ise +1; hatada w ← w + ηyx, b ← b + ηy</td></tr>
 <tr><td>Softmax · çapraz entropi</td><td class="m">p_k = e^{z_k}/Σe^{z_j} · −ln p_y</td></tr>
 <tr><td>Sınıra uzaklık</td><td class="m">|w·x + b|/‖w‖</td></tr>
 </tbody></table></div>
@@ -84,7 +84,7 @@
 <tr><td>Momentum · Adam</td><td class="m">m ← βm + g, θ ← θ − ηm · (m, s birlikte; η = 10⁻³, β₁ = 0.9, β₂ = 0.999)</td></tr>
 <tr><td>Evrişim çıktı boyutu</td><td class="m">⌊(n + 2p − k)/s⌋ + 1</td></tr>
 <tr><td>Evrişim parametresi</td><td class="m">F·(k_h·k_w·C_in) ağırlık + F bias</td></tr>
-<tr><td>Boole → step nöronu</td><td class="m">VE: +1 / −1 ağırlık, b = −(#pozitif değişmez) + 0.5 · VEYA: ağırlık 1, b = −0.5</td></tr>
+<tr><td>Boole ifadesini step nöronuyla kurmak</td><td class="m">VE: +1 / −1 ağırlık, b = −(#pozitif değişmez) + 0.5 · VEYA: ağırlık 1, b = −0.5</td></tr>
 </tbody></table></div>
 
 <h2 id="log2-tablosu">Hesap makinesiz sınav için log₂ ve entropi tablosu</h2>

@@ -46,7 +46,7 @@
 <h2>İki boyutta w ve b'yi elle bulmak (sınav kalıbı)</h2>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden “= ±1” denklemleri?</div><p>w ve b'yi 2 ile çarparsak aynı doğruyu elde ederiz; ölçeği sabitlemek için “destek vektörlerinde w·x + b tam +1 ya da −1 olsun” deriz (kanonik biçim). Böylece destek vektörlerini bildiğimizde her biri bize bir denklem verir; üç bilinmeyen (w₁, w₂, b) için genelde üç denklem yeter.</p></div>
 <p>Sınavda iki boyutlu küçük bir veri için w ve b'yi bulmanız istenir. İzlenecek yol dört adımdır. Önce noktaları çizin ve iki sınıfın birbirine en yakın olduğu yeri bulun; sokağa değecek noktalar oradadır. Sonra her destek vektörü için kanonik denklemi yazın: pozitif bir destek vektöründe w·x + b = +1, negatif birinde −1. Üç bilinmeyen (w₁, w₂, b) için genelde üç denklem yeter. Denklemleri çözüp sınırı, ‖w‖'yi ve marjı yazın. Son olarak bütün diğer noktaların yᵢ(w·xᵢ + b) ≥ 1 koşulunu sağladığını denetleyin; sağlamıyorsa yanlış destek vektörleri seçilmiştir.</p>
-<div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>Pozitif (2, 0), negatif (0, 0). Destek vektörleri bu iki nokta. w = (w₁, 0) varsayarak w ve b?</p><details><summary>Cevabı göster</summary><p>2w₁ + b = +1, 0 + b = −1 → b = <strong>−1</strong>, w₁ = <strong>1</strong>. Sınır x₁ = 1 (iki noktanın tam ortası), marj 1/‖w‖ = 1.</p></details></div>
+<div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>Pozitif (2, 0), negatif (0, 0). Destek vektörleri bu iki nokta. w = (w₁, 0) varsayarak w ve b?</p><details><summary>Cevabı göster</summary><p>2w₁ + b = +1 ve 0 + b = −1 denklemlerinden b = <strong>−1</strong> ve w₁ = <strong>1</strong> bulunur. Sınır x₁ = 1 (iki noktanın tam ortası), marj 1/‖w‖ = 1.</p></details></div>
 <div data-widget="hardsvm"></div>
 <p>Araçtaki varsayılan veride pozitifler (2, 2) ve (3, 1), negatifler (0, 0) ve (1, 0)'dır. En yakın bölge, (1, 0) noktası ile pozitiflerin arasındaki kenardır ve yön (1, 1)'dir. (2, 2), (3, 1) ve (1, 0) için yazılan üç denklem 2w₁ + 2w₂ + b = 1, 3w₁ + w₂ + b = 1 ve w₁ + b = −1'dir. Bunlar çözülünce w₁ = w₂ = 2/3 ve b = −5/3 bulunur: sınır x₁ + x₂ = 2.5 doğrusu, marj yaklaşık 1.06'dır. (0, 0) noktasında skor −1.67'dir; −1'den küçük olduğu için sokağın dışındadır ve destek vektörü değildir.</p>
 <p>SVM'nin bir de <strong>ikil biçimi</strong> vardır: w, destek vektörlerinin ağırlıklı toplamı olarak yazılır (w = Σαᵢyᵢxᵢ) ve katsayılar Σαᵢyᵢ = 0 koşulunu sağlar; destek vektörü olmayan noktalarda α = 0'dır. Yukarıdaki örnekte α'lar pozitifler için 2/9 ve 2/9, negatif için 4/9'dur: tek negatif destek vektörü, iki pozitifi dengeler. Bazen bir nokta sokağın kenarında durduğu hâlde katsayısı sıfır çıkabilir.</p>
@@ -104,7 +104,7 @@
 <li>Destek vektörlerini seçip çözdükten sonra diğer noktaları denetlememek (y·f ≥ 1 olmalı).</li>
 <li>Negatif destek vektöründe w·x + b = <strong>−1</strong> yerine +1 yazmak.</li>
 <li>Marjı 2/‖w‖ yazmak: marj 1/‖w‖, 2/‖w‖ sokak genişliği.</li>
-<li>C'nin yönünü ters söylemek: büyük C → dar marj, az destek vektörü, düşük yanlılık, yüksek varyans.</li>
+<li>C'nin yönünü ters söylemek: C büyüdükçe marj daralır, destek vektörü azalır, yanlılık düşer ve varyans artar.</li>
 <li>Ölçeklemeden RBF kullanmak.</li>
 <li>ξ'yi yanlış tarafta olmayan noktalar için hep 0 sanmak: sokağın içindeki doğru taraftaki noktada 0 &lt; ξ &lt; 1.</li>
 </ul>
@@ -117,14 +117,14 @@
 <tr><td>C</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>dar marj, az destek vektörü; λ = 1/C</td></tr>
 <tr><td>RBF γ</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>dar tümsekler, adalar; γ → 0 doğrusala yaklaşır</td></tr>
 <tr><td>Polinom derecesi d</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>d &gt; 3 nadiren gerekir</td></tr>
-<tr><td>Çekirdek: doğrusal → RBF</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>kapasite büyür</td></tr>
+<tr><td>Çekirdeği doğrusaldan RBF'ye değiştirmek</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>kapasite büyür</td></tr>
 </tbody></table></div>
 <p class="small">Destek vektörü oranı %50'nin üstündeyse C ya da γ çok büyük olabilir (ya da veri çok gürültülü). Dikkat: C'yi 0.1'den 100'e çıkarırsak marj daralır, destek vektörü sayısı azalır, yanlılık düşer, varyans artar. (Bazı kaynaklar C'yi ters yönde “ihlal bütçesi” olarak tanımlar; formüle bakın: burada C, Σξ'nin katsayısıdır.)</p>
 
 <h2>Kendini sına: kısa sorular</h2>
 <div class="quiz" data-answer="2"><p>w = (1, 2), b = −3 (kanonik). Marj ve (2, 2) noktasının konumu? (√5 = 2.236)</p><ol>
 <li data-why="Sokak genişliği 2/‖w‖ = 0.894; marj bunun yarısı.">marj 0.894; nokta sokağın içinde</li>
-<li data-why="">marj 1/√5 = 0.447; f(2,2) = 3 &gt; 1 → sokağın dışında, uzaklık 3/√5 = 1.342</li>
+<li data-why="">marj 1/√5 = 0.447; f(2,2) = 3 &gt; 1 olduğu için nokta sokağın dışındadır; uzaklık 3/√5 = 1.342</li>
 <li data-why="f = 2 + 4 − 3 = 3.">marj 0.447; nokta sınırın üstünde</li>
 <li data-why="‖w‖ = √5.">marj 1/3</li></ol></div>
 
@@ -133,7 +133,7 @@
 <li data-why="Bu denklemler (2,1) ile (1,0)'ın ortasından geçen sınırı vermez.">w = (2, 0), b = −3</li>
 <li data-why="Veri ayrılabilir.">Sert marj çözümü yoktur</li>
 <li data-why="">w = (1, 1), b = −2; sınır x₁ + x₂ = 2, marj 1/√2 ≈ 0.707</li></ol>
-<div class="explain">2w₁ + w₂ + b = 1, w₁ + b = −1, w₂ + b = −1 → w₁ = w₂ = 1, b = −2. (3,2): f = 3 ≥ 1 ✓.</div></div>
+<div class="explain">2w₁ + w₂ + b = 1, w₁ + b = −1, w₂ + b = −1 denklemlerinden w₁ = w₂ = 1 ve b = −2 bulunur. (3,2): f = 3 ≥ 1 ✓.</div></div>
 
 <div class="quiz" data-answer="1"><p>Yumuşak marjlı SVM'de C küçültülürse?</p><ol>
 <li data-why="">Marj genişler, destek vektörü sayısı artar, aşırı uyum eğilimi azalır</li>

@@ -16,7 +16,7 @@
 <h1>Hiperparametre tablosu</h1>
 <p class="lead">Her haftanın sonunda doldurulan ve sınavda aynı biçimde sorulan tablo: <em>“X artarsa yanlılık, varyans ve aşırı uyum riski nasıl değişir, neden?”</em> Tek kelimelik yanıt ve tek cümlelik gerekçe yeter.</p>
 
-<div class="callout"><div class="callout-title">Tek kural</div><p>Hiperparametre <strong>modeli esnekleştiriyorsa</strong> (daha karmaşık sınır, daha az ceza) → yanlılık ↓, varyans ↑, aşırı uyum riski ↑. <strong>Katılaştırıyorsa</strong> (daha çok ceza, daha çok ortalama, daha basık ağaç) → tersi. İstisnalar: eğitim örneği sayısı n ve rastgele ormanda ağaç sayısı yanlılığı değiştirmez, yalnız varyansı düşürür. Öğrenme oranı ve batch boyutu eniyileme eksenindedir, ayrı tutun.</p></div>
+<div class="callout"><div class="callout-title">Tek kural</div><p>Hiperparametre <strong>modeli esnekleştiriyorsa</strong> (daha karmaşık bir sınıra izin veriyor ya da daha az ceza uyguluyorsa) yanlılık azalır, varyans artar ve aşırı uyum riski yükselir. Hiperparametre <strong>modeli katılaştırıyorsa</strong> (daha çok ceza, daha çok ortalama alma, daha sığ bir ağaç) tam tersi olur: yanlılık artar, varyans azalır ve eksik uyum riski yükselir. İstisnalar: eğitim örneği sayısı n ve rastgele ormanda ağaç sayısı yanlılığı değiştirmez, yalnız varyansı düşürür. Öğrenme oranı ve yığın (batch) boyutu ise modelin esnekliğini değil eğitimin nasıl ilerlediğini etkiler; bunları yanlılık-varyans ekseninden ayrı düşünün.</p></div>
 
 <div data-widget="hyper"></div>
 

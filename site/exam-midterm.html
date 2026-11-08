@@ -35,7 +35,7 @@
 <li>Kısa sorularda kalıp: <strong>“hiperparametre artarsa: yanlılık / varyans / aşırı uyum”</strong> tablosu (3–7. haftalar).</li>
 <li>Süre yetmezse yöntemi yazın.</li>
 </ul></div>
-<p>Örnek sınav 110 dakika / 108 puandı ve içinde bir de “her şey aynı veride” büyük sorusu (ölçekleme → çizim → LR → perceptron → kNN → eşik → SVM → λ seçimi) vardı. <a href="sample-midterm.html">Çözümü burada</a>.</p>
+<p>Örnek sınav 110 dakika / 108 puandı ve içinde bir de “her şey aynı veride” büyük sorusu (sırasıyla ölçekleme, çizim, doğrusal regresyon, perceptron, kNN, eşik seçimi, SVM ve λ seçimi soruluyordu) vardı. <a href="sample-midterm.html">Çözümü burada</a>.</p>
 
 <h2>Her haftadan neyi bilmeniz gerekiyor?</h2>
 <p>Her hafta için iki şey sıralanıyor: sınavda <em>elle</em> yapmanız beklenen hesaplar ve kısa sorularda sorulabilecek kavramlar. Bir maddeyi rahatça yapamıyorsanız haftanın sayfasındaki ilgili bölüme dönün.</p>
@@ -59,7 +59,7 @@
 <li><strong>FP ile FN'yi karıştırmak.</strong> Önce her örneğe TP/FN/FP/TN yazın; TP + FN = pozitif sayısı denetimini yapın.</li>
 <li>z-score'da σ'yı n − 1'e bölmek (ders n'ye böler); PCA kovaryansında ise n − 1.</li>
 <li>Test verisinin min/max/μ'sünü yeniden hesaplamak: <strong>eğitimin</strong> parametreleri kullanılır.</li>
-<li>Perceptron'da z = 0'ı yanlış sınıflamak: kural <strong>z ≥ 0 → +1</strong>. Doğru sınıflanan örnekte güncelleme yapmak.</li>
+<li>Perceptron'da z = 0'ı yanlış sınıflamak: kural <strong>z ≥ 0 ise +1</strong> demektir. Doğru sınıflanan örnekte güncelleme yapmak.</li>
 <li>Lojistik adımda w ← w <strong>−</strong> η(p − y)x yerine artı yazmak; 1/n'yi unutmak (çok örnekte).</li>
 <li>ID3'te ağırlıklı entropide |D_v|/|D| çarpanını unutmak; alt dalda <em>kalan</em> örneklerle değil bütün veriyle hesaplamak.</li>
 <li>Bilgi kazancını en küçük olanı seçmek (en büyüğü seçilir); Gini'de ise ağırlıklı Gini en küçük olan.</li>

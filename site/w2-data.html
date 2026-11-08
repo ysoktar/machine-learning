@@ -45,7 +45,7 @@
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden ölçeklemeliyiz?</div><p>İki müşteriyi karşılaştırıyoruz: yaşları 30 ve 60, gelirleri 40.000 ve 41.000 TL. Ham sayılarla uzaklık hesaplarsak gelirdeki 1000 TL'lik fark, yaştaki 30 yıllık farkı ezer: model yaşı hiç görmez. Ölçekleme bütün öznitelikleri aynı “birime” getirir.</p><p><strong>min-max</strong>: en küçüğü 0, en büyüğü 1 yap. <strong>z-score</strong>: “ortalamadan kaç standart sapma uzakta?” (z = 2: ortalamanın 2 standart sapma üstü).</p></div>
 <p>En sık kullanılan iki yöntem şunlardır:</p>
 <div class="formula">min-max: x′ = (x − min) / (max − min) ∈ [0, 1]&nbsp;&nbsp;&nbsp;&nbsp; z-score: z = (x − μ) / σ</div>
-<div class="read-formula"><b>Nasıl okunur?</b><ul><li><b>min-max</b>: değerden en küçük değeri çıkar, aralığa (en büyük − en küçük) böl. En küçük değer 0'a, en büyük 1'e gider. Örn. 2…9 aralığında 5 → (5 − 2)/7 = 0.43.</li><li><b>z-score</b>: değerden ortalamayı (μ) çıkar, standart sapmaya (σ) böl. Sonuç “ortalamadan kaç standart sapma uzakta?” sorusunun cevabı: z = 0 tam ortalama, z = 1 bir sapma yukarıda, z = −2 iki sapma aşağıda.</li></ul></div>
+<div class="read-formula"><b>Nasıl okunur?</b><ul><li><b>min-max</b>: değerden en küçük değeri çıkar, aralığa (en büyük − en küçük) böl. En küçük değer 0'a, en büyük 1'e gider. Örneğin değerler 2 ile 9 arasındaysa 5 değeri (5 − 2)/7 = 0.43 olur.</li><li><b>z-score</b>: değerden ortalamayı (μ) çıkar, standart sapmaya (σ) böl. Sonuç “ortalamadan kaç standart sapma uzakta?” sorusunun cevabı: z = 0 tam ortalama, z = 1 bir sapma yukarıda, z = −2 iki sapma aşağıda.</li></ul></div>
 <p><b>Elle bir örnek.</b> x = (2, 4, 4, 4, 5, 5, 7, 9) dizisini ölçekleyelim. En küçük değer 2, en büyük 9, aralık 7. Ortalama μ = 40/8 = 5. Ortalamadan farkların kareleri 9, 1, 1, 1, 0, 0, 4, 16; toplamı 32, varyans 32/8 = 4, standart sapma σ = 2.</p>
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th>x</th><th>2</th><th>4</th><th>4</th><th>4</th><th>5</th><th>5</th><th>7</th><th>9</th></tr></thead><tbody>
 <tr><td>min-max: (x − 2)/7</td><td>0</td><td>0.29</td><td>0.29</td><td>0.29</td><td>0.43</td><td>0.43</td><td>0.71</td><td>1</td></tr>
@@ -97,7 +97,7 @@
 <li>Her örneğin altına <strong>TP / FN / FP / TN</strong> yazın: önce <em>gerçek</em>e bakın (pozitifse TP ya da FN), sonra tahmine.</li>
 <li>Sayın ve 2×2 tabloyu çizin (satır = gerçek, sütun = tahmin).</li>
 <li><strong>Denetim</strong>: TP + FN = pozitif sayısı, FP + TN = negatif sayısı, toplam = n.</li>
-<li>Her ölçütü formül → sayılar → sonuç olarak yazın (ara adım puandır).</li>
+<li>Her ölçütü önce formülüyle yazın, sonra sayıları yerleştirin, en son sonucu verin; ara adımlar da puan getirir.</li>
 </ol><p class="small">Hatırlatıcı: <em>Precision</em> “tahmin ettiğim pozitifler” (sütun), <em>Recall</em> “gerçek pozitifler” (satır) üzerinden.</p></div>
 <div data-widget="confusion"></div>
 <p>Precision ile recall genelde ters yönde hareket eder. Modelin “pozitif” deme eşiğini yükseltirseniz daha az ama daha emin pozitif dersiniz: yanlış alarmlar azalır, precision artar; ama bazı gerçek pozitifler kaçar, recall düşer. Specificity aynı soruyu negatifler için sorar (gerçek negatiflerin kaçı doğru bırakıldı?); 1 − specificity de yanlış alarm oranıdır (FPR). F1 bir harmonik ortalamadır, bu yüzden ikisinden küçük olanı öne çıkarır: precision 1 ve recall 0.1 olan bir modelin aritmetik ortalaması 0.55 iken F1'i yalnız 0.18'dir.</p>
@@ -179,7 +179,7 @@
 <li data-why="">1.0</li>
 <li data-why="μ'yü test değeriyle birlikte yeniden hesaplamak sızıntıdır.">μ ve σ, 7 eklenerek yeniden hesaplanır</li>
 <li data-why="σ = √(54/6) = 3, n − 1 değil.">0.93</li></ol>
-<div class="explain">μ = 24/6 = 4, sapmaların kareleri 9, 4, 4, 0, 1, 36 → toplam 54, σ² = 54/6 = 9, σ = 3. z = (7 − 4)/3 = 1.0.</div></div>
+<div class="explain">μ = 24/6 = 4, sapmaların kareleri 9, 4, 4, 0, 1, 36 olup toplamları 54'tür; σ² = 54/6 = 9, σ = 3. z = (7 − 4)/3 = 1.0.</div></div>
 
 <div class="quiz" data-answer="4"><p>Hangisi veri sızıntısı <em>değildir</em>?</p><ol>
 <li data-why="Ölçekleyici test satırlarını görmüş olur.">Bütün veride <code>scaler.fit</code>, sonra bölmek</li>
@@ -199,7 +199,7 @@
 <li data-why="Yamuk ya da çift sayma 0.89 verir.">0.75</li>
 <li data-why="">8/9 ≈ 0.89</li>
 <li data-why="Bir (pozitif, negatif) çifti ters sıralı: 3. sıradaki negatif 4. sıradaki pozitifin önünde.">1.0</li></ol>
-<div class="explain">3 pozitif × 3 negatif = 9 çift. 1. negatifin (3. sıra) önünde 2, diğer iki negatifin önünde 3'er pozitif: 2 + 3 + 3 = 8 → 8/9.</div></div>
+<div class="explain">3 pozitif × 3 negatif = 9 çift. 1. negatifin (3. sıra) önünde 2, diğer iki negatifin önünde 3'er pozitif: toplam 2 + 3 + 3 = 8 çift doğru sıralıdır, dolayısıyla AUC = 8/9.</div></div>
 
 <div class="quiz" data-answer="2"><p>5 katlı CV: A modeli F1 = 0.81 ± 0.09, B modeli 0.79 ± 0.01. En makul yorum?</p><ol>
 <li data-why="Fark A'nın std'sinden küçük; A kararsız.">A açıkça daha iyi, A seçilir</li>
@@ -212,7 +212,7 @@
 <li data-why="Özdeğerler a ± c = 3 ve 1/3.">%60</li>
 <li data-why="">%90</li>
 <li data-why="İz 10/3, λ₁ = 3.">%100</li></ol>
-<div class="explain">Köşegenler eşit (a = 5/3), c = 4/3 → λ = 3 ve 1/3. Oran 3/(10/3) = 0.90; PC1 yönü (1, 1)/√2.</div></div>
+<div class="explain">Köşegenler eşit (a = 5/3), c = 4/3 olduğundan özdeğerler λ = 3 ve 1/3 çıkar. Oran 3/(10/3) = 0.90; PC1 yönü (1, 1)/√2.</div></div>
 
 </div></main>
 </body>

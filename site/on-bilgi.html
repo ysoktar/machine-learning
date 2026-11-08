@@ -60,7 +60,7 @@
 <ol>
 <li>Ortalama μ = toplam/adet = 40/8 = <strong>5</strong>.</li>
 <li>Her değerin ortalamadan farkı: −3, −1, −1, −1, 0, 0, 2, 4.</li>
-<li>Farkların kareleri: 9, 1, 1, 1, 0, 0, 4, 16 → toplam 32.</li>
+<li>Farkların kareleri: 9, 1, 1, 1, 0, 0, 4, 16; bunların toplamı 32'dir.</li>
 <li>Varyans σ² = 32/8 = <strong>4</strong> (ders z-score için n'ye böler). Standart sapma σ = √4 = <strong>2</strong>.</li>
 </ol>
 <p>Neden kare? Farkların toplamı her zaman 0'dır (artılar eksileri götürür); kare almak hepsini pozitif yapar. PCA'daki kovaryans aynı fikrin iki değişkenli hâlidir: (x farkı) × (y farkı) ortalaması; ikisi birlikte artıyorsa pozitif çıkar.</p>
@@ -73,11 +73,11 @@
 <li><strong>Uzunluk (norm)</strong> ‖w‖ = √(w·w). ‖(2, −1)‖ = √5 ≈ 2.236.</li>
 <li><strong>Öklid uzaklığı</strong> d(x, z) = √Σ(xⱼ − zⱼ)². (1, 2) ile (4, 6): √(9 + 16) = 5. Sıralama için karekök gereksizdir: d² = 25 yeter.</li>
 <li><strong>Manhattan</strong> Σ|xⱼ − zⱼ| = 3 + 4 = 7 (şehir bloklarında yürümek gibi).</li>
-<li><strong>Doğru denklemi</strong> w₁x₁ + w₂x₂ + b = 0. Çizmek için x₂'yi yalnız bırakın: x₂ = −(w₁x₁ + b)/w₂. Örn. x₁ − 2x₂ + 1 = 0 → x₂ = (x₁ + 1)/2: (0, 0.5) ve (1, 1)'den geçer. w vektörü doğruya diktir ve w·x + b'nin <em>pozitif</em> olduğu tarafı gösterir.</li>
+<li><strong>Doğru denklemi</strong> w₁x₁ + w₂x₂ + b = 0. Çizmek için x₂'yi yalnız bırakın: x₂ = −(w₁x₁ + b)/w₂. Örneğin x₁ − 2x₂ + 1 = 0 doğrusu x₂ = (x₁ + 1)/2 biçiminde yazılır ve (0, 0.5) ile (1, 1) noktalarından geçer. w vektörü doğruya diktir ve w·x + b'nin <em>pozitif</em> olduğu tarafı gösterir.</li>
 <li>Bir noktanın doğruya uzaklığı |w·x + b| / ‖w‖.</li>
 </ul>
 <div class="tryit"><div class="tryit-title">Hemen dene</div><p>w = (1, 1), b = −2. (3, 2) noktası doğrunun hangi tarafında ve doğruya uzaklığı ne?</p>
-<details><summary>Cevap</summary><p>w·x + b = 3 + 2 − 2 = 3 &gt; 0 → pozitif taraf. Uzaklık 3/√2 = 3/1.414 ≈ <strong>2.12</strong>.</p></details></div>
+<details><summary>Cevap</summary><p>w·x + b = 3 + 2 − 2 = 3 &gt; 0 olduğundan nokta pozitif taraftadır. Uzaklık 3/√2 = 3/1.414 ≈ <strong>2.12</strong>.</p></details></div>
 
 <h2>Türev, gradyan ve zincir kuralı</h2>
 <div class="intuition"><div class="intuition-title">Sezgi</div>
