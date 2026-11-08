@@ -369,6 +369,35 @@ Object.assign(FIG, {
   },
 });
 
+
+// ---------------------------------------------------------------- sample midterm figures
+const MID = [["P1", 0.1, 1, 1], ["P2", 0.3, 0.25, 1], ["P3", 0, 0.75, 1], ["P4", 0.7, 0.75, -1], ["P5", 1, 0, -1], ["P6", 0.4, 0, -1], ["P7", 0.8, 0.5, -1]];
+function midPlot(extra, labelNotes = {}) {
+  const S = 300, ox = 50, oy = 330, X = (v) => ox + v * S, Y = (v) => oy - v * S;
+  let s = `${DEFS}<defs><clipPath id="mclip"><rect x="${X(-0.05)}" y="${Y(1.05)}" width="${X(1.05) - X(-0.05)}" height="${Y(-0.05) - Y(1.05)}"/></clipPath></defs>`;
+  for (let i = 0; i <= 10; i += 2) { const v = i / 10; s += `<line x1="${X(v)}" y1="${Y(0)}" x2="${X(v)}" y2="${Y(1)}" class="fig-grid"/><line x1="${X(0)}" y1="${Y(v)}" x2="${X(1)}" y2="${Y(v)}" class="fig-grid"/>${T(X(v), Y(0) + 15, v, { anchor: "middle", cls: "fig-sub" })}${T(X(0) - 8, Y(v) + 4, v, { anchor: "end", cls: "fig-sub" })}`; }
+  s += T(X(1), Y(0) + 30, "x₁′ (rüzgâr, ölçekli)", { anchor: "end" }) + T(X(0) - 40, Y(1) - 10, "x₂′ (görüş)");
+  s += `<g clip-path="url(#mclip)">${extra(X, Y)}</g>`;
+  for (const [n, a, b, y] of MID) s += pt(X(a), Y(b), y > 0 ? "pos" : "neg", 6) + T(X(a) + 9, Y(b) - 8, n + (labelNotes[n] ? " " + labelNotes[n] : ""), { cls: labelNotes[n] ? "lab" : "fig-sub" });
+  return svg(390, 370, s, "Ölçeklenmiş noktalar");
+}
+Object.assign(FIG, {
+  midscatter: () => midPlot((X, Y) => `<line x1="${X(0.35)}" y1="${Y(-0.1)}" x2="${X(0.35)}" y2="${Y(1.1)}" class="line accent"/><line x1="${X(0.26)}" y1="${Y(-0.1)}" x2="${X(0.74)}" y2="${Y(1.1)}" class="line dash"/>`),
+  midperc: () => midPlot((X, Y) => `<polygon points="${X(-0.1)},${Y(-0.1)} ${X(1.1)},${Y(1.1)} ${X(-0.1)},${Y(1.1)}" class="region-pos"/><polygon points="${X(-0.1)},${Y(-0.1)} ${X(1.1)},${Y(1.1)} ${X(1.1)},${Y(-0.1)}" class="region-neg"/><line x1="${X(-0.1)}" y1="${Y(-0.1)}" x2="${X(1.1)}" y2="${Y(1.1)}" class="line"/>`, { P2: "(z = −0.05: FN)", P4: "(z = +0.05: FP)" }),
+  dronetree: () => {
+    const nb = (x, y, t, sub, cls = "fig-box") => box(x - 72, y, 144, 44, t, cls, sub);
+    return svg(460, 260, `${DEFS}${nb(230, 10, "Rüzgâr?", "IG = 0.522 (en büyük)")}
+      ${arrow(195, 54, 120, 100)}${arrow(265, 54, 340, 100)}${T(132, 82, "Kuvvetli")}${T(312, 82, "Hafif")}
+      ${nb(110, 100, "→ Hayır", "4, 5, 7 [0 Evet / 3 Hayır]", "fig-box3")}${nb(350, 100, "Yağış?", "1, 2, 3, 6 [3 / 1]")}
+      ${arrow(320, 144, 270, 190)}${arrow(380, 144, 410, 190)}${T(272, 172, "Yok")}${T(402, 172, "Var")}
+      ${nb(250, 190, "→ Evet", "1, 2, 3 [3 / 0]", "fig-box3")}${box(368, 190, 88, 44, "→ Hayır", "fig-box3", "6 [0 / 1]")}`, "Dron karar ağacı");
+  },
+  lambdacurve: () => lines({ series: [
+    { pts: [[0, 0.02], [1, 0.05], [2, 0.09], [3, 0.17], [4, 0.33]], cls: "curve1", dots: true, name: "eğitim hatası", color: "pos" },
+    { pts: [[0, 0.31], [1, 0.22], [2, 0.14], [3, 0.18], [4, 0.34]], cls: "curve2", dots: true, name: "doğrulama hatası", color: "neg" },
+  ], xlim: [0, 4], ylim: [0, 0.4], xstep: 1, ystep: 0.1, xlabel: "λ: 0 · 0.01 · 0.1 · 1 · 10", ylabel: "hata", aria: "Lambda eğrisi" }),
+});
+
 export function figure(ds) {
   const make = FIG[ds.fig];
   if (!make) return h("p", { class: "err" }, "Bilinmeyen şekil: " + ds.fig);

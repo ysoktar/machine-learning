@@ -18,28 +18,21 @@
 
 <div class="callout warn"><div class="callout-title">Dikkat: iki tuzak</div><p>2(d)'de P2 (z = −0.05) ve P4 (z = +0.05) sınıra çok yakın: işaretleri yanlış okumak bütün karmaşıklık matrisini ve 2(e)'yi bozar. 2(f)'de en yakın komşu P2 (Evet) ama k = 3'te karar Hayır'a döner.</p></div>
 
-<h2>Soru 1: ID3 ile karar ağacı (10 p)</h2>
+<h2>Soru 1 (10 p): dron verisinden ID3 ile karar ağacı</h2>
 <p>Dron teslimat uçuşu: 7 gözlem, öznitelikler Rüzgar (Hafif/Kuvvetli), Yağış (Yok/Var), Görüş (İyi/Kötü), sınıf Uçuş (Evet/Hayır).</p>
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th>No</th><th>Rüzgar</th><th>Yağış</th><th>Görüş</th><th>Uçuş?</th></tr></thead><tbody>
 <tr><td>1</td><td>Hafif</td><td>Yok</td><td>İyi</td><td>Evet</td></tr><tr><td>2</td><td>Hafif</td><td>Yok</td><td>Kötü</td><td>Evet</td></tr><tr><td>3</td><td>Hafif</td><td>Yok</td><td>İyi</td><td>Evet</td></tr><tr><td>4</td><td>Kuvvetli</td><td>Var</td><td>İyi</td><td>Hayır</td></tr><tr><td>5</td><td>Kuvvetli</td><td>Yok</td><td>Kötü</td><td>Hayır</td></tr><tr><td>6</td><td>Hafif</td><td>Var</td><td>Kötü</td><td>Hayır</td></tr><tr><td>7</td><td>Kuvvetli</td><td>Yok</td><td>İyi</td><td>Hayır</td></tr></tbody></table></div>
-<details class="solution"><summary>Çözüm</summary><div class="body">
-<p><strong>H(D)</strong>: 3 Evet / 4 Hayır → H = (3/7)(1.222) + (4/7)(0.807) = 0.524 + 0.461 = <strong>0.985</strong>.</p>
-<div class="table-wrap"><table class="simple compact"><thead><tr><th>Öznitelik</th><th>Dal: n (E/H), H</th><th>Ağırlıklı H</th><th>IG</th></tr></thead><tbody>
-<tr class="hl"><td>Rüzgar</td><td>Hafif 4 (3/1) 0.811 · Kuvvetli 3 (0/3) 0</td><td>(4/7)·0.811 = 0.464</td><td><strong>0.522</strong></td></tr>
-<tr><td>Yağış</td><td>Yok 5 (3/2) 0.971 · Var 2 (0/2) 0</td><td>(5/7)·0.971 = 0.694</td><td>0.292</td></tr>
-<tr><td>Görüş</td><td>İyi 4 (2/2) 1 · Kötü 3 (1/2) 0.918</td><td>0.571 + 0.393 = 0.965</td><td>0.020</td></tr>
+<details class="solution"><summary>Çözüm</summary><div class="body"><p>ID3'te önce bütün verinin belirsizliğini (entropisini) hesaplarız, sonra her özniteliğin bu belirsizliği ne kadar azalttığına (bilgi kazancına) bakarız. En çok azaltan kök olur; karışık kalan dallarda aynı hesabı kalan özniteliklerle tekrarlarız.</p>
+<p><strong>Bütün verinin entropisi.</strong> 7 uçuşun 3'ü Evet, 4'ü Hayır. Tablodan −log₂(3/7) = 1.222 ve −log₂(4/7) = 0.807 değerlerini alırız: H(D) = (3/7)·1.222 + (4/7)·0.807 = 0.524 + 0.461 = <strong>0.985</strong>.</p>
+<p><strong>Kök için üç adayın kazancı.</strong> Her öznitelik için veriyi değerlerine göre gruplara ayırıp her grubun entropisini buluyor, grupları büyüklükleriyle ağırlıklandırıp topluyoruz.</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Öznitelik</th><th>Gruplar: uçuş sayısı (Evet/Hayır) ve entropi</th><th>Ağırlıklı entropi</th><th>Kazanç</th></tr></thead><tbody>
+<tr class="hl"><td>Rüzgâr</td><td>Hafif: 4 (3/1), H = 0.811 · Kuvvetli: 3 (0/3), H = 0</td><td>(4/7)·0.811 = 0.464</td><td><strong>0.522</strong></td></tr>
+<tr><td>Yağış</td><td>Yok: 5 (3/2), H = 0.971 · Var: 2 (0/2), H = 0</td><td>(5/7)·0.971 = 0.694</td><td>0.292</td></tr>
+<tr><td>Görüş</td><td>İyi: 4 (2/2), H = 1 · Kötü: 3 (1/2), H = 0.918</td><td>0.571 + 0.393 = 0.965</td><td>0.020</td></tr>
 </tbody></table></div>
-<p><strong>Kök: Rüzgar.</strong> Kuvvetli dalı saf → Hayır. Hafif dalı {1, 2, 3, 6}: 3 Evet / 1 Hayır, H = 0.811.</p>
-<div class="table-wrap"><table class="simple compact"><thead><tr><th>Hafif dalında</th><th>Dallar</th><th>Ağırlıklı H</th><th>IG</th></tr></thead><tbody>
-<tr class="hl"><td>Yağış</td><td>Yok {1,2,3} 3/0 → 0 · Var {6} 0/1 → 0</td><td>0</td><td><strong>0.811</strong></td></tr>
-<tr><td>Görüş</td><td>İyi {1,3} 2/0 → 0 · Kötü {2,6} 1/1 → 1</td><td>(2/4)·1 = 0.5</td><td>0.311</td></tr>
-</tbody></table></div>
-<div class="tree">Rüzgar? [3/4]
-    Kuvvetli: → Hayır [0/3]
-    Hafif: Yağış? [3/1]
-        Yok: → Evet [3/0]
-        Var: → Hayır [0/1]</div>
-<p>Derinlik 2, 3 yaprak, eğitim hatası 0; Görüş hiç kullanılmadı.</p>
+<p>En büyük kazanç Rüzgâr'da olduğu için <strong>kök Rüzgâr</strong>dır. Kuvvetli rüzgârlı üç günün hepsinde uçuş yapılmamış; bu dal saftır ve “Hayır” yaprağı olur.</p>
+<p><strong>Hafif dalı.</strong> Kalan dört gün (1, 2, 3, 6) içinde 3 Evet, 1 Hayır var, entropi 0.811. Bu dört günle kalan iki özniteliği deneriz. Yağış'a göre bölünce yağışsız 3 gün hepsi Evet, yağışlı 1 gün Hayır: iki grup da saf, kazanç 0.811 (bütün belirsizlik gider). Görüş'e göre bölünce iyi görüşlü iki gün Evet ama kötü görüşlü iki gün yarı yarıya kalır; kazanç yalnız 0.311. Bu yüzden Hafif dalında <strong>Yağış</strong>'a göre bölünür.</p>
+<div data-widget="fig" data-fig="dronetree" data-caption="Sonuç ağacı: iki seviye, üç yaprak, eğitim hatası sıfır. Görüş hiç kullanılmadı."></div><p>Ağacı adım adım kendiniz kurmak için:</p>
 <div data-widget="id3" data-data="Rüzgar Yağış Görüş Uçuş
 Hafif Yok İyi Evet
 Hafif Yok Kötü Evet
@@ -47,136 +40,125 @@ Hafif Yok İyi Evet
 Kuvvetli Var İyi Hayır
 Kuvvetli Yok Kötü Hayır
 Hafif Var Kötü Hayır
-Kuvvetli Yok İyi Hayır"></div>
-</div></details>
+Kuvvetli Yok İyi Hayır"></div></div></details>
 
-<h2>Soru 2: sayısal öznitelikler (50 p)</h2>
+<h2>Soru 2 (50 p): aynı veride sayısal ölçümlerle yedi model</h2>
 <p>x₁ = rüzgar hızı (km/sa), x₂ = görüş (km); Evet = +1, Hayır = −1.</p>
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th>Örnek</th><th>x₁</th><th>x₂</th><th>Sınıf</th></tr></thead><tbody>
 <tr><td>P1</td><td>8</td><td>10</td><td>+1</td></tr><tr><td>P2</td><td>14</td><td>4</td><td>+1</td></tr><tr><td>P3</td><td>5</td><td>8</td><td>+1</td></tr><tr><td>P4</td><td>26</td><td>8</td><td>−1</td></tr><tr><td>P5</td><td>35</td><td>2</td><td>−1</td></tr><tr><td>P6</td><td>17</td><td>2</td><td>−1</td></tr><tr><td>P7</td><td>29</td><td>6</td><td>−1</td></tr></tbody></table></div>
 
-<h3>(a) min-max ölçekleme (4 p)</h3>
-<details class="solution"><summary>Çözüm</summary><div class="body">
-<p>x₁: min 5, max 35, aralık 30 → x₁′ = (x₁ − 5)/30. x₂: min 2, max 10, aralık 8 → x₂′ = (x₂ − 2)/8.</p>
+<h3>(a) Öznitelikleri 0–1 aralığına ölçeklemek (4 p)</h3>
+<details class="solution"><summary>Çözüm</summary><div class="body"><p>min-max ölçeklemede her değerden o sütunun en küçük değerini çıkarır, sütunun aralığına (en büyük − en küçük) böleriz; böylece en küçük değer 0, en büyük 1 olur.</p>
+<p>Rüzgâr hızında en küçük değer 5, en büyük 35, aralık 30'dur; bu yüzden x₁′ = (x₁ − 5)/30. Örneğin P1 için (8 − 5)/30 = 0.1. Görüş mesafesinde en küçük 2, en büyük 10, aralık 8'dir; x₂′ = (x₂ − 2)/8. Örneğin P2 için (4 − 2)/8 = 0.25.</p>
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th></th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th><th>P7</th></tr></thead><tbody>
 <tr><td>x₁′</td><td>0.1</td><td>0.3</td><td>0</td><td>0.7</td><td>1</td><td>0.4</td><td>0.8</td></tr>
 <tr><td>x₂′</td><td>1</td><td>0.25</td><td>0.75</td><td>0.75</td><td>0</td><td>0</td><td>0.5</td></tr>
-<tr><td>y</td><td>+</td><td>+</td><td>+</td><td>−</td><td>−</td><td>−</td><td>−</td></tr></tbody></table></div>
-</div></details>
+<tr><td>sınıf</td><td>+</td><td>+</td><td>+</td><td>−</td><td>−</td><td>−</td><td>−</td></tr></tbody></table></div>
+<p>Bundan sonraki bütün şıklarda bu ölçeklenmiş değerler kullanılır.</p></div></details>
 
-<h3>(b) Çizim ve doğrusal ayrılabilirlik (5 p)</h3>
-<details class="solution"><summary>Çözüm</summary><div class="body">
-<p><strong>Ayrılabilir.</strong> Pozitiflerin hepsi x₁′ ≤ 0.3, negatiflerin hepsi x₁′ ≥ 0.4: en basit ayırıcı dikey doğru <strong>x₁′ = 0.35</strong>. (Eğik bir doğru da olur; örneğin (h)'deki en büyük marjlı sınır −10x₁′ + 4x₂′ + 3 = 0, yani x₂′ = 2.5x₁′ − 0.75.)</p>
-</div></details>
+<h3>(b) Noktaları çizmek: bir doğruyla ayrılıyorlar mı? (5 p)</h3>
+<details class="solution"><summary>Çözüm</summary><div class="body"><p>Ölçeklenmiş noktaları çizdiğimizde (aşağıda) pozitif üç noktanın (P1, P2, P3) hepsinin sol tarafta, x₁′ değerinin 0.3 ya da daha küçük olduğu bölgede kaldığını; negatif dört noktanın ise x₁′ ≥ 0.4 bölgesinde olduğunu görürüz. Demek ki iki sınıfı tek bir doğruyla ayırmak mümkündür: veri <strong>doğrusal olarak ayrılabilir</strong>.</p>
+<p>En basit ayırıcı, iki grubun arasından geçen dikey doğru <strong>x₁′ = 0.35</strong>'tir. Eğik bir doğru da olur; örneğin (h) şıkkında bulacağımız en geniş marjlı sınır x₂′ = 2.5x₁′ − 0.75 doğrusudur.</p>
+<div data-widget="fig" data-fig="midscatter" data-caption="Mavi daireler Evet (+1), kırmızı kareler Hayır (−1). Düz çizgi x₁′ = 0.35, kesikli çizgi (h) şıkkındaki SVM sınırı."></div></div></details>
 
-<h3>(c) Lojistik regresyon katsayıları (6 p)</h3>
-<details class="solution"><summary>Çözüm</summary><div class="body">
-<p>Sınır x₁′ = 0.35 ile uyumlu, P2 ve P6'da tablodaki değerlere düşen bir seçim: <strong>w₁ = −20, w₂ = 0, w₀ = 7</strong> (z = 7 − 20x₁′; z = 0 ⇔ x₁′ = 0.35; sol taraf Evet).</p>
-<ul>
-<li>P2: z = 7 − 6 = 1 → p = 1/(1 + e⁻¹) = 1/(1 + 0.368) = <strong>0.731</strong> (Evet).</li>
-<li>P6: z = 7 − 8 = −1 → p = 1/(1 + e¹) = 1/(1 + 1/0.368) = 0.368/1.368 = <strong>0.269</strong> (Hayır). (σ(−z) = 1 − σ(z) kısayolu.)</li>
-<li>Diğer bütün noktalar da doğru tarafta: pozitiflerde z ≥ 1, negatiflerde z ≤ −1.</li>
-</ul>
-<p>p = 0.5 sınırı z = 0, yani x₁′ = 0.35 dikey doğrusu. (h)'deki SVM ağırlıkları (−10, 4, 3) da olur: P2'de z = 1, P6'da z = −1 → aynı 0.731 / 0.269.)</p>
-</div></details>
+<h3>(c) Uygun lojistik regresyon katsayılarını seçmek (6 p)</h3>
+<details class="solution"><summary>Çözüm</summary><div class="body"><p>Lojistik regresyonun sınırı, skorun sıfır olduğu doğrudur (z = w₁x₁′ + w₂x₂′ + w₀ = 0; orada p = 0.5). (b) şıkkındaki x₁′ = 0.35 sınırıyla uyumlu olması için x₂′'nin katsayısını 0 alıp skoru yalnız x₁′'ye bağlayabiliriz. Sol taraf (küçük x₁′) Evet olacağı için x₁′'nin katsayısı negatif olmalıdır. Hesabı kolaylaştırmak için P2 ve P6'nın skoru ±1 çıkacak katsayılar seçelim: <strong>w₁ = −20, w₂ = 0, w₀ = 7</strong>. Bu durumda z = 7 − 20x₁′ ve z = 0 tam x₁′ = 0.35'te olur.</p>
+<p>P2 için z = 7 − 20·0.3 = 1. Tablodan e⁻¹ = 0.368, dolayısıyla p = 1/(1 + 0.368) = 1/1.368 ≈ <strong>0.731</strong>: model P2'nin Evet olduğuna %73 inanıyor. P6 için z = 7 − 20·0.4 = −1; σ(−1) = 1 − σ(1) olduğundan p ≈ <strong>0.269</strong>: model P6'nın Evet olma olasılığını %27 görüyor, yani Hayır diyor. Diğer bütün noktalarda da skorun işareti doğru çıkar (pozitiflerde z ≥ 1, negatiflerde z ≤ −1).</p>
+<p>p = 0.5 sınırı, (b)'deki çizimdeki dikey doğrunun aynısıdır. (h) şıkkındaki SVM katsayıları (−10, 4, 3) da kabul edilir: onlarla da P2'nin skoru 1, P6'nınki −1 çıkar ve aynı olasılıklar bulunur.</p></div></details>
 
-<h3>(d) Perceptron W = (−1, 1), w₀ = 0 ile tahmin ve ölçütler (7 p)</h3>
-<details class="solution"><summary>Çözüm</summary><div class="body">
+<h3>(d) Verilen perceptron'un tahminleri ve ölçütleri (7 p)</h3>
+<details class="solution"><summary>Çözüm</summary><div class="body"><p>Verilen sınıflandırıcı her nokta için f = −x₁′ + x₂′ değerini hesaplar ve f ≥ 0 ise Evet der. Sınırı f = 0, yani x₂′ = x₁′ köşegenidir: köşegenin üstündeki noktalar Evet, altındakiler Hayır tahmin edilir.</p>
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th></th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th><th>P7</th></tr></thead><tbody>
 <tr><td>f = −x₁′ + x₂′</td><td>0.9</td><td>−0.05</td><td>0.75</td><td>0.05</td><td>−1</td><td>−0.4</td><td>−0.3</td></tr>
 <tr><td>tahmin</td><td>+</td><td>−</td><td>+</td><td>+</td><td>−</td><td>−</td><td>−</td></tr>
 <tr><td>gerçek</td><td>+</td><td>+</td><td>+</td><td>−</td><td>−</td><td>−</td><td>−</td></tr>
-<tr><td>durum</td><td><span class="tag TP">TP</span></td><td><span class="tag FN">FN</span></td><td><span class="tag TP">TP</span></td><td><span class="tag FP">FP</span></td><td><span class="tag TN">TN</span></td><td><span class="tag TN">TN</span></td><td><span class="tag TN">TN</span></td></tr></tbody></table></div>
-<p>TP = 2, FN = 1, FP = 1, TN = 3. Precision = 2/3 = <strong>0.667</strong>, recall = 2/3 = <strong>0.667</strong>, accuracy = 5/7 = <strong>0.714</strong> (F1 = 0.667).</p>
-<div data-widget="confusion" data-y="1 1 1 0 0 0 0" data-p="1 0 1 1 0 0 0"></div>
-</div></details>
+<tr><td>sonuç</td><td><span class="tag TP">TP</span></td><td><span class="tag FN">FN</span></td><td><span class="tag TP">TP</span></td><td><span class="tag FP">FP</span></td><td><span class="tag TN">TN</span></td><td><span class="tag TN">TN</span></td><td><span class="tag TN">TN</span></td></tr></tbody></table></div>
+<p>İki nokta sınıra çok yakın ve kolayca yanlış okunur: P2'nin skoru −0.05 (köşegenin hemen altında, gerçek sınıfı Evet olduğu için kaçırılmış: FN), P4'ünkü +0.05 (köşegenin hemen üstünde, gerçek sınıfı Hayır olduğu için yanlış alarm: FP).</p>
+<div data-widget="fig" data-fig="midperc" data-caption="Perceptron'un sınırı x₂′ = x₁′. Mavi bölge Evet, kırmızı bölge Hayır tahmini. P2 ile P4 sınırın yanlış tarafında."></div>
+<p>Sayınca TP = 2, FN = 1, FP = 1, TN = 3 olur. Precision, Evet dediklerimizin kaçının doğru olduğudur: 2/(2 + 1) = <strong>0.667</strong>. Recall, gerçek Evetlerin kaçını yakaladığımızdır: 2/(2 + 1) = <strong>0.667</strong>. Accuracy, doğru tahminlerin oranıdır: (2 + 3)/7 = <strong>0.714</strong>.</p>
+<div data-widget="confusion" data-y="1 1 1 0 0 0 0" data-p="1 0 1 1 0 0 0"></div></div></details>
 
-<h3>(e) Bir tur perceptron, η = 0.4 (7 p)</h3>
-<details class="solution"><summary>Çözüm</summary><div class="body">
-<div class="table-wrap"><table class="simple compact"><thead><tr><th>#</th><th>x′</th><th>y</th><th>f(x) = w·x + w₀</th><th>ŷ</th><th>güncelleme?</th><th>w, w₀ sonra</th></tr></thead><tbody>
-<tr><td>P1</td><td>(0.1, 1)</td><td>+1</td><td>0.9</td><td>+1</td><td>hayır</td><td>(−1, 1), 0</td></tr>
-<tr class="hl"><td>P2</td><td>(0.3, 0.25)</td><td>+1</td><td>−0.3 + 0.25 = −0.05</td><td>−1</td><td><strong>evet</strong>: w + 0.4·(0.3, 0.25)</td><td>(−0.88, 1.1), 0.4</td></tr>
-<tr><td>P3</td><td>(0, 0.75)</td><td>+1</td><td>0.825 + 0.4 = 1.225</td><td>+1</td><td>hayır</td><td>(−0.88, 1.1), 0.4</td></tr>
-<tr class="hl"><td>P4</td><td>(0.7, 0.75)</td><td>−1</td><td>−0.616 + 0.825 + 0.4 = 0.609</td><td>+1</td><td><strong>evet</strong>: w − 0.4·(0.7, 0.75)</td><td>(−1.16, 0.8), 0</td></tr>
-<tr><td>P5</td><td>(1, 0)</td><td>−1</td><td>−1.16</td><td>−1</td><td>hayır</td><td>(−1.16, 0.8), 0</td></tr>
-<tr><td>P6</td><td>(0.4, 0)</td><td>−1</td><td>−0.464</td><td>−1</td><td>hayır</td><td>(−1.16, 0.8), 0</td></tr>
-<tr><td>P7</td><td>(0.8, 0.5)</td><td>−1</td><td>−0.928 + 0.4 = −0.528</td><td>−1</td><td>hayır</td><td>(−1.16, 0.8), 0</td></tr>
-</tbody></table></div>
-<p>Tur sonu: <strong>w = (−1.16, 0.8), w₀ = 0</strong>. İki güncelleme (P2, P4). Not: bu ağırlıklarla P2 hâlâ yanlış (−0.348 + 0.2 = −0.148): yakınsamak için bir tur daha gerekir.</p>
+<h3>(e) Perceptron öğrenme kuralıyla bir tur (7 p)</h3>
+<details class="solution"><summary>Çözüm</summary><div class="body"><p>Perceptron kuralında örnekleri sırayla işleriz. Her örnekte f = w·x + w₀'ı hesaplar, tahmin doğruysa hiçbir şey yapmayız; yanlışsa ağırlıkları w ← w + η·y·x ve w₀ ← w₀ + η·y ile güncelleriz. Başlangıç w = (−1, 1), w₀ = 0.</p>
+<p>P1'de f = −0.1 + 1 = 0.9, tahmin Evet, doğru. P2'de f = −0.3 + 0.25 = −0.05, tahmin Hayır ama gerçek Evet: ilk güncelleme. Pozitif örneği eklediğimiz için w = (−1, 1) + 0.4·(0.3, 0.25) = (−0.88, 1.1) ve w₀ = 0 + 0.4 = 0.4 olur. P3'te f = 0 + 1.1·0.75 + 0.4 = 1.225, doğru. P4'te f = −0.88·0.7 + 1.1·0.75 + 0.4 = −0.616 + 0.825 + 0.4 = 0.609, tahmin Evet ama gerçek Hayır: ikinci güncelleme. Negatif örneği çıkarıyoruz: w = (−0.88, 1.1) − 0.4·(0.7, 0.75) = (−1.16, 0.8) ve w₀ = 0.4 − 0.4 = 0. Kalan P5, P6 ve P7'de skorlar −1.16, −0.464 ve −0.528; üçü de doğru tahmin edilir.</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>örnek</th><th>f(x) = w·x + w₀</th><th>tahmin</th><th>gerçek</th><th>güncelleme</th><th>sonra w, w₀</th></tr></thead><tbody>
+<tr><td>P1</td><td>0.9</td><td>+</td><td>+</td><td>yok</td><td>(−1, 1), 0</td></tr>
+<tr class="hl"><td>P2</td><td>−0.05</td><td>−</td><td>+</td><td>w + 0.4·(0.3, 0.25)</td><td>(−0.88, 1.1), 0.4</td></tr>
+<tr><td>P3</td><td>1.225</td><td>+</td><td>+</td><td>yok</td><td>(−0.88, 1.1), 0.4</td></tr>
+<tr class="hl"><td>P4</td><td>0.609</td><td>+</td><td>−</td><td>w − 0.4·(0.7, 0.75)</td><td>(−1.16, 0.8), 0</td></tr>
+<tr><td>P5</td><td>−1.16</td><td>−</td><td>−</td><td>yok</td><td>(−1.16, 0.8), 0</td></tr>
+<tr><td>P6</td><td>−0.464</td><td>−</td><td>−</td><td>yok</td><td>(−1.16, 0.8), 0</td></tr>
+<tr><td>P7</td><td>−0.528</td><td>−</td><td>−</td><td>yok</td><td>(−1.16, 0.8), 0</td></tr></tbody></table></div>
+<p>Tur sonunda <strong>w = (−1.16, 0.8), w₀ = 0</strong>. Dikkat: bu ağırlıklarla P2 hâlâ yanlış sınıflanır (f = −0.348 + 0.2 = −0.148); algoritmanın yakınsaması için bir tur daha gerekir. Aşağıdaki araçla turu adım adım izleyebilirsiniz.</p>
 <div data-widget="perceptron" data-pts="0.1 1 +
 0.3 0.25 +
 0 0.75 +
 0.7 0.75 -
 1 0 -
 0.4 0 -
-0.8 0.5 -" data-w="-1 1" data-b="0" data-eta="0.4"></div>
-</div></details>
+0.8 0.5 -" data-w="-1 1" data-b="0" data-eta="0.4"></div></div></details>
 
-<h3>(f) kNN, Q = (0.45, 0.35) (5 p)</h3>
-<details class="solution"><summary>Çözüm</summary><div class="body">
-<div class="table-wrap"><table class="simple compact center"><thead><tr><th></th><th>P2</th><th>P6</th><th>P7</th><th>P4</th><th>P3</th><th>P5</th><th>P1</th></tr></thead><tbody>
-<tr><td>d²</td><td>0.0225 + 0.01 = 0.0325</td><td>0.0025 + 0.1225 = 0.125</td><td>0.1225 + 0.0225 = 0.145</td><td>0.0625 + 0.16 = 0.2225</td><td>0.3625</td><td>0.425</td><td>0.545</td></tr>
-<tr><td>sınıf</td><td>+</td><td>−</td><td>−</td><td>−</td><td>+</td><td>−</td><td>+</td></tr></tbody></table></div>
-<p>k = 1: en yakın P2 → <strong>Evet</strong>. k = 3: P2 (+), P6 (−), P7 (−) → <strong>Hayır</strong>.</p>
+<h3>(f) Yeni bir günü kNN ile sınıflamak (5 p)</h3>
+<details class="solution"><summary>Çözüm</summary><div class="body"><p>Yeni gün Q'ya her noktanın uzaklığını hesaplayıp sıralarız. Öklid uzaklığında karekök almak sıralamayı değiştirmediği için kare uzaklıkla (d²) çalışmak yeterlidir.</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>sıra</th><th>nokta</th><th>d² = (x₁′ − 0.45)² + (x₂′ − 0.35)²</th><th>sınıf</th></tr></thead><tbody>
+<tr class="hl"><td>1</td><td>P2</td><td>0.0225 + 0.01 = 0.0325</td><td>+</td></tr>
+<tr class="hl"><td>2</td><td>P6</td><td>0.0025 + 0.1225 = 0.125</td><td>−</td></tr>
+<tr class="hl"><td>3</td><td>P7</td><td>0.1225 + 0.0225 = 0.145</td><td>−</td></tr>
+<tr><td>4</td><td>P4</td><td>0.0625 + 0.16 = 0.2225</td><td>−</td></tr>
+<tr><td>5</td><td>P3</td><td>0.2025 + 0.16 = 0.3625</td><td>+</td></tr>
+<tr><td>6</td><td>P5</td><td>0.3025 + 0.1225 = 0.425</td><td>−</td></tr>
+<tr><td>7</td><td>P1</td><td>0.1225 + 0.4225 = 0.545</td><td>+</td></tr></tbody></table></div>
+<p>k = 1'de yalnız en yakın komşuya, P2'ye bakılır; P2 Evet olduğu için karar <strong>Evet</strong>. k = 3'te P2, P6 ve P7'ye bakılır: bir Evet, iki Hayır; çoğunluk kararı <strong>Hayır</strong>. Aynı nokta için k'ya göre kararın değiştiği tipik bir sınav sorusudur.</p>
 <div data-widget="knn" data-pts="0.1 1 + P1
 0.3 0.25 + P2
 0 0.75 + P3
 0.7 0.75 - P4
 1 0 - P5
 0.4 0 - P6
-0.8 0.5 - P7" data-qx="0.45" data-qy="0.35"></div>
-</div></details>
+0.8 0.5 - P7" data-qx="0.45" data-qy="0.35"></div></div></details>
 
-<h3>(g) Sayısal ağaç: en iyi eşik (6 p)</h3>
-<details class="solution"><summary>Çözüm</summary><div class="body">
-<p>H(D) = 0.985. <strong>x₁′</strong> sıralı: 0(+), 0.1(+), 0.3(+), 0.4(−), 0.7(−), 0.8(−), 1(−): sınıf yalnız 0.3–0.4 arasında değişir → aday <strong>t = 0.35</strong>: sol 3/0, sağ 0/4, ikisi de saf → IG = 0.985 (en büyük olası).</p>
-<p><strong>x₂′</strong> sıralı: 0(−), 0(−), 0.25(+), 0.5(−), 0.75(+ ve −), 1(+): adaylar 0.125 (IG 0.292), 0.375 (0.020), 0.625 (0.128), 0.875 (0.198).</p>
-<p>Ağaç tek bölme: <strong>x₁′ ≤ 0.35 → Evet, değilse Hayır</strong> (iki yaprak da saf).</p>
-<div data-widget="threshold" data-x="0.1 0.3 0 0.7 1 0.4 0.8" data-y="E E E H H H H"></div>
-</div></details>
+<h3>(g) Sayısal ağaç için en iyi eşiği bulmak (6 p)</h3>
+<details class="solution"><summary>Çözüm</summary><div class="body"><p>Sayısal bir öznitelikte aday eşikler, değerler sıralandığında ardışık iki değerin ortalarıdır. En iyi eşik her zaman sınıfın değiştiği yerlerden biri olduğu için yalnız onlara bakmak yeter. Bütün verinin entropisi 0.985'tir (3 Evet, 4 Hayır).</p>
+<p><strong>x₁′.</strong> Sıralanmış değerler ve sınıfları: 0 (+), 0.1 (+), 0.3 (+), 0.4 (−), 0.7 (−), 0.8 (−), 1 (−). Sınıf yalnız 0.3 ile 0.4 arasında değişiyor, bu yüzden tek aday <strong>eşik 0.35</strong>'tir. Bu eşik sol tarafa üç Evet, sağ tarafa dört Hayır bırakır; iki taraf da saftır ve kazanç bütün belirsizliğe, yani 0.985'e eşittir (olabilecek en büyük değer).</p>
+<p><strong>x₂′.</strong> Sıralanmış değerler 0 (−), 0 (−), 0.25 (+), 0.5 (−), 0.75 (+ ve −), 1 (+); sınıf birçok yerde değişiyor ve adayların kazançları 0.292 (eşik 0.125), 0.020 (0.375), 0.128 (0.625) ve 0.198 (0.875). Hiçbiri x₁′'nin eşiğine yaklaşamıyor.</p>
+<p>Sonuç ağacı tek bir bölmeden oluşur: <strong>x₁′ ≤ 0.35 ise Evet, değilse Hayır</strong>; iki yaprak da saftır.</p>
+<div data-widget="threshold" data-x="0.1 0.3 0 0.7 1 0.4 0.8" data-y="E E E H H H H"></div></div></details>
 
-<h3>(h) Sert marjlı SVM: destek vektörleri (5 p)</h3>
-<details class="solution"><summary>Çözüm</summary><div class="body">
-<p>Sınıfların birbirine en yakın olduğu yer P2 (+) ile P6 ve P4 (−) arası. Kanonik denklemler:</p>
-<ul><li>P2: 0.3w₁ + 0.25w₂ + b = +1</li><li>P6: 0.4w₁ + b = −1</li><li>P4: 0.7w₁ + 0.75w₂ + b = −1</li></ul>
-<p>P4 − P6: 0.3w₁ + 0.75w₂ = 0 → w₁ = −2.5w₂. P2 − P6: −0.1w₁ + 0.25w₂ = 2 → 0.25w₂ + 0.25w₂ = 2 → w₂ = 4, w₁ = −10, b = −1 + 4 = 3.</p>
-<p><strong>w = (−10, 4), b = 3</strong>; sınır x₂′ = 2.5x₁′ − 0.75; ‖w‖ = √116 ≈ 10.77, marj ≈ 0.093. Denetim: P1 f = 6, P3 f = 6, P5 f = −7, P7 f = −3: hepsi |f| ≥ 1, sokağın dışında. <strong>Destek vektörleri P2, P4, P6.</strong> (Sınav “yaklaşık çizin” der: bu üç noktayı işaretleyip aralarından geçen sokağı çizmek yeter.)</p>
+<h3>(h) SVM'nin destek vektörlerini ve sınırını bulmak (5 p)</h3>
+<details class="solution"><summary>Çözüm</summary><div class="body"><p>Sert marjlı SVM, iki sınıfı ayıran ve iki sınıfa da olabildiğince uzak geçen doğruyu bulur. Bu doğrunun yerini yalnız sınıflar arasındaki “sokağın” kenarına değen noktalar, yani destek vektörleri belirler. Çizimde iki sınıfın birbirine en yakın olduğu yer P2 (Evet) ile P6 ve P4 (Hayır) arasıdır; destek vektörlerinin bunlar olmasını bekleriz.</p>
+<p>Destek vektörlerinde skor tam ±1 olur. Böylece üç denklem yazarız: P2 için 0.3w₁ + 0.25w₂ + b = 1; P6 için 0.4w₁ + b = −1; P4 için 0.7w₁ + 0.75w₂ + b = −1. P4'ün denkleminden P6'nınkini çıkarınca 0.3w₁ + 0.75w₂ = 0, yani w₁ = −2.5w₂ bulunur. P2'ninkinden P6'nınkini çıkarınca −0.1w₁ + 0.25w₂ = 2 olur; w₁ yerine −2.5w₂ koyarsak 0.5w₂ = 2, yani w₂ = 4 ve w₁ = −10. Son olarak P6'nın denkleminden b = −1 + 4 = 3.</p>
+<p>Sonuç <strong>w = (−10, 4), b = 3</strong>; sınır −10x₁′ + 4x₂′ + 3 = 0, yani x₂′ = 2.5x₁′ − 0.75 doğrusu. ‖w‖ = √116 ≈ 10.77 ve marj 1/‖w‖ ≈ 0.093'tür (P2 ile P6 birbirine çok yakın olduğu için sokak dar). Denetim için diğer noktalara bakarız: P1 ve P3'ün skoru 6, P5'inki −7, P7'ninki −3; hepsinin mutlak değeri 1'den büyük, yani sokağın dışında kalıyorlar. <strong>Destek vektörleri P2, P4 ve P6</strong>'dır. Sınav “yaklaşık çizin” dediği için bu üç noktayı işaretleyip aralarından geçen sokağı çizmek yeterlidir.</p>
 <div data-widget="hardsvm" data-pts="0.1 1 + P1
 0.3 0.25 + P2
 0 0.75 + P3
 0.7 0.75 - P4
 1 0 - P5
 0.4 0 - P6
-0.8 0.5 - P7"></div>
-</div></details>
+0.8 0.5 - P7"></div></div></details>
 
-<h3>(i) λ seçimi, 5 katlı CV (5 p)</h3>
+<h3>(i) Çapraz doğrulama tablosundan λ seçmek (5 p)</h3>
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th>λ</th><th>0</th><th>0.01</th><th>0.1</th><th>1</th><th>10</th></tr></thead><tbody>
 <tr><td>eğitim hatası</td><td>0.02</td><td>0.05</td><td>0.09</td><td>0.17</td><td>0.33</td></tr>
 <tr><td>doğrulama hatası</td><td>0.31</td><td>0.22</td><td>0.14</td><td>0.18</td><td>0.34</td></tr></tbody></table></div>
-<details class="solution"><summary>Çözüm</summary><div class="body">
-<ul>
-<li><strong>λ = 0.1</strong>: en düşük ortalama doğrulama hatası (0.14), eğitim-doğrulama açığı küçük.</li>
-<li><strong>Aşırı uyum</strong>: λ = 0 ve 0.01 (eğitim hatası çok düşük, doğrulama yüksek, büyük açık).</li>
-<li><strong>Yetersiz uyum</strong>: λ = 10 (iki hata da yüksek ve birbirine yakın); λ = 1 bu yöne kaymaya başlamış.</li>
-<li><strong>Nihai model</strong>: seçilen λ = 0.1 ile <em>bütün</em> eğitim verisinde (200 örnek) yeniden eğitilir; kat modelleri atılır. Raporda CV skoru ortalama ± std ve (varsa) ayrı test kümesinde tek seferlik skor verilir; test kümesine bakıp λ değiştirilmez.</li>
-</ul>
-</div></details>
+<details class="solution"><summary>Çözüm</summary><div class="body"><p>Düzenlileştirme gücü λ arttıkça model basitleşir. Tabloyu yorumlamak için eğitim ve doğrulama hatalarını birlikte okuruz; bunu bir grafikte görmek kolaylaştırır:</p>
+<div data-widget="fig" data-fig="lambdacurve" data-caption="λ arttıkça eğitim hatası sürekli artar; doğrulama hatası önce düşer, λ = 0.1'de en düşüğe iner, sonra yeniden yükselir."></div>
+<p>Seçilecek değer, ortalama doğrulama hatasının en düşük olduğu <strong>λ = 0.1</strong>'dir (0.14); orada eğitim ile doğrulama hataları da birbirine yakındır. Tablonun sol ucu (λ = 0 ve 0.01) <strong>aşırı öğrenmeye</strong> karşılık gelir: eğitim hatası çok düşük ama doğrulama hatası yüksek, aralarında büyük bir açık var. Sağ ucu (λ = 10, kısmen λ = 1) <strong>yetersiz öğrenmeye</strong> karşılık gelir: iki hata da yüksek ve birbirine yakın.</p>
+<p>λ seçildikten sonra çapraz doğrulamadaki beş model atılır; nihai model λ = 0.1 ile <strong>bütün eğitim verisinde</strong> (200 örnek) yeniden eğitilir. Raporda çapraz doğrulama sonucu ortalama ± standart sapma olarak verilir ve ayrı bir test kümesi varsa model orada yalnız bir kez değerlendirilir; test sonucuna bakarak λ değiştirilmez.</p></div></details>
 
-<h2>Soru 3: kısa sorular (12 × 4 p)</h2>
+<h2>Soru 3 (48 p): on iki kısa kavram sorusu</h2>
 <p>Her biri için 2–4 cümle yeter. Önce kendi cevabınızı söyleyin, sonra açın.</p>
-<details class="solution"><summary>1) Aynı öznitelik bir yolda birden çok kullanılabilir mi?</summary><div class="body"><p><strong>Kategorik</strong> (her değere bir dal): hayır; o dalda özniteliğin tek değeri kalır, kazancı 0. <strong>Sayısal</strong> (ikili eşik): evet; “x ≤ 5” dalında “x ≤ 2” ile yeniden bölmek aralığı daraltır.</p></div></details>
-<details class="solution"><summary>2) Lojistik regresyonu 4 sınıfta nasıl kullanırsınız?</summary><div class="body"><p>(a) <strong>One-vs-rest</strong>: 4 ikili model (“k mı değil mi?”), en yüksek olasılık. (b) <strong>Softmax</strong> (çok terimli LR): sınıf başına bir ağırlık vektörü, tek model, olasılıkların toplamı 1, çapraz entropi kaybı. (One-vs-one da olur: 6 model, oylama.) OvR basit ve paralel ama skorları tam karşılaştırılabilir değil ve her ikili problem dengesiz; softmax tek tutarlı olasılık dağılımı verir.</p></div></details>
-<details class="solution"><summary>3) Öznitelik seçimi ile çıkarımı farkı</summary><div class="body"><p>Seçim var olan sütunların alt kümesini tutar (filtre: korelasyon/karşılıklı bilgi; sarmalayıcı: RFE; gömülü: Lasso) → <strong>yorumlanabilirliği korur</strong>. Çıkarım eski sütunlardan yeni sütunlar kurar (PCA, LDA, otokodlayıcı); yeni eksenler yorumlanması zor bileşimlerdir.</p></div></details>
-<details class="solution"><summary>4) Perceptron ile lojistik regresyon: iki fark; hangisinin ağırlıkları sınırsız büyür?</summary><div class="body"><p>Öğrenme: perceptron yalnız <strong>yanlış</strong> sınıflanan örnekte günceller (w += ηyx); LR her örnekte (p − y)x gradyanıyla günceller. Çıktı: perceptron sert etiket (±1), LR olasılık. Doğrusal ayrılabilir veride <strong>düzenlileştirmesiz LR</strong>'nin ağırlıkları sınırsız büyür (p'ler 0/1'e yaklaştıkça kayıp hep azalır); perceptron ilk ayıran sınırda durur.</p></div></details>
-<details class="solution"><summary>5) Yetersiz uyumda üç değişiklik</summary><div class="body"><p>(1) Daha esnek model (derece↑, derinlik↑, k↓, çekirdek/MLP): hipotez uzayı genişler. (2) Düzenlileştirmeyi azalt (λ↓, C↑): katsayılar özgürleşir. (3) Daha iyi/daha çok öznitelik (etkileşimler, alan bilgisi): model ayırt edici bilgiyi görür. (Daha uzun eğitim de olur. Daha çok veri yanlılığı azaltmaz.)</p></div></details>
-<details class="solution"><summary>6) Ağaç çok iyi, doğrusal çok kötü olabilir mi? Tersi?</summary><div class="body"><p>Evet: XOR ya da “içi pozitif bir kare” gibi eksene hizalı ama doğrusal olmayan yapıda ağaç iki-dört bölmeyle kusursuz, doğrusal model rastgele düzeyde. Tersi: sınır çapraz bir doğruysa (x₁ + x₂ &gt; 1) doğrusal model tek doğruyla çözer; ağaç merdivenle taklit etmek zorunda, az veride kötü genelleşir.</p></div></details>
-<details class="solution"><summary>7) CV'de iyi, testte kötü: üç neden</summary><div class="body"><p>(1) Veri sızıntısı (ölçekleme/öznitelik seçimi CV dışında; aynı grup ya da zaman iki tarafta). (2) Çok ayar denenip CV'ye aşırı uyuldu (seçim yanlılığı; iç içe CV gerekirdi). (3) Test kümesi farklı dağılımdan (kayma), çok küçük ya da gürültülü.</p></div></details>
-<details class="solution"><summary>8) kNN'de k artınca yanlılık ve varyans; k = 1 ve k = n</summary><div class="body"><p>k↑ → yanlılık artar, varyans azalır (sınır düzleşir). k = 1: eğitim hatası 0, tek gürültülü komşu kararı belirler (çok yüksek varyans, ezber). k = n: her sorguya çoğunluk sınıfı, sabit model (sıfır varyans, çok yüksek yanlılık).</p></div></details>
-<details class="solution"><summary>9) σ′ ≤ 0.25 ve kaybolan gradyan</summary><div class="body"><p>Geri yayılımda her katman gradyanı σ′(z) ile çarpar; σ′ en çok 0.25 olduğundan L katmanda gradyan en az 4^L kat küçülür (doymuş nöronlarda σ′ ≈ 0, daha da kötü): ilk katmanlar neredeyse öğrenmez. (Tek katmanlı LR'de sorun değildir: log-loss ile gradyan (p − y)x olur, σ′ sadeleşir.) Çözüm: gizli katmanlarda ReLU, iyi ilklendirme (He/Xavier), batch normalization, artık bağlantılar.</p></div></details>
-<details class="solution"><summary>10) C küçülürse?</summary><div class="body"><p>Marj genişler, destek vektörü sayısı artar, aşırı öğrenme eğilimi azalır (yanlılık artar, varyans azalır).</p></div></details>
-<details class="solution"><summary>11) Rastgele orman neden daha az aşırı öğrenir?</summary><div class="body"><p>(1) <strong>Bagging</strong>: her ağaç farklı bootstrap örnekleminde, oyların ortalaması varyansı düşürür. (2) <strong>Her bölmede rastgele öznitelik alt kümesi</strong>: ağaçları ilişkisizleştirir, ortalamanın varyans azaltımını büyütür. Tek derin ağaç ise bütün gürültüyü ezberler.</p></div></details>
-<details class="solution"><summary>12) Veri sızıntısı örneği; StandardScaler CV içinde nasıl?</summary><div class="body"><p>Örnek: müşteri kaybını “hesap kapanış tarihi” ile tahmin etmek (hedef sızıntısı) ya da aynı hastanın görüntüleri hem eğitimde hem testte. Ölçekleyici <strong>her katta yalnız o katın eğitim parçasına</strong> fit edilip doğrulama parçasına transform edilmeli: <code>Pipeline([("sc", StandardScaler()), ("model", …)])</code> ve <code>cross_val_score(pipe, …)</code>. Bütün veride fit edip sonra CV yapmak sızıntıdır.</p></div></details>
+<details class="solution"><summary>1) Aynı öznitelik bir yolda birden çok kullanılabilir mi?</summary><div class="body"><p>Bu, özniteliğin türüne bağlıdır. <strong>Kategorik</strong> bir öznitelikte her değere ayrı bir dal açılır; bir dala girildiğinde o özniteliğin artık tek bir değeri kalmıştır, yeniden sormak hiçbir şey kazandırmaz. Bu yüzden aynı yolda ikinci kez kullanılmaz. <strong>Sayısal</strong> bir öznitelikte ise her bölme yalnız bir eşiktir; “x ≤ 5” dalında “x ≤ 2” diye yeniden sormak aralığı daha da daraltır. Bu yüzden aynı yolda birden çok kez kullanılabilir.</p></div></details>
+<details class="solution"><summary>2) Lojistik regresyonu 4 sınıfta nasıl kullanırsınız?</summary><div class="body"><p>İki yol vardır. <strong>Birine karşı geri kalanlar</strong> (one-vs-rest) yönteminde dört ayrı ikili model eğitilir (“bu örnek A sınıfı mı, değil mi?” gibi) ve tahmin olarak olasılığı en yüksek modelin sınıfı seçilir. <strong>Softmax</strong> (çok terimli lojistik regresyon) ise tek bir modeldir: her sınıf için bir ağırlık vektörü vardır ve dört sınıfın skorları toplamı 1 olan olasılıklara çevrilir. İlki basittir ve paralel eğitilebilir ama farklı modellerin skorları tam karşılaştırılabilir değildir ve her ikili problem dengesizdir; softmax tutarlı tek bir olasılık dağılımı verir.</p></div></details>
+<details class="solution"><summary>3) Öznitelik seçimi ile çıkarımı farkı</summary><div class="body"><p><strong>Öznitelik seçimi</strong> var olan sütunların bir kısmını tutup gerisini atar; örneğin korelasyona göre filtrelemek, RFE ya da lasso. Sütunlar değişmediği için model <strong>yorumlanabilir</strong> kalır. <strong>Öznitelik çıkarımı</strong> eski sütunlardan yeni sütunlar türetir; örneğin PCA. Yeni sütunlar eski sütunların karışımı olduğu için ne anlama geldiklerini söylemek zorlaşır.</p></div></details>
+<details class="solution"><summary>4) Perceptron ile lojistik regresyon: iki fark; hangisinin ağırlıkları sınırsız büyür?</summary><div class="body"><p>Birinci fark öğrenme kuralındadır: perceptron yalnız <strong>yanlış</strong> sınıfladığı örnekte günceller (w += η·y·x), lojistik regresyon ise her örnekte (p − y)·x gradyanıyla günceller. İkinci fark çıktıdadır: perceptron yalnız bir sınıf (±1) söyler, lojistik regresyon bir olasılık verir. Veri doğrusal ayrılabiliyorsa düzenlileştirmesiz lojistik regresyonun ağırlıkları <strong>sınırsız büyür</strong>, çünkü olasılıkları 0 ve 1'e yaklaştırdıkça kayıp hep azalır; perceptron ise ilk ayıran sınırı bulunca durur.</p></div></details>
+<details class="solution"><summary>5) Yetersiz uyumda üç değişiklik</summary><div class="body"><p>Yetersiz uyumda model fazla basittir, bu yüzden esnekliğini artıran değişiklikler denenir. Birincisi daha esnek bir model ya da ayar kullanmaktır (polinomun derecesini ya da ağacın derinliğini artırmak, kNN'de k'yı küçültmek); hipotez uzayı genişler. İkincisi düzenlileştirmeyi azaltmaktır (λ'yı küçültmek, C'yi büyütmek); ağırlıklar daha serbest kalır. Üçüncüsü daha iyi öznitelikler eklemektir (etkileşimler, alan bilgisi); model ayırt edici bilgiyi görür. Daha uzun eğitim de yardımcı olabilir. Daha çok veri ise yanlılığı azaltmaz, bu durumda işe yaramaz.</p></div></details>
+<details class="solution"><summary>6) Ağaç çok iyi, doğrusal çok kötü olabilir mi? Tersi?</summary><div class="body"><p>Evet. Sınıflar eksenlere hizalı ama doğrusal olmayan bir desende dağılmışsa (XOR ya da “içi pozitif bir kare” gibi) ağaç birkaç bölmeyle kusursuz sonuç verir, doğrusal model ise rastgele düzeyde kalır. Tersi de olabilir: sınıfları ayıran sınır çapraz bir doğruysa (örneğin x₁ + x₂ > 1) doğrusal model onu tek doğruyla çözer; ağaç ise çapraz doğruyu ancak çok sayıda basamakla taklit edebilir ve az veride kötü genelleşir.</p></div></details>
+<details class="solution"><summary>7) CV'de iyi, testte kötü: üç neden</summary><div class="body"><p>Birinci olası neden veri sızıntısıdır: ölçekleme ya da öznitelik seçimi çapraz doğrulamanın dışında yapılmış olabilir, ya da aynı hastaya veya döneme ait örnekler katların iki tarafına dağılmış olabilir. İkincisi, çok sayıda ayar denenip çapraz doğrulamanın kendisine aşırı uyulmuş olabilir; bunu önlemek için iç içe çapraz doğrulama kullanılır. Üçüncüsü, test kümesi eğitim verisinden farklı bir dağılımdan geliyor ya da çok küçük ve gürültülü olabilir.</p></div></details>
+<details class="solution"><summary>8) kNN'de k artınca yanlılık ve varyans; k = 1 ve k = n</summary><div class="body"><p>k arttıkça model daha çok komşunun ortalamasını aldığı için karar sınırı düzleşir: <strong>yanlılık artar, varyans azalır</strong>. k = 1'de model eğitim verisini ezberler: eğitim hatası sıfırdır ama tek bir gürültülü komşu kararı değiştirebilir (çok yüksek varyans). k = n'de ise model her sorguya çoğunluk sınıfını söyler; bu sabit bir modeldir (sıfır varyans, çok yüksek yanlılık).</p></div></details>
+<details class="solution"><summary>9) σ′ ≤ 0.25 ve kaybolan gradyan</summary><div class="body"><p>Geri yayılımda gradyan her katmandan geçerken o katmanın sigmoid türeviyle çarpılır. Bu türev en çok 0.25 olduğu için gradyan her katmanda en az dört kat küçülür; doymuş nöronlarda türev sıfıra yakın olduğundan daha da fazla küçülür. Sonuçta ilk katmanlara neredeyse hiç gradyan ulaşmaz ve bu katmanlar öğrenemez: buna kaybolan gradyan denir. (Tek katmanlı lojistik regresyonda sorun yoktur, çünkü log-loss ile gradyan (p − y)·x olur ve sigmoid türevi sadeleşir.) Çözüm olarak gizli katmanlarda pozitif bölgede türevi 1 olan ReLU kullanılabilir; iyi ilklendirme, toplu normalleştirme ve artık bağlantılar da yardımcı olur.</p></div></details>
+<details class="solution"><summary>10) C küçülürse?</summary><div class="body"><p>C, marj ihlallerinin bedelidir. C küçülünce ihlaller ucuzlar: model daha geniş bir marj için birkaç noktanın kuralı çiğnemesine izin verir. Bu yüzden <strong>marj genişler</strong>, sokağın içine ya da kenarına düşen nokta sayısı, yani <strong>destek vektörü sayısı artar</strong> ve model daha basit olduğu için <strong>aşırı öğrenme eğilimi azalır</strong> (yanlılık artar, varyans azalır).</p></div></details>
+<details class="solution"><summary>11) Rastgele orman neden daha az aşırı öğrenir?</summary><div class="body"><p>Birinci mekanizma <strong>bagging</strong>'dir: her ağaç verinin farklı bir bootstrap örnekleminde eğitilir ve ağaçların oylarının ortalaması alınır; tek tek ağaçların dalgalanmaları birbirini götürür ve varyans azalır. İkinci mekanizma <strong>her bölmede özniteliklerin rastgele bir alt kümesine bakmaktır</strong>: bu, ağaçların birbirine benzemesini engeller; birbirinden farklı ağaçların ortalaması, birbirine benzeyen ağaçlarınkinden çok daha fazla varyans azaltır. Tek bir derin ağaç ise eğitim verisinin gürültüsünü olduğu gibi ezberler.</p></div></details>
+<details class="solution"><summary>12) Veri sızıntısı örneği; StandardScaler CV içinde nasıl?</summary><div class="body"><p>Somut bir örnek: müşteri kaybını tahmin eden bir modele “hesap kapanış tarihi” özniteliğini vermek. Bu bilgi yalnız zaten ayrılmış müşterilerde vardır, yani etiketi ele verir (hedef sızıntısı). Aynı hastanın görüntülerinin hem eğitimde hem testte olması da bir sızıntıdır. StandardScaler'ın doğru kullanımı, her katta yalnız o katın eğitim kısmına uydurulup (fit) doğrulama kısmına aynen uygulanmasıdır (transform). Bunu yapmanın kolay yolu ölçekleyiciyi ve modeli bir <code>Pipeline</code> içine koyup <code>cross_val_score(pipe, …)</code> kullanmaktır. Ölçekleyiciyi bütün veride fit edip sonra çapraz doğrulama yapmak sızıntıdır.</p></div></details>
 
 </div></main>
 </body>

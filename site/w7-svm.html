@@ -31,7 +31,7 @@
 <div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-svm">SVM</a> · <a href="sozluk.html#t-marj">Marj</a> · <a href="sozluk.html#t-destek-vektoru">Destek vektörü</a> · <a href="sozluk.html#t-yumusak-marj">Yumuşak marj</a> · <a href="sozluk.html#t-gevsek-degisken">Gevşek değişken</a> · <a href="sozluk.html#t-mentese-kaybi">Menteşe kaybı</a> · <a href="sozluk.html#t-cekirdek-kernel">Çekirdek</a></div>
 
 
-<h2>Marj ve geometri</h2>
+<h2>En geniş yolu açan sınır: marj ve destek vektörleri</h2>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>En geniş yol</div><p>İki köyün arasına bir yol yapacaksınız; yolun iki köyden de olabildiğince uzak geçmesini istersiniz ki kimse yanlışlıkla öbür tarafa geçmesin. Perceptron iki sınıfı ayıran <em>herhangi</em> bir doğru bulur; SVM ise iki sınıfa da en uzak, yani en geniş “sokağı” açan doğruyu bulur. Sokağın kenarına değen noktalar <strong>destek vektörleridir</strong>: sokağın yerini yalnız onlar belirler.</p><p>Neden geniş sokak? Yeni noktalar eğitim noktalarının biraz yanına düşer; sınır noktalardan uzaksa küçük sapmalar yanlış tarafa geçmeye yetmez: daha iyi genelleme.</p></div>
 <div data-widget="fig" data-fig="street" data-caption="SVM sokağı: ortadaki çizgi karar sınırı, kesikli çizgiler sokağın kenarları, halkalı noktalar destek vektörleri."></div>
 <p>Karar sınırı yine w·x + b = 0 doğrusudur. SVM, w ve b'nin ölçeğini şöyle sabitler: sınıra en yakın noktalarda w·x + b tam olarak +1 ya da −1 olsun. Buna <strong>kanonik biçim</strong> denir. Bu biçimde sınıra uzaklık ve marj çok sade formüllerle yazılır:</p>
@@ -43,7 +43,7 @@
 <p>Koşulu tam eşitlikle sağlayan noktalar, yani sokağın kenarında duranlar, <strong>destek vektörleridir</strong>. Çözüm yalnız onlara bağlıdır: diğer noktaları silmek ya da sokağa girmeden taşımak sınırı değiştirmez. Aşağıdaki araçla verilen bir w ve b için noktaların sokağa göre nerede durduğunu hesaplayabilirsiniz.</p>
 <div data-widget="svmpoint"></div>
 
-<h2>2B'de elle çözüm (sınav kalıbı)</h2>
+<h2>İki boyutta w ve b'yi elle bulmak (sınav kalıbı)</h2>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden “= ±1” denklemleri?</div><p>w ve b'yi 2 ile çarparsak aynı doğruyu elde ederiz; ölçeği sabitlemek için “destek vektörlerinde w·x + b tam +1 ya da −1 olsun” deriz (kanonik biçim). Böylece destek vektörlerini bildiğimizde her biri bize bir denklem verir; üç bilinmeyen (w₁, w₂, b) için genelde üç denklem yeter.</p></div>
 <p>Sınavda iki boyutlu küçük bir veri için w ve b'yi bulmanız istenir. İzlenecek yol dört adımdır. Önce noktaları çizin ve iki sınıfın birbirine en yakın olduğu yeri bulun; sokağa değecek noktalar oradadır. Sonra her destek vektörü için kanonik denklemi yazın: pozitif bir destek vektöründe w·x + b = +1, negatif birinde −1. Üç bilinmeyen (w₁, w₂, b) için genelde üç denklem yeter. Denklemleri çözüp sınırı, ‖w‖'yi ve marjı yazın. Son olarak bütün diğer noktaların yᵢ(w·xᵢ + b) ≥ 1 koşulunu sağladığını denetleyin; sağlamıyorsa yanlış destek vektörleri seçilmiştir.</p>
 <div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>Pozitif (2, 0), negatif (0, 0). Destek vektörleri bu iki nokta. w = (w₁, 0) varsayarak w ve b?</p><details><summary>Cevabı göster</summary><p>2w₁ + b = +1, 0 + b = −1 → b = <strong>−1</strong>, w₁ = <strong>1</strong>. Sınır x₁ = 1 (iki noktanın tam ortası), marj 1/‖w‖ = 1.</p></details></div>
@@ -52,7 +52,7 @@
 <p>SVM'nin bir de <strong>ikil biçimi</strong> vardır: w, destek vektörlerinin ağırlıklı toplamı olarak yazılır (w = Σαᵢyᵢxᵢ) ve katsayılar Σαᵢyᵢ = 0 koşulunu sağlar; destek vektörü olmayan noktalarda α = 0'dır. Yukarıdaki örnekte α'lar pozitifler için 2/9 ve 2/9, negatif için 4/9'dur: tek negatif destek vektörü, iki pozitifi dengeler. Bazen bir nokta sokağın kenarında durduğu hâlde katsayısı sıfır çıkabilir.</p>
 <div class="callout"><div class="callout-title">Geniş marj neden daha iyi genelleme demek?</div><p>Bir model ailesinin kapasitesini ölçmenin bir yolu <strong>VC boyutudur</strong>. Bir aile n noktayı “parçalayabiliyorsa”, yani bu noktaların 2ⁿ farklı etiketlemesinin her biri için hepsini doğru sınıflayan bir model bulunabiliyorsa, VC boyutu en az n'dir. Düzlemdeki doğruların VC boyutu 3'tür: aynı doğru üzerinde olmayan üç nokta her biçimde ayrılabilir, ama dört noktada çaprazların aynı sınıfta olduğu (XOR) etiketleme hiçbir doğruyla ayrılamaz. Kapasite büyükse eğitim ve test hatası arasındaki açık büyüyebilir. Marjı en az belli bir değer olan sınırların etkin kapasitesi, marj büyüdükçe küçülür; geniş marj bu yüzden daha küçük bir genelleme açığı demektir.</p></div>
 
-<h2>Yumuşak marj ve C</h2>
+<h2>Birkaç hataya izin vermek: yumuşak marj ve C</h2>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Kuralları biraz esnetmek</div><p>Gerçek veride bir iki nokta yanlış tarafta olabilir (gürültü, aykırı değer). Sert marjlı SVM o zaman ya hiç çözüm bulamaz ya da o tek nokta yüzünden çok dar bir sokak açar. Yumuşak marj birkaç noktanın kuralı çiğnemesine izin verir ama her ihlal için ceza öder; C cezanın büyüklüğüdür. Küçük C: “birkaç hata olsun, sokak geniş olsun”. Büyük C: “hiç hata istemem”.</p></div>
 <div class="formula">min ½‖w‖² + C Σ ξᵢ &nbsp; öyle ki &nbsp; yᵢ(w·xᵢ + b) ≥ 1 − ξᵢ, &nbsp; ξᵢ ≥ 0</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>ξᵢ (“ksi”): i. noktanın kuralı ne kadar çiğnediği. Kural artık “≥ 1 − ξᵢ”: biraz içeri girmeye izin var ama her ihlal C kadar ceza getirir.</li><li>C büyükse ihlal pahalı (sert marja yakın, dar sokak); küçükse ucuz (geniş sokak, birkaç hata).</li></ul></div>
@@ -62,7 +62,7 @@
 <div data-widget="softsvm"></div>
 <p>Araçtaki örnekte aykırı bir pozitif nokta (1.5, 2) var. H1 adayının marjı geniştir (1) ama bu noktada ξ = 1.5'lik bir ihlal yapar; H2 her noktayı ayırır ama marjı yalnız 0.354'tür. C = 1'de H1 kazanır (0.5 + 1.5 = 2.0, H2 ise 4.0); C = 10'da H2 kazanır (H1 15.5'e çıkar).</p>
 
-<h2>Çekirdek hilesi</h2>
+<h2>Doğrusal olmayan sınırlar: çekirdek hilesi</h2>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Kâğıdı bükmek</div><p>Bir sınıfın noktaları ortada, ötekininki çevresinde bir halka olsun: hiçbir doğru ayıramaz. Ama her noktaya “merkeze uzaklığın karesi” diye üçüncü bir öznitelik eklersek ortadakiler aşağıda, halkadakiler yukarıda kalır ve bir düzlemle ayrılırlar. Çekirdek hilesi bu yeni öznitelikleri hiç hesaplamadan, yalnız noktalar arası “benzerlik” fonksiyonuyla aynı sonucu verir.</p></div>
 <div data-widget="fig" data-fig="kerneltrick" data-caption="Sol: ortadaki pozitifler tek bir eşikle ayrılamaz. Sağ: her noktaya x² özniteliği eklenince bir doğruyla ayrılırlar. Çekirdek bu dönüşümü açıkça yapmadan aynı sonucu verir."></div>
 <p>Bunun neden mümkün olduğunu SVM'nin ikil biçimi açıklar: hem eğitim hem tahmin, verileri yalnız iki nokta arasındaki iç çarpımlar (xᵢ·xⱼ) üzerinden kullanır. Her iç çarpımı K(xᵢ, xⱼ) = φ(xᵢ)·φ(xⱼ) biçiminde bir çekirdek fonksiyonuyla değiştirmek, verileri φ'nin tanımladığı yüksek boyutlu uzaya taşıyıp orada doğrusal SVM eğitmekle aynı şeydir; ama φ'yi hiç hesaplamamız gerekmez. Sık kullanılan çekirdekler şunlardır:</p>
@@ -77,11 +77,11 @@
 <div data-widget="kernel"></div>
 <p>Çekirdeği ve parametrelerini kullanıcı seçer; α'lar ve b eğitimle bulunur. RBF çekirdeğinde γ, bir destek vektörünün etkisinin ne kadar uzağa yayılacağını belirler: γ büyükse etki çok yerel kalır ve sınır noktaların etrafında adacıklar oluşturur (aşırı uyum). Çekirdekler uzaklığa ve iç çarpıma dayandığı için öznitelikler mutlaka ölçeklenmelidir. C ve γ birlikte, logaritmik bir ızgarada çapraz doğrulamayla ayarlanır. Eğitimde %100, testte %60 başarı alan bir RBF-SVM'de ilk denenecek şey γ'yı küçültmektir.</p>
 
-<h2>SVM mi, lojistik regresyon mu?</h2>
+<h2>Hangisini seçmeli? SVM ile lojistik regresyonun karşılaştırması</h2>
 <p>İki model de doğrusal bir sınır çizer ama farklı kayıplar kullanır ve farklı durumlarda öne çıkar. SVM'nin menteşe kaybı marjın dışındaki noktaları tamamen yok sayar; lojistik regresyonun log-loss'u ise bütün noktalardan etkilenir. Lojistik regresyon doğrudan, güvenilir olasılıklar verir; SVM vermez (ek bir yöntemle sonradan hesaplanabilir). Veri bir doğruyla kusursuz ayrılabiliyorsa SVM'nin tek bir çözümü (en geniş marj) vardır; düzenlileştirme olmadan lojistik regresyonun ağırlıkları ise sınırsız büyür. SVM çekirdeklerle doğrusal olmayan sınırları kolayca çizer, ama çekirdekli SVM'nin eğitimi örnek sayısıyla hızla pahalılaşır; lojistik regresyon ise SGD ile milyonlarca örneğe ölçeklenir.</p>
 <p>Kısaca: belirgin bir marj varsa, öznitelik sayısı örnek sayısına göre büyükse (metin gibi) ya da doğrusal olmayan bir sınır gerekiyorsa SVM; olasılık ve yorumlanabilir katsayılar gerekiyorsa ya da veri çok büyükse lojistik regresyon tercih edilir. Çok sınıflı problemlerde SVM, birine karşı geri kalanlar ya da bire karşı bir yaklaşımıyla kullanılır.</p>
 
-<h2>Sınav tipi çözümlü problemler</h2>
+<h2>Sınav tipi problemler ve adım adım çözümleri</h2>
 <p>Aşağıdaki problemler sınavdaki biçimdedir. Her birini önce kâğıtta çözmeye çalış (5–10 dakika), sonra “çözümü aç”a bas: çözümde her adımın <em>neden</em> öyle yapıldığı da yazıyor. Takılırsan sayfanın ilgili bölümüne dön.</p>
 <h3>Problem 1: marj ve noktaların konumu</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H7)</span></div><p>Kanonik biçimde bir SVM'nin parametreleri w = (1, 2), b = −3. (a) ‖w‖, marj ve sokak genişliği nedir? (b) x = (2, 2) için f(x) ve sınıra uzaklık nedir; nokta sokağın içinde mi? (c) Şu noktalar için y·f(x) ve menteşe kaybını bulun: (2, 2) ve y = +1; (1, 1) ve y = +1; (3, 0) ve y = −1; (0, 2) ve y = −1. Hangileri destek vektörü olabilir? (√5 = 2.236)</p></div>
@@ -99,7 +99,7 @@
 <h3>Problem 4: çekirdeği elle hesaplamak</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H7)</span></div><p>(a) x = (1, 1) ve z = (2, 0) için polinom çekirdeği (x·z)²'yi hesaplayın ve φ(v) = (v₁², √2·v₁v₂, v₂²) dönüşümüyle denetleyin. (b) ‖x − z‖² = 1 için RBF çekirdeğini γ = 0.5 ve γ = 2 ile hesaplayın (e⁻⁰·⁵ = 0.607, e⁻² = 0.135). (c) SVM'nin ikil biçimi çekirdekleri neden mümkün kılar?</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Çekirdek, iki noktanın daha yüksek boyutlu bir uzaydaki iç çarpımını, o uzaya hiç geçmeden hesaplamanın yoludur.</p><p>(a) x·z = 1 × 2 + 1 × 0 = 2, çekirdek değeri 2² = <strong>4</strong>. Denetlemek için iki noktayı açıkça 3 boyutlu uzaya taşıyalım: φ(x) = (1, 1.414, 1), φ(z) = (4, 0, 0). Bunların iç çarpımı 1 × 4 = 4: aynı sonuç. Çekirdek bize bu sayıyı φ'yi hesaplamadan verdi.</p><p>(b) RBF çekirdeği exp(−γ‖x − z‖²)'dir. γ = 0.5 için e⁻⁰·⁵ = <strong>0.607</strong>, γ = 2 için e⁻² = <strong>0.135</strong>. γ büyüdükçe benzerlik daha hızlı düşer; yani her destek vektörü yalnız çok yakınındaki bölgeyi etkiler.</p><p>(c) İkil biçimde hem eğitim hem tahmin, veriyi yalnız iki nokta arasındaki iç çarpımlar (xᵢ·xⱼ) üzerinden kullanır. Her iç çarpımı bir çekirdek değeriyle değiştirmek, SVM'yi φ'nin tanımladığı yüksek boyutlu uzayda eğitmekle aynı şeydir.</p></div></details>
-<h2>Sık hatalar</h2>
+<h2>Sınavda sık yapılan hatalar</h2>
 <ul class="mistakes">
 <li>Destek vektörlerini seçip çözdükten sonra diğer noktaları denetlememek (y·f ≥ 1 olmalı).</li>
 <li>Negatif destek vektöründe w·x + b = <strong>−1</strong> yerine +1 yazmak.</li>
@@ -109,7 +109,7 @@
 <li>ξ'yi yanlış tarafta olmayan noktalar için hep 0 sanmak: sokağın içindeki doğru taraftaki noktada 0 &lt; ξ &lt; 1.</li>
 </ul>
 
-<h2>Hiperparametre satırları</h2>
+<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2>
 <p><b>Bu tablo nasıl okunur?</b> Her satır bir ayarın (hiperparametrenin) değeri <em>artırıldığında</em> ne olduğunu söyler. <b>Yanlılık</b> “model çok mu basit, sistematik hata yapıyor mu?”, <b>varyans</b> “model veriye göre çok mu oynuyor?”, <b>aşırı uyum riski</b> “ezberleme tehlikesi”. Kural: ayar modeli daha esnek yapıyorsa yanlılık ↓, varyans ↑, risk ↑; daha katı yapıyorsa tersi. Sınavda “X artarsa ne olur, neden?” diye tam bu biçimde sorulur. <span class="down">Yeşil</span> = azalır, <span class="up">kırmızı</span> = artar.</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
@@ -121,7 +121,7 @@
 </tbody></table></div>
 <p class="small">Destek vektörü oranı %50'nin üstündeyse C ya da γ çok büyük olabilir (ya da veri çok gürültülü). Dikkat: C'yi 0.1'den 100'e çıkarırsak marj daralır, destek vektörü sayısı azalır, yanlılık düşer, varyans artar. (Bazı kaynaklar C'yi ters yönde “ihlal bütçesi” olarak tanımlar; formüle bakın: burada C, Σξ'nin katsayısıdır.)</p>
 
-<h2>Sınama soruları</h2>
+<h2>Kendini sına: kısa sorular</h2>
 <div class="quiz" data-answer="2"><p>w = (1, 2), b = −3 (kanonik). Marj ve (2, 2) noktasının konumu? (√5 = 2.236)</p><ol>
 <li data-why="Sokak genişliği 2/‖w‖ = 0.894; marj bunun yarısı.">marj 0.894; nokta sokağın içinde</li>
 <li data-why="">marj 1/√5 = 0.447; f(2,2) = 3 &gt; 1 → sokağın dışında, uzaklık 3/√5 = 1.342</li>

@@ -16,12 +16,12 @@
 <h1>Ara sınav rehberi</h1>
 <p class="lead"><strong>9 Kasım 2026 Pazartesi, 16:30</strong>, ders saatinde, her zamanki derslikte. Kâğıt üzerinde, 100 dakika, kitap ve not kapalı, hesap makinesi ve elektronik cihaz yok; logaritma ve üstel tablolar soru kâğıdında verilir. Kapsam <strong>1–7. haftalar</strong>.</p>
 
-<h2>Biçim ve süre planı</h2>
+<h2>Sınavın bölümleri, puanları ve önerilen süreler</h2>
 <p>8. haftanın ilk dersinde açıklanan biçim:</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Bölüm</th><th>Soru türü</th><th class="num">Puan</th><th class="num">Önerilen süre</th><th>Çalışma sayfası</th></tr></thead>
 <tbody>
-<tr><td>A</td><td>Kısa kavramsal sorular (8 × 4 p)</td><td class="num">32</td><td class="num">20 dk</td><td><a href="#kisa-sorular">aşağıda</a>, <a href="hyper.html">hiperparametre tablosu</a></td></tr>
+<tr><td>A</td><td>Kısa kavramsal sorular (8 × 4 p)</td><td class="num">32</td><td class="num">20 dk</td><td><a href="#kisa-kavram-sorulari-ve-cevaplari">aşağıda</a>, <a href="hyper.html">hiperparametre tablosu</a></td></tr>
 <tr><td>B</td><td>Karar ağacı: entropi ve bilgi kazancı hesabı</td><td class="num">17</td><td class="num">20 dk</td><td><a href="w5-trees.html">H5</a> · <a href="drill.html">üreteç: bilgi kazancı</a></td></tr>
 <tr><td>C</td><td>Lojistik regresyon / perceptron: bir güncelleme adımı</td><td class="num">17</td><td class="num">20 dk</td><td><a href="w4-linear.html">H4</a> · <a href="drill.html">üreteç</a></td></tr>
 <tr><td>D</td><td>kNN ve ölçütler: karmaşıklık matrisi, F1</td><td class="num">17</td><td class="num">15 dk</td><td><a href="w2-data.html">H2</a>, <a href="w3-knn.html">H3</a></td></tr>
@@ -37,20 +37,24 @@
 </ul></div>
 <p>Örnek sınav 110 dakika / 108 puandı ve içinde bir de “her şey aynı veride” büyük sorusu (ölçekleme → çizim → LR → perceptron → kNN → eşik → SVM → λ seçimi) vardı. <a href="sample-midterm.html">Çözümü burada</a>.</p>
 
-<h2>Hafta hafta: bilinmesi gerekenler</h2>
-<div class="table-wrap"><table class="simple">
-<thead><tr><th>Hafta</th><th>Elle hesap</th><th>Kavram</th></tr></thead>
-<tbody>
-<tr><td><a href="w1-intro.html">1</a></td><td>hipotez sayma (1 + ∏(kᵢ+1)), Find-S izleme</td><td>T/E/P; gözetimli (sınıflandırma/regresyon), gözetimsiz, pekiştirmeli; tümevarımsal yanlılık; aşırı/yetersiz uyum</td></tr>
-<tr><td><a href="w2-data.html">2</a></td><td>min-max, z-score (σ: n'ye böl), karmaşıklık matrisi → accuracy/precision/recall/F1/specificity, ROC tablosu ve AUC (çift sayma), MSE/MAE/R², 2B PCA</td><td>kodlama türleri, ölçeklemeden kim etkilenir, sızıntı, train/val/test, k-katlı CV (ortalama ± std, son model bütün veride), metrik seçimi</td></tr>
-<tr><td><a href="w3-knn.html">3</a></td><td>kNN (d² ile sıralama, beraberlik), z-score ile kNN, LOO</td><td>kayıp türleri, ERM, i.i.d., taban çizgisi, yanlılık-varyans ayrışımı, doğrulama/öğrenme eğrisi, düzenlileştirme, sızıntı türleri, boyut laneti</td></tr>
-<tr><td><a href="w4-linear.html">4</a></td><td>tek değişkenli en küçük kareler, gradyan inişi adımı, lojistik regresyon adımı, perceptron epoch'u + karmaşıklık matrisi, softmax, karar sınırı ve uzaklık, mantık kapıları</td><td>MSE ↔ Gauss olabilirlik, log-loss neden, batch/SGD/mini-batch, öğrenme oranı, XOR, OvR/softmax, ridge/lasso, C = 1/λ</td></tr>
-<tr><td><a href="w5-trees.html">5</a></td><td>tam ID3 (her seviyede bütün adaylar), Gini, sürekli eşik, kazanç oranı, regresyon ağacı SSE</td><td>budama (ön/sonra, α), ağaçların varyansı, aynı öznitelik iki kez</td></tr>
-<tr><td><a href="w6-ensembles.html">6</a></td><td>çoğunluk oyu hatası (binom), bootstrap (1 − 1/n)ⁿ, OOB tahmini, AdaBoost turu (ε, α, yeni ağırlıklar), gradyan artırma adımı</td><td>bagging vs boosting, RF'nin iki rastgeleliği, ağaç sayısı ve aşırı uyum, stacking sızıntısı</td></tr>
-<tr><td><a href="w7-svm.html">7</a></td><td>marj, uzaklık, menteşe/ξ, 2B'de destek vektörleri + w, b (kanonik denklemler), yumuşak marj amaç karşılaştırması, polinom/RBF çekirdek değeri</td><td>sert/yumuşak marj, C ve γ, çekirdek hilesi, VC boyutu, SVM vs LR</td></tr>
-</tbody></table></div>
+<h2>Her haftadan neyi bilmeniz gerekiyor?</h2>
+<p>Her hafta için iki şey sıralanıyor: sınavda <em>elle</em> yapmanız beklenen hesaplar ve kısa sorularda sorulabilecek kavramlar. Bir maddeyi rahatça yapamıyorsanız haftanın sayfasındaki ilgili bölüme dönün.</p>
+<h3><a href="w1-intro.html">1. hafta: giriş ve temel kavramlar</a></h3>
+<p><b>Hesap:</b> bir öznitelik kümesi için örnek ve hipotez sayısını bulmak (örnek = değer sayılarının çarpımı, hipotez = 1 + (değer sayısı + 1)'lerin çarpımı) ve Find-S algoritmasını birkaç örnek üzerinde adım adım uygulamak. <b>Kavram:</b> bir sistemin görevini, deneyimini ve başarım ölçüsünü (T, E, P) yazmak; gözetimli (sınıflandırma ve regresyon), gözetimsiz ve pekiştirmeli öğrenmeyi ayırmak; tümevarımsal yanlılığın neden gerekli olduğunu ve aşırı/yetersiz uyumun ne olduğunu açıklamak.</p>
+<h3><a href="w2-data.html">2. hafta: veri, öznitelik ve değerlendirme</a></h3>
+<p><b>Hesap:</b> min-max ve z-score ölçekleme (σ'yı n'ye bölerek); tahmin listesinden karmaşıklık matrisini kurup accuracy, precision, recall, specificity ve F1'i hesaplamak; sıralı bir diziden ROC tablosunu çıkarıp AUC'yi çift sayarak bulmak; MSE, MAE ve R²; iki boyutlu küçük bir veride PCA (kovaryans, özdeğer, açıklanan varyans). <b>Kavram:</b> hangi öznitelik nasıl kodlanır, ölçeklemeye kim ihtiyaç duyar, veri sızıntısı nedir, eğitim/doğrulama/test bölmesi ve k-katlı çapraz doğrulama nasıl yapılır, hangi durumda hangi ölçüt seçilir.</p>
+<h3><a href="w3-knn.html">3. hafta: kNN ve model seçimi</a></h3>
+<p><b>Hesap:</b> kNN'de kare uzaklıklarla komşuları sıralayıp k = 1, 3, 5 için karar vermek (gerekirse önce z-score uygulayarak); birini dışarıda bırakma (LOO) ile k seçmek. <b>Kavram:</b> kayıp türleri ve ampirik risk, i.i.d. varsayımı, taban çizgisi, yanlılık-varyans ayrışımı, eğitim ve doğrulama hatasına bakarak rejim tanısı, düzenlileştirme fikri, sızıntı türleri ve boyut laneti.</p>
+<h3><a href="w4-linear.html">4. hafta: doğrusal modeller</a></h3>
+<p><b>Hesap:</b> tek değişkenli en küçük kareler; bir gradyan inişi adımı; tek örnekte bir lojistik regresyon adımı (z, p, kayıp, gradyan, yeni ağırlıklar); bir perceptron epoch'u ve sonundaki karmaşıklık matrisi; softmax olasılıkları; bir doğrunun denklemi ve bir noktanın ona uzaklığı; AND/OR için ağırlık bulmak. <b>Kavram:</b> kare hatanın Gauss gürültüsüyle ilişkisi, log-loss'un neden kullanıldığı, batch/SGD/mini-batch farkı, öğrenme oranının etkisi, XOR'un neden tek doğruyla ayrılamadığı, çok sınıflı yaklaşımlar, ridge ile lasso farkı ve scikit-learn'deki C = 1/λ.</p>
+<h3><a href="w5-trees.html">5. hafta: karar ağaçları</a></h3>
+<p><b>Hesap:</b> tam bir ID3 ağacı (her seviyede bütün adayların kazancıyla); Gini ile kök seçimi; sayısal bir öznitelikte en iyi eşik; kazanç oranı; regresyon ağacında SSE. <b>Kavram:</b> ön ve sonradan budama, ağaçların neden kararsız (yüksek varyanslı) olduğu, aynı özniteliğin bir yolda iki kez kullanılıp kullanılamayacağı.</p>
+<h3><a href="w6-ensembles.html">6. hafta: topluluk yöntemleri</a></h3>
+<p><b>Hesap:</b> bağımsız modellerin çoğunluk oyu hatası (binom); bootstrap'te dışarıda kalma olasılığı; verilen örneklemlerden OOB tahmini; bir AdaBoost turu (ε, α ve yeni ağırlıklar); bir gradyan artırma adımı. <b>Kavram:</b> bagging ile boosting farkı, rastgele ormanın iki rastgelelik kaynağı, ağaç sayısının aşırı uyuma etkisi, stacking'deki sızıntı riski.</p>
+<h3><a href="w7-svm.html">7. hafta: destek vektör makineleri</a></h3>
+<p><b>Hesap:</b> verilen w, b için marj, bir noktanın uzaklığı ve menteşe kaybı; iki boyutta destek vektörlerini seçip w ve b'yi kanonik denklemlerden bulmak; iki aday sınırı yumuşak marj amacıyla karşılaştırmak; polinom ve RBF çekirdek değerleri. <b>Kavram:</b> sert ve yumuşak marj farkı, C ve γ'nın etkisi, çekirdek hilesi, VC boyutu, SVM ile lojistik regresyonun karşılaştırması.</p>
 
-<h2>Sık yapılan hatalar</h2>
+<h2>Sınavda en sık kaybedilen puanlar</h2>
 <ul>
 <li><strong>FP ile FN'yi karıştırmak.</strong> Önce her örneğe TP/FN/FP/TN yazın; TP + FN = pozitif sayısı denetimini yapın.</li>
 <li>z-score'da σ'yı n − 1'e bölmek (ders n'ye böler); PCA kovaryansında ise n − 1.</li>
@@ -64,22 +68,22 @@
 <li>Öklid uzaklığında karekök almaya uğraşmak: sıralama için d² yeter.</li>
 </ul>
 
-<h2>Kısa sorular</h2>
+<h2>Kısa kavram soruları ve cevapları</h2>
 <p>Ders slaytlarında, alıştırma kâğıtlarında ve önceki dönemin ara sınav listesinde geçen kalıplar. Cevabı söyleyin, sonra açın.</p>
 <details class="solution"><summary>Öznitelik normalleştirme nedir, neden ve nasıl?</summary><div class="body"><p>Öznitelikleri karşılaştırılabilir ölçeğe getirmek. Uzaklık temelli (kNN, SVM, k-ortalamalar) ve gradyan temelli (LR, sinir ağı) yöntemlerde büyük ölçekli öznitelik baskın olur / eniyileme yavaşlar. Sınırları belli, kabaca düzgün veride min-max; yaklaşık normal veride z-score; sağa çarpıkta önce log; uç değerde kırpma. Parametreler yalnız eğitimden; ağaçlar etkilenmez.</p></div></details>
 <details class="solution"><summary>PCA nedir, faydası, ne zaman?</summary><div class="body"><p>Veriyi varyansın en büyük olduğu dik yönlere izdüşüren denetimsiz doğrusal dönüşüm (kovaryansın özvektörleri). Boyut indirgeme (hız, bellek, boyut lanetine karşı), ilişkili öznitelikleri birleştirme, gürültü azaltma, 2B görselleştirme. Öznitelikler çok ilişkiliyse işe yarar; etiketleri görmediği için ayırt edici yönü kaçırabilir; önce ölçekleyin.</p></div></details>
 <details class="solution"><summary>Precision ve recall: tanım, FN/FP ile ilişki, birbirleriyle ilişki</summary><div class="body"><p>Precision = TP/(TP + FP): FP arttıkça düşer. Recall = TP/(TP + FN): FN arttıkça düşer. Eşik yükselince daha az pozitif denir: FP azalır (precision ↑), FN artar (recall ↓); ikisi arasında denge vardır, F1 harmonik ortalamalarıdır.</p></div></details>
 <details class="solution"><summary>Doğrulama kümesi neden ve nasıl?</summary><div class="body"><p>Hiperparametre seçmek ve modelleri karşılaştırmak için; test kümesi yalnız son raporda bir kez kullanılsın diye. Eğitimde parametreler öğrenilir, doğrulamada ayar seçilir; küçük veride tek bölme yerine k-katlı CV; seçimden sonra son model bütün eğitim verisiyle eğitilir.</p></div></details>
-<details class="solution"><summary>Aşırı uyum oldu mu nasıl anlarız, ne yaparız?</summary><div class="body"><p>Eğitim hatası düşük, doğrulama hatası belirgin yüksek (büyük açık); doğrulama eğrisinde tepe noktasının ötesi. Çare: esnekliği azalt (k↑, derinlik↓, λ↑, C↓, γ↓), budama, daha çok veri, öznitelik seçimi, erken durdurma, topluluk (bagging/RF).</p></div></details>
+<details class="solution"><summary>Aşırı uyum oldu mu nasıl anlarız, ne yaparız?</summary><div class="body"><p>Eğitim hatası düşük, doğrulama hatası belirgin yüksek (büyük açık); doğrulama eğrisinde tepe noktasının ötesi. Çare: esnekliği azalt (kNN'de k'yı büyütmek, ağacın derinliğini azaltmak, λ'yı artırmak, SVM'de C'yi ya da γ'yı küçültmek), budama, daha çok veri, öznitelik seçimi, erken durdurma, topluluk (bagging/RF).</p></div></details>
 <details class="solution"><summary>kNN'de aşırı uyumu nasıl önleriz?</summary><div class="body"><p>k'yı büyütmek (CV ile seçmek), öznitelikleri ölçeklemek ve ilgisizleri atmak (ya da PCA), daha çok veri, uzaklık ölçüsünü probleme uygun seçmek.</p></div></details>
 <details class="solution"><summary>Gradyan inişi formülü, nerede, neden kapalı çözüm yerine?</summary><div class="body"><p>w ← w − η∇L(w). Kaybı en aza indirmek için parametreleri en dik iniş yönünde küçük adımlarla günceller (LR, sinir ağı, büyük veride doğrusal regresyon). Kapalı çözüm (XᵀX)⁻¹Xᵀy büyük d'de O(d³) ve bellek ister; LR ve sinir ağlarının kapalı çözümü yoktur; akan veride çevrimiçi güncellemeye izin verir.</p></div></details>
 <details class="solution"><summary>Öğrenme oranı büyük/küçük olursa?</summary><div class="body"><p>Küçük: yavaş yakınsama, yerel düzlükte takılma, sınırlı bütçede eksik uyum. Büyük: minimumu aşma, salınım, ıraksama (kayıp artar). Pratikte adım çizelgesi ya da Adam.</p></div></details>
 <details class="solution"><summary>Neden step yerine sigmoid etkinleştirme?</summary><div class="body"><p>Step'in türevi her yerde 0 (sıçramada tanımsız): gradyanla eğitilemez. Sigmoid türevlenebilir (σ′ = σ(1 − σ)), çıktısı olasılık olarak okunur, log-loss ile dışbükey kayıp verir.</p></div></details>
 <details class="solution"><summary>Bagging ile boosting farkı</summary><div class="body"><p>Bagging: bootstrap örneklemlerinde bağımsız/paralel modeller, oy ya da ortalama; varyansı azaltır; derin ağaç. Boosting: sıralı, her model öncekilerin hatalarına (ağırlık ya da kalıntı) odaklanır; yanlılığı azaltır; sığ ağaç/kütük; gürültüye daha duyarlı.</p></div></details>
 <details class="solution"><summary>Rastgele ormanda ağaç sayısı artarken doğrulama hatası?</summary><div class="body"><p>Hızla düşer, sonra bir platoya oturur; aşırı uyum yüzünden yeniden yükselmez (ortalamanın varyansı azalır, yanlılık sabit). Bedeli süre ve bellek.</p></div></details>
-<details class="solution"><summary>kNN, karar ağacı, MLP hiperparametrelerinin yanlılık/varyansa etkisi</summary><div class="body"><p>kNN: k↑ → yanlılık↑ varyans↓. Ağaç: max_depth↑ → yanlılık↓ varyans↑; min_samples_leaf↑ → yanlılık↑ varyans↓. MLP: gizli nöron sayısı↑, katman sayısı↑, epoch↑ → yanlılık↓ varyans↑; L2/dropout↑ → yanlılık↑ varyans↓. <a href="hyper.html">Tam tablo</a>.</p></div></details>
+<details class="solution"><summary>kNN, karar ağacı, MLP hiperparametrelerinin yanlılık/varyansa etkisi</summary><div class="body"><p>kNN'de k arttıkça yanlılık artar, varyans azalır. Karar ağacında en büyük derinlik arttıkça yanlılık azalır, varyans artar; yaprak başına en az örnek sayısı arttıkça tersi olur. Sinir ağında gizli nöron sayısı, katman sayısı ve epoch sayısı arttıkça yanlılık azalır, varyans artar; L2 cezası ya da dropout arttıkça tersi olur. <a href="hyper.html">Tam tablo</a>.</p></div></details>
 
-<h2>Son tekrar için</h2>
+<h2>Son tekrar için kullanılacak sayfalar</h2>
 <div class="cards">
 <a class="card" href="sample-midterm.html"><h3>Örnek sınav çözümü</h3><p>Bütün soru tiplerinin bir arada olduğu tek belge.</p></a>
 <a class="card" href="drill.html"><h3>Alıştırma üreteci</h3><p>12 hesap türünde sınırsız soru, cevap denetimiyle.</p></a>

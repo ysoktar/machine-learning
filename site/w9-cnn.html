@@ -27,7 +27,7 @@
 <div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-evrisim">Evrişim</a> · <a href="sozluk.html#t-dropout-seyreltme">Dropout</a> · <a href="sozluk.html#t-aktarimli-ogrenme">Aktarımlı öğrenme</a> · <a href="sozluk.html#t-erken-durdurma">Erken durdurma</a></div>
 
 
-<h2>Derin ağları eğitmek</h2>
+<h2>Derin ağları eğitmenin zorlukları ve çareleri</h2>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Konu</th><th>Ne?</th><th>Neden / nasıl</th></tr></thead>
 <tbody>
@@ -40,18 +40,18 @@
 <tr><td>Öğrenme oranı çizelgesi</td><td>adım azaltma, kosinüs, ısınma (warm-up)</td><td>başta hızlı, sonda ince ayar</td></tr>
 </tbody></table></div>
 
-<h2>Neden evrişim?</h2>
+<h2>Görüntüde neden tam bağlı katman yerine evrişim kullanılır?</h2>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Büyüteçle taramak</div><p>Bir fotoğrafta kedi aramak için her pikseli ayrı ayrı bütün diğer piksellerle ilişkilendirmeye gerek yok; küçük bir büyüteci (filtre) resmin üzerinde gezdirip her yerde aynı deseni (kulak, göz, kenar) ararsınız. Evrişim budur: aynı küçük filtre her konumda kullanılır, bu yüzden öğrenilecek sayı az olur ve desen nerede olursa olsun tanınır.</p></div>
 <p>32×32×3 görüntüde tek bir tam bağlı katman bile 3072 girdi × nöron sayısı kadar ağırlık ister; yüksek çözünürlükte patlar ve uzamsal yapıyı (yakın piksellerin ilişkisi) yok sayar. Evrişim: küçük bir filtre bütün görüntüde <strong>kaydırılır</strong> (yerel bağlantı + <strong>ağırlık paylaşımı</strong>): parametre sayısı görüntü boyutundan bağımsızdır ve aynı desen her yerde tanınır (kaymaya eşdeğişkenlik). MLP'nin görüntüde verimsizliğinin cevabı budur.</p>
 
-<h2>Elle evrişim</h2>
+<h2>Evrişimi elle hesaplamak: filtre, dolgu ve adım</h2>
 <p><strong>1B</strong>: f = (4, 3, 2, −5, 3, 5, 2, 5, 5, 6), kutu filtre (⅓, ⅓, ⅓) → ilk hücre (4 + 3 + 2)/3 = 3, sonra 0, 0, 1, 10/3, 4, 4, 16/3: çıktı 10 − 3 + 1 = 8 eleman. Kutu filtre <strong>alçak geçiren</strong> (yumuşatır, gürültüyü bastırır); kenar filtresi (1, 0, −1) <strong>yüksek geçiren</strong> (ani değişimleri, kenarları vurgular).</p>
 <p><strong>2B</strong>: çıktı hücresi = filtre ile girdi penceresinin eleman eleman çarpımlarının toplamı (kütüphanelerdeki “evrişim” aslında çapraz ilişkidir, filtre çevrilmez). Varsayılan örnek: 4×4 görüntü, dikey kenar filtresi [[1,0,−1],[1,0,−1],[1,0,−1]] → her hücre “sol sütun toplamı − sağ sütun toplamı”; çıktı [[0, 2], [−1, −1]]. Dolgu 1 ile çıktı 4×4 kalır (“same”).</p>
 <div data-widget="conv"></div>
 <div class="formula">çıktı boyutu = ⌊(n + 2p − k)/s⌋ + 1</div>
 <p>Dolgu yok (“valid”): kenar pikselleri az görülür, çıktı küçülür. Sıfır dolgu p = (k − 1)/2 ve s = 1: “same”. Adım s &gt; 1 çıktıyı küçültür. Dikdörtgen filtre ve farklı yatay/dikey adım/dolgu: her eksen için formülü ayrı uygulayın.</p>
 
-<h2>Havuzlama ve parametre sayma</h2>
+<h2>Havuzlama ve bir katmandaki parametreleri saymak</h2>
 <p><strong>Max/ortalama havuzlama</strong> (tipik 2×2, adım 2): her penceredeki en büyük ya da ortalama değer; boyutu yarıya indirir, parametresi yoktur, küçük kaymalara dayanıklılık verir.</p>
 <div class="formula">evrişim katmanı parametresi = (k_h·k_w·C_in + 1)·C_out</div>
 <div class="table-wrap"><table class="simple compact">
@@ -67,31 +67,31 @@
 <div data-widget="convlayer"></div>
 <p>Varsayılan değerler geçmiş final sorusudur: 128×128×16 girdi, 64 tane 3×7 filtre, adım (2, 3), dolgu (1, 2) → çıktı 64×42×64; 64·3·7·16 = 21,504 ağırlık, 64 bias.</p>
 
-<h2>Mimariler ve aktarımlı öğrenme</h2>
+<h2>Bilinen mimariler ve hazır modeli yeniden kullanmak (aktarımlı öğrenme)</h2>
 <ul>
 <li><strong>LeNet</strong> (rakamlar; conv-pool-conv-pool-FC), <strong>AlexNet</strong> (2012; ReLU, dropout, GPU, büyük veri), <strong>VGG</strong> (üst üste 3×3), <strong>ResNet</strong> (artık bağlantı <span class="m">y = F(x) + x</span>: gradyan kısa yoldan akar, yüzlerce katman eğitilebilir).</li>
 <li><strong>Aktarımlı öğrenme</strong>: ImageNet'te ön eğitilmiş ağın erken katmanları genel desenleri (kenar, doku) öğrenmiştir; bunlar tıbbi görüntü gibi çok farklı alanlarda da işe yarar. Az veride çoğu katmanı dondurup yalnız yeni sınıflandırıcı başını eğit; çok veride daha çok katmanı küçük η ile ince ayarla. Ön eğitilmiş modelin son katmandan önceki çıktısı bir <strong>gömme</strong> (embedding) olarak başka modellere girdi yapılabilir.</li>
 </ul>
 
-<h2>Sınav tipi çözümlü problemler</h2>
-<h3>Problem 1: 1B evrişim, dolgu ve adım</h3>
+<h2>Sınav tipi problemler ve adım adım çözümleri</h2>
+<h3>Problem 1: Tek boyutlu evrişimde dolgu ve adımın etkisi</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(9. hafta derste)</span></div><p>f = (4, 3, 2, −5, 3, 5, 2, 5, 5, 6), kutu filtre g = (⅓, ⅓, ⅓). (a) Dolgusuz, adım 1. (b) Aynı, adım 2. (c) Sıfır dolgu 1, adım 1: uzunluk ve ilk/son hücre.</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li>Uzunluk 10 − 3 + 1 = 8: 3, 0, 0, 1, 10/3, 4, 4, 16/3 (örn. ilk (4 + 3 + 2)/3 = 3, ikinci (3 + 2 − 5)/3 = 0).</li>
 <li>Adım 2: ⌊(10 − 3)/2⌋ + 1 = 4 hücre: 1., 3., 5., 7. pencereler → 3, 0, 10/3, 4.</li>
 <li>Dolgu 1: (10 + 2 − 3)/1 + 1 = 10 (“same”). İlk hücre (0 + 4 + 3)/3 = 7/3, son (5 + 6 + 0)/3 = 11/3: kenarlar kısmen sıfır görür.</li></ol></div></details>
-<h3>Problem 2: 2B evrişim</h3>
+<h3>Problem 2: İki boyutlu bir görüntüde evrişim</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(9. hafta derste)</span></div><p>I = [[1, 2, 0, 1], [0, 1, 3, 1], [2, 1, 0, 0], [1, 0, 1, 2]], dikey kenar filtresi K = [[1, 0, −1], [1, 0, −1], [1, 0, −1]], dolgu 0, adım 1. Çıktıyı bulun.</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Çıktı (4 − 3)/1 + 1 = 2 → 2×2. Her hücre = pencerenin sol sütun toplamı − sağ sütun toplamı:</p>
 <ul><li>(0,0): pencere satırları [1,2,0], [0,1,3], [2,1,0] → (1 + 0 + 2) − (0 + 3 + 0) = <strong>0</strong></li><li>(0,1): [2,0,1], [1,3,1], [1,0,0] → (2 + 1 + 1) − (1 + 1 + 0) = <strong>2</strong></li>
 <li>(1,0): [0,1,3], [2,1,0], [1,0,1] → (0 + 2 + 1) − (3 + 0 + 1) = <strong>−1</strong></li><li>(1,1): [1,3,1], [1,0,0], [0,1,2] → (1 + 1 + 0) − (1 + 0 + 2) = <strong>−1</strong></li></ul>
 <p>Parlaklık sağa doğru artıyorsa yanıt negatif, azalıyorsa pozitif. Dolgu 1 ile çıktı 4×4 olur (yukarıdaki araca girin).</p></div></details>
-<h3>Problem 3: katman boyutları ve parametreler</h3>
+<h3>Problem 3: Katman katman çıktı boyutu ve parametre sayısı</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(geçmiş final listesi)</span></div><p>Girdi 128×128×16; 64 tane 3×7 filtre, adım (2, 3), dolgu (1, 2). Çıktı boyutu, ağırlık ve bias sayısı?</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Yükseklik ⌊(128 + 2 − 3)/2⌋ + 1 = ⌊63.5⌋ + 1 = 64; genişlik ⌊(128 + 4 − 7)/3⌋ + 1 = ⌊41.67⌋ + 1 = 42 → <strong>64×42×64</strong>. Ağırlık 64·3·7·16 = <strong>21,504</strong>; bias <strong>64</strong> (filtre başına bir).</p></div></details>
-<h3>Problem 4: küçük CNN'de parametre sayma</h3>
+<h3>Problem 4: Küçük bir CNN'in toplam parametre sayısı</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(9. hafta derste)</span></div><p>3×32×32 girdi → Conv 3→16 (3×3, p = 1) → MaxPool 2×2 → Conv 16→32 (3×3, p = 1) → MaxPool 2×2 → Flatten → Linear →10. Her katmanın çıktısı ve parametre sayısı? En çok parametre nerede?</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Conv1: 16×32×32, (3·3·3 + 1)·16 = 448. Pool: 16×16×16, 0. Conv2: 32×16×16, (3·3·16 + 1)·32 = 4,640. Pool: 32×8×8, 0. Flatten 2048 → Linear: 2048·10 + 10 = 20,490. Toplam <strong>25,578</strong>; yaklaşık %80'i tam bağlı katmanda. Havuzlamanın parametresi yoktur.</p></div></details>
-<h2>Sık hatalar</h2>
+<h2>Sınavda sık yapılan hatalar</h2>
 <ul class="mistakes">
 <li>Çıktı boyutunda tabanı (⌊ ⌋) almayı unutmak ya da +1'i atlamak.</li>
 <li>Parametre sayısında girdi kanalı C'yi unutmak; bias'ı kanal başına değil filtre başına sayın.</li>
@@ -100,7 +100,7 @@
 <li>Dikdörtgen filtre / farklı adımda iki ekseni aynı sayıyla hesaplamak.</li>
 </ul>
 
-<h2>Hiperparametre satırları</h2>
+<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
 <tbody>
@@ -113,7 +113,7 @@
 <tr><td>Dondurulmuş katman (aktarım)</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>az veri: çok dondur</td></tr>
 </tbody></table></div>
 
-<h2>Sınama soruları</h2>
+<h2>Kendini sına: kısa sorular</h2>
 <div class="quiz" data-answer="3"><p>32×32 girdi, 5×5 filtre, dolgu 0, adım 1. Çıktı?</p><ol>
 <li data-why="Bu “same” dolguyla olurdu.">32×32</li>
 <li data-why="(32 − 5)/1 + 1 = 28.">27×27</li>

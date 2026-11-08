@@ -16,7 +16,7 @@
 <h1>Formül kâğıdı ve sözlük</h1>
 <p class="lead">Bütün dönemin formülleri tek sayfada, sınavda verilen türden log₂ ve eˣ tabloları ve Türkçe–İngilizce terimler. Yazdırılabilir (tarayıcının yazdır komutu menüleri gizler).</p>
 
-<h2>Veri ve değerlendirme</h2>
+<h2>Veriyi hazırlamak ve modeli değerlendirmek</h2>
 <div class="table-wrap"><table class="simple">
 <tbody>
 <tr><td>min-max</td><td class="m">x′ = (x − min)/(max − min)</td></tr>
@@ -32,7 +32,7 @@
 <tr><td>Açıklanan varyans</td><td class="m">λ_k / Σλ</td></tr>
 </tbody></table></div>
 
-<h2>kNN, risk, yanlılık-varyans</h2>
+<h2>kNN, risk ve yanlılık-varyans dengesi</h2>
 <div class="table-wrap"><table class="simple"><tbody>
 <tr><td>Öklid · Manhattan</td><td class="m">√Σ(x_j − z_j)² · Σ|x_j − z_j|</td></tr>
 <tr><td>Kosinüs uzaklığı</td><td class="m">1 − x·z/(‖x‖‖z‖)</td></tr>
@@ -41,7 +41,7 @@
 <tr><td>Düzenlileştirilmiş ERM</td><td class="m">min R̂(h) + λΩ(h)</td></tr>
 </tbody></table></div>
 
-<h2>Doğrusal modeller</h2>
+<h2>Doğrusal ve lojistik regresyon, algılayıcı</h2>
 <div class="table-wrap"><table class="simple"><tbody>
 <tr><td>En küçük kareler</td><td class="m">w = (XᵀX)⁻¹Xᵀy; &nbsp;w₁ = Σ(x−x̄)(y−ȳ)/Σ(x−x̄)², w₀ = ȳ − w₁x̄</td></tr>
 <tr><td>Ridge</td><td class="m">w = (XᵀX + λI)⁻¹Xᵀy</td></tr>
@@ -54,7 +54,7 @@
 <tr><td>Sınıra uzaklık</td><td class="m">|w·x + b|/‖w‖</td></tr>
 </tbody></table></div>
 
-<h2>Ağaçlar ve topluluklar</h2>
+<h2>Karar ağaçları ve topluluk yöntemleri</h2>
 <div class="table-wrap"><table class="simple"><tbody>
 <tr><td>Entropi · Gini</td><td class="m">−Σpᵢ log₂ pᵢ · 1 − Σpᵢ²</td></tr>
 <tr><td>Bilgi kazancı</td><td class="m">IG = H(D) − Σ(|D_v|/|D|)H(D_v)</td></tr>
@@ -66,7 +66,7 @@
 <tr><td>Gradyan artırma</td><td class="m">F₀ = ȳ, r = y − F, F ← F + η·f(r)</td></tr>
 </tbody></table></div>
 
-<h2>SVM</h2>
+<h2>Destek vektör makineleri (SVM)</h2>
 <div class="table-wrap"><table class="simple"><tbody>
 <tr><td>Sert marj</td><td class="m">min ½‖w‖² s.t. yᵢ(w·xᵢ + b) ≥ 1</td></tr>
 <tr><td>Marj · sokak</td><td class="m">1/‖w‖ · 2/‖w‖</td></tr>
@@ -76,7 +76,7 @@
 <tr><td>Çekirdekler</td><td class="m">(γx·z + r)^d · exp(−γ‖x − z‖²)</td></tr>
 </tbody></table></div>
 
-<h2>Sinir ağları ve CNN (final)</h2>
+<h2>Sinir ağları ve evrişimli ağlar (yalnızca final)</h2>
 <div class="table-wrap"><table class="simple"><tbody>
 <tr><td>Katman</td><td class="m">h = g(Wx + b)</td></tr>
 <tr><td>Çıktı deltası (sigmoid + BCE / softmax + CE)</td><td class="m">δ_out = ŷ − y</td></tr>
@@ -87,7 +87,7 @@
 <tr><td>Boole → step nöronu</td><td class="m">VE: +1 / −1 ağırlık, b = −(#pozitif değişmez) + 0.5 · VEYA: ağırlık 1, b = −0.5</td></tr>
 </tbody></table></div>
 
-<h2 id="log2-tablosu">log₂ ve entropi tablosu</h2>
+<h2 id="log2-tablosu">Hesap makinesiz sınav için log₂ ve entropi tablosu</h2>
 <div class="two-col">
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>p = k/n</th><th class="num">−log₂ p</th><th class="num">H(p) iki sınıf</th></tr></thead><tbody>
 <tr><td>1/2</td><td class="num">1.000</td><td class="num">1.000</td></tr>
@@ -135,7 +135,7 @@
 </div>
 <p class="small">ln 2 = 0.693 · ln 3 = 1.099 · ln 4 = 1.386 · ln 5 = 1.609 · ln 6 = 1.792 · ln 7 = 1.946 · ln 11 = 2.398 · √2 = 1.414 · √5 = 2.236 · σ(−x) = 1 − σ(x).</p>
 
-<h2>Sözlük (Türkçe – İngilizce)</h2>
+<h2>Terimlerin İngilizce karşılıkları</h2>
 <div class="table-wrap"><table class="simple compact">
 <thead><tr><th>Türkçe</th><th>İngilizce</th><th>Türkçe</th><th>İngilizce</th></tr></thead>
 <tbody>
