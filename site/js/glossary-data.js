@@ -167,7 +167,7 @@ export const TERMS = [
 "term": "Doğrulama kümesi",
 "def": "Hiperparametre seçmek ve modelleri karşılaştırmak için ayrılan veri. Test kümesi en sona saklanır.",
 "id": "t-dogrulama-kumesi",
-"match": "doğrulama kümesi",
+"match": "doğrulama kümesi|doğrulama(?! eğrisi)",
 "week": 2,
 "en": "validation set"
 },
@@ -728,7 +728,7 @@ export const TERMS = [
 "term": "Test kümesi",
 "def": "Yalnız en sonda, bir kez, modelin gerçek başarımını tahmin etmek için kullanılan veri. Karar vermek için kullanılırsa “görülmemiş” olmaktan çıkar.",
 "id": "t-test-kumesi",
-"match": "test kümesi",
+"match": "test kümesi|(?<!hastalık )test(?!ler| etme)",
 "week": 2,
 "en": "test set"
 },

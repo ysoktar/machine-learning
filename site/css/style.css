@@ -489,3 +489,6 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 .en-tag { white-space: normal; }
 .fig-formula { font-size: 1rem; margin: 0.4rem auto 0.3rem; max-width: 100%; }
 .fig-formula .ff { display: inline-block; margin: 0.1rem 0.9rem; }
+
+/* the hidden attribute must win over display rules such as .controls { display: flex } */
+[hidden] { display: none !important; }

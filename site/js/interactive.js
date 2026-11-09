@@ -3,6 +3,8 @@
 import { h, table, frame, area, parseRows, errorBox } from "./lib/ui.js";
 import * as ml from "./lib/ml.js";
 import { lines } from "./lib/plot.js";
+// "0.5x₁ + x₂ − 2" (no "1x₂", no "+ −2")
+const lin = (w, b) => { const t = w.map((c, i) => [c, `x${"₁₂₃₄"[i]}`]).filter(([c]) => Math.abs(c) > 1e-12).map(([c, x], k) => `${c < 0 ? (k ? " − " : "−") : k ? " + " : ""}${Math.abs(Math.abs(c) - 1) < 1e-12 ? "" : ml.fmt(Math.abs(c))}${x}`).join(""); return `${t || "0"}${b < 0 ? " − " : " + "}${ml.fmt(Math.abs(b))}`; };
 import { pointEditor, pointsToText } from "./lib/editor.js";
 
 const f = ml.fmt;
@@ -94,7 +96,7 @@ export function knn(ds) {
     const byK = [1, 2, 3, 4, 5, 6, 7].filter((kk) => kk <= r.length).map((kk) => { const vv = ml.knnVote(r, kk); return [kk, vv.tie ? "=" : vv.label > 0 ? "+" : "−"]; });
     put(out,
       h("div", { class: "narrate" }, h("b", {}, `k = ${K}: `), `q = (${f(q[0])}, ${f(q[1])}) noktasına en yakın ${K} komşu `,
-        r.slice(0, K).map((p) => `${p.name}(${p.y > 0 ? "+" : "−"})`).join(", "), ` → ${nPos} artı, ${nNeg} eksi → karar `, h("b", {}, decision), ".",
+        r.slice(0, K).map((p) => `${p.name}(${p.y > 0 ? "+" : "−"})`).join(", "), `. Bu komşuların ${nPos} tanesi artı, ${nNeg} tanesi eksi olduğu için çoğunluk oyuyla karar `, h("b", {}, decision), " olur.",
         v.boundaryTie ? h("span", { class: "bad" }, ` Dikkat: ${K}. ve ${K + 1}. komşu aynı uzaklıkta; hangisinin sayılacağı bir kurala bağlı.`) : null),
       h("div", { class: "vote-bar", "aria-hidden": "true" }, nPos ? h("div", { class: "vp", style: { flex: nPos } }, `+ ${nPos}`) : null, nNeg ? h("div", { class: "vn", style: { flex: nNeg } }, `− ${nNeg}`) : null),
       table(["sıra", "nokta", M === "euclid2" ? "d² hesabı (karekök gerekmez)" : "L1 hesabı", "sınıf"], r.map((p, i) => ({ row: [i + 1, p.name, calc(p), lab(p.y)], cls: i < K ? "hl" : "" })), { cls: "compact" }),
@@ -201,8 +203,8 @@ export function perceptron(ds) {
       const term = (c, k) => `${c < 0 ? (k ? " − " : "−") : k ? " + " : ""}${f(Math.abs(c))}`;
       const zTxt = `${x.map((xi, j) => `${term(p.w[j], j)}·${f(xi)}`).join("")}${term(p.b, 1)} = ${f(s.z)}`;
       const head = h("b", {}, `${s.epoch}. epoch, örnek ${s.name}: `);
-      if (!s.wrong) put(narr, head, `z = ${zTxt} → ŷ = ${sgn(s.pred)} (z ≥ 0 ise +1). Gerçek y = ${sgn(s.y)}: `, h("b", { class: "good" }, "doğru, hiçbir şey değişmez."));
-      else put(narr, head, `z = ${zTxt} → ŷ = ${sgn(s.pred)}, ama gerçek y = ${sgn(s.y)}: `, h("b", { class: "bad" }, "yanlış!"), " ",
+      if (!s.wrong) put(narr, head, `z = ${zTxt} olduğu için ŷ = ${sgn(s.pred)} (kural: z ≥ 0 ise +1). Gerçek etiket y = ${sgn(s.y)}, yani tahmin `, h("b", { class: "good" }, "doğru, hiçbir şey değişmez."));
+      else put(narr, head, `z = ${zTxt} olduğu için ŷ = ${sgn(s.pred)}, ama gerçek etiket y = ${sgn(s.y)}; yani tahmin `, h("b", { class: "bad" }, "yanlış!"), " ",
         s.y > 0 ? "Pozitif örnek eksi tarafta kalmış: ağırlıklara η·x eklenir, sınır örneği + tarafa alacak yönde döner. " : "Negatif örnek artı tarafta kalmış: ağırlıklardan η·x çıkarılır, sınır örneği − tarafa itecek yönde döner. ",
         `w ← ${vec(p.w)} ${s.y > 0 ? "+" : "−"} ${f(cur.eta)}·${vec(x)} = `, h("b", {}, vec(cur.w)), `; b ← ${f(p.b)} ${s.y > 0 ? "+" : "−"} ${f(cur.eta)} = `, h("b", {}, f(cur.b)), ". Kesikli gri çizgi eski sınır.");
     }
@@ -265,8 +267,8 @@ export function lineplay(ds) {
     const wrong = ed.points.filter((p) => ((ml.dot(w, p.x) + B0) >= 0 ? 1 : -1) !== p.y);
     goal.className = "goal" + (wrong.length ? "" : " done");
     goal.textContent = wrong.length ? `Görev: bütün noktaları doğru tarafa al. Şu an ${wrong.length} yanlış (çarpılı): ${wrong.map((p) => p.name).join(", ")}.` : "✓ Bütün noktalar doğru tarafta! Şimdi aynı oranla w₁, w₂, b'yi iki katına çıkarın: sınır hiç kıpırdamaz.";
-    const eq = Math.abs(w[1]) > 1e-9 ? `x₂ = ${f(-w[0] / w[1])}·x₁ + ${f(-B0 / w[1])}` : Math.abs(w[0]) > 1e-9 ? `x₁ = ${f(-B0 / w[0])}` : "—";
-    put(out, h("div", { class: "narrate" }, `Sınır: ${f(w[0])}x₁ + ${f(w[1])}x₂ + ${f(B0)} = 0  ⇔  ${eq}`),
+    const eq = Math.abs(w[1]) > 1e-9 ? `x₂ = ${f(-w[0] / w[1])}·x₁ ${-B0 / w[1] < 0 ? "−" : "+"} ${f(Math.abs(B0 / w[1]))}` : Math.abs(w[0]) > 1e-9 ? `x₁ = ${f(-B0 / w[0])}` : "—";
+    put(out, h("div", { class: "narrate" }, `Sınır: ${lin(w, B0)} = 0  ⇔  ${eq}`),
       h("ul", { class: "steps small" },
         h("li", {}, h("b", {}, "b"), " sınırı kendine paralel kaydırır (eğimi değişmez)."),
         h("li", {}, h("b", {}, "w₁, w₂"), " sınırı döndürür; ok (w) sınıra diktir ve + tarafı gösterir."),
@@ -340,7 +342,7 @@ export function gdplay() {
     put(out, h("div", { class: "two-col" },
       lines({ series: [{ pts: ws.map((v) => [v, L(v)]), cls: "curve3", name: "L(w) = (w − 2)² + 0.5", color: "s3" }, { pts: clipped, cls: "curve2", dots: true, name: "adımlar", color: "neg" }], xlim: [-1.5, 5.5], ylim: [0, 13], xstep: 1, ystep: 2, xlabel: "w" }),
       h("div", {},
-        h("div", { class: "narrate" }, `${path.length - 1}. adım: w = ${f(w)}, L = ${f(L(w))}. Eğim L′(w) = 2(w − 2) = ${f(dL(w))} → sonraki w = w − η·L′ = ${f(w)} − ${f(e, 2)}·${f(dL(w))} = `, h("b", {}, f(w - e * dL(w)))),
+        h("div", { class: "narrate" }, `${path.length - 1}. adım: w = ${f(w)}, L = ${f(L(w))}. Eğim L′(w) = 2(w − 2) = ${f(dL(w))} olduğu için sonraki w = w − η·L′ = ${f(w)} − ${f(e, 2)}·(${f(dL(w))}) = `, h("b", {}, f(w - e * dL(w)))),
         h("p", { class: "small" }, `Bu η ile: ${fate}. (Bu eğride sınır η = 1.)`),
         table(["adım", "w", "L(w)"], path.slice(-6).map((v, i) => [path.length - Math.min(6, path.length) + i, f(v), f(L(v))]), { cls: "compact" }))));
   }
@@ -429,8 +431,8 @@ export function adaboost(ds) {
       const v = ml.uniq(P.map((p) => p.x[j])).sort((a, b2) => a - b2);
       for (let i = 0; i + 1 < v.length; i++) {
         const th = (v[i] + v[i + 1]) / 2;
-        pool.push({ name: `x${j + 1} ≥ ${f(th)} → +`, j, th, dir: 1, f: (x) => (x[j] >= th ? 1 : -1) });
-        pool.push({ name: `x${j + 1} < ${f(th)} → +`, j, th, dir: -1, f: (x) => (x[j] < th ? 1 : -1) });
+        pool.push({ name: `x${j + 1} ≥ ${f(th)} ise +`, j, th, dir: 1, f: (x) => (x[j] >= th ? 1 : -1) });
+        pool.push({ name: `x${j + 1} < ${f(th)} ise +`, j, th, dir: -1, f: (x) => (x[j] < th ? 1 : -1) });
       }
     }
     if (!pool.length || !P.some((p) => p.y > 0) || !P.some((p) => p.y < 0)) { res = null; put(narr, "İki sınıftan da nokta gerekli."); ed.redraw(); return; }

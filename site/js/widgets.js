@@ -8,11 +8,17 @@ import * as I from "./interactive.js";
 import { GUIDE } from "./guides.js";
 
 const f = ml.fmt;
+const SUP = "⁰¹²³⁴⁵⁶⁷⁸⁹", SUB = "₀₁₂₃₄₅₆₇₈₉";
+const sup = (n) => String(n).replace(/\d/g, (d) => SUP[d]).replace("-", "⁻");
+const pm = (v) => `${v < 0 ? "−" : "+"} ${f(Math.abs(v))}`;   // "+ 2" / "− 2" instead of "+ −2"
+const par = (v) => (v < 0 ? `(${f(v)})` : f(v));
+const sub = (n) => String(n).replace(/\d/g, (d) => SUB[d]);
+
 const f2 = (x) => ml.fmt(x, 2);
 const tag = (t) => h("span", { class: "tag " + t }, t);
 const signTxt = (y) => (y > 0 ? "+1" : "−1");
 /** "a·x₁ + b·x₂ + c" with proper signs. */
-const lin = (w, b) => { const t = w.map((c, i) => [c, `x${"₁₂₃₄"[i]}`]).filter(([c]) => Math.abs(c) > 1e-12).map(([c, x], k) => `${c < 0 ? (k ? " − " : "−") : k ? " + " : ""}${f(Math.abs(c))}${x}`).join(""); return `${t}${b < 0 ? " − " : " + "}${f(Math.abs(b))}`; };
+const lin = (w, b) => { const t = w.map((c, i) => [c, `x${"₁₂₃₄"[i]}`]).filter(([c]) => Math.abs(c) > 1e-12).map(([c, x], k) => `${c < 0 ? (k ? " − " : "−") : k ? " + " : ""}${Math.abs(Math.abs(c) - 1) < 1e-12 ? "" : f(Math.abs(c))}${x}`).join(""); return `${t}${b < 0 ? " − " : " + "}${f(Math.abs(b))}`; };
 const vec = (v, d = 3) => `(${v.map((x) => f(x, d)).join(", ")})`;
 const W = {};
 W.fig = (ds) => figure(ds);
@@ -100,7 +106,7 @@ W.hypspace = () => {
       ["Örnek (gün) sayısı", v.join(" · "), { v: inst.toLocaleString("tr-TR"), cls: "num" }],
       ["Sözdizimsel hipotez (değer, ?, Ø)", v.map((x) => `(${x}+2)`).join(" · "), { v: syn.toLocaleString("tr-TR"), cls: "num" }],
       ["Anlamca farklı hipotez", `1 + ${v.map((x) => `(${x}+1)`).join(" · ")}`, { v: sem.toLocaleString("tr-TR"), cls: "num" }],
-      ["Olası bütün kavramlar (evet/hayır etiketlemeleri)", `2^${inst}`, { v: inst <= 60 ? (2 ** inst).toLocaleString("tr-TR") : `2^${inst} ≈ 10^${Math.round(inst * Math.log10(2))}`, cls: "num" }],
+      ["Olası bütün kavramlar (evet/hayır etiketlemeleri)", `2${sup(inst)}`, { v: inst <= 60 ? (2 ** inst).toLocaleString("tr-TR") : `2${sup(inst)} ≈ 10${sup(Math.round(inst * Math.log10(2)))}`, cls: "num" }],
     ]), h("p", { class: "small muted" }, "İçinde Ø geçen her hipotez hiçbir günü kabul etmez; hepsi aynı (boş) kavramdır, bu yüzden bir kez sayılır: “1 +”. Hipotez dilinin ifade edebildiği kavramlar, bütün kavramların küçücük bir kesridir: tümevarımsal yanlılık budur."));
   });
   return el;
@@ -121,7 +127,7 @@ W.finds = () => {
       const lab = r[d].toLowerCase();
       const posEx = ["evet", "yes", "+", "1"].includes(lab);
       if (posEx) hyp = hyp.map((c, j) => (c === "Ø" ? r[j] : c === r[j] ? c : "?"));
-      steps.push([`h${i + 1}`, `${i + 1}. örnek (${r[d]})`, posEx ? `⟨${hyp.join(", ")}⟩` : "değişmez: negatif örnekler kullanılmaz"]);
+      steps.push([`h${sub(i + 1)}`, `${i + 1}. örnek (${r[d]})`, posEx ? `⟨${hyp.join(", ")}⟩` : "değişmez: negatif örnekler kullanılmaz"]);
     });
     const consistentNeg = rows.filter((r) => !["evet", "yes", "+", "1"].includes(r[d].toLowerCase())).every((r) => !hyp.every((c, j) => c === "?" || c === r[j]));
     put(out, table(["Adım", "Görülen örnek", "Hipotez h (en özelden genele)"], steps),
@@ -169,7 +175,7 @@ W.polyfit = () => {
     ], xlim: [0, 9], ylim: [0, 1.5], xstep: 1, xlabel: "M", ylabel: "RMSE", aria: "Hata eğrileri" });
     const [, trE, teE] = errs[M];
     const verdict = M <= 1 ? "yetersiz uyum (yüksek yanlılık): iki hata da yüksek" : teE > trE * 3 && M >= 7 ? "aşırı uyum (yüksek varyans): eğitim hatası ≈ 0, test hatası büyük" : "makul: test hatası düşük";
-    put(out, h("div", { class: "two-col" }, fit, err), h("p", {}, `M = ${M}: eğitim RMSE ${f2(trE)}, test RMSE ${f2(teE)} → `, h("strong", {}, verdict), "."),
+    put(out, h("div", { class: "two-col" }, fit, err), h("p", {}, `M = ${M} iken eğitim RMSE ${f2(trE)}, test RMSE ${f2(teE)}. Tanı: `, h("strong", {}, verdict), "."),
       h("p", { class: "small muted" }, "Dereceyi 9'a çekin: polinom 10 noktanın hepsinden geçer, aralarda savrulur. Sonra λ'yı büyütün: aynı M = 9 sakinleşir (düzenlileştirme)."));
   });
   return el;
@@ -285,7 +291,7 @@ W.pca = (ds) => {
       table(["x₁", "x₂", "x₁−μ₁", "x₂−μ₂", "(x₁−μ₁)²", "(x₂−μ₂)²", "çarpım", "PC1 skoru"], rows, { cls: "compact" }),
       h("div", { class: "two-col" }, h("div", {},
         h("p", {}, `S = [[${f(r.cov[0][0])}, ${f(r.cov[0][1])}], [${f(r.cov[1][0])}, ${f(r.cov[1][1])}]]  (toplamlar / ${n1})`),
-        h("p", {}, `λ² − (${f(r.trace)})λ + ${f(r.det)} = 0 → λ₁ = `, h("b", {}, f(r.eig[0])), ", λ₂ = ", h("b", {}, f(r.eig[1]))),
+        h("p", {}, `λ² − (${f(r.trace)})λ + ${f(r.det)} = 0 denkleminin kökleri λ₁ = `, h("b", {}, f(r.eig[0])), ", λ₂ = ", h("b", {}, f(r.eig[1]))),
         h("p", {}, "PC1 yönü ≈ ", h("b", {}, vec(r.pc1)), ` · PC1'in açıkladığı varyans: ${f(r.eig[0])}/${f(r.trace)} = `, h("b", {}, `%${f(100 * r.ratio, 1)}`)),
         h("p", { class: "small muted" }, `Denetim: λ₁ + λ₂ = iz(S) = ${f(r.trace)}, λ₁·λ₂ = det(S) = ${f(r.det)}. Köşegen girdileri eşitse özvektörler (1, 1) ve (1, −1) yönündedir.`),
         h("p", {}, r.ratio >= 0.9 ? "Tek bileşen varyansın %90'ından fazlasını taşıyor: 1 boyuta indirmek makul." : "PC1 %90'ın altında: tek boyuta inmek çok bilgi kaybettirir.")), plot));
@@ -491,8 +497,8 @@ W.boundary = () => {
     const P = t.value.split(/[;\n]/).map((s) => parseNums(s)).filter((p) => p.length === 2);
     if (Wv.length !== 2) return;
     const n = ml.norm(Wv);
-    const rows = P.map((p) => { const z = ml.dot(Wv, p) + B; return [`(${p.join(", ")})`, `${f(Wv[0])}·${p[0]} + ${f(Wv[1])}·${p[1]} + ${f(B)} = ${f(z)}`, z >= 0 ? "+1" : "−1", f(Math.abs(z) / n)]; });
-    const eq = Math.abs(Wv[1]) > 1e-12 ? `x₂ = ${f(-Wv[0] / Wv[1])}·x₁ + ${f(-B / Wv[1])}` : `x₁ = ${f(-B / Wv[0])}`;
+    const rows = P.map((p) => { const z = ml.dot(Wv, p) + B; return [`(${p.join(", ")})`, `${f(Wv[0])}·${par(p[0])} ${pm(Wv[1])}·${par(p[1])} ${pm(B)} = ${f(z)}`, z >= 0 ? "+1" : "−1", f(Math.abs(z) / n)]; });
+    const eq = Math.abs(Wv[1]) > 1e-12 ? `x₂ = ${f(-Wv[0] / Wv[1])}·x₁ ${pm(-B / Wv[1])}` : `x₁ = ${f(-B / Wv[0])}`;
     const plot = scatter({ ...bounds(P.map((x) => ({ x })), 0.4), equal: true, points: P.map((x) => ({ x, y: ml.dot(Wv, x) + B >= 0 ? 1 : -1, name: `(${x.join(",")})` })), shade: { w: Wv, b: B }, lines: [{ w: Wv, b: B }], xlabel: "x₁", ylabel: "x₂" });
     put(out, h("p", {}, `Sınır: ${lin(Wv, B)} = 0  ⇔  ${eq}. ‖w‖ = ${f(n)}; w sınıra diktir ve + tarafı gösterir.`),
       h("div", { class: "two-col" }, table(["nokta", "z", "ŷ (z ≥ 0 → +1)", "uzaklık |z|/‖w‖"], rows, { cls: "compact" }), plot),
@@ -621,7 +627,7 @@ W.regtree = () => {
     const best = r.rows.reduce((p, q) => (q.total < p.total ? q : p));
     put(out, h("p", {}, `Kök (tek yaprak): tahmin ȳ = ${f(r.rootMean)}, SSE = ${f(r.root)}`),
       table(["eşik", "sol ortalama", "sol SSE", "sağ ortalama", "sağ SSE", "toplam SSE"], r.rows.map((q) => ({ row: [f(q.t), f(q.meanL), f(q.sseL), f(q.meanR), f(q.sseR), f(q.total)], cls: q === best ? "hl" : "" })), { cls: "compact" }),
-      h("p", {}, `En iyi bölme x ≤ ${f(best.t)}: SSE ${f(r.root)} → ${f(best.total)} (azalma ${f(r.root - best.total)}). Her yaprak bir sabit tahmin eder: ağaç bir merdiven fonksiyonudur.`));
+      h("p", {}, `En iyi bölme x ≤ ${f(best.t)}: SSE ${f(r.root)} değerinden ${f(best.total)} değerine iner (azalma ${f(r.root - best.total)}). Her yaprak bir sabit tahmin eder: ağaç bir merdiven fonksiyonudur.`));
   });
   return el;
 };
@@ -635,7 +641,7 @@ W.vote = () => {
   live(body, () => {
     const N = Math.max(1, Math.round(n.get())) | 1, P = p.get();
     const terms = [];
-    for (let k = Math.floor(N / 2) + 1; k <= N; k++) terms.push(`C(${N},${k})·${f(1 - P, 2)}^${k}·${f(P, 2)}^${N - k} = ${f(ml.binom(N, k) * (1 - P) ** k * P ** (N - k), 4)}`);
+    for (let k = Math.floor(N / 2) + 1; k <= N; k++) terms.push(`C(${N},${k})·${f(1 - P, 2)}${sup(k)}·${f(P, 2)}${sup(N - k)} = ${f(ml.binom(N, k) * (1 - P) ** k * P ** (N - k), 4)}`);
     const series = [1, 3, 5, 7, 9, 11, 15, 21, 31, 51].map((m) => [m, ml.majorityError(m, P)]);
     put(out, h("p", {}, "Çoğunluk yanılır ⇔ en az ⌈n/2⌉ üye yanılır: ", terms.join(" + "), " = ", h("b", {}, f(ml.majorityError(N, P), 4)), ` (tek üyenin hatası ${f(1 - P)})`),
       lines({ series: [{ pts: series, cls: "curve2", name: "çoğunluk hatası", color: "neg" }], xlim: [1, 51], ylim: [0, Math.max(0.5, 1 - P)], xlabel: "n", ylabel: "hata" }),
@@ -652,7 +658,7 @@ W.bootstrap = () => {
   live(body, () => {
     const N = Math.max(1, Math.round(n.get()));
     const q = ml.bootstrapOut(N);
-    put(out, h("p", {}, `(1 − 1/${N})^${N} = `, h("b", {}, f(q)), ` → örneklem ortalama %${f(100 * (1 - q), 1)} farklı örnek içerir, %${f(100 * q, 1)}'i torba dışı (OOB) kalır. n → ∞ için e⁻¹ = 0.368.`));
+    put(out, h("p", {}, `(1 − 1/${N})${sup(N)} = `, h("b", {}, f(q)), `. Yani bir bootstrap örneklemi ortalama olarak örneklerin yaklaşık %${f(100 * (1 - q), 1)} kadarını içerir; geri kalan %${f(100 * q, 1)} kadarı torba dışı (OOB) kalır. n → ∞ için e⁻¹ = 0.368.`));
   });
   return el;
 };
@@ -669,11 +675,11 @@ W.adaboost = (ds) => {
     const pool = [];
     for (const j of [0, 1]) {
       const v = ml.uniq(pts.map((p) => p.x[j])).sort((a, b) => a - b);
-      for (let i = 0; i + 1 < v.length; i++) { const th = (v[i] + v[i + 1]) / 2; pool.push({ name: `x${j + 1} ≥ ${f(th)} → +`, f: (x) => (x[j] >= th ? 1 : -1) }); }
+      for (let i = 0; i + 1 < v.length; i++) { const th = (v[i] + v[i + 1]) / 2; pool.push({ name: `x${j + 1} ≥ ${f(th)} ise +`, f: (x) => (x[j] >= th ? 1 : -1) }); }
     }
     for (const j of [0, 1]) {
       const v = ml.uniq(pts.map((p) => p.x[j])).sort((a, b) => a - b);
-      for (let i = 0; i + 1 < v.length; i++) { const th = (v[i] + v[i + 1]) / 2; pool.push({ name: `x${j + 1} < ${f(th)} → +`, f: (x) => (x[j] < th ? 1 : -1) }); }
+      for (let i = 0; i + 1 < v.length; i++) { const th = (v[i] + v[i + 1]) / 2; pool.push({ name: `x${j + 1} < ${f(th)} ise +`, f: (x) => (x[j] < th ? 1 : -1) }); }
     }
     const res = ml.adaboost(pts.map((p) => p.x), pts.map((p) => p.y), pool, Math.min(20, Math.max(1, Math.round(T.get()))));
     const blocks = [];
@@ -686,7 +692,7 @@ W.adaboost = (ds) => {
     }
     const used = res.rounds.filter((r) => !r.stop);
     const H = res.score;
-    blocks.push(h("h4", {}, "Son oylama H(x) = sign(Σ αₜ hₜ(x))"), table(["örnek", "y", ...used.map((r) => `h${r.t} (α=${f(r.alpha)})`), "Σ αh", "H", "doğru?"], pts.map((p, i) => [p.name, signTxt(p.y), ...used.map((r) => signTxt(r.best.h[i])), f(H[i]), signTxt(H[i] >= 0 ? 1 : -1), Math.sign(H[i]) === p.y ? "evet" : h("span", { class: "bad" }, "hayır")]), { cls: "compact" }));
+    blocks.push(h("h4", {}, "Son oylama H(x) = sign(Σ αₜ hₜ(x))"), table(["örnek", "y", ...used.map((r) => `h${sub(r.t)} (α = ${f(r.alpha)})`), "Σ αh", "H", "doğru?"], pts.map((p, i) => [p.name, signTxt(p.y), ...used.map((r) => signTxt(r.best.h[i])), f(H[i]), signTxt(H[i] >= 0 ? 1 : -1), Math.sign(H[i]) === p.y ? "evet" : h("span", { class: "bad" }, "hayır")]), { cls: "compact" }));
     put(out, ...blocks);
   });
   return el;
@@ -799,7 +805,7 @@ W.kernel = () => {
       ? (() => { const phi = (v) => [v[0] ** 2, Math.SQRT2 * v[0] * v[1], v[1] ** 2]; return h("p", { class: "small" }, `Açık özniteliklerle denetim: φ(x) = ${vec(phi(X))}, φ(z) = ${vec(phi(Z))}, φ(x)·φ(z) = ${f(ml.dot(phi(X), phi(Z)))}`); })()
       : h("p", { class: "small muted" }, "γ = 1, d = 2, r = 0 seçin: (x·z)² ile φ(x)·φ(z) aynı çıkar, φ(v) = (v₁², √2·v₁v₂, v₂²).");
     put(out, h("p", {}, `x·z = ${f(ml.dot(X, Z))} · doğrusal K = ${f(ml.kernels.linear(X, Z))}`),
-      h("p", {}, `Polinom K = (γ x·z + r)^d = (${f(g.get())}·${f(ml.dot(X, Z))} + ${f(r.get())})^${d.get()} = `, h("b", {}, f(ml.kernels.poly(X, Z, { gamma: g.get(), d: d.get(), r: r.get() })))),
+      h("p", {}, `Polinom K = (γ x·z + r)ᵈ = (${f(g.get())}·${f(ml.dot(X, Z))} + ${f(r.get())})${sup(d.get())} = `, h("b", {}, f(ml.kernels.poly(X, Z, { gamma: g.get(), d: d.get(), r: r.get() })))),
       h("p", {}, `RBF K = exp(−γ‖x − z‖²) = exp(−${f(g.get())}·${f(d2)}) = `, h("b", {}, f(ml.kernels.rbf(X, Z, { gamma: g.get() })))), extra,
       h("p", { class: "small muted" }, "γ büyüdükçe benzerlik daha hızlı söner: her destek vektörü yalnız yakın çevresini etkiler, sınır noktaların etrafında adalar yapar (aşırı uyum)."));
   });
@@ -884,18 +890,18 @@ W.boolmlp = (ds) => {
     try { r = parseBool(inp.value); } catch (e) { put(out, errorBox(e.message)); return; }
     if (!r.terms.length) { put(out, h("p", {}, "İfade hiçbir girdide doğru değil: çıktı nöronu w = 0, b = −1 (hep 0) yeter.")); return; }
     const net = ml.dnfToMLP(r.terms, r.nVars);
-    const lit = (l) => (l.neg ? `¬x${l.i + 1}` : `x${l.i + 1}`);
-    const unitRows = net.units.map((u, k) => [`h${k + 1}`, u.term.map(lit).join(" ∧ "), u.w.map((w, i) => (w ? `${w > 0 ? "+" : "−"}x${i + 1}` : "")).filter(Boolean).join(" ") + ` ${u.bias >= 0 ? "+" : "−"} ${f(Math.abs(u.bias))}`,
-      `${u.term.filter((l) => !l.neg).length} pozitif değişmez → b = −${u.term.filter((l) => !l.neg).length} + 0.5`]);
+    const lit = (l) => (l.neg ? `¬x${sub(l.i + 1)}` : `x${sub(l.i + 1)}`);
+    const unitRows = net.units.map((u, k) => [`h${sub(k + 1)}`, u.term.map(lit).join(" ∧ "), u.w.map((w, i) => (w ? `${w > 0 ? "+" : "−"}x${sub(i + 1)}` : "")).filter(Boolean).join(" ") + ` ${u.bias >= 0 ? "+" : "−"} ${f(Math.abs(u.bias))}`,
+      `${u.term.filter((l) => !l.neg).length} olumlu değişken olduğu için b = −${u.term.filter((l) => !l.neg).length} + 0.5`]);
     const X = ml.allBinary(r.nVars);
     const evalAst = (n, x) => (n.op === "var" ? !!x[n.i] : n.op === "not" ? !evalAst(n.a, x) : n.op === "and" ? evalAst(n.a, x) && evalAst(n.b, x) : evalAst(n.a, x) || evalAst(n.b, x));
     const bad = X.filter((x) => ml.evalMLP(net, x).y !== (evalAst(r.ast, x) ? 1 : 0));
     const single = net.units.length === 1;
     put(out, h("p", {}, "VEYA'ların VE'si (DNF): ", h("strong", {}, r.terms.map((t) => "(" + t.map(lit).join(" ∧ ") + ")").join(" ∨ "))),
       table(["gizli nöron", "terim (VE)", "z = w·x + b", "neden bu bias?"], unitRows, { cls: "compact" }),
-      h("p", {}, single ? "Tek terim var: bu nöronun kendisi çıktı olabilir (gizli katman gerekmez)." : `Çıktı nöronu (VEYA): y = step(${net.units.map((_, k) => `h${k + 1}`).join(" + ")} − 0.5).`),
+      h("p", {}, single ? "Tek terim var: bu nöronun kendisi çıktı olabilir (gizli katman gerekmez)." : `Çıktı nöronu (VEYA): y = step(${net.units.map((_, k) => `h${sub(k + 1)}`).join(" + ")} − 0.5).`),
       h("p", { class: "small" }, `Doğruluk tablosunun ${X.length} satırı denetlendi: `, bad.length ? h("span", { class: "bad" }, `${bad.length} satır tutmuyor!`) : h("span", { class: "good" }, "hepsi tutuyor ✓")),
-      h("details", {}, h("summary", { class: "small" }, "Doğruluk tablosunu göster"), table([...Array.from({ length: r.nVars }, (_, i) => `x${i + 1}`), ...net.units.map((_, k) => `h${k + 1}`), "y"], X.map((x) => { const e = ml.evalMLP(net, x); return { row: [...x, ...e.h, e.y], cls: e.y ? "hl" : "" }; }), { cls: "center compact" })));
+      h("details", {}, h("summary", { class: "small" }, "Doğruluk tablosunu göster"), table([...Array.from({ length: r.nVars }, (_, i) => `x${sub(i + 1)}`), ...net.units.map((_, k) => `h${sub(k + 1)}`), "y"], X.map((x) => { const e = ml.evalMLP(net, x); return { row: [...x, ...e.h, e.y], cls: e.y ? "hl" : "" }; }), { cls: "center compact" })));
   });
   return el;
 };
@@ -1083,7 +1089,7 @@ const GEN = {
     return {
       prompt: [h("p", {}, `w = (0, 0), b = 0, η = ${eta}, tek örnek x = (${x.join(", ")}), y = ${y}. Bir gradyan adımından sonra w ve b?`)],
       fields: [{ label: "p (önce)", v: r.p }, { label: "w₁", v: r.w[0] }, { label: "w₂", v: r.w[1] }, { label: "b", v: r.b }],
-      solution: () => [h("p", {}, `z = 0 → p = 0.5. p − y = ${f(r.gb)}. ∇w = ${vec(r.gw)}. w = ${vec(r.w)}, b = ${f(r.b)}. Yeni p = σ(${f(r.z2)}) = ${f(r.p2)}.`)],
+      solution: () => [h("p", {}, `Başlangıçta w = 0 olduğu için z = 0 ve p = σ(0) = 0.5 olur. Çıktı hatası p − y = ${f(r.gb)}. ∇w = ${vec(r.gw)}. w = ${vec(r.w)}, b = ${f(r.b)}. Yeni p = σ(${f(r.z2)}) = ${f(r.p2)}.`)],
     };
   } },
   scaling: { title: "min-max ve z-score", make(R) {
@@ -1093,7 +1099,7 @@ const GEN = {
     return {
       prompt: [h("p", {}, `Eğitim verisi: ${xs.join(", ")}. Test değeri ${t}'i eğitim parametreleriyle ölçekleyin (σ: n'ye bölünen).`)],
       fields: [{ label: "μ", v: z.mean }, { label: "σ", v: z.sd }, { label: "min-max", v: mm }, { label: "z", v: z.values[0] }],
-      solution: () => [h("p", {}, `min = ${Math.min(...xs)}, max = ${Math.max(...xs)}, μ = ${f(z.mean)}, σ = ${f(z.sd)} → min-max ${f(mm)}, z ${f(z.values[0])}`)],
+      solution: () => [h("p", {}, `min = ${Math.min(...xs)}, max = ${Math.max(...xs)}, μ = ${f(z.mean)}, σ = ${f(z.sd)}. Bu değerlerle min-max sonucu ${f(mm)}, z-skoru ${f(z.values[0])} olur.`)],
     };
   } },
   auc: { title: "ROC-AUC (çift sayma)", make(R) {
@@ -1103,7 +1109,7 @@ const GEN = {
     return {
       prompt: [h("p", {}, `Skora göre sıralı (yüksekten düşüğe) gerçek sınıflar: ${l.map((v) => (v ? "+" : "−")).join(" ")}. AUC?`)],
       fields: [{ label: "AUC", v: r.auc }],
-      solution: () => [h("p", {}, `${r.P} pozitif, ${r.N} negatif. Her negatifin önündeki pozitifler toplamı ${r.goodPairs} → AUC = ${r.goodPairs}/${r.pairs} = ${f(r.auc)}.`)],
+      solution: () => [h("p", {}, `${r.P} pozitif, ${r.N} negatif. Her negatifin önündeki pozitifler toplamı ${r.goodPairs} olduğu için AUC = ${r.goodPairs}/${r.pairs} = ${f(r.auc)}.`)],
     };
   } },
   adaboost: { title: "AdaBoost turu", make(R) {
@@ -1122,7 +1128,7 @@ const GEN = {
     return {
       prompt: [h("p", {}, `w = ${vec(w)}, b = ${b}, nokta x = (${x.join(", ")}), y = ${signTxt(y)}. f(x), sınıra uzaklık, menteşe kaybı ve marj?`)],
       fields: [{ label: "f(x)", v: p.f }, { label: "uzaklık", v: p.distance }, { label: "menteşe", v: p.hinge }, { label: "marj 1/‖w‖", v: 1 / ml.norm(w) }],
-      solution: () => [h("p", {}, `f = ${f(p.f)}, ‖w‖ = ${f(ml.norm(w))}, uzaklık |f|/‖w‖ = ${f(p.distance)}, y·f = ${f(p.yf)} → menteşe ${f(p.hinge)} (${p.where}).`)],
+      solution: () => [h("p", {}, `f = ${f(p.f)}, ‖w‖ = ${f(ml.norm(w))}, uzaklık |f|/‖w‖ = ${f(p.distance)}, y·f = ${f(p.yf)}; menteşe kaybı max(0, 1 − y·f) = ${f(p.hinge)} (${p.where}).`)],
     };
   } },
   lsq: { title: "En küçük kareler", make(R) {
@@ -1132,7 +1138,7 @@ const GEN = {
     return {
       prompt: [h("p", {}, `x = (${x.join(", ")}), y = (${y.join(", ")}). y = w₀ + w₁x doğrusunu ve MSE'yi bulun.`)],
       fields: [{ label: "w₁", v: r.w1 }, { label: "w₀", v: r.w0 }, { label: "MSE", v: r.mse }],
-      solution: () => [h("p", {}, `x̄ = ${f(r.xbar)}, ȳ = ${f(r.ybar)}, Σ(x−x̄)(y−ȳ) = ${f(r.sxy)}, Σ(x−x̄)² = ${f(r.sxx)} → w₁ = ${f(r.w1)}, w₀ = ${f(r.w0)}; MSE = ${f(r.mse)}.`)],
+      solution: () => [h("p", {}, `x̄ = ${f(r.xbar)}, ȳ = ${f(r.ybar)}, Σ(x−x̄)(y−ȳ) = ${f(r.sxy)}, Σ(x−x̄)² = ${f(r.sxx)}; buradan w₁ = ${f(r.w1)}, w₀ = ${f(r.w0)}; MSE = ${f(r.mse)}.`)],
     };
   } },
   vote: { title: "Çoğunluk oyu hatası", make(R) {
@@ -1145,7 +1151,7 @@ const GEN = {
     const p = ml.softmax(z);
     return { prompt: [h("p", {}, `Skorlar z = (${z.join(", ")}). Olasılıklar ve doğru sınıf ${k + 1} iken çapraz entropi kaybı? (e = 2.718, e⁻¹ = 0.368, e² = 7.389)`)],
       fields: [...p.map((v, i) => ({ label: `p${i + 1}`, v })), { label: "kayıp", v: -Math.log(p[k]) }],
-      solution: () => [h("p", {}, `eᶻ = ${vec(z.map(Math.exp))}, toplam ${f(ml.sum(z.map(Math.exp)))} → p = ${vec(p)}; −ln p${k + 1} = ${f(-Math.log(p[k]))}.`)] };
+      solution: () => [h("p", {}, `eᶻ = ${vec(z.map(Math.exp))}, toplamları ${f(ml.sum(z.map(Math.exp)))}; her birini bu toplama bölünce p = ${vec(p)}; −ln p${k + 1} = ${f(-Math.log(p[k]))}.`)] };
   } },
 };
 W.drill = (ds) => {
