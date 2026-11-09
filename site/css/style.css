@@ -509,3 +509,7 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 .plot .auc-ok { fill: rgba(31, 157, 85, 0.22); stroke: var(--border-strong); }
 .plot .auc-bad { fill: var(--neg-wash); stroke: var(--border-strong); }
 .plot .auc-curve { fill: none; stroke: var(--pos); stroke-width: 3; }
+/* optional background (derivations etc.) that the exam does not ask for: closed by default */
+details.aside { margin: 0.6rem 0 1rem; padding: 0.4rem 0.8rem; border: 1px dashed var(--border-strong); border-radius: 8px; color: var(--text-2); font-size: 0.95rem; }
+details.aside > summary { cursor: pointer; font-weight: 600; color: var(--muted); }
+details.aside .m { white-space: normal; overflow-wrap: anywhere; }
