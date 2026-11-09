@@ -184,6 +184,30 @@ Object.assign(FIG, {
     ${[[1, 0, 0], [0, 1, 0], [1, 0, 0], [0, 0, 1]].map((r, i) => r.map((v, j) => box(185 + j * 85, 30 + i * 36, 80, 30, String(v), v ? "fig-box3" : "fig-box")).join("")).join("")}
     ${T(300, 182, "her şehir için bir 0/1 sütunu; her satırda tam bir tane 1", { anchor: "middle", cls: "fig-sub" })}`, "One-hot kodlama"),
 
+  pcawalk: () => {
+    // the worked example of week 2: A(0,0) B(1,1) C(3,2) D(4,1), mean (2,1), PC1 ∝ (3,1), PC2 ∝ (−1,3)
+    const P = [["A", 0, 0], ["B", 1, 1], ["C", 3, 2], ["D", 4, 1]];
+    const S = 70, ox = 50, oy = 240, X = (v) => ox + v * S, Y = (v) => oy - v * S;
+    const m = [2, 1], u = [3 / Math.sqrt(10), 1 / Math.sqrt(10)], w = [-u[1], u[0]];
+    let s = `${DEFS}`;
+    for (let i = -0.5; i <= 4.51; i += 0.5) s += `<line x1="${X(i)}" y1="${Y(-0.5)}" x2="${X(i)}" y2="${Y(2.8)}" class="fig-grid"/>`;
+    for (let j = -0.5; j <= 2.81; j += 0.5) s += `<line x1="${X(-0.5)}" y1="${Y(j)}" x2="${X(4.5)}" y2="${Y(j)}" class="fig-grid"/>`;
+    for (let i = 0; i <= 4; i++) s += T(X(i), Y(-0.5) + 14, i, { anchor: "middle", cls: "fig-sub" });
+    for (let j = 0; j <= 2; j++) s += T(X(-0.5) - 6, Y(j) + 4, j, { anchor: "end", cls: "fig-sub" });
+    s += `<line x1="${X(m[0] - u[0] * 2.6)}" y1="${Y(m[1] - u[1] * 2.6)}" x2="${X(m[0] + u[0] * 2.6)}" y2="${Y(m[1] + u[1] * 2.6)}" class="line accent" marker-end="url(#ah)"/>`;
+    s += `<line x1="${X(m[0])}" y1="${Y(m[1])}" x2="${X(m[0] + w[0] * 1.3)}" y2="${Y(m[1] + w[1] * 1.3)}" class="line dash" marker-end="url(#ah)"/>`;
+    for (const [n, a, b] of P) {
+      const t = (a - m[0]) * u[0] + (b - m[1]) * u[1], fx = m[0] + t * u[0], fy = m[1] + t * u[1];
+      s += `<line x1="${X(a)}" y1="${Y(b)}" x2="${X(fx)}" y2="${Y(fy)}" class="fig-proj"/>`;
+      s += `<circle cx="${X(fx)}" cy="${Y(fy)}" r="3" class="fig-gray"/>`;
+      // point label away from the PC1 line: points below it get the label underneath, points above it on top
+      const below = (a - m[0]) * w[0] + (b - m[1]) * w[1] < 0;
+      s += pt(X(a), Y(b), "pos") + T(X(a), Y(b) + (below ? 20 : -11), `${n}(${a}, ${b})`, { anchor: "middle", size: 12 });
+    }
+    s += pt(X(m[0]), Y(m[1]), "q", 5) + T(X(m[0]) - 8, Y(m[1]) - 8, "μ", { anchor: "end" });
+    s += T(X(4.45), Y(1.95), "PC1 ∝ (3, 1)", { anchor: "end", cls: "fig-sub" }) + T(X(m[0] + w[0] * 1.3) - 8, Y(m[1] + w[1] * 1.3) + 4, "PC2 ∝ (−1, 3)", { anchor: "end", cls: "fig-sub" });
+    return svg(400, 300, s, "PCA örneği");
+  },
   pcaaxes: () => {
     const P = [[1, 2], [2, 3], [3, 3], [4, 5], [5, 4], [6, 7]];
     const S = 42, ox = 40, oy = 330, X = (v) => ox + v * S, Y = (v) => oy - v * S;

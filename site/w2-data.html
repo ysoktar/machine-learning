@@ -128,10 +128,25 @@
 <tr><td>D</td><td>(2, 0)</td><td>6</td><td>1.897</td></tr>
 </tbody></table></div>
 <p>İki boyutlu her nokta artık tek bir sayıyla temsil ediliyor. Güzel bir denetim var: <span class="no-gl">skorların</span> ortalaması 0'dır (−7 − 3 + 4 + 6 = 0) ve varyansları tam olarak λ₁'e eşittir: (49 + 9 + 16 + 36)/10/3 = 110/30 = 11/3. Özdeğerin anlamı budur: <strong>o yöne izdüşürülen noktaların varyansı</strong>.</p>
+<div data-widget="fig" data-fig="pcawalk" data-formula="zᵢ = (xᵢ − μ)·u₁   ·   u₁ = (3, 1)/√10" data-caption="Örneğin çizimi. Yeşil ok PC1, kesikli ok PC2 yönü; her nokta PC1'e dik olarak izdüşürülür (ince çizgiler). Gri noktaların PC1 üzerindeki konumları PC1 skorlarıdır. İnce çizgilerin kısa olması, PC2 yönünde az bilgi olduğunu gösterir."></div>
 
 <h4>8. adım: Ne kaybettiğimizi görmek</h4>
 <p>Tek boyuta indirince her noktanın PC2 yönündeki bileşenini atmış oluruz. B noktasını geri kurmayı deneyelim: <span class="m">x̂ = μ + z·u₁</span> = (2, 1) + (−3/√10)·(3, 1)/√10 = (2, 1) + (−0.9, −0.3) = (1.1, 0.7). Gerçek nokta (1, 1) idi; aradaki uzaklık √(0.1² + 0.3²) ≈ 0.316'dır. Bu uzaklık, B'nin PC2 skorunun büyüklüğüne eşittir: (−1, 0)·u₂ = 1/√10 ≈ 0.316. Atılan bilginin hepsi bu küçük PC2 skorlarındadır.</p>
 
+<h4>Neden en çok yayılma özvektörün yönünde?</h4>
+<p>Uzunluğu 1 olan herhangi bir u yönü seçelim. Merkezlenmiş noktaları bu yöne izdüşürürsek elde ettiğimiz sayıların varyansı <span class="m">uᵀSu = s₁₁u₁² + 2s₁₂u₁u₂ + s₂₂u₂²</span> olur. PCA'nın sorusu şudur: bu değeri en büyük yapan yön hangisi? Birkaç yönü örneğimizin S matrisiyle deneyelim:</p>
+<div class="table-wrap"><table class="simple compact center">
+<thead><tr><th>yön u</th><th>uᵀSu (bu yöndeki varyans)</th></tr></thead>
+<tbody>
+<tr><td>(1, 0): yalnız x₁ ekseni</td><td>10/3 ≈ 3.333</td></tr>
+<tr><td>(0, 1): yalnız x₂ ekseni</td><td>2/3 ≈ 0.667</td></tr>
+<tr><td>(1, 1)/√2: 45° köşegen</td><td>(10/3 + 2·1 + 2/3)/2 = 3</td></tr>
+<tr><td>(1, −1)/√2</td><td>(10/3 − 2·1 + 2/3)/2 = 1</td></tr>
+<tr class="hl"><td>(3, 1)/√10: PC1</td><td>(10/3·9 + 2·1·3 + 2/3·1)/10 = 11/3 ≈ 3.667 (en büyük)</td></tr>
+<tr><td>(−1, 3)/√10: PC2</td><td>1/3 ≈ 0.333 (en küçük)</td></tr>
+</tbody></table></div>
+<p>Hiçbir yön 11/3'ü geçemez ve hiçbiri 1/3'ün altına inemez. Matematikte bu bir teoremdir: uᵀSu'nun en büyük değeri S'nin en büyük özdeğeridir ve bu değere o özdeğerin özvektörü yönünde ulaşılır. “PC1 = en büyük özdeğerin özvektörü” denmesinin nedeni budur.</p>
+<p><strong>Ölçeğe dikkat.</strong> Bu hesap, sütunların aynı birimde olduğunu varsayar. Bir sütun metre, öteki santimetre cinsindense santimetre sütununun varyansı 10 000 kat büyük çıkar ve PC1 neredeyse tamamen o sütuna yönelir. Bu yüzden birimleri farklı veride PCA'dan önce her sütun z-score ile ölçeklenir.</p>
 <div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Sınavda yazılacak sıra</div><ol>
 <li>Ortalamayı bul ve tabloda her noktayı merkezle (sütun toplamlarının 0 olduğunu denetle).</li>
 <li>d₁², d₂², d₁·d₂ sütunlarını doldur; toplamlarını n − 1'e bölerek S'yi yaz.</li>
@@ -163,7 +178,7 @@
 <p>Saydığımızda TP = 4, FN = 2, FP = 1, TN = 3 çıkar ve matris şöyle olur (denetim: 4 + 2 = 6 gerçek pozitif, 1 + 3 = 4 gerçek negatif):</p>
 <table class="cm"><tr><th></th><th>Tahmin +</th><th>Tahmin −</th></tr><tr><th>Gerçek +</th><td class="d">TP = 4</td><td class="o">FN = 2</td></tr><tr><th>Gerçek −</th><td class="o">FP = 1</td><td class="d">TN = 3</td></tr></table>
 <p>Bu dört sayıdan bütün ölçütler hesaplanır. Aşağıdaki çizim, her ölçütün matrisin hangi hücrelerini kullandığını gösteriyor:</p><div data-widget="fig" data-fig="cmread" data-formula="precision = TP / (TP + FP)   ·   recall = TP / (TP + FN)   ·   accuracy = (TP + TN) / n" data-caption="Precision tahmin sütununa, recall gerçek satırına, accuracy köşegene bakar (yukarıdaki örneğin sayılarıyla)."></div>
-<div class="formula">Accuracy = (TP+TN)/n<br>Precision = TP/(TP+FP)<br>Recall = TP/(TP+FN)<br>F1 = 2PR/(P+R) = 2TP/(2TP+FP+FN)</div>
+<div class="formula">Accuracy = (TP+TN)/n<br>Precision = TP/(TP+FP)<br>Recall = TP/(TP+FN)<br>F1 = 2·Precision·Recall / (Precision + Recall) = 2TP / (2TP + FP + FN)</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li><b>Accuracy</b>: doğru tahminler (TP + TN) bölü bütün örnekler.</li><li><b>Precision</b>: paydada <em>pozitif dediklerim</em> (TP + FP) var: “dediklerimin kaçı doğru?”</li><li><b>Recall</b>: paydada <em>gerçek pozitifler</em> (TP + FN) var: “gerçek pozitiflerin kaçını yakaladım?”</li><li><b>F1</b>: ikisinin harmonik ortalaması; biri küçükse F1 de küçük olur. Elle hesapta 2TP/(2TP + FP + FN) biçimi daha kolay.</li></ul></div>
 <div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Sınavda karmaşıklık matrisi sorusu: 5 adım</div><ol>
 <li>Pozitif sınıfı yazın (soru belirtir; çoğu zaman 1 ya da “Evet”).</li>
@@ -217,6 +232,15 @@
 <h3>Problem 3: dört noktada PCA</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H2)</span></div><p>Noktalar (0, 0), (2, 2), (1, 3) ve (3, 1). (a) Veriyi merkezleyin. (b) Kovaryans matrisini n − 1 ile hesaplayın. (c) Özdeğerleri ve PC1'in yönünü bulun. (d) PC1 varyansın ne kadarını açıklar; veriyi tek boyuta indirir miydiniz?</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>PCA'da önce verinin merkezini sıfıra taşırız, sonra iki değişkenin ne kadar yayıldığını ve birlikte nasıl değiştiğini kovaryans matrisiyle özetleriz. Bu matrisin özdeğerleri her yöndeki yayılmayı, özvektörleri de yönleri verir.</p><p>(a) x₁'lerin ortalaması (0 + 2 + 1 + 3)/4 = 1.5, x₂'lerinki de 1.5. Her noktadan (1.5, 1.5) çıkarınca merkezlenmiş noktalar (−1.5, −1.5), (0.5, 0.5), (−0.5, 1.5) ve (1.5, −0.5) olur.</p><p>(b) s₁₁, x₁ farklarının kareleri toplamının 3'e bölümüdür: (2.25 + 0.25 + 0.25 + 2.25)/3 = 5/3. Aynı hesap x₂ için de 5/3 verir. s₁₂, iki farkın çarpımlarının toplamının 3'e bölümüdür: (2.25 + 0.25 − 0.75 − 0.75)/3 = 1/3. Böylece S = [[5/3, 1/3], [1/3, 5/3]].</p><p>(c) Köşegendeki iki sayı eşit olduğunda (burada a = 5/3, köşegen dışı c = 1/3) özdeğerler a + c ve a − c olur: <strong>2</strong> ve <strong>4/3</strong>. Büyük özdeğerin yönü (1, 1), yani PC1 köşegen boyuncadır. Denetim olarak özdeğerlerin toplamı köşegenlerin toplamına eşit olmalı: 2 + 4/3 = 10/3 ✓.</p><p>(d) PC1'in payı 2/(10/3) = <strong>%60</strong>. Geriye kalan %40 küçümsenemeyecek kadar büyük olduğu için bu veriyi tek boyuta indirmek çok bilgi kaybettirir (genelde %90–95 hedeflenir).</p></div></details>
+<h3>Ek problem: köşegenleri eşit olmayan bir PCA</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>Noktalar (0, 0), (0, 2), (3, 3) ve (5, 3). (a) Kovaryans matrisini n − 1 ile kurun. (b) Özdeğerleri bulun. (c) PC1'in birim yönünü bulun. (d) PC1'in açıkladığı varyans oranını ve dört noktanın PC1 skorlarını hesaplayın.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Köşegenler eşit çıkmayacağı için kısa yol yok; yukarıdaki adımları sırayla uygulayacağız.</p>
+<p><strong>(a)</strong> Ortalama μ = ((0 + 0 + 3 + 5)/4, (0 + 2 + 3 + 3)/4) = (2, 2). Merkezlenmiş noktalar (−2, −2), (−2, 0), (1, 1) ve (3, 1). Kareler toplamları Σd₁² = 4 + 4 + 1 + 9 = 18 ve Σd₂² = 4 + 0 + 1 + 1 = 6; çarpımlar toplamı Σd₁d₂ = 4 + 0 + 1 + 3 = 8. Hepsini n − 1 = 3'e bölünce s₁₁ = 6, s₂₂ = 2, s₁₂ = 8/3 olur:</p>
+<div class="formula">S = [ [6, 8/3], [8/3, 2] ]</div>
+<p><strong>(b)</strong> Hazır formülle: köşegenlerin ortalaması (6 + 2)/2 = 4, kök içi ((6 − 2)/2)² + (8/3)² = 4 + 64/9 = 100/9, karekökü 10/3. Özdeğerler <strong>λ₁ = 4 + 10/3 = 22/3 ≈ 7.333</strong> ve <strong>λ₂ = 4 − 10/3 = 2/3 ≈ 0.667</strong>. Denetim: toplam 8 = 6 + 2 ✓, çarpım 44/9 = 6·2 − 64/9 = 44/9 ✓.</p>
+<p><strong>(c)</strong> (S − λ₁I)v = 0'ın ilk satırı: (6 − 22/3)v₁ + (8/3)v₂ = 0, yani −(4/3)v₁ + (8/3)v₂ = 0 ve v₁ = 2v₂. Yön (2, 1); uzunluğu √5 ≈ 2.236 olduğundan u₁ = (2, 1)/√5 ≈ <strong>(0.894, 0.447)</strong>.</p>
+<p><strong>(d)</strong> Oran λ₁/(λ₁ + λ₂) = (22/3)/8 = 11/12 ≈ <strong>%91.7</strong>. Skorlar zᵢ = (2d₁ + d₂)/√5: (−4 − 2)/√5 = <strong>−2.683</strong>, (−4 + 0)/√5 = <strong>−1.789</strong>, (2 + 1)/√5 = <strong>1.342</strong>, (6 + 1)/√5 = <strong>3.130</strong>. Denetim: toplamları 0 ve varyansları (36 + 16 + 9 + 49)/5/3 = 22/3 = λ₁ ✓.</p>
+<div data-widget="pca" data-pts="0 0&#10;0 2&#10;3 3&#10;5 3"></div></div></details>
 <h3>Problem 4: regresyon ölçütleri</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H2)</span></div><p>Gerçek değerler y = (2, 4, 6, 8), tahminler ŷ = (3, 4, 5, 9). MSE, RMSE, MAE ve R² nedir? Tek bir büyük hataya hangisi daha duyarlıdır?</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Önce her örnekteki hatayı (y − ŷ) yazıyoruz: −1, 0, 1, −1. Bütün ölçütler bu hatalardan hesaplanır.</p><p>MSE, hataların karelerinin ortalamasıdır: (1 + 0 + 1 + 1)/4 = <strong>0.75</strong>. RMSE bunun kareköküdür: √0.75 ≈ <strong>0.87</strong>. MAE, hataların mutlak değerlerinin ortalamasıdır: (1 + 0 + 1 + 1)/4 = <strong>0.75</strong>.</p><p>R² için modelin hatasını, “her şeye ortalamayı söylemek” ile karşılaştırırız. y'nin ortalaması 5; ortalamaya göre kareler toplamı 9 + 1 + 1 + 9 = 20, modelin hata kareleri toplamı 3. R² = 1 − 3/20 = <strong>0.85</strong>: model, ortalamaya göre hatanın %85'ini açıklıyor.</p><p>MSE hataların karesini aldığı için tek bir büyük hatadan çok etkilenir; MAE hata büyüdükçe yalnız doğrusal olarak artar.</p></div></details>

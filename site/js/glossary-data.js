@@ -261,7 +261,7 @@ export const TERMS = [
 },
 {
 "term": "F1",
-"def": "Precision ve recall'un harmonik ortalaması: ikisi de yüksekse yüksek. Dengesiz veride accuracy'den çok daha bilgilendirici. (2PR/(P + R) = 2TP/(2TP + FP + FN))",
+"def": "Precision ve recall'un harmonik ortalaması: ikisi de yüksekse yüksek. Dengesiz veride accuracy'den çok daha bilgilendirici. (2·Precision·Recall / (Precision + Recall) = 2TP / (2TP + FP + FN))",
 "id": "t-f1",
 "match": "F1",
 "week": 2,
