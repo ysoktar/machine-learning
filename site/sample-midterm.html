@@ -80,7 +80,22 @@ Kuvvetli Yok İyi Hayır"></div></div></details>
 
 <h3>(e) Perceptron öğrenme kuralıyla bir tur (7 p)</h3>
 <details class="solution"><summary>Çözüm</summary><div class="body"><p>Perceptron kuralında örnekleri sırayla işleriz. Her örnekte f = w·x + w₀'ı hesaplar, tahmin doğruysa hiçbir şey yapmayız; yanlışsa ağırlıkları w ← w + η·y·x ve w₀ ← w₀ + η·y ile güncelleriz. Başlangıç w = (−1, 1), w₀ = 0.</p>
-<p>Perceptron her örnekte skoru f = w·x + w₀ ile hesaplar ve f ≥ 0 ise Evet der. Tahmin doğruysa hiçbir şey değişmez; yanlışsa ağırlıklar w ← w + η·y·x ve w₀ ← w₀ + η·y kuralıyla güncellenir (y = +1 Evet, −1 Hayır, η = 0.4). Başlangıçta w = (−1, 1), w₀ = 0. P1'de f = −0.1 + 1 = 0.9, tahmin Evet, doğru. P2'de f = −0.3 + 0.25 = −0.05, tahmin Hayır ama gerçek Evet: ilk güncelleme. Pozitif örneği eklediğimiz için w = (−1, 1) + 0.4·(0.3, 0.25) = (−0.88, 1.1) ve w₀ = 0 + 0.4 = 0.4 olur. P3'te f = 0 + 1.1·0.75 + 0.4 = 1.225, doğru. P4'te f = −0.88·0.7 + 1.1·0.75 + 0.4 = −0.616 + 0.825 + 0.4 = 0.609, tahmin Evet ama gerçek Hayır: ikinci güncelleme. Negatif örneği çıkarıyoruz: w = (−0.88, 1.1) − 0.4·(0.7, 0.75) = (−1.16, 0.8) ve w₀ = 0.4 − 0.4 = 0. Kalan P5, P6 ve P7'de skorlar −1.16, −0.464 ve −0.528; üçü de doğru tahmin edilir.</p>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Her örnekte yapılan</div><ol>
+<li><strong>Skoru hesapla:</strong> f = w₁·x₁′ + w₂·x₂′ + w₀.</li>
+<li><strong>Tahmin et:</strong> f ≥ 0 ise Evet (+1), değilse Hayır (−1).</li>
+<li><strong>Karşılaştır:</strong> doğruysa hiçbir şey değişmez. Yanlışsa w ← w + η·y·x ve w₀ ← w₀ + η·y; burada η = 0.4, yani gerçek sınıf Evet ise 0.4·x eklenir, Hayır ise 0.4·x çıkarılır.</li>
+</ol></div>
+<p>Başlangıçta w = (−1, 1) ve w₀ = 0. Örnekleri sırayla işleyelim:</p>
+<ol class="walk">
+<li><strong>P1 = (0.1, 1), gerçek Evet.</strong> f = −1·0.1 + 1·1 + 0 = 0.9. f ≥ 0, tahmin Evet. Doğru, değişiklik yok.</li>
+<li><strong>P2 = (0.3, 0.25), gerçek Evet.</strong> f = −0.3 + 0.25 + 0 = −0.05. f &lt; 0, tahmin Hayır. <em>Yanlış</em>: ilk güncelleme. Gerçek sınıf Evet olduğu için 0.4·x eklenir: w = (−1, 1) + (0.12, 0.1) = <strong>(−0.88, 1.1)</strong> ve w₀ = 0 + 0.4 = <strong>0.4</strong>.</li>
+<li><strong>P3 = (0, 0.75), gerçek Evet.</strong> f = 0 + 1.1·0.75 + 0.4 = 1.225, tahmin Evet. Doğru.</li>
+<li><strong>P4 = (0.7, 0.75), gerçek Hayır.</strong> f = −0.88·0.7 + 1.1·0.75 + 0.4 = −0.616 + 0.825 + 0.4 = 0.609, tahmin Evet. <em>Yanlış</em>: ikinci güncelleme. Gerçek sınıf Hayır olduğu için 0.4·x çıkarılır: w = (−0.88, 1.1) − (0.28, 0.3) = <strong>(−1.16, 0.8)</strong> ve w₀ = 0.4 − 0.4 = <strong>0</strong>.</li>
+<li><strong>P5 = (1, 0), gerçek Hayır.</strong> f = −1.16·1 + 0.8·0 + 0 = −1.16, tahmin Hayır. Doğru.</li>
+<li><strong>P6 = (0.4, 0), gerçek Hayır.</strong> f = −1.16·0.4 = −0.464, tahmin Hayır. Doğru.</li>
+<li><strong>P7 = (0.8, 0.5), gerçek Hayır.</strong> f = −0.928 + 0.4 = −0.528, tahmin Hayır. Doğru.</li>
+</ol>
+<p>Aynı adımlar sınavda şöyle bir tabloyla yazılır:</p>
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>örnek</th><th>f(x) = w·x + w₀</th><th>tahmin</th><th>gerçek</th><th>güncelleme</th><th>sonra w, w₀</th></tr></thead><tbody>
 <tr><td>P1</td><td>0.9</td><td>+</td><td>+</td><td>yok</td><td>(−1, 1), 0</td></tr>
 <tr class="hl"><td>P2</td><td>−0.05</td><td>−</td><td>+</td><td>w + 0.4·(0.3, 0.25)</td><td>(−0.88, 1.1), 0.4</td></tr>
@@ -126,7 +141,13 @@ Kuvvetli Yok İyi Hayır"></div></div></details>
 
 <h3>(h) SVM'nin destek vektörlerini ve sınırını bulmak (5 p)</h3>
 <details class="solution"><summary>Çözüm</summary><div class="body"><p>Sert marjlı SVM, iki sınıfı ayıran ve iki sınıfa da olabildiğince uzak geçen doğruyu bulur. Bu doğrunun yerini yalnız sınıflar arasındaki “sokağın” kenarına değen noktalar, yani destek vektörleri belirler. Çizimde iki sınıfın birbirine en yakın olduğu yer P2 (Evet) ile P6 ve P4 (Hayır) arasıdır; destek vektörlerinin bunlar olmasını bekleriz.</p>
-<p>Destek vektörlerinde skor tam ±1 olur. Böylece üç denklem yazarız: P2 için 0.3w₁ + 0.25w₂ + b = 1; P6 için 0.4w₁ + b = −1; P4 için 0.7w₁ + 0.75w₂ + b = −1. P4'ün denkleminden P6'nınkini çıkarınca 0.3w₁ + 0.75w₂ = 0, yani w₁ = −2.5w₂ bulunur. P2'ninkinden P6'nınkini çıkarınca −0.1w₁ + 0.25w₂ = 2 olur; w₁ yerine −2.5w₂ koyarsak 0.5w₂ = 2, yani w₂ = 4 ve w₁ = −10. Son olarak P6'nın denkleminden b = −1 + 4 = 3.</p>
+<p>Sert marjlı SVM'de destek vektörleri sokağın tam kenarındadır; bu yüzden onların skoru tam olarak +1 (pozitif) ya da −1 (negatif) olur. Sınırın en yakınındaki üç nokta P2 (Evet), P4 ve P6 (Hayır) olduğu için her biri için bir denklem yazar ve üç bilinmeyeni (w₁, w₂, b) buluruz:</p>
+<ol class="walk">
+<li><strong>Denklemleri yaz.</strong> Skor w₁·x₁′ + w₂·x₂′ + b'dir. P2 = (0.3, 0.25) için 0.3w₁ + 0.25w₂ + b = 1; P6 = (0.4, 0) için 0.4w₁ + b = −1; P4 = (0.7, 0.75) için 0.7w₁ + 0.75w₂ + b = −1.</li>
+<li><strong>b'yi yok et (P4 − P6).</strong> P4'ün denkleminden P6'nınkini çıkarınca 0.3w₁ + 0.75w₂ = 0 kalır; buradan w₁ = −2.5w₂.</li>
+<li><strong>Bir kez daha b'yi yok et (P2 − P6).</strong> P2'ninkinden P6'nınkini çıkarınca −0.1w₁ + 0.25w₂ = 2 olur. w₁ yerine −2.5w₂ koyunca 0.25w₂ + 0.25w₂ = 0.5w₂ = 2, yani <strong>w₂ = 4</strong> ve <strong>w₁ = −2.5·4 = −10</strong>.</li>
+<li><strong>b'yi bul.</strong> P6'nın denkleminde 0.4·(−10) + b = −1, yani −4 + b = −1 ve <strong>b = 3</strong>.</li>
+</ol>
 <p>Sonuç <strong>w = (−10, 4), b = 3</strong>; sınır −10x₁′ + 4x₂′ + 3 = 0, yani x₂′ = 2.5x₁′ − 0.75 doğrusu. ‖w‖ = √116 ≈ 10.77 ve marj 1/‖w‖ ≈ 0.093'tür (P2 ile P6 birbirine çok yakın olduğu için sokak dar). Denetim için diğer noktalara bakarız: P1 ve P3'ün skoru 6, P5'inki −7, P7'ninki −3; hepsinin mutlak değeri 1'den büyük, yani sokağın dışında kalıyorlar. <strong>Destek vektörleri P2, P4 ve P6</strong>'dır. Sınav “yaklaşık çizin” dediği için bu üç noktayı işaretleyip aralarından geçen sokağı çizmek yeterlidir.</p>
 <div data-widget="hardsvm" data-pts="0.1 1 + P1
 0.3 0.25 + P2
