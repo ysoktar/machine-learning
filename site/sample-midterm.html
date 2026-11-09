@@ -141,7 +141,7 @@ Kuvvetli Yok İyi Hayır"></div></div></details>
 <tr><td>eğitim hatası</td><td>0.02</td><td>0.05</td><td>0.09</td><td>0.17</td><td>0.33</td></tr>
 <tr><td>doğrulama hatası</td><td>0.31</td><td>0.22</td><td>0.14</td><td>0.18</td><td>0.34</td></tr></tbody></table></div>
 <details class="solution"><summary>Çözüm</summary><div class="body"><p>Düzenlileştirme gücü λ arttıkça model basitleşir. Tabloyu yorumlamak için eğitim ve doğrulama hatalarını birlikte okuruz; bunu bir grafikte görmek kolaylaştırır:</p>
-<div data-widget="fig" data-fig="lambdacurve" data-caption="λ arttıkça eğitim hatası sürekli artar; doğrulama hatası önce düşer, λ = 0.1'de en düşüğe iner, sonra yeniden yükselir."></div>
+<div data-widget="fig" data-fig="lambdacurve" data-formula="en küçük L(w) + λ·‖w‖²" data-caption="λ arttıkça eğitim hatası sürekli artar; doğrulama hatası önce düşer, λ = 0.1'de en düşüğe iner, sonra yeniden yükselir."></div>
 <p>Seçilecek değer, ortalama doğrulama hatasının en düşük olduğu <strong>λ = 0.1</strong>'dir (0.14); orada eğitim ile doğrulama hataları da birbirine yakındır. Tablonun sol ucu (λ = 0 ve 0.01) <strong>aşırı öğrenmeye</strong> karşılık gelir: eğitim hatası çok düşük ama doğrulama hatası yüksek, aralarında büyük bir açık var. Sağ ucu (λ = 10, kısmen λ = 1) <strong>yetersiz öğrenmeye</strong> karşılık gelir: iki hata da yüksek ve birbirine yakın.</p>
 <p>λ seçildikten sonra çapraz doğrulamadaki beş model atılır; nihai model λ = 0.1 ile <strong>bütün eğitim verisinde</strong> (200 örnek) yeniden eğitilir. Raporda çapraz doğrulama sonucu ortalama ± standart sapma olarak verilir ve ayrı bir test kümesi varsa model orada yalnız bir kez değerlendirilir; test sonucuna bakarak λ değiştirilmez.</p></div></details>
 
