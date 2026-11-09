@@ -172,6 +172,8 @@ export function enhanceQuizzes(root = document) {
       buttons[answer - 1].classList.add("correct");
       const list = items.map((li, i) => (li.dataset.why ? `<li class="${i + 1 === answer ? "ok" : "no"}"><strong>${L(i)}</strong> ${i + 1 === answer ? "✓" : "✗"} ${li.dataset.why}</li>` : "")).join("");
       fb.innerHTML = `<span class="verdict ${revealed ? "no" : "ok"}">${revealed ? `Doğru cevap: ${L(answer - 1)}.` : "✓ Doğru."}</span> ${explain ? explain.innerHTML : ""}` + (list ? `<ul class="quiz-whys">${list}</ul>` : "");
+      // figures or widgets inside an explanation are mounted when the explanation is shown
+      if (fb.querySelector("[data-widget]")) import("./widgets.js").then((m) => m.mountAll(fb));
     };
     items.forEach((li, i) => {
       const b = h("button", { type: "button" }, h("span", { class: "opt-letter" }, L(i)), h("span", { html: li.innerHTML }));

@@ -185,6 +185,57 @@ Object.assign(FIG, {
     ${[[1, 0, 0], [0, 1, 0], [1, 0, 0], [0, 0, 1]].map((r, i) => r.map((v, j) => box(185 + j * 85, 30 + i * 36, 80, 30, String(v), v ? "fig-box3" : "fig-box")).join("")).join("")}
     ${T(300, 182, "her şehir için bir 0/1 sütunu; her satırda tam bir tane 1", { anchor: "middle", cls: "fig-sub" })}`, "One-hot kodlama"),
 
+  aucgrid: (ds) => {
+    // ROC drawn on a P×N grid: each + steps up, each − steps right. Column j holds one square per positive ranked
+    // above the j-th negative, so the squares under the curve are exactly the correctly ordered (+, −) pairs.
+    const seq = String(ds.seq || "+ + − + − −").replace(/[\s,]/g, "").split("").map((c) => "+1p".includes(c));
+    const P = seq.filter(Boolean).length, N = seq.length - P;
+    const c = Math.min(56, Math.floor(260 / Math.max(P, N))), ox = 112, oy = 30 + P * c;
+    const X = (i) => ox + i * c, Y = (j) => oy - j * c;
+    let s = DEFS, x = 0, y = 0, good = 0;
+    const hs = [];
+    for (const pos of seq) { if (pos) y++; else { hs.push(y); x++; } }
+    hs.forEach((hgt, j) => {
+      for (let r = 0; r < P; r++) s += `<rect x="${X(j)}" y="${Y(r + 1)}" width="${c}" height="${c}" class="${r < hgt ? "auc-ok" : "auc-bad"}"/>`;
+      good += hgt;
+      s += T(X(j) + c / 2, oy + 16, `${j + 1}. −`, { anchor: "middle", cls: "fig-sub" });
+      s += T(X(j) + c / 2, oy + 33, String(hgt), { anchor: "middle" });
+    });
+    for (let r = 0; r < P; r++) s += T(ox - 8, Y(r + 1) + c / 2 + 4, `${r + 1}. +`, { anchor: "end", cls: "fig-sub" });
+    s += T(ox - 8, oy + 33, "önündeki + sayısı:", { anchor: "end", cls: "fig-sub", size: 11 });
+    // the ROC staircase itself
+    let pts = [[0, 0]]; x = 0; y = 0;
+    for (const pos of seq) { if (pos) y++; else x++; pts.push([x, y]); }
+    s += `<polyline points="${pts.map(([a, b]) => `${X(a)},${Y(b)}`).join(" ")}" class="auc-curve"/>`;
+    s += `<line x1="${X(0)}" y1="${Y(0)}" x2="${X(N)}" y2="${Y(P)}" class="line dash"/>`;
+    s += T(X(N) + 8, Y(P) + 4, "ROC", { cls: "fig-sub" });
+    s += T(ox + (N * c) / 2, 18, `AUC = yeşil kare / bütün kareler = ${good}/${P * N}`, { anchor: "middle" });
+    s += T(ox + (N * c) / 2, oy + 50, "yatay: negatifler (FPR), dikey: pozitifler (TPR)", { anchor: "middle", cls: "fig-sub", size: 11 });
+    return svg(ox + N * c + 50, oy + 60, s, "AUC ızgarası");
+  },
+  distballs: () => {
+    // left: the two ways from x to z (straight line vs city blocks); right: all points at distance 1 (circle vs diamond)
+    const S = 34, X = (ox, v) => ox + v * S, Y = (oy, v) => oy - v * S;
+    let s = DEFS;
+    const grid = (ox, oy, n, m, x0 = 0, y0 = 0) => { let g = ""; for (let i = 0; i <= n; i++) g += `<line x1="${X(ox, i)}" y1="${Y(oy, 0)}" x2="${X(ox, i)}" y2="${Y(oy, m)}" class="fig-grid"/>`; for (let j = 0; j <= m; j++) g += `<line x1="${X(ox, 0)}" y1="${Y(oy, j)}" x2="${X(ox, n)}" y2="${Y(oy, j)}" class="fig-grid"/>`; return g; };
+    // panel 1: x = (1, 1), z = (4, 5)
+    const o1 = [20, 250];
+    s += grid(o1[0], o1[1], 5, 5);
+    s += `<polyline points="${X(o1[0], 1)},${Y(o1[1], 1)} ${X(o1[0], 4)},${Y(o1[1], 1)} ${X(o1[0], 4)},${Y(o1[1], 5)}" fill="none" class="line" style="stroke: var(--neg); stroke-width: 3"/>`;
+    s += `<line x1="${X(o1[0], 1)}" y1="${Y(o1[1], 1)}" x2="${X(o1[0], 4)}" y2="${Y(o1[1], 5)}" class="line accent" style="stroke-width: 3"/>`;
+    s += pt(X(o1[0], 1), Y(o1[1], 1), "pos") + pt(X(o1[0], 4), Y(o1[1], 5), "pos");
+    s += T(X(o1[0], 1) - 10, Y(o1[1], 1) - 8, "x (1, 1)", { anchor: "end", cls: "fig-sub" }) + T(X(o1[0], 4) - 10, Y(o1[1], 5) - 4, "z (4, 5)", { anchor: "end", cls: "fig-sub" });
+    s += T(X(o1[0], 2.5), Y(o1[1], 1) + 18, "3 birim", { anchor: "middle", cls: "fig-sub" }) + T(X(o1[0], 4) + 8, Y(o1[1], 3), "4 birim", { cls: "fig-sub" });
+    s += T(X(o1[0], 2.5), 18, "Öklid: √(3² + 4²) = 5", { anchor: "middle", size: 13 }) + T(X(o1[0], 2.5), 36, "Manhattan: 3 + 4 = 7", { anchor: "middle", size: 13 });
+    // panel 2: unit "circles" around the origin
+    const o2 = [250, 250], c = [2.5, 2.5];
+    s += grid(o2[0], o2[1], 5, 5);
+    s += `<ellipse cx="${X(o2[0], c[0])}" cy="${Y(o2[1], c[1])}" rx="${2 * S}" ry="${2 * S}" class="ring" style="stroke: var(--accent); stroke-width: 2.5"/>`;
+    s += `<polygon points="${[[c[0] + 2, c[1]], [c[0], c[1] + 2], [c[0] - 2, c[1]], [c[0], c[1] - 2]].map(([a, b]) => `${X(o2[0], a)},${Y(o2[1], b)}`).join(" ")}" fill="none" style="stroke: var(--neg); stroke-width: 2.5"/>`;
+    s += pt(X(o2[0], c[0]), Y(o2[1], c[1]), "q", 5) + T(X(o2[0], c[0]) + 8, Y(o2[1], c[1]) + 16, "q", { size: 13 });
+    s += T(X(o2[0], 2.5), 18, "q'ya uzaklığı 2 olan noktalar", { anchor: "middle", size: 13 }) + T(X(o2[0], 2.5), 36, "Öklid: daire · Manhattan: dörtgen", { anchor: "middle", cls: "fig-sub" });
+    return svg(440, 270, s, "Öklid ve Manhattan uzaklığı");
+  },
   pcawalk: () => {
     // the worked example of week 2: A(0,0) B(1,1) C(3,2) D(4,1), mean (2,1), PC1 ∝ (3,1), PC2 ∝ (−1,3)
     const P = [["A", 0, 0], ["B", 1, 1], ["C", 3, 2], ["D", 4, 1]];

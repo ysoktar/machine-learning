@@ -506,3 +506,6 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 .mat::after { right: 0; border-left: none; }
 .mat > span { padding: 0 0.1em; }
 .mat-eq { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35em; justify-content: center; }
+.plot .auc-ok { fill: rgba(31, 157, 85, 0.22); stroke: var(--border-strong); }
+.plot .auc-bad { fill: var(--neg-wash); stroke: var(--border-strong); }
+.plot .auc-curve { fill: none; stroke: var(--pos); stroke-width: 3; }

@@ -94,6 +94,8 @@ export function pointEditor(opts) {
       return s;
     },
     seg(a, b, cls = "line dash") { return `<line x1="${X(a[0])}" y1="${Y(a[1])}" x2="${X(b[0])}" y2="${Y(b[1])}" class="${cls}"/>`; },
+    /** Manhattan "circle": every point at L1 distance r from c (a diamond) */
+    diamond(c, r, cls = "ring") { return `<polygon points="${[[c[0] + r, c[1]], [c[0], c[1] + r], [c[0] - r, c[1]], [c[0], c[1] - r]].map(([a, b]) => `${X(a)},${Y(b)}`).join(" ")}" class="${cls}"/>`; },
     circle(c, r, cls = "ring") { return `<ellipse cx="${X(c[0])}" cy="${Y(c[1])}" rx="${Math.abs(X(c[0] + r) - X(c[0]))}" ry="${Math.abs(Y(c[1] + r) - Y(c[1]))}" class="${cls}"/>`; },
     text(p, s, cls = "lab") { return `<text x="${X(p[0])}" y="${Y(p[1])}" class="${cls}">${esc(s)}</text>`; },
   };

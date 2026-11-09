@@ -1,6 +1,6 @@
 // Teaching widgets built on the interactive point editor: drag, add and remove points; step through algorithms with
 // a narration of what happens and why; explore formulas with sliders. Registered into widgets.js (W.*).
-import { h, table, frame, area, parseRows, parseNums, readNumber, errorBox } from "./lib/ui.js";
+import { h, table, frame, area, parseRows, parseNums, readNumber, errorBox, checkbox } from "./lib/ui.js";
 import * as ml from "./lib/ml.js";
 import { lines } from "./lib/plot.js";
 // "0.5x₁ + x₂ − 2" (no "1x₂", no "+ −2")
@@ -62,6 +62,7 @@ export function knn(ds) {
   const mode = seg([["q", "◆ sorguyu taşı"], ["+", "● + ekle"], ["-", "■ − ekle"]], "q");
   const k = slider("k (komşu)", 1, 9, 1, Number(ds.k ?? 3), () => render(), (v) => String(v));
   const metric = seg([["euclid2", "Öklid"], ["manhattan", "Manhattan"]], "euclid2", () => render());
+  const shade = checkbox(" arka planı boya: her noktada kNN ne derdi?", false, () => render());
   const out = h("div", { class: "out" });
   const B = box(start, 0.15, [q0]);
   const ed = pointEditor({ ...B, points: start, query: q0, getMode: mode.get, onChange: () => { data.set(pointsToText(ed.points)); render(); },
@@ -70,8 +71,11 @@ export function knn(ds) {
       if (!e.points.length) return "";
       const r = ml.knnRank(e.points, e.query, metric.get());
       const K = Math.min(k.get(), r.length);
-      let s = r.slice(0, K).map((p) => api.seg(e.query, p.x, "nb")).join("");
-      if (metric.get() === "euclid2") s += api.circle(e.query, Math.sqrt(r[K - 1].d));
+      // optional background: the decision kNN would make if the query stood at each point (decision regions)
+      let s = shade.get() ? api.cells((a, b) => { const v = ml.knnVote(ml.knnRank(e.points, [a, b], metric.get()), K); return v.tie ? 0 : v.label; }, 40) : "";
+      s += r.slice(0, K).map((p) => api.seg(e.query, p.x, "nb")).join("");
+      // the k-th neighbour's distance as a "ball": a circle for Euclid, a diamond for Manhattan
+      s += metric.get() === "euclid2" ? api.circle(e.query, Math.sqrt(r[K - 1].d)) : api.diamond(e.query, r[K - 1].d);
       return s;
     },
     decorate: (e) => {
@@ -93,16 +97,18 @@ export function knn(ds) {
     const nPos = r.slice(0, K).filter((p) => p.y > 0).length, nNeg = K - nPos;
     const calc = (p) => (M === "euclid2" ? `(${f(p.x[0])}−${f(q[0])})² + (${f(p.x[1])}−${f(q[1])})² = ${f(p.d)}` : `|${f(p.x[0])}−${f(q[0])}| + |${f(p.x[1])}−${f(q[1])}| = ${f(p.d)}`);
     const decision = v.tie ? "beraberlik (k'yı tek seçin ya da kural koyun)" : v.label > 0 ? "+" : "−";
-    const byK = [1, 2, 3, 4, 5, 6, 7].filter((kk) => kk <= r.length).map((kk) => { const vv = ml.knnVote(r, kk); return [kk, vv.tie ? "=" : vv.label > 0 ? "+" : "−"]; });
+    const byK = [1, 2, 3, 4, 5, 6, 7].filter((kk) => kk <= r.length).map((kk) => { const vv = ml.knnVote(r, kk); return [kk, vv.tie ? "berabere" : vv.label > 0 ? "+" : "−"]; });
     put(out,
       h("div", { class: "narrate" }, h("b", {}, `k = ${K}: `), `q = (${f(q[0])}, ${f(q[1])}) noktasına en yakın ${K} komşu `,
         r.slice(0, K).map((p) => `${p.name}(${p.y > 0 ? "+" : "−"})`).join(", "), `. Bu komşuların ${nPos} tanesi artı, ${nNeg} tanesi eksi olduğu için çoğunluk oyuyla karar `, h("b", {}, decision), " olur.",
         v.boundaryTie ? h("span", { class: "bad" }, ` Dikkat: ${K}. ve ${K + 1}. komşu aynı uzaklıkta; hangisinin sayılacağı bir kurala bağlı.`) : null),
       h("div", { class: "vote-bar", "aria-hidden": "true" }, nPos ? h("div", { class: "vp", style: { flex: nPos } }, `+ ${nPos}`) : null, nNeg ? h("div", { class: "vn", style: { flex: nNeg } }, `− ${nNeg}`) : null),
       table(["sıra", "nokta", M === "euclid2" ? "d² hesabı (karekök gerekmez)" : "L1 hesabı", "sınıf"], r.map((p, i) => ({ row: [i + 1, p.name, calc(p), lab(p.y)], cls: i < K ? "hl" : "" })), { cls: "compact" }),
+      shade.get() ? h("p", { class: "small" }, "Arka plan: sorgu noktası o konumda olsaydı kNN'nin vereceği karar (mavi +, kırmızı −, boş beraberlik). k büyüdükçe bölgelerin sınırı yumuşar; k = 1'de her noktanın etrafında küçük adacıklar oluşur.") : null,
+      h("p", { class: "small" }, M === "euclid2" ? "Öklid uzaklığı d = √((x₁ − q₁)² + (x₂ − q₂)²): düz çizgi uzaklığıdır; eşit uzaklıktaki noktalar bir daire oluşturur." : "Manhattan uzaklığı d = |x₁ − q₁| + |x₂ − q₂|: şehir bloklarında yürür gibi yalnız yatay ve dikey adımların toplamıdır; eşit uzaklıktaki noktalar bir eşkenar dörtgen oluşturur."),
       h("p", { class: "small" }, "Aynı sorgu için k'ya göre karar: ", byK.map(([kk, d]) => `k=${kk}: ${d}`).join(" · "), ". k büyüdükçe karar daha uzak komşulara bağlanır."));
   }
-  body.append(h("div", { class: "controls" }, mode.el, metric.el), k.el, h("div", { class: "two-col" }, ed.el, out), data.el);
+  body.append(h("div", { class: "controls" }, mode.el, metric.el, shade.label), k.el, h("div", { class: "two-col" }, ed.el, out), data.el);
   render();
   return el;
 }
