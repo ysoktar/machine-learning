@@ -495,3 +495,6 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 /* long inline formulas (glossary, tables) wrap on phones instead of widening the page */
 .glossary .m { display: block; white-space: normal; margin: 0.25rem 0; }
 .glossary dd { overflow-wrap: anywhere; }
+/* "Burada: …" line under a formula: what every symbol stands for */
+.formula-legend { font-size: 0.9rem; color: var(--text-2); margin: -0.35rem 0 0.9rem; line-height: 1.55; }
+.fig .formula-legend { text-align: left; margin: 0.1rem 0 0.4rem; }

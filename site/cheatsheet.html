@@ -31,6 +31,7 @@
 <tr><td>2×2 özdeğer</td><td class="m">λ² − (s₁₁+s₂₂)λ + (s₁₁s₂₂ − s₁₂²) = 0; &nbsp;eşit köşegen: a ± c, yön (1,±1)</td></tr>
 <tr><td>Açıklanan varyans</td><td class="m">λ_k / Σλ</td></tr>
 </tbody></table></div>
+<p class="formula-legend"><b>Semboller:</b> x bir değer, min ve max eğitim verisindeki en küçük ve en büyük değer, μ ortalama, σ standart sapma, n örnek sayısı. TP doğru pozitif, TN doğru negatif, FP yanlış pozitif (yanlış alarm), FN yanlış negatif (kaçırılan) sayısı; P ve N gerçek pozitif ve negatif sayısı; spec. specificity. y gerçek değer, ŷ tahmin, ȳ gerçek değerlerin ortalaması. s_jk j ve k sütunlarının kovaryansı (j = k ise varyans), μ_j j'inci sütunun ortalaması; λ özdeğer, s₁₁, s₂₂ köşegendeki varyanslar, s₁₂ kovaryans, a ve c eşit köşegen ve köşegen dışı değer.</p>
 
 <h2>kNN, risk ve yanlılık-varyans dengesi</h2><p class="h-en" lang="en">kNN, risk and the bias-variance trade-off</p>
 <div class="table-wrap"><table class="simple"><tbody>
@@ -40,6 +41,7 @@
 <tr><td>Ayrışım</td><td class="m">E[(y − ĥ)²] = yanlılık² + varyans + σ²</td></tr>
 <tr><td>Düzenlileştirilmiş ERM</td><td class="m">min R̂(h) + λΩ(h)</td></tr>
 </tbody></table></div>
+<p class="formula-legend"><b>Semboller:</b> x ve z iki nokta, x_j ve z_j j'inci öznitelikleri, ‖x‖ x'in uzunluğu, x·z iç çarpım. h model (hipotez), L(y, h(x)) tek bir tahminin kaybı, R̂(h) eğitim verisindeki ortalama kayıp (ampirik risk), n örnek sayısı. ĥ eğitilmiş model, E[…] farklı eğitim kümeleri üzerinden ortalama, σ² gürültü. Ω(h) modelin karmaşıklığı, λ cezanın ağırlığı.</p>
 
 <h2>Doğrusal ve lojistik regresyon, algılayıcı</h2><p class="h-en" lang="en">Linear and logistic regression, perceptron</p>
 <div class="table-wrap"><table class="simple"><tbody>
@@ -53,6 +55,7 @@
 <tr><td>Softmax · çapraz entropi</td><td class="m">p_k = e^{z_k}/Σe^{z_j} · −ln p_y</td></tr>
 <tr><td>Sınıra uzaklık</td><td class="m">|w·x + b|/‖w‖</td></tr>
 </tbody></table></div>
+<p class="formula-legend"><b>Semboller:</b> X her satırı bir örnek olan veri matrisi, y hedef değerlerin vektörü, w ağırlıklar, ᵀ devrik, ⁻¹ ters matris, I birim matris, λ ridge cezası, x̄ ve ȳ ortalamalar, w₁ eğim, w₀ sabit terim. η öğrenme oranı, ∇L kaybın gradyanı. z = w·x + b skor, σ sigmoid, p = σ(z) y = 1 olasılığı, b sabit terim, y gerçek etiket (lojistikte 0/1, perceptron'da ±1). p_k k'inci sınıfın softmax olasılığı, z_k ham skoru, p_y doğru sınıfın olasılığı. ‖w‖ w'nin uzunluğu.</p>
 
 <h2>Karar ağaçları ve topluluk yöntemleri</h2><p class="h-en" lang="en">Decision trees and ensemble methods</p>
 <div class="table-wrap"><table class="simple"><tbody>
@@ -65,6 +68,7 @@
 <tr><td>AdaBoost</td><td class="m">ε = Σ_yanlış w, &nbsp;α = ½ ln((1−ε)/ε); &nbsp;yanlış × 1/(2ε), doğru × 1/(2(1−ε)); &nbsp;H = sign(Σαh)</td></tr>
 <tr><td>Gradyan artırma</td><td class="m">F₀ = ȳ, r = y − F, F ← F + η·f(r)</td></tr>
 </tbody></table></div>
+<p class="formula-legend"><b>Semboller:</b> pᵢ i'inci sınıfın düğümdeki oranı, H(D) D kümesinin entropisi, D_v A özniteliği v değerini alan alt küme, |D| küme büyüklüğü. T ağaç, R(T) hatası, |T| yaprak sayısı, α yaprak başına ceza. n üye sayısı, p her üyenin doğruluğu, C(n, k) n'den k seçme sayısı. ε yanlış örneklerin ağırlıkları toplamı, α kütüğün oy ağırlığı, h kütüğün tahmini, H son karar. F modelin tahmini, F₀ ilk tahmin (ortalama), r kalıntı (y − F), f(r) kalıntıya uydurulan ağaç, η öğrenme oranı.</p>
 
 <h2>Destek vektör makineleri (SVM)</h2><p class="h-en" lang="en">Support vector machines (SVM)</p>
 <div class="table-wrap"><table class="simple"><tbody>
@@ -75,6 +79,7 @@
 <tr><td>Yumuşak marj</td><td class="m">min ½‖w‖² + CΣξᵢ, ξᵢ = max(0, 1 − yᵢf(xᵢ))</td></tr>
 <tr><td>Çekirdekler</td><td class="m">(γx·z + r)^d · exp(−γ‖x − z‖²)</td></tr>
 </tbody></table></div>
+<p class="formula-legend"><b>Semboller:</b> w ağırlık vektörü, b sabit terim, xᵢ i'inci nokta, yᵢ etiketi (+1 ya da −1), ‖w‖ w'nin uzunluğu, “s.t.” “şu koşulla” demektir. αᵢ i'inci noktanın ikil katsayısı (destek vektörlerinde 0'dan büyük). C ihlal cezası, ξᵢ i'inci noktanın marj ihlali (gevşek değişken), f(x) = w·x + b skor. Çekirdeklerde γ, r ve d seçilen ayarlardır.</p>
 
 <h2>Sinir ağları ve evrişimli ağlar (yalnızca final)</h2><p class="h-en" lang="en">Neural networks and convolutional networks (final only)</p>
 <div class="table-wrap"><table class="simple"><tbody>
@@ -86,6 +91,7 @@
 <tr><td>Evrişim parametresi</td><td class="m">F·(k_h·k_w·C_in) ağırlık + F bias</td></tr>
 <tr><td>Boole ifadesini step nöronuyla kurmak</td><td class="m">VE: +1 / −1 ağırlık, b = −(#pozitif değişmez) + 0.5 · VEYA: ağırlık 1, b = −0.5</td></tr>
 </tbody></table></div>
+<p class="formula-legend"><b>Semboller:</b> x girdi, W ağırlık matrisi (her satırı bir nöron), b sabit terimler, g etkinleştirme işlevi, h katmanın çıktısı. ŷ tahmin, y gerçek değer, δ bir nöronun hatası, v_kj j'inci gizli nörondan k'inci çıktıya giden ağırlık, g′ etkinleştirmenin türevi, z_j nöronun ağırlıklı toplamı. m momentum, g gradyan, θ herhangi bir parametre, η öğrenme oranı, β momentum katsayısı. n girdi uzunluğu, k filtre uzunluğu, p dolgu, s adım; F filtre sayısı, k_h ve k_w filtre boyutu, C_in girdi kanal sayısı.</p>
 
 <h2 id="log2-tablosu">Hesap makinesiz sınav için log₂ ve entropi tablosu</h2><p class="h-en" lang="en">log₂ and entropy table for the no-calculator exam</p>
 <div class="two-col">

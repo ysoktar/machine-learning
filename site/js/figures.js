@@ -436,5 +436,5 @@ Object.assign(FIG, {
 export function figure(ds) {
   const make = FIG[ds.fig];
   if (!make) return h("p", { class: "err" }, "Bilinmeyen şekil: " + ds.fig);
-  return h("figure", { class: "fig" }, make(ds), ds.formula ? h("div", { class: "formula fig-formula" }, ds.formula.split(/\s{2,}·\s{2,}/).map((part) => h("span", { class: "ff" }, part.trim()))) : null, ds.caption ? h("figcaption", {}, ds.caption) : null);
+  return h("figure", { class: "fig" }, make(ds), ds.formula ? h("div", { class: "formula fig-formula" }, ds.formula.split(/\s{2,}·\s{2,}/).map((part) => h("span", { class: "ff" }, part.trim()))) : null, ds.legend ? h("p", { class: "formula-legend" }, h("b", {}, "Burada: "), ds.legend) : null, ds.caption ? h("figcaption", {}, ds.caption) : null);
 }
