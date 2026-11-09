@@ -354,8 +354,18 @@ Object.assign(FIG, {
   workflow: () => {
     const steps = ["Problem", "Veri", "Öznitelikler", "Model", "Değerlendirme", "Kullanım"];
     let s = DEFS;
-    steps.forEach((t, i) => { const x = 8 + i * 77; s += box(x, 30, 70, 40, t, i === 1 || i === 2 ? "fig-box2" : "fig-box"); if (i < 5) s += arrow(x + 70, 50, x + 77, 50); });
-    return svg(470, 110, s + T(235, 95, "renkli adımlar: zamanın çoğunun geçtiği yer (veriyi anlamak ve hazırlamak)", { anchor: "middle", cls: "fig-sub" }), "İş akışı");
+    // two rows of three, so labels stay readable on a phone; arrows sit in the gaps, never over a box
+    const bw = 116, bh = 40, gap = 26, x0 = 6, ys = [8, 92];
+    const pos = (i) => [x0 + (i % 3) * (bw + gap), ys[Math.floor(i / 3)]];
+    steps.forEach((t, i) => {
+      const [x, y] = pos(i);
+      s += box(x, y, bw, bh, t, i === 1 || i === 2 ? "fig-box2" : "fig-box");
+      if (i % 3 < 2) s += arrow(x + bw + 3, y + bh / 2, x + bw + gap - 3, y + bh / 2);
+    });
+    const [ax, ay] = pos(2), [bx, by] = pos(3);
+    s += `<path d="M${ax + bw / 2},${ay + bh + 2} V${ay + bh + 20} H${bx + bw / 2} V${by - 3}" class="fig-arrow" fill="none" marker-end="url(#ah)"/>`;
+    const W = x0 * 2 + 3 * bw + 2 * gap;
+    return svg(W, 168, s + T(W / 2, 158, "Renkli adımlar, zamanın çoğunun geçtiği yerdir: veriyi anlamak ve hazırlamak.", { anchor: "middle", cls: "fig-sub" }), "İş akışı");
   },
 
   learntypes: () => {
