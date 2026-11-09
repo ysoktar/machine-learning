@@ -20,7 +20,7 @@ export const TERMS = [
 "term": "Ağırlık",
 "def": "Modelin öğrendiği sayılardan biri: bir özniteliğin karara ne kadar ve hangi yönde katkı yaptığı. w = (2, −1) ise x₁ artınca skor artar, x₂ artınca azalır. (ŷ = w·x + b)",
 "id": "t-agirlik",
-"match": "ağırlık(?!lı)",
+"match": "ağırlık(?!lı|land)",
 "week": 4,
 "en": "weight",
 "skip": [
@@ -79,7 +79,7 @@ export const TERMS = [
 "term": "Bias",
 "def": "Doğrusal modeldeki sabit sayı: karar sınırını orijinden kaydırır. “Yanlılık-varyans”taki yanlılıkla aynı kelime ama farklı kavram. (ŷ = w·x + b)",
 "id": "t-bias-yanlilik-terimi-b",
-"match": "bias",
+"match": "(?<!inductive )bias",
 "week": 4,
 "en": "bias / intercept"
 },
@@ -239,7 +239,7 @@ export const TERMS = [
 "term": "Etiket",
 "def": "Bir örneğin doğru cevabı: e-postanın spam olup olmadığı, evin fiyatı. Gözetimli öğrenmede model etiketlerden öğrenir. (y)",
 "id": "t-etiket",
-"match": "etiket",
+"match": "etiket(?!leyerek)",
 "week": 1,
 "en": "label / target"
 },
@@ -424,7 +424,7 @@ export const TERMS = [
 "term": "Kayıp",
 "def": "Tek bir tahminin ne kadar kötü olduğunu ölçen sayı. Eğitim, ortalama kaybı küçültmektir. (kare: (y − ŷ)², log-loss, menteşe)",
 "id": "t-kayip-fonksiyonu",
-"match": "kayıp fonksiyonu|kayıp|kaybı|kaybın",
+"match": "kayıp fonksiyonu|(?<!müşteri |bilgi |bir )kayıp|(?<!müşteri |bilgi )kaybı|(?<!müşteri |bilgi )kaybın",
 "week": 3,
 "en": "loss function"
 },
@@ -456,9 +456,12 @@ export const TERMS = [
 "term": "Kök",
 "def": "Karar ağacının en üstteki düğümü; ID3'te bilgi kazancı en büyük öznitelik buraya konur.",
 "id": "t-kok",
-"match": "kök",
+"match": "kök(?!ü al|ünü al|ü hiç)",
 "week": 5,
-"en": "root"
+"en": "root",
+"skip": [
+"on-bilgi"
+]
 },
 {
 "term": "Lasso",
@@ -536,9 +539,12 @@ export const TERMS = [
 "term": "Normalleştirme",
 "def": "Öznitelikleri karşılaştırılabilir ölçeğe getirmek (min-max, z-score). Uzaklık ve gradyan temelli yöntemler için şart.",
 "id": "t-normallestirme",
-"match": "normalleştirme|normalizasyon",
+"match": "(?<!toplu )normalleştirme|normalizasyon",
 "week": 2,
-"en": "normalization / feature scaling"
+"en": "normalization / feature scaling",
+"skip": [
+"w6-ensembles"
+]
 },
 {
 "term": "One-hot kodlama",
@@ -740,7 +746,11 @@ export const TERMS = [
 "id": "t-varyans-model",
 "match": "varyans",
 "week": 3,
-"en": "variance"
+"en": "variance",
+"skip": [
+"w2-data",
+"on-bilgi"
+]
 },
 {
 "term": "Veri sızıntısı",
@@ -756,7 +766,10 @@ export const TERMS = [
 "id": "t-yanlilik-model",
 "match": "yanlılık",
 "week": 3,
-"en": "bias"
+"en": "bias",
+"skip": [
+"on-bilgi"
+]
 },
 {
 "term": "Yanlılık-varyans ayrışımı",

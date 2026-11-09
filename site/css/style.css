@@ -482,3 +482,8 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
   .site-header .header-actions a.icon-btn[href*="github"] { display: none; }
   .site-header .header-actions { flex-shrink: 0; gap: 0.3rem; }
 }
+/* narrow screens: grid columns and control rows must not push content past the card */
+.two-col > * { min-width: 0; }
+.controls label { max-width: 100%; flex-wrap: wrap; }
+.controls input[type="text"] { min-width: 0; max-width: 100%; }
+.en-tag { white-space: normal; }

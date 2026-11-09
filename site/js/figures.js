@@ -74,10 +74,11 @@ export const FIG = {
       + board(115, 255, "yüksek yanlılık · düşük varyans", 30, 9) + board(345, 255, "yüksek yanlılık · yüksek varyans", 26, 40), "Hedef tahtası");
   },
 
-  split: () => svg(460, 120, `${DEFS}
-    <rect x="10" y="30" width="300" height="40" rx="6" class="fig-box"/><rect x="310" y="30" width="70" height="40" rx="6" class="fig-box2"/><rect x="380" y="30" width="70" height="40" rx="6" class="fig-box3"/>
-    ${T(160, 55, "eğitim (%70): ağırlıkları öğren", { anchor: "middle" })}${T(345, 55, "doğrulama", { anchor: "middle", size: 11 })}${T(415, 55, "test", { anchor: "middle" })}
-    ${T(345, 95, "k, λ, derinlik seç", { anchor: "middle", cls: "fig-sub" })}${T(415, 95, "en sonda, 1 kez", { anchor: "middle", cls: "fig-sub" })}${T(160, 95, "model burada öğrenir", { anchor: "middle", cls: "fig-sub" })}`, "Veri bölmesi"),
+  split: () => svg(460, 130, `${DEFS}
+    <rect x="10" y="20" width="300" height="40" rx="6" class="fig-box"/><rect x="310" y="20" width="70" height="40" rx="6" class="fig-box2"/><rect x="380" y="20" width="70" height="40" rx="6" class="fig-box3"/>
+    ${T(160, 45, "eğitim (%70): ağırlıkları öğren", { anchor: "middle" })}${T(345, 45, "doğrulama", { anchor: "middle", size: 11 })}${T(415, 45, "test", { anchor: "middle" })}
+    <line x1="345" y1="62" x2="345" y2="80" class="fig-proj"/><line x1="415" y1="62" x2="415" y2="104" class="fig-proj"/>
+    ${T(160, 84, "model burada öğrenir", { anchor: "middle", cls: "fig-sub" })}${T(350, 92, "k, λ, derinlik seçilir", { anchor: "end", cls: "fig-sub" })}${T(420, 118, "en sonda, yalnız bir kez", { anchor: "end", cls: "fig-sub" })}`, "Veri bölmesi"),
 
   cv: () => {
     let s = "";
@@ -128,24 +129,24 @@ export const FIG = {
       ${nb(250, 190, "→ Hayır", "[0/2]", "fig-box3")}${box(370, 190, 85, 44, "→ Evet", "fig-box3", "[1/0]")}`, "Karar ağacı");
   },
 
-  ensemble: () => svg(470, 250, `${DEFS}
-    ${T(10, 18, "Bagging / rastgele orman: paralel, bağımsız")}
-    ${box(10, 30, 70, 34, "veri")}
-    ${[0, 1, 2].map((i) => arrow(80, 47, 120, 25 + i * 22)).join("")}
-    ${[0, 1, 2].map((i) => box(122, 12 + i * 22, 110, 20, `bootstrap ${i + 1} → ağaç`, "fig-box2")).join("")}
-    ${[0, 1, 2].map((i) => arrow(232, 22 + i * 22, 290, 47)).join("")}${box(292, 30, 160, 34, "oy / ortalama", "fig-box3", "varyans ↓")}
-    ${T(10, 128, "Boosting: sıralı, her model öncekinin hatasına odaklanır")}
-    ${box(10, 145, 80, 40, "model 1")}${arrow(90, 165, 125, 165)}${box(125, 145, 80, 40, "model 2", "fig-box", "hataları ağır")}${arrow(205, 165, 240, 165)}${box(240, 145, 80, 40, "model 3")}${arrow(320, 165, 350, 165)}${box(350, 145, 102, 40, "Σ αₜ·hₜ", "fig-box3", "yanlılık ↓")}
-    ${T(235, 225, "AdaBoost: yanlış örneklerin ağırlığını artır · gradyan artırma: kalıntıya yeni ağaç uydur", { anchor: "middle", cls: "fig-sub" })}`, "Topluluk yöntemleri"),
+  ensemble: () => svg(470, 280, `${DEFS}
+    ${T(10, 16, "Bagging / rastgele orman: paralel, bağımsız")}
+    ${box(10, 50, 70, 34, "veri")}
+    ${[0, 1, 2].map((i) => arrow(80, 67, 128, 41 + i * 30)).join("")}
+    ${[0, 1, 2].map((i) => box(130, 28 + i * 30, 140, 26, `örneklem ${i + 1} → ağaç`, "fig-box2")).join("")}
+    ${[0, 1, 2].map((i) => arrow(270, 41 + i * 30, 304, 67)).join("")}${box(306, 50, 150, 34, "oy / ortalama", "fig-box3", "varyans ↓")}
+    ${T(10, 142, "Boosting: sıralı, her model öncekinin hatasına odaklanır")}
+    ${box(10, 160, 80, 40, "model 1")}${arrow(90, 180, 125, 180)}${box(125, 160, 80, 40, "model 2", "fig-box", "hataları ağır")}${arrow(205, 180, 240, 180)}${box(240, 160, 80, 40, "model 3")}${arrow(320, 180, 350, 180)}${box(350, 160, 106, 40, "Σ αₜ·hₜ", "fig-box3", "yanlılık ↓")}
+    ${T(235, 236, "AdaBoost: yanlış örneklerin ağırlığını artırır", { anchor: "middle", cls: "fig-sub" })}${T(235, 256, "Gradyan artırma: kalan hataya (kalıntıya) yeni ağaç uydurur", { anchor: "middle", cls: "fig-sub" })}`, "Topluluk yöntemleri"),
 
   knnidea: () => {
     const P = [[1, 2, 1], [2, 1, 1], [2, 3, 1], [3, 2, 1], [4, 4, -1], [6, 4, -1], [7, 1, -1], [7, 6, -1]];
     const S = 45, ox = 30, oy = 300, X = (v) => ox + v * S, Y = (v) => oy - v * S;
-    let s = `<circle cx="${X(4)}" cy="${Y(3)}" r="${Math.SQRT2 * S}" class="ring"/><circle cx="${X(4)}" cy="${Y(3)}" r="${Math.sqrt(4) * S + 1}" class="ring" style="stroke:var(--s4)"/>`;
+    let s = `<circle cx="${X(4)}" cy="${Y(3)}" r="${1.2 * S}" class="ring"/><circle cx="${X(4)}" cy="${Y(3)}" r="${Math.sqrt(4) * S + 1}" class="ring" style="stroke:var(--s4)"/>`;
     for (const [a, b, y] of P) s += y > 0 ? `<circle cx="${X(a)}" cy="${Y(b)}" r="7" class="pt-pos"/>` : `<rect x="${X(a) - 6}" y="${Y(b) - 6}" width="12" height="12" class="pt-neg"/>`;
     s += `<rect x="${X(4) - 7}" y="${Y(3) - 7}" width="14" height="14" transform="rotate(45 ${X(4)} ${Y(3)})" class="pt-q"/>`;
-    s += T(X(4) + 12, Y(3) + 22, "q") + T(X(5.2), Y(5.3), "k = 1: en yakın tek komşu (−)", { cls: "fig-sub" }) + T(X(5.2), Y(4.9), "k = 3: dairede 2 artı, 1 eksi → +", { cls: "fig-sub" });
-    return svg(370, 320, s, "kNN fikri");
+    s += T(X(4) + 12, Y(3) + 22, "q") + T(10, 326, "İç daire, k = 1: en yakın tek komşu kare (−), karar −", { cls: "fig-sub" }) + T(10, 346, "Dış daire, k = 3: içinde 2 daire (+), 1 kare (−), karar +", { cls: "fig-sub" });
+    return svg(370, 356, s, "kNN fikri");
   },
 };
 
@@ -195,9 +196,9 @@ Object.assign(FIG, {
       const t = (a - m[0]) * v1[0] + (b - m[1]) * v1[1];
       s += `<line x1="${X(a)}" y1="${Y(b)}" x2="${X(m[0] + t * v1[0])}" y2="${Y(m[1] + t * v1[1])}" class="fig-proj"/>` + pt(X(a), Y(b), "pos");
     }
-    s += pt(X(m[0]), Y(m[1]), "q", 4) + T(X(m[0]) + 8, Y(m[1]) + 16, "ortalama", { cls: "fig-sub" });
-    s += T(X(6.9), Y(7.6), "PC1: en çok yayılma (%95)", { cls: "fig-sub" }) + T(X(1.4), Y(5.6), "PC2: dik yön (%5)", { cls: "fig-sub" });
-    return svg(400, 350, s, "PCA eksenleri");
+    s += pt(X(m[0]), Y(m[1]), "q", 4) + pt(250, 344, "q", 4) + T(260, 348, "= verinin ortalaması", { cls: "fig-sub" });
+    s += T(X(6.4), Y(7.55), "PC1: en çok yayılma (%95)", { anchor: "end", cls: "fig-sub" }) + T(X(1.4), Y(5.6), "PC2: dik yön (%5)", { cls: "fig-sub" });
+    return svg(400, 356, s, "PCA eksenleri");
   },
 
   rocex: () => lines({ series: [

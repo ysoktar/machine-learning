@@ -22,7 +22,7 @@ const nice = (lo, hi) => {
  *  rings: names to circle; onclick(x1, x2, event); labels: show names; xlabel, ylabel.
  */
 export function scatter(opts) {
-  const W = 420, H = 340, m = { l: 40, r: 14, t: 12, b: 34 };
+  const W = 420, H = 340, m = { l: 40, r: 14, t: opts.ylabel ? 26 : 12, b: 34 };
   let [x0, x1] = opts.xlim, [y0, y1] = opts.ylim;
   if (opts.equal) {
     // same units per pixel on both axes (margins and right angles look right)
@@ -51,7 +51,7 @@ export function scatter(opts) {
   }
   ax.append(s("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b }), s("line", { x1: m.l, x2: m.l, y1: m.t, y2: H - m.b }));
   if (opts.xlabel) ax.append(s("text", { x: W - m.r, y: H - 4, "text-anchor": "end", class: "lab" }, opts.xlabel));
-  if (opts.ylabel) ax.append(s("text", { x: 6, y: m.t + 4, class: "lab" }, opts.ylabel));
+  if (opts.ylabel) ax.append(s("text", { x: 6, y: 14, class: "lab" }, opts.ylabel));
   svg.append(g, plotArea, ax);
 
   if (opts.shadeFn) {
@@ -115,7 +115,7 @@ export function scatter(opts) {
 
 /** Line chart: series [{pts:[[x,y]...], cls, name}] */
 export function lines(opts) {
-  const W = 420, H = 260, m = { l: 44, r: 14, t: 12, b: 34 };
+  const W = 420, H = 260, m = { l: 44, r: 14, t: opts.ylabel ? 26 : 12, b: 34 };
   const all = opts.series.flatMap((se) => se.pts);
   const [x0, x1] = opts.xlim || [Math.min(...all.map((p) => p[0])), Math.max(...all.map((p) => p[0]))];
   const [y0, y1] = opts.ylim || [Math.min(0, ...all.map((p) => p[1])), Math.max(...all.map((p) => p[1]))];
@@ -128,7 +128,7 @@ export function lines(opts) {
   for (let v = Math.ceil(y0 / sy) * sy; v <= y1 + 1e-9; v += sy) { g.append(s("line", { y1: Y(v), y2: Y(v), x1: m.l, x2: W - m.r })); ax.append(s("text", { x: m.l - 6, y: Y(v) + 4, "text-anchor": "end" }, +v.toFixed(4))); }
   ax.append(s("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b }), s("line", { x1: m.l, x2: m.l, y1: m.t, y2: H - m.b }));
   if (opts.xlabel) ax.append(s("text", { x: W - m.r, y: H - 4, "text-anchor": "end", class: "lab" }, opts.xlabel));
-  if (opts.ylabel) ax.append(s("text", { x: 6, y: m.t + 4, class: "lab" }, opts.ylabel));
+  if (opts.ylabel) ax.append(s("text", { x: 6, y: 14, class: "lab" }, opts.ylabel));
   svg.append(g, ax);
   for (const se of opts.series) {
     svg.append(s("polyline", { points: se.pts.map(([a, b]) => `${X(a)},${Y(b)}`).join(" "), class: se.cls || "curve1" }));

@@ -88,7 +88,7 @@ export function installTermPopover() {
     current = el;
     pop.innerHTML = "";
     const b = document.createElement("strong");
-    b.textContent = el.dataset.term + (el.dataset.en ? ` (İng. ${el.dataset.en})` : "") + ": ";
+    b.textContent = el.dataset.term + (el.dataset.en && el.dataset.en.toLowerCase() !== el.dataset.term.toLowerCase() ? ` (İng. ${el.dataset.en})` : "") + ": ";
     const more = document.createElement("a");
     more.href = "sozluk.html#" + el.dataset.id;
     more.textContent = "Sözlükte aç →";
