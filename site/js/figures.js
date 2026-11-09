@@ -54,9 +54,9 @@ export const FIG = {
   bvcurve: () => {
     const c = range(0, 10, 100);
     return lines({ series: [
-      { pts: c.map((x) => [x, 3 * Math.exp(-0.45 * x) + 0.05]), cls: "curve1", name: "yanlılık²", color: "pos" },
-      { pts: c.map((x) => [x, 0.05 + 0.03 * x * x]), cls: "curve2", name: "varyans", color: "neg" },
-      { pts: c.map((x) => [x, 3 * Math.exp(-0.45 * x) + 0.1 + 0.03 * x * x + 0.4]), cls: "curve3", name: "toplam test hatası (+ gürültü)", color: "s3" },
+      { pts: c.map((x) => [x, 3 * Math.exp(-0.45 * x) + 0.05]), cls: "curve1", name: "yanlılık² (Bias²)", color: "pos" },
+      { pts: c.map((x) => [x, 0.05 + 0.03 * x * x]), cls: "curve2", name: "varyans (Var)", color: "neg" },
+      { pts: c.map((x) => [x, 3 * Math.exp(-0.45 * x) + 0.1 + 0.03 * x * x + 0.4]), cls: "curve3", name: "toplam test hatası (+ gürültü σ²)", color: "s3" },
     ], xlim: [0, 10], ylim: [0, 3.6], xstep: 2, ystep: 1, xlabel: "model karmaşıklığı →", ylabel: "hata", aria: "Yanlılık varyans" });
   },
 

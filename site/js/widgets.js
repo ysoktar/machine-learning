@@ -130,11 +130,14 @@ W.finds = () => {
   return el;
 };
 
-// polynomial fit (bias–variance in one picture)
+// polynomial fit (bias–variance in one picture). Fitted in u = 2x − 1 ∈ [−1, 1]: with raw x ∈ [0, 1] the degree-9
+// normal equations are too ill-conditioned for double precision and the solver gave up (flat zero curve).
 function polyfit(xs, ys, deg, lambda = 0) {
-  const A = Array.from({ length: deg + 1 }, (_, i) => Array.from({ length: deg + 1 }, (_, j) => ml.sum(xs.map((x) => x ** (i + j))) + (i === j && i > 0 ? lambda : 0)));
-  const b = Array.from({ length: deg + 1 }, (_, i) => ml.sum(xs.map((x, k) => x ** i * ys[k])));
-  return ml.solve(A, b) || Array(deg + 1).fill(0);
+  const us = xs.map((x) => 2 * x - 1);
+  const A = Array.from({ length: deg + 1 }, (_, i) => Array.from({ length: deg + 1 }, (_, j) => ml.sum(us.map((u) => u ** (i + j))) + (i === j && i > 0 ? lambda : 0)));
+  const b = Array.from({ length: deg + 1 }, (_, i) => ml.sum(us.map((u, k) => u ** i * ys[k])));
+  const c = ml.solve(A, b) || Array(deg + 1).fill(0);
+  return (x) => c.reduce((s, ci, k) => s + ci * (2 * x - 1) ** k, 0);
 }
 W.polyfit = () => {
   const { el, body } = frame("Ezber mi, öğrenme mi? Polinom derecesi ve hata");
@@ -147,18 +150,18 @@ W.polyfit = () => {
   const lam = select("Düzenlileştirme λ: ", [["0", "0"], ["0.0001", "0.0001"], ["0.01", "0.01"], ["1", "1"]], "0");
   const out = outBox();
   body.append(h("div", { class: "controls" }, h("label", {}, "Derece M: ", deg, h("b", { class: "mval" }, "3")), lam.label), out);
-  const rmse = (c, d) => Math.sqrt(ml.mean(d.map(([x, y]) => (y - c.reduce((s, ci, i) => s + ci * x ** i, 0)) ** 2)));
+  const rmse = (p, d) => Math.sqrt(ml.mean(d.map(([x, y]) => (y - p(x)) ** 2)));
   live(body, () => {
     const M = Number(deg.value);
     $(".mval", body).textContent = " " + M;
     const L = Number(lam.get());
-    const curve = (c) => Array.from({ length: 121 }, (_, i) => { const x = i / 120; return [x, c.reduce((s, ci, k) => s + ci * x ** k, 0)]; });
+    const curve = (p) => Array.from({ length: 241 }, (_, i) => { const x = i / 240; return [x, p(x)]; });
     const c = polyfit(tr.map((p) => p[0]), tr.map((p) => p[1]), M, L);
     const errs = Array.from({ length: 10 }, (_, m) => { const cm = polyfit(tr.map((p) => p[0]), tr.map((p) => p[1]), m, L); return [m, rmse(cm, tr), rmse(cm, te)]; });
     const fit = lines({ series: [
       { pts: Array.from({ length: 121 }, (_, i) => [i / 120, truth(i / 120)]), cls: "curve3", name: "gerçek f(x) = sin 2πx", color: "s3" },
       { pts: curve(c), cls: "curve1", name: `M = ${M} polinomu`, color: "pos" },
-      { pts: tr, cls: "curve2", dots: true, name: "10 eğitim noktası (çizgi yalnız sıra)", color: "neg" },
+      { pts: tr, cls: "curve2", dots: true, noLine: true, name: "10 eğitim noktası", color: "neg" },
     ], xlim: [0, 1], ylim: [-1.8, 1.8], xlabel: "x", ylabel: "t", aria: "Polinom uydurma" });
     const err = lines({ series: [
       { pts: errs.map((e) => [e[0], e[1]]), cls: "curve1", name: "eğitim RMSE", color: "pos" },

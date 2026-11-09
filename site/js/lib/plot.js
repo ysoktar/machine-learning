@@ -120,7 +120,8 @@ export function lines(opts) {
   const [x0, x1] = opts.xlim || [Math.min(...all.map((p) => p[0])), Math.max(...all.map((p) => p[0]))];
   const [y0, y1] = opts.ylim || [Math.min(0, ...all.map((p) => p[1])), Math.max(...all.map((p) => p[1]))];
   const X = (v) => m.l + ((v - x0) / (x1 - x0 || 1)) * (W - m.l - m.r);
-  const Y = (v) => H - m.b - ((Math.min(Math.max(v, y0), y1) - y0) / (y1 - y0 || 1)) * (H - m.t - m.b);
+  // curves are clipped at the plot edge (not flattened onto it); values far outside are capped so the path stays sane
+  const Y = (v) => H - m.b - ((Math.min(Math.max(v, y0 - 10 * (y1 - y0)), y1 + 10 * (y1 - y0)) - y0) / (y1 - y0 || 1)) * (H - m.t - m.b);
   const svg = s("svg", { viewBox: `0 0 ${W} ${H}`, class: "plot", role: "img", "aria-label": opts.aria || "Grafik" });
   const g = s("g", { class: "grid" }), ax = s("g", { class: "axis" });
   const sx = opts.xstep ?? nice(x0, x1), sy = opts.ystep ?? nice(y0, y1);
@@ -129,10 +130,13 @@ export function lines(opts) {
   ax.append(s("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b }), s("line", { x1: m.l, x2: m.l, y1: m.t, y2: H - m.b }));
   if (opts.xlabel) ax.append(s("text", { x: W - m.r, y: H - 4, "text-anchor": "end", class: "lab" }, opts.xlabel));
   if (opts.ylabel) ax.append(s("text", { x: 6, y: 14, class: "lab" }, opts.ylabel));
-  svg.append(g, ax);
+  const clipId = "l" + Math.random().toString(36).slice(2);
+  svg.append(s("defs", {}, s("clipPath", { id: clipId }, s("rect", { x: m.l, y: m.t - 4, width: W - m.l - m.r + 4, height: H - m.t - m.b + 8 }))));
+  const area = s("g", { "clip-path": `url(#${clipId})` });
+  svg.append(g, ax, area);
   for (const se of opts.series) {
-    svg.append(s("polyline", { points: se.pts.map(([a, b]) => `${X(a)},${Y(b)}`).join(" "), class: se.cls || "curve1" }));
-    if (se.dots) for (const [a, b] of se.pts) svg.append(s("circle", { cx: X(a), cy: Y(b), r: 3, class: (se.cls || "curve1") + "-dot", fill: "currentColor", style: "fill: var(--text-2)" }));
+    if (!se.noLine) area.append(s("polyline", { points: se.pts.map(([a, b]) => `${X(a)},${Y(b)}`).join(" "), class: se.cls || "curve1" }));
+    if (se.dots) for (const [a, b] of se.pts) area.append(s("circle", { cx: X(a), cy: Y(b), r: se.noLine ? 4 : 3, class: (se.cls || "curve1") + "-dot", fill: "currentColor", style: se.noLine ? `fill: var(--${se.color || "neg"})` : "fill: var(--text-2)" }));
   }
   const legend = h("div", { class: "legend" }, opts.series.filter((se) => se.name).map((se) => h("span", {}, h("i", { style: { background: `var(--${se.color || "pos"})` } }), se.name)));
   return h("div", {}, svg, legend);
