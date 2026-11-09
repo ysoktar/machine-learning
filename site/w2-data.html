@@ -273,13 +273,13 @@
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Metrik seçerken önce “hangi hata daha pahalı?” sorusunu cevaplarız; doğru metrik oradan çıkar.</p><p>(a) Acil bir hastayı kaçırmak (FN) çok pahalıdır, gereksiz yere doktora göndermek (FP) ise ucuzdur. Bu yüzden kaçırılanları cezalandıran <strong>recall</strong> önemlidir.</p><p>(b) Gerçek bir iş e-postasını spam diye silmek (FP) pahalıdır, birkaç spamin gelen kutusuna düşmesi kabul edilebilir. Bu yüzden yanlış alarmları cezalandıran <strong>precision</strong> önemlidir.</p><p>(c) Burada tek bir eşik değil, bir sıralama kararı veriyoruz. Modelin pozitifleri negatiflerin önüne ne kadar iyi dizdiğini ölçen <strong>ROC-AUC</strong> (ya da en üstteki %10'daki precision) uygundur.</p></div></details>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
-<li>FP ile FN'yi karıştırmak: FN = <em>gerçekte pozitif</em> ama negatif denmiş (kaçırılan).</li>
-<li>Precision'ı satırdan (TP/(TP+FN)) hesaplamak: o recall'dır.</li>
-<li>z-score için σ hesaplarken kare toplamını n − 1'e bölmek; ders veri sayısı n'ye böler. PCA'daki kovaryansta ise n − 1 kullanılır.</li>
-<li>Test değerini ölçeklerken test verisinin min/max/μ'sünü kullanmak (sızıntı).</li>
-<li>AUC'yi accuracy ile karıştırmak; AUC eşikten bağımsızdır.</li>
-<li>Dengesiz veride yalnız accuracy raporlamak; çoğunluk sınıfı taban çizgisini unutmak.</li>
-<li>CV'den sonra kat modellerinden birini seçmek: son model <em>bütün</em> eğitim verisiyle yeniden eğitilir.</li>
+<li><strong>FP ile FN'yi karıştırmak.</strong> FN (yanlış negatif), gerçekte pozitif olduğu hâlde negatif denmiş, yani kaçırılmış örnektir. FP (yanlış pozitif), gerçekte negatif olduğu hâlde pozitif denmiş, yani yanlış alarmdır.</li>
+<li><strong>Precision'ı yanlış payda ile hesaplamak.</strong> Precision'ın paydasında modelin pozitif dediği örnekler vardır: TP/(TP + FP). TP/(TP + FN) recall'dur.</li>
+<li><strong>z-score için σ'yı n − 1'e bölerek hesaplamak.</strong> Bu derste z-score'da farkların kare toplamı veri sayısı n'ye bölünür. PCA'daki kovaryansta ise n − 1 kullanılır.</li>
+<li><strong>Test değerini ölçeklerken test verisinin min, max ya da μ'sünü kullanmak.</strong> Ölçekleme değerleri yalnız eğitim verisinden öğrenilir; test verisinin kendi değerlerini kullanmak sızıntıdır.</li>
+<li><strong>AUC'yi accuracy ile karıştırmak.</strong> Accuracy tek bir eşikteki doğru tahmin oranıdır. AUC ise bütün eşiklere bakar ve modelin pozitifleri negatiflerin önüne ne kadar iyi sıraladığını ölçer.</li>
+<li><strong>Dengesiz veride yalnız accuracy raporlamak.</strong> Örneklerin %98'i negatifse hiçbir şey öğrenmeden “hepsi negatif” demek bile %98 accuracy verir. Precision, recall, F1 de raporlanmalı ve sonuç bu çoğunluk sınıfı taban çizgisiyle karşılaştırılmalıdır.</li>
+<li><strong>Çapraz doğrulamadan sonra kat modellerinden birini son model olarak seçmek.</strong> Çapraz doğrulama yalnız ayarları seçmek ve başarımı tahmin etmek içindir; seçilen ayarlarla son model <em>bütün</em> eğitim verisiyle yeniden eğitilir.</li>
 </ul>
 
 <h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>

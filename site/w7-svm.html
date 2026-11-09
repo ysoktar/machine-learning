@@ -101,12 +101,12 @@
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Çekirdek, iki noktanın daha yüksek boyutlu bir uzaydaki iç çarpımını, o uzaya hiç geçmeden hesaplamanın yoludur.</p><p>(a) x·z = 1 × 2 + 1 × 0 = 2, çekirdek değeri 2² = <strong>4</strong>. Denetlemek için iki noktayı açıkça 3 boyutlu uzaya taşıyalım: φ(x) = (1, 1.414, 1), φ(z) = (4, 0, 0). Bunların iç çarpımı 1 × 4 = 4: aynı sonuç. Çekirdek bize bu sayıyı φ'yi hesaplamadan verdi.</p><p>(b) RBF çekirdeği exp(−γ‖x − z‖²)'dir. γ = 0.5 için e⁻⁰·⁵ = <strong>0.607</strong>, γ = 2 için e⁻² = <strong>0.135</strong>. γ büyüdükçe benzerlik daha hızlı düşer; yani her destek vektörü yalnız çok yakınındaki bölgeyi etkiler.</p><p>(c) İkil biçimde hem eğitim hem tahmin, veriyi yalnız iki nokta arasındaki iç çarpımlar (xᵢ·xⱼ) üzerinden kullanır. Her iç çarpımı bir çekirdek değeriyle değiştirmek, SVM'yi φ'nin tanımladığı yüksek boyutlu uzayda eğitmekle aynı şeydir.</p></div></details>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
-<li>Destek vektörlerini seçip çözdükten sonra diğer noktaları denetlememek (y·f ≥ 1 olmalı).</li>
-<li>Negatif destek vektöründe w·x + b = <strong>−1</strong> yerine +1 yazmak.</li>
-<li>Marjı 2/‖w‖ yazmak: marj 1/‖w‖, 2/‖w‖ sokak genişliği.</li>
-<li>C'nin yönünü ters söylemek: C büyüdükçe marj daralır, destek vektörü azalır, yanlılık düşer ve varyans artar.</li>
-<li>Ölçeklemeden RBF kullanmak.</li>
-<li>ξ'yi yanlış tarafta olmayan noktalar için hep 0 sanmak: sokağın içindeki doğru taraftaki noktada 0 &lt; ξ &lt; 1.</li>
+<li><strong>Destek vektörlerinden w ve b'yi bulup diğer noktaları denetlememek.</strong> Bulunan çözümde bütün noktalar için y·(w·x + b) ≥ 1 sağlanmalıdır; sağlanmıyorsa seçilen destek vektörleri yanlıştır.</li>
+<li><strong>Negatif destek vektörünün denklemini +1'e eşitlemek.</strong> Negatif sınıftaki destek vektörlerinde w·x + b = <strong>−1</strong>'dir.</li>
+<li><strong>Marjı 2/‖w‖ yazmak.</strong> Marj, sınırdan sokağın bir kenarına olan uzaklıktır: 1/‖w‖. 2/‖w‖ sokağın tamamının genişliğidir.</li>
+<li><strong>C'nin etkisini ters söylemek.</strong> C büyüdükçe ihlaller pahalılaşır: marj daralır, destek vektörü sayısı azalır, yanlılık düşer ve varyans artar.</li>
+<li><strong>Ölçekleme yapmadan RBF çekirdeği kullanmak.</strong> RBF uzaklığa dayandığı için ölçeği büyük olan öznitelik sonucu belirler; önce öznitelikler ölçeklenmelidir.</li>
+<li><strong>Doğru taraftaki her noktada ξ'nin 0 olduğunu sanmak.</strong> ξ = max(0, 1 − y·f(x))'tir. Nokta doğru tarafta ama sokağın içindeyse (0 &lt; y·f &lt; 1) ξ 0 ile 1 arasında bir değer alır.</li>
 </ul>
 
 <h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>

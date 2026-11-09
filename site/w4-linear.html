@@ -170,14 +170,14 @@
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>(a) NAND, AND'in tersidir: yalnız iki girdi de 1 iken 0 verir. AND için w = (1, 1), b = −1.5 kullanılır; bütün işaretleri ters çevirince NAND elde edilir: w = (−1, −1), <strong>b = 1.5</strong>. Denetim: (1, 1) için z = −0.5 < 0, çıktı 0; diğer üç girdide z en az 0.5, çıktı 1.</p><p>(b) XOR'un (0, 1) ve (1, 0) için 1 vermesi gerekir; bu, w₂ + b ≥ 0 ve w₁ + b ≥ 0 demektir. (0, 0) için 0 vermesi b < 0, (1, 1) için 0 vermesi w₁ + w₂ + b < 0 demektir. İlk iki eşitsizliği toplarsak w₁ + w₂ + 2b ≥ 0, yani w₁ + w₂ + b ≥ −b elde ederiz. b negatif olduğu için −b pozitiftir; dolayısıyla w₁ + w₂ + b pozitif çıkar. Bu, son koşulla çelişir. Demek ki hiçbir w₁, w₂, b XOR'u veremez; bunun için gizli katmanlı bir ağ gerekir (8. hafta).</p></div></details>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
-<li>Perceptron'da z = 0'ı −1 saymak (kural z ≥ 0 ise +1 demektir).</li>
-<li>Doğru sınıflanan örnekte de güncelleme yapmak.</li>
-<li>Perceptron güncellemesinde y'yi unutmak: w ← w + η<strong>y</strong>x (negatif örnekte çıkarılır).</li>
-<li>Lojistik adımda w ← w <strong>+</strong> η(p − y)x yazmak (eksi olmalı).</li>
-<li>Epoch sonundaki karmaşıklık matrisini epoch içindeki tahminlerden kurmak (son ağırlıklarla yeniden sınıflayın).</li>
-<li>Sigmoid değerini tablodan yanlış okumak: σ(z) = 1/(1 + e⁻ᶻ); e⁻ᶻ tabloda, σ değil.</li>
-<li>Lasso/ridge farkında “ikisi de sıfıra indirir” demek (yalnız lasso).</li>
-<li>scikit-learn'de C'yi λ sanmak: C = 1/λ, büyük C az düzenlileştirme.</li>
+<li><strong>Perceptron'da z = 0'ı −1 saymak.</strong> Bu dersteki kural “z ≥ 0 ise +1” der; z tam 0 çıkarsa tahmin +1'dir.</li>
+<li><strong>Doğru sınıflanan örnekte de güncelleme yapmak.</strong> Perceptron yalnız yanlış sınıflanan örneklerde ağırlıkları değiştirir.</li>
+<li><strong>Perceptron güncellemesinde y'yi unutmak.</strong> Kural w ← w + η·<strong>y</strong>·x'tir: pozitif örnekte (y = +1) x eklenir, negatif örnekte (y = −1) çıkarılır.</li>
+<li><strong>Lojistik regresyonda gradyanın işaretini karıştırmak.</strong> Kaybı azaltmak için gradyanın tersine gidilir: w ← w <strong>−</strong> η·(p − y)·x. Artı yazmak kaybı artırır.</li>
+<li><strong>Epoch sonundaki karmaşıklık matrisini epoch içindeki tahminlerden kurmak.</strong> Epoch sırasında ağırlıklar değiştiği için o tahminler son modelin tahminleri değildir; bütün örnekler son ağırlıklarla yeniden sınıflandırılmalıdır.</li>
+<li><strong>Sigmoid değerini tablodan yanlış okumak.</strong> Sınavdaki tablo genelde e⁻ᶻ'yi verir, σ'yı değil; önce e⁻ᶻ okunur, sonra σ(z) = 1/(1 + e⁻ᶻ) hesaplanır.</li>
+<li><strong>Ridge ile lasso'nun ikisinin de katsayıları sıfıra indirdiğini söylemek.</strong> Yalnız lasso bazı katsayıları tam olarak sıfır yapar; ridge katsayıları küçültür ama genelde sıfır yapmaz.</li>
+<li><strong>scikit-learn'deki C'yi λ sanmak.</strong> C = 1/λ'dır: büyük C az düzenlileştirme (daha esnek model), küçük C çok düzenlileştirme demektir.</li>
 </ul>
 
 <h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>

@@ -150,13 +150,13 @@
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Hamming uzaklığında iki kaydı öznitelik öznitelik karşılaştırıp farklı olanları sayarız; uzaklık 1, yalnız bir öznitelikte fark var demektir.</p><p>(a) En yakın uzaklıkta (1) tek bir başvuru değil beş başvuru var. k = 1 için hangisinin “en yakın” olduğu belli değildir, yani karar <strong>tanımsızdır</strong>. Böyle durumlarda bir kural koymak gerekir: rastgele seçmek, en küçük kayıt numarasını almak ya da eşit uzaklıktaki hepsini saymak.</p><p>(b) k = 5 tam bu beş başvuruyu kapsar: üç Hayır, iki Evet. Çoğunluk kararı <strong>Hayır</strong>dır.</p></div></details>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
-<li>k = 1'in eğitim doğruluğuna (hep %100) bakıp k seçmek.</li>
-<li>Ölçek farkı olan özniteliklerde z-score yapmadan uzaklık hesaplamak.</li>
-<li>Sorguyu z-score'larken test/sorgu değerlerinden yeni μ, σ hesaplamak.</li>
-<li>Manhattan'da da d² ile sıralamak (L1'de kare alınmaz).</li>
-<li>k. sıradaki eşitliği görmezden gelmek: yazın ve kuralı belirtin.</li>
-<li>“Daha çok veri” her soruna çare sanmak: yetersiz uyumda (yanlılık) işe yaramaz.</li>
-<li>Yanlılığı “hata”, varyansı “gürültü” ile karıştırmak: gürültü σ² ayrı, azaltılamaz terimdir.</li>
+<li><strong>k'yı eğitim doğruluğuna bakarak seçmek.</strong> k = 1'de her eğitim noktasının en yakın komşusu kendisidir, bu yüzden eğitim doğruluğu her zaman %100 çıkar ve hiçbir şey söylemez. k, doğrulama kümesiyle ya da birini dışarıda bırakma (LOO) ile seçilmelidir.</li>
+<li><strong>Ölçekleri çok farklı özniteliklerde z-score yapmadan uzaklık hesaplamak.</strong> Örneğin gelir binlerle, yaş onlarla ölçülüyorsa uzaklığı neredeyse yalnız gelir belirler. Önce her sütun z = (x − μ)/σ ile ölçeklenmelidir.</li>
+<li><strong>Sorguyu ölçeklerken onun için yeni μ ve σ hesaplamak.</strong> Sorgu noktası da eğitim verisinin μ ve σ değerleriyle ölçeklenir; sorgunun ya da test verisinin kendi ortalaması kullanılmaz.</li>
+<li><strong>Soru Manhattan uzaklığını istediği hâlde farkların karesini almak.</strong> Öklid'de sıralama için d² = (x₁ − q₁)² + (x₂ − q₂)² kullanmak doğrudur. Manhattan'da ise farkların mutlak değerleri toplanır, kare alınmaz: d = |x₁ − q₁| + |x₂ − q₂|. İkisi farklı komşu sırası verebilir. Örneğin q = (0, 0) için A = (3, 0) ve B = (2, 2): kareli hesapta A 9, B 8 (B daha yakın), Manhattan'da A 3, B 4 (A daha yakın).</li>
+<li><strong>k'ıncı sıradaki eşitliği görmezden gelmek.</strong> k'ıncı ve (k + 1)'inci komşu aynı uzaklıktaysa hangisinin sayılacağı belirsizdir. Bunu cevapta yazın ve hangi kuralı uyguladığınızı belirtin (örneğin alfabetik sıra ya da ikisini de saymak).</li>
+<li><strong>“Daha çok veri” her soruna çare sanmak.</strong> Veri eklemek varyansı (aşırı uyumu) azaltır. Model fazla basitse (yetersiz uyum, yüksek yanlılık) daha çok veri işe yaramaz; daha esnek bir model ya da daha iyi öznitelikler gerekir.</li>
+<li><strong>Yanlılık, varyans ve gürültüyü karıştırmak.</strong> Yanlılık modellerin ortalamasının gerçekten sistematik sapması, varyans modellerin veriye göre dağınıklığıdır. Gürültü (σ²) bunlardan ayrı, etiketlerin kendisindeki rastgelelikten gelen ve hiçbir modelin azaltamayacağı hatadır.</li>
 </ul>
 
 <h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>

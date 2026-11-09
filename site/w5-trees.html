@@ -131,13 +131,13 @@
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Veride 5 Evet ve 3 Hayır var: H(D) = H(3/8) ≈ 0.954. Kök için iki özniteliğin kazancını karşılaştırıyoruz.</p><p>Yaş'a göre bölersek genç dalında A ve D (ikisi de Hayır, saf), yaşlı dalında C, F ve H (hepsi Evet, saf), orta yaşlı dalında B, E ve G (2 Evet, 1 Hayır, entropi 0.918) kalır. Ağırlıklı entropi (3/8)·0.918 ≈ 0.344, kazanç ≈ <strong>0.610</strong>.</p><p>Bakiye'ye göre bölersek düşük dalı A, B, C (1 Evet, 2 Hayır), orta dalı D, E, F (2 Evet, 1 Hayır) ikisi de karışık (0.918), yüksek dalı G, H saf. Ağırlıklı entropi ≈ 0.689, kazanç ≈ 0.266. Kök <strong>Yaş</strong> olur.</p><p>Tek karışık dal orta yaşlılar dalıdır ve orada yalnız Bakiye kalır: düşük bakiyeli B Hayır, orta ve yüksek bakiyeli E ile G Evet; iki dal da saf. Ağaç: Yaş genç ise Hayır, yaşlı ise Evet, orta yaşlı ise Bakiye'ye bak (bakiye düşükse Hayır, değilse Evet). (yüksek, genç) müşteri genç dalına düşer: karar <strong>Hayır</strong>; bakiye hiç sorulmaz.</p></div></details>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
-<li>Ağırlıklı entropide n_dal/n çarpanını unutmak.</li>
-<li>Alt dalda bütün verinin entropisiyle (H(D)) hesap yapmak: o dalın kendi H'si kullanılır.</li>
-<li>Bilgi kazancında en küçüğü seçmek (en büyük seçilir); Gini'de ise <em>ağırlıklı Gini</em> en küçük olan seçilir.</li>
-<li>Kökte kullanılan kategorik özniteliği alt dalda yeniden aday yapmak.</li>
-<li>log₂ değerlerini tablodan almayıp ezberden yanlış yazmak; 0·log 0 için “tanımsız” demek (0'dır).</li>
-<li>Sürekli eşiği değerin kendisine koymak (orta nokta alınır).</li>
-<li>Ağacı çizerken dal değerlerini ya da yaprak sınıflarını yazmamak.</li>
+<li><strong>Ağırlıklı entropide dalların payını unutmak.</strong> Her dalın entropisi, o dala düşen örneklerin oranıyla (n_dal/n) çarpılıp toplanmalıdır; yalnız entropileri toplamak yanlıştır.</li>
+<li><strong>Alt dalda bütün verinin entropisini kullanmak.</strong> Bir alt düğümde kazanç hesaplarken başlangıç entropisi o düğümün kendi örneklerinden hesaplanır, H(D)'den değil.</li>
+<li><strong>Bilgi kazancında en küçüğü seçmek.</strong> Kazanç belirsizliğin ne kadar azaldığıdır; en büyük kazanç seçilir. Gini kullanılıyorsa bölme sonrasındaki ağırlıklı Gini'si en küçük olan seçilir.</li>
+<li><strong>Kökte kullanılmış kategorik özniteliği alt dalda yeniden aday yapmak.</strong> O dalda bütün örneklerin bu öznitelikteki değeri zaten aynıdır; yeniden bölmek hiçbir şey kazandırmaz.</li>
+<li><strong>log₂ değerlerini ezberden yazmak ve 0·log 0'ı tanımsız saymak.</strong> log₂ değerleri sınavda verilen tablodan okunmalıdır. Bir sınıfın oranı 0 ise o terim 0 kabul edilir (0·log 0 = 0).</li>
+<li><strong>Sayısal bir öznitelikte eşiği değerlerin kendisine koymak.</strong> Aday eşikler ardışık iki değerin orta noktasıdır, örneğin 3 ile 5 için 4.</li>
+<li><strong>Ağacı çizerken dalların ve yaprakların etiketlerini yazmamak.</strong> Her dalın üzerine o dalın değerini, her yaprağa da tahmin ettiği sınıfı yazmak puanın bir parçasıdır.</li>
 </ul>
 
 <h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>

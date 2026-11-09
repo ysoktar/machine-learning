@@ -168,11 +168,11 @@
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Bir modeli değerlendirirken iki hataya birlikte bakarız: eğitim hatası modelin gördüğü veriye ne kadar uyduğunu, test hatası görmediği veride ne kadar iyi olduğunu söyler.</p><p>(a) M = 0 ve M = 1'de iki hata da yüksek ve birbirine yakın: model eğriyi yakalayamayacak kadar basit, yani <strong>yetersiz uyum</strong> var. M = 9'da eğitim hatası 0 ama test hatası 0.90: model 10 noktanın hepsinden, gürültüleriyle birlikte geçmiş, yani <strong>aşırı uyum</strong> var. Test hatası en düşük olan <strong>M = 3</strong> seçilir.</p><p>(b) 100 noktayla 9. derece bir polinom artık her noktadan geçemez; çok sayıda nokta eğriyi gerçek şekle doğru sabitler. Böylece modelin veriye göre oynaması (varyansı) azalır ve test hatası gürültü düzeyine yaklaşır.</p><p>(c) Dereceyi değiştirmeden şunlar yapılabilir: büyük katsayıları cezalandıran düzenlileştirme kullanmak, daha çok veri toplamak, bir doğrulama kümesiyle eğitimi erken durdurmak ya da birden çok modelin ortalamasını almak.</p></div></details>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
-<li>Hipotez sayarken Ø'lu hipotezleri ayrı ayrı saymak (hepsi tek bir boş kavramdır: <strong>+1</strong>).</li>
-<li>Örnek sayısıyla hipotez sayısını karıştırmak: örnek = ∏kᵢ, hipotez = 1 + ∏(kᵢ + 1).</li>
-<li>Find-S'te negatif örnekte hipotezi değiştirmek.</li>
-<li>Pekiştirmeli öğrenmeyi “etiketli veri” ile tanımlamak: etiket yok, <em>ödül</em> var.</li>
-<li>Kalan süre ya da sayı tahminini sınıflandırma sanmak: hedef sürekli ya da sayısal bir değerse problem regresyondur.</li>
+<li><strong>Hipotez sayarken Ø içeren hipotezleri ayrı ayrı saymak.</strong> İçinde Ø bulunan her hipotez hiçbir günü kabul etmez; hepsi aynı “boş” kavramdır. Bu yüzden toplamın sonuna yalnız <strong>+1</strong> eklenir.</li>
+<li><strong>Örnek sayısıyla hipotez sayısını karıştırmak.</strong> Örnek (gün) sayısı her özniteliğin değer sayısının çarpımıdır: ∏kᵢ. Hipotez sayısında her özniteliğe bir de “?” seçeneği eklenir ve boş hipotez sayılır: 1 + ∏(kᵢ + 1).</li>
+<li><strong>Find-S'te negatif bir örnek gelince hipotezi değiştirmek.</strong> Find-S yalnız pozitif örneklerde hipotezi genelleştirir; negatif örnekleri tamamen yok sayar.</li>
+<li><strong>Pekiştirmeli öğrenmeyi “etiketli veri” ile tanımlamak.</strong> Pekiştirmeli öğrenmede doğru cevabı söyleyen etiket yoktur; ajan davranışlarının sonucunda bir <em>ödül</em> (ya da ceza) alır ve ödülü artırmayı öğrenir.</li>
+<li><strong>Sayı tahminini sınıflandırma sanmak.</strong> Hedef bir kategori değil de sürekli bir sayıysa (kalan süre, fiyat, sıcaklık) problem regresyondur.</li>
 </ul>
 
 <h2>Kendini sına: kısa sorular</h2><p class="h-en" lang="en">Self-check: short questions</p>
