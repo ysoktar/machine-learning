@@ -107,17 +107,25 @@ export const FIG = {
   },
 
   street: () => {
-    // boundary x1 + x2 = 2.5 on a 0..4 grid
-    const S = 70, ox = 40, oy = 300, X = (v) => ox + v * S, Y = (v) => oy - v * S;
-    const line = (c) => `<line x1="${X(-0.3)}" y1="${Y(c + 0.3)}" x2="${X(c + 0.3)}" y2="${Y(-0.3)}"`;
-    const pts = [[2, 2, 1, true], [3, 1, 1, true], [3.3, 2.6, 1, false], [0, 0, -1, false], [1, 0, -1, true], [0.2, 1, -1, false]];
-    let s = `${DEFS}<polygon points="${X(-0.3)},${Y(1.8)} ${X(1.8)},${Y(-0.3)} ${X(3.5)},${Y(-0.3)} ${X(-0.3)},${Y(3.5)}" class="fig-street"/>`;
-    s += `${line(2.5)} class="line"/>${line(1.5)} class="line dash"/>${line(3.5)} class="line dash"/>`;
+    // w = (2/3, 2/3), b = −5/3: boundary x₁ + x₂ = 2.5, street edges x₁ + x₂ = 1 (score −1) and x₁ + x₂ = 4 (score +1).
+    // The edges pass exactly through the support vectors (1, 0) and (2, 2), (3, 1); the margin is their distance to the boundary.
+    const S = 60, ox = 30, oy = 345, lo = -0.3, hi = 4.6, X = (v) => ox + v * S, Y = (v) => oy - v * S;
+    // segment of x₁ + x₂ = c inside the square [lo, hi]²
+    const seg = (c) => { const a = [Math.max(lo, c - hi), Math.min(hi, c - lo)]; return [[a[0], c - a[0]], [a[1], c - a[1]]]; };
+    const line = (c, cls) => { const [[x1, y1], [x2, y2]] = seg(c); return `<line x1="${X(x1)}" y1="${Y(y1)}" x2="${X(x2)}" y2="${Y(y2)}" class="${cls}"/>`; };
+    const [[a1, b1], [a2, b2]] = seg(1), [[c1, d1], [c2, d2]] = seg(4);
+    let s = `${DEFS}<polygon points="${X(a1)},${Y(b1)} ${X(a2)},${Y(b2)} ${X(c2)},${Y(d2)} ${X(c1)},${Y(d1)}" class="fig-street"/>`;
+    s += line(2.5, "line") + line(1, "line dash") + line(4, "line dash");
+    const pts = [[2, 2, 1, true], [3, 1, 1, true], [3.6, 2.6, 1, false], [0, 0, -1, false], [1, 0, -1, true], [0.1, 0.6, -1, false]];
     for (const [a, b, y, sv] of pts) s += (y > 0 ? `<circle cx="${X(a)}" cy="${Y(b)}" r="7" class="pt-pos"/>` : `<rect x="${X(a) - 6}" y="${Y(b) - 6}" width="12" height="12" class="pt-neg"/>`) + (sv ? `<circle cx="${X(a)}" cy="${Y(b)}" r="12" class="sv"/>` : "");
-    s += `<line x1="${X(1)}" y1="${Y(0)}" x2="${X(1.5)}" y2="${Y(0.5)}" class="fig-arrow" marker-end="url(#ah)"/>${T(X(1.32), Y(0.15), "marj 1/‖w‖", { cls: "fig-sub" })}`;
-    s += T(X(2.75), Y(-0.05), "w·x + b = −1", { cls: "fig-sub" }) + T(X(3.05), Y(0.5), "w·x + b = 0", { cls: "fig-sub" }) + T(X(3.2), Y(1.2), "w·x + b = +1", { cls: "fig-sub" });
-    s += T(X(2.6), Y(3.6), "halkalı = destek vektörü", { cls: "fig-sub" });
-    return svg(360, 340, s, "SVM sokağı");
+    // margin: from the support vector (1, 0) perpendicular to the boundary, ending on it at (1.75, 0.75)
+    s += `<line x1="${X(1.1)}" y1="${Y(0.1)}" x2="${X(1.75)}" y2="${Y(0.75)}" class="fig-arrow" marker-end="url(#ah)"/>`;
+    s += T(X(1.35), Y(-0.2), "marj = 1/‖w‖", { cls: "fig-sub" });
+    // each line labelled at its lower-right end
+    s += T(X(-0.22), Y(1.42), "−1", { cls: "fig-sub" }) + T(X(-0.22), Y(2.92), "0 (sınır)", { cls: "fig-sub" }) + T(X(-0.22), Y(4.42), "+1", { cls: "fig-sub" });
+    s += T(X(-0.3), 20, "çizgilerin ucundaki sayı: o çizgide w·x + b değeri", { cls: "fig-sub" });
+    s += T(X(-0.3), 40, "halkalı noktalar destek vektörüdür", { cls: "fig-sub" });
+    return svg(350, 370, s, "SVM sokağı");
   },
 
   tree: () => {
