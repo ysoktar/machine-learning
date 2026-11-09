@@ -8,8 +8,9 @@ const SKIP = "h1, h2, h3, h4, .h-en, .en-tag, a, code, pre, button, summary, tex
 const L = "\\p{L}\\p{N}";
 
 /**
- * Underline glossary terms. A term is underlined at its first use in every section (h2) of the page, so a reader who
- * jumps into the middle of a page still gets help. Terms taught in an earlier week are assumed known: on a later
+ * Underline glossary terms. A term is underlined at its first use in every section (h2) of the page, and again at its
+ * first use inside each self-contained box (solution, problem, tip, quiz…), so a reader who jumps into the middle of a
+ * page still gets help. Terms taught in an earlier week are assumed known: on a later
  * page they are underlined only once.
  */
 export function annotateTerms(root, pageWeek = 0, pageId = "") {
@@ -35,6 +36,15 @@ export function annotateTerms(root, pageWeek = 0, pageId = "") {
       return n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
     },
   });
+  // boxes that are often read on their own (a solution opened from the TOC, a quiz, a tip) get their own "first use"
+  const BOX = "details, .problem, .callout, .intuition, .tryit, .recipe, .quiz, figure, .mistakes";
+  const boxSeen = new Map();
+  const scopeSet = (n) => {
+    const box = n.parentElement.closest(BOX);
+    if (!box || !root.contains(box)) return perSection;
+    if (!boxSeen.has(box)) boxSeen.set(box, new Set());
+    return boxSeen.get(box);
+  };
   const items = [];
   while (walker.nextNode()) items.push(walker.currentNode);
   for (const node of items) {
@@ -46,7 +56,7 @@ export function annotateTerms(root, pageWeek = 0, pageId = "") {
       const key = Object.keys(m.groups).find((g) => m.groups[g] !== undefined);
       const t = terms[Number(key.slice(1))];
       if (t.lower && m[0][0] !== m[0][0].toLocaleLowerCase("tr")) continue;
-      const seen = known(t) ? perPage : perSection;
+      const seen = known(t) ? perPage : scopeSet(node);
       if (seen.has(t.id)) continue;
       seen.add(t.id);
       const span = document.createElement("span");
