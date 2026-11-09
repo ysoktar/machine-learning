@@ -475,13 +475,34 @@ W.logstep = (ds) => {
     if (X.length !== Wv.length) { put(out, errorBox("x ve w aynı boyutta olmalı.")); return; }
     const Y = Number(y.get());
     const r = ml.logisticStep(Wv, b.get(), X, Y, eta.get());
+    // left: where the example sits on the sigmoid before and after the step
+    const zr = Math.max(4, Math.ceil(Math.max(Math.abs(r.z), Math.abs(r.z2)) + 1));
+    const sigPic = h("figure", { class: "fig" }, lines({ series: [
+      { pts: Array.from({ length: 121 }, (_, i) => { const z = -zr + (2 * zr * i) / 120; return [z, ml.sigmoid(z)]; }), cls: "curve3", name: "σ(z)", color: "s3" },
+      { pts: [[r.z, r.p]], cls: "curve2", dots: true, noLine: true, name: `önce: z = ${f(r.z)}, p = ${f(r.p)}`, color: "neg" },
+      { pts: [[r.z2, r.p2]], cls: "curve1", dots: true, noLine: true, name: `sonra: z = ${f(r.z2)}, p = ${f(r.p2)}`, color: "pos" },
+    ], xlim: [-zr, zr], ylim: [0, 1], ystep: 0.25, xlabel: "z", ylabel: "p", aria: "Sigmoid üzerinde önce ve sonra" }),
+      h("figcaption", {}, `Örnek sigmoid eğrisinin üzerinde: kırmızı adımdan önce, mavi adımdan sonra. Gerçek etiket ${Y} olduğu için p'nin ${Y ? "1'e" : "0'a"} yaklaşması istenir.`));
+    // right: the example and the decision boundary w·x + b = 0 before (dashed) and after (solid), for 2 features
+    let planePic = null;
+    if (X.length === 2) {
+      const R = Math.max(2, Math.abs(X[0]), Math.abs(X[1])) + 1;
+      planePic = h("figure", { class: "fig" }, scatter({ xlim: [-R, R], ylim: [-R, R], equal: true, labels: true,
+        points: [{ x: X, y: Y ? 1 : -1, name: `x (y = ${Y})` }],
+        shade: { w: r.w, b: r.b },
+        lines: [{ w: Wv, b: b.get(), cls: "dash" }, { w: r.w, b: r.b, cls: "accent" }], xlabel: "x₁", ylabel: "x₂", aria: "Karar sınırı önce ve sonra" }),
+        h("figcaption", {}, `${Wv.every((v) => Math.abs(v) < 1e-12) ? "Adımdan önce w = 0 olduğu için bir sınır yoktu; düz çizgi adımdan sonraki" : "Kesikli çizgi adımdan önceki, düz çizgi adımdan sonraki"} karar sınırıdır (w·x + b = 0). Mavi taraf p > 0.5, kırmızı taraf p < 0.5. Sınır, örneği ${Y ? "mavi" : "kırmızı"} tarafa almak için ${Wv.every((v) => Math.abs(v) < 1e-12) ? "oluştu" : "döndü"}.`));
+    }
     put(out, table(["", "z = w·x + b", "p = σ(z)", "kayıp −[y ln p + (1−y) ln(1−p)]"], [["adımdan önce", f(r.z), f(r.p), f(r.loss)], ["adımdan sonra", f(r.z2), f(r.p2), f(r.loss2)]], { cls: "compact" }),
-      h("ol", { class: "steps" },
-        h("li", {}, `hata p − y = ${f(r.p)} − ${Y} = ${f(r.gb)}`),
-        h("li", {}, `∂L/∂w = (p − y)·x = ${vec(r.gw)},  ∂L/∂b = ${f(r.gb)}`),
-        h("li", {}, `w ← w − η·∂L/∂w = ${vec(Wv)} − ${f(eta.get())}·${vec(r.gw)} = `, h("b", {}, vec(r.w))),
-        h("li", {}, `b ← ${f(b.get())} − ${f(eta.get())}·(${f(r.gb)}) = `, h("b", {}, f(r.b)))),
-      h("p", { class: "small muted" }, r.loss2 < r.loss ? "Kayıp düştü: adım doğru yönde." : "Kayıp artmış: η çok büyük."));
+      h("div", { class: "two-col" }, sigPic, planePic),
+      steps([
+        { what: "Tahmin hatasını buluruz: model 1 olasılığını p verdi, gerçek etiket y.", formula: "hata = p − y", calc: `${f(r.p)} − ${Y}`, result: f(r.gb) },
+        { what: "Ağırlıkları güncelleriz: hata × girdi kadar, öğrenme oranıyla çarpılıp ters yönde.", formula: "w ← w − η·(p − y)·x",
+          calc: `${vec(Wv)} − ${f(eta.get())}·${par(r.gb)}·${vec(X)} = ${vec(Wv)} − ${vec(r.gw.map((g) => eta.get() * g))}`, result: vec(r.w) },
+        { what: "Sabit terimi güncelleriz (girdisi 1 sayılır).", formula: "b ← b − η·(p − y)", calc: `${f(b.get())} − ${f(eta.get())}·${par(r.gb)}`, result: f(r.b) },
+        { what: "Yeni ağırlıklarla aynı örneğe yeniden bakarız.", formula: "z = w·x + b, p = σ(z)", calc: `z = ${f(r.z2)}, p`, result: f(r.p2),
+          note: r.loss2 < r.loss ? `Olasılık ${f(r.p)}'den ${f(r.p2)}'ye ${Y ? "çıktı" : "indi"}, kayıp ${f(r.loss)}'den ${f(r.loss2)}'ye düştü: adım doğru yönde.` : "Kayıp artmış: η çok büyük, adım minimumun ötesine geçti." },
+      ]));
   });
   return el;
 };
