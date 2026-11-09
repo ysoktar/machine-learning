@@ -23,7 +23,7 @@
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
 <tr><td>Karmaşıklık matrisi + ölçütler</td><td>tahmin/gerçek dizisi ya da 4 sayı verilir; accuracy, precision, recall, specificity, F1</td><td>önce her örneğe TP/FN/FP/TN etiketi, sonra formül + yerine koyma</td></tr>
 <tr><td>ROC tablosu ve AUC</td><td>skora göre sıralı + / − dizisi; her eşik için TP, FP, TPR, FPR; köşe noktaları; AUC</td><td>tabloyu eksiksiz doldurmak; AUC'yi çift sayarak denetlemek</td></tr>
-<tr><td>Ölçekleme</td><td>min-max / z-score, test değerinin eğitim parametreleriyle dönüştürülmesi</td><td>σ'yı n'ye bölmek; testte eğitimin min/μ'sünü kullanmak</td></tr>
+<tr><td>Ölçekleme</td><td>min-max / z-score, test değerinin eğitim parametreleriyle dönüştürülmesi</td><td>σ hesaplarken kare toplamını n − 1'e değil veri sayısı n'ye bölmek; test değerini eğitimin min, max, μ ve σ değerleriyle ölçeklemek</td></tr>
 <tr><td>PCA (2B)</td><td>4–6 nokta: merkezle, kovaryans, özdeğer, PC1 yönü, açıklanan varyans</td><td>ara tabloyu kurmak; iz/determinant denetimi</td></tr>
 <tr><td>Kavram</td><td>kodlama seçimi, sızıntı, CV, metrik seçimi (recall mı precision mı?)</td><td>gerekçeyi maliyetle bağlamak (FN mi FP mi pahalı?)</td></tr>
 </tbody></table></div><p class="small">Ara sınavın D bölümü (kNN ve ölçütler, 17 p) ve kısa soruların bir kısmı bu haftadan.</p></div>
@@ -50,7 +50,7 @@
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th>x</th><th>2</th><th>4</th><th>4</th><th>4</th><th>5</th><th>5</th><th>7</th><th>9</th></tr></thead><tbody>
 <tr><td>min-max: (x − 2)/7</td><td>0</td><td>0.29</td><td>0.29</td><td>0.29</td><td>0.43</td><td>0.43</td><td>0.71</td><td>1</td></tr>
 <tr><td>z-score: (x − 5)/2</td><td>−1.5</td><td>−0.5</td><td>−0.5</td><td>−0.5</td><td>0</td><td>0</td><td>1</td><td>2</td></tr></tbody></table></div>
-<p>Sınavda σ (standart sapma) <strong>n'ye bölünerek</strong> hesaplanır. İki yöntemin farkı aykırı değerlerde ortaya çıkar: min-max'ta tek bir uç değer en büyük değer olduğu için bütün ölçeği belirler ve diğer değerleri küçük bir aralığa sıkıştırır; z-score bundan daha az etkilenir. Gelir ya da sözcük sıklığı gibi sağa çarpık (çok sayıda küçük, az sayıda dev değer içeren) verilerde önce logaritma almak iyi bir ilk adımdır.</p>
+<p><strong>Standart sapmada neye bölüneceğine dikkat edin.</strong> Varyansı bulurken farkların karelerinin toplamı <strong>veri sayısı n'ye</strong> bölünür: yukarıdaki örnekte 8 değer olduğu için 32/8 = 4. İstatistik derslerinde bazen n − 1'e bölünür (örneklem standart sapması, burada 32/7 olurdu); bu derste z-score için n kullanılır, yalnız PCA'daki kovaryans n − 1'e bölünür. İki yöntemin farkı aykırı değerlerde ortaya çıkar: min-max'ta tek bir uç değer en büyük değer olduğu için bütün ölçeği belirler ve diğer değerleri küçük bir aralığa sıkıştırır; z-score bundan daha az etkilenir. Gelir ya da sözcük sıklığı gibi sağa çarpık (çok sayıda küçük, az sayıda dev değer içeren) verilerde önce logaritma almak iyi bir ilk adımdır.</p>
 <div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>Eğitim verisi 10, 20, 30. Test değeri 40'ın min-max değeri nedir?</p><details><summary>Cevabı göster</summary><p>(40 − 10)/(30 − 10) = <strong>1.5</strong>. Eğitim aralığının dışına taştı: sorun değil, eğitimin min/max'ı kullanılır; testin değerleriyle yeniden hesaplanmaz.</p></details></div>
 <p>Aşağıdaki araçla bir dizi için iki ölçeklemeyi de sınavdaki ara sütunlarla birlikte görebilirsiniz.</p>
 <div data-widget="scaling"></div>
@@ -154,7 +154,7 @@
 <ul class="mistakes">
 <li>FP ile FN'yi karıştırmak: FN = <em>gerçekte pozitif</em> ama negatif denmiş (kaçırılan).</li>
 <li>Precision'ı satırdan (TP/(TP+FN)) hesaplamak: o recall'dır.</li>
-<li>z-score'da σ'yı n − 1'e bölmek (ders n'ye böler); PCA kovaryansında ise n − 1 kullanılır.</li>
+<li>z-score için σ hesaplarken kare toplamını n − 1'e bölmek; ders veri sayısı n'ye böler. PCA'daki kovaryansta ise n − 1 kullanılır.</li>
 <li>Test değerini ölçeklerken test verisinin min/max/μ'sünü kullanmak (sızıntı).</li>
 <li>AUC'yi accuracy ile karıştırmak; AUC eşikten bağımsızdır.</li>
 <li>Dengesiz veride yalnız accuracy raporlamak; çoğunluk sınıfı taban çizgisini unutmak.</li>
@@ -174,7 +174,7 @@
 </tbody></table></div>
 
 <h2>Kendini sına: kısa sorular</h2><p class="h-en" lang="en">Self-check: short questions</p>
-<div class="quiz" data-answer="2"><p>x = (1, 2, 2, 4, 5, 10) eğitim verisi. Test değeri 7'nin z-skoru nedir? (σ: n'ye bölünen)</p><ol>
+<div class="quiz" data-answer="2"><p>x = (1, 2, 2, 4, 5, 10) eğitim verisi. Test değeri 7'nin z-skoru nedir? (σ hesaplanırken kare toplamı veri sayısı n'ye bölünür)</p><ol>
 <li data-why="Bu min-max değeri: (7 − 1)/9.">0.67</li>
 <li data-why="">1.0</li>
 <li data-why="μ'yü test değeriyle birlikte yeniden hesaplamak sızıntıdır.">μ ve σ, 7 eklenerek yeniden hesaplanır</li>

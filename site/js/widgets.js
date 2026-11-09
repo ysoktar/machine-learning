@@ -1097,7 +1097,7 @@ const GEN = {
     const t = R.int(0, 14);
     const mm = ml.minmax([t], xs).values[0], z = ml.zscore([t], xs);
     return {
-      prompt: [h("p", {}, `Eğitim verisi: ${xs.join(", ")}. Test değeri ${t}'i eğitim parametreleriyle ölçekleyin (σ: n'ye bölünen).`)],
+      prompt: [h("p", {}, `Eğitim verisi: ${xs.join(", ")}. Test değeri ${t}'i eğitim parametreleriyle ölçekleyin (σ hesaplanırken kare toplamı n'ye bölünür).`)],
       fields: [{ label: "μ", v: z.mean }, { label: "σ", v: z.sd }, { label: "min-max", v: mm }, { label: "z", v: z.values[0] }],
       solution: () => [h("p", {}, `min = ${Math.min(...xs)}, max = ${Math.max(...xs)}, μ = ${f(z.mean)}, σ = ${f(z.sd)}. Bu değerlerle min-max sonucu ${f(mm)}, z-skoru ${f(z.values[0])} olur.`)],
     };

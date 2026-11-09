@@ -42,7 +42,7 @@
 <h3><a href="w1-intro.html">1. hafta: giriş ve temel kavramlar</a></h3>
 <p><b>Hesap:</b> bir öznitelik kümesi için örnek ve hipotez sayısını bulmak (örnek = değer sayılarının çarpımı, hipotez = 1 + (değer sayısı + 1)'lerin çarpımı) ve Find-S algoritmasını birkaç örnek üzerinde adım adım uygulamak. <b>Kavram:</b> bir sistemin görevini, deneyimini ve başarım ölçüsünü (T, E, P) yazmak; gözetimli (sınıflandırma ve regresyon), gözetimsiz ve pekiştirmeli öğrenmeyi ayırmak; tümevarımsal yanlılığın neden gerekli olduğunu ve aşırı/yetersiz uyumun ne olduğunu açıklamak.</p>
 <h3><a href="w2-data.html">2. hafta: veri, öznitelik ve değerlendirme</a></h3>
-<p><b>Hesap:</b> min-max ve z-score ölçekleme (σ'yı n'ye bölerek); tahmin listesinden karmaşıklık matrisini kurup accuracy, precision, recall, specificity ve F1'i hesaplamak; sıralı bir diziden ROC tablosunu çıkarıp AUC'yi çift sayarak bulmak; MSE, MAE ve R²; iki boyutlu küçük bir veride PCA (kovaryans, özdeğer, açıklanan varyans). <b>Kavram:</b> hangi öznitelik nasıl kodlanır, ölçeklemeye kim ihtiyaç duyar, veri sızıntısı nedir, eğitim/doğrulama/test bölmesi ve k-katlı çapraz doğrulama nasıl yapılır, hangi durumda hangi ölçüt seçilir.</p>
+<p><b>Hesap:</b> min-max ve z-score ölçekleme (σ hesaplanırken farkların kare toplamı veri sayısı n'ye bölünür); tahmin listesinden karmaşıklık matrisini kurup accuracy, precision, recall, specificity ve F1'i hesaplamak; sıralı bir diziden ROC tablosunu çıkarıp AUC'yi çift sayarak bulmak; MSE, MAE ve R²; iki boyutlu küçük bir veride PCA (kovaryans, özdeğer, açıklanan varyans). <b>Kavram:</b> hangi öznitelik nasıl kodlanır, ölçeklemeye kim ihtiyaç duyar, veri sızıntısı nedir, eğitim/doğrulama/test bölmesi ve k-katlı çapraz doğrulama nasıl yapılır, hangi durumda hangi ölçüt seçilir.</p>
 <h3><a href="w3-knn.html">3. hafta: kNN ve model seçimi</a></h3>
 <p><b>Hesap:</b> kNN'de kare uzaklıklarla komşuları sıralayıp k = 1, 3, 5 için karar vermek (gerekirse önce z-score uygulayarak); birini dışarıda bırakma (LOO) ile k seçmek. <b>Kavram:</b> kayıp türleri ve ampirik risk, i.i.d. varsayımı, taban çizgisi, yanlılık-varyans ayrışımı, eğitim ve doğrulama hatasına bakarak rejim tanısı, düzenlileştirme fikri, sızıntı türleri ve boyut laneti.</p>
 <h3><a href="w4-linear.html">4. hafta: doğrusal modeller</a></h3>
@@ -57,7 +57,7 @@
 <h2>Sınavda en sık kaybedilen puanlar</h2><p class="h-en" lang="en">Where points are most often lost</p>
 <ul>
 <li><strong>FP ile FN'yi karıştırmak.</strong> Önce her örneğe TP/FN/FP/TN yazın; TP + FN = pozitif sayısı denetimini yapın.</li>
-<li>z-score'da σ'yı n − 1'e bölmek (ders n'ye böler); PCA kovaryansında ise n − 1.</li>
+<li>z-score için σ hesaplarken kare toplamını n − 1'e bölmek; ders veri sayısı n'ye böler. PCA'daki kovaryansta ise n − 1.</li>
 <li>Test verisinin min/max/μ'sünü yeniden hesaplamak: <strong>eğitimin</strong> parametreleri kullanılır.</li>
 <li>Perceptron'da z = 0'ı yanlış sınıflamak: kural <strong>z ≥ 0 ise +1</strong> demektir. Doğru sınıflanan örnekte güncelleme yapmak.</li>
 <li>Lojistik adımda w ← w <strong>−</strong> η(p − y)x yerine artı yazmak; 1/n'yi unutmak (çok örnekte).</li>
