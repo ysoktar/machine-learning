@@ -3,7 +3,7 @@
 // the same list as sozluk.html).
 import { TERMS } from "./glossary-data.js";
 
-const SKIP = "h1, h2, h3, h4, .h-en, .en-tag, a, code, pre, button, summary, textarea, input, select, svg, .widget, .fig, .formula, .m, .term, .words, .quiz-options, .page-toc, .section-toc, .toc-rail, .toc-bar, .kicker, .studied, .tree, .glossary, .letter-nav, .table-wrap th";
+const SKIP = "h1, h2, h3, h4, .h-en, .en-tag, .no-gl, a, code, pre, button, summary, textarea, input, select, svg, .widget, .fig, .formula, .m, .term, .words, .quiz-options, .page-toc, .section-toc, .toc-rail, .toc-bar, .kicker, .studied, .tree, .glossary, .letter-nav, .table-wrap th";
 // a term may take Turkish suffixes (entropisi, marjı, kNN'de…) but must start at a word boundary
 const L = "\\p{L}\\p{N}";
 

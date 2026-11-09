@@ -70,8 +70,78 @@
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>PCA ne yapar?</div><p>Bir yemek tarifini 20 malzemeyle anlatmak yerine “ne kadar tatlı, ne kadar acı” diye iki sayıyla özetlediğinizi düşünün: bilgi kaybı az, anlatım çok daha kısa. PCA bunu sayılarla yapar: veride en çok değişkenlik (yayılma) olan yönü bulur (PC1), sonra ona dik ikinci yönü (PC2)… İlk birkaç yön çoğu bilgiyi taşıyorsa gerisini atarız.</p><p>Hesap: (1) her sütunun ortalamasını çıkar (merkezle), (2) sütunların birlikte nasıl değiştiğini gösteren kovaryans matrisini kur, (3) bu matrisin özdeğerleri “o yöndeki yayılma miktarı”, özvektörleri “yön”dür.</p></div>
 <p>PCA'nın adımları her zaman aynıdır. Önce her sütunun ortalaması çıkarılarak veri merkezlenir. Sonra sütunların ne kadar yayıldığını ve birlikte nasıl değiştiğini gösteren <strong>kovaryans matrisi</strong> kurulur (sınavda n − 1'e bölünür). Bu matrisin <strong>özdeğerleri</strong> her yöndeki yayılmanın büyüklüğünü, <strong>özvektörleri</strong> o yönleri verir. En büyük özdeğerin yönü PC1'dir, PC2 ona diktir. Bir bileşenin açıkladığı varyans oranı, kendi özdeğerinin bütün özdeğerlerin toplamına oranıdır.</p>
 <div data-widget="fig" data-fig="pcaaxes" data-formula="S = (1/(n − 1))·Σ (xᵢ − x̄)(xᵢ − x̄)ᵀ   ·   açıklanan varyans = λ₁ / (λ₁ + λ₂)" data-caption="Altı nokta, ortalamaları ve iki temel bileşen. Noktaların PC1 üzerine izdüşümü (kesikli çizgiler) verinin çoğunu korur."></div>
-<p>İki boyutta özdeğerler λ² − (s₁₁ + s₂₂)λ + (s₁₁s₂₂ − s₁₂²) = 0 denkleminden bulunur. Sınavda işinize yarayacak bir kısa yol var: köşegendeki iki sayı eşitse (a, a) ve köşegen dışı c ise özdeğerler a + c ve a − c, yönler de (1, 1) ve (1, −1) olur. PCA etiketleri kullanmaz (denetimsizdir) ve ölçeğe duyarlıdır; bu yüzden önce z-score uygulanır.</p>
-<div data-widget="pca"></div>
+<p>İki boyutta özdeğerler λ² − (s₁₁ + s₂₂)λ + (s₁₁s₂₂ − s₁₂²) = 0 denkleminden bulunur; aşağıdaki örnekte bu denklemi adım adım çözüyoruz. Bir kısa yolu da bilmekte yarar var: köşegendeki iki sayı eşitse (S = [[a, c], [c, a]]) özdeğerler a + c ve a − c, yönler de (1, 1) ve (1, −1) olur. PCA etiketleri kullanmaz (denetimsizdir) ve ölçeğe duyarlıdır; bu yüzden önce z-score uygulanır.</p>
+<h3>Adım adım bir PCA hesabı</h3>
+<p>Yöntemi bir örnek üzerinde baştan sona uygulayalım. Dört noktamız var: (0, 0), (1, 1), (3, 2) ve (4, 1). Bu veride kovaryans matrisinin köşegenleri eşit çıkmadığı için aşağıda anlatılan kısa yol işe yaramaz; yöntemin bütün adımlarını görmek için iyi bir örnektir. Her adımda neyi neden yaptığımızı da yazacağız.</p>
+
+<h4>1. adım: Her sütunun ortalamasını bulmak</h4>
+<p>PCA yönleri verinin merkezinden geçen doğrular olarak arar; bu yüzden önce merkezi buluruz. x₁ sütununun ortalaması (0 + 1 + 3 + 4)/4 = 2, x₂ sütununun ortalaması (0 + 1 + 2 + 1)/4 = 1'dir. Verinin merkezi <span class="m">μ = (2, 1)</span>.</p>
+
+<h4>2. adım: Veriyi merkezlemek</h4>
+<p>Her noktadan ortalamayı çıkarırız. Böylece merkez orijine taşınır ve her sayı “bu nokta ortalamadan ne kadar sapıyor?” sorusunun cevabı olur. Aşağıdaki tabloda bu farklara d₁ = x₁ − 2 ve d₂ = x₂ − 1 diyoruz; son üç sütun bir sonraki adımda kullanılacak.</p>
+<div class="table-wrap"><table class="simple compact center">
+<thead><tr><th>nokta</th><th>x₁</th><th>x₂</th><th>d₁ = x₁ − 2</th><th>d₂ = x₂ − 1</th><th>d₁²</th><th>d₂²</th><th>d₁·d₂</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>0</td><td>0</td><td>−2</td><td>−1</td><td>4</td><td>1</td><td>2</td></tr>
+<tr><td>B</td><td>1</td><td>1</td><td>−1</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td>C</td><td>3</td><td>2</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>D</td><td>4</td><td>1</td><td>2</td><td>0</td><td>4</td><td>0</td><td>0</td></tr>
+<tr class="hl"><td>toplam</td><td></td><td></td><td>0</td><td>0</td><td>10</td><td>2</td><td>3</td></tr>
+</tbody></table></div>
+<p>Denetim: merkezlenmiş sütunların toplamı her zaman 0 olmalıdır. Burada iki sütun da 0 tutuyor.</p>
+
+<h4>3. adım: Kovaryans matrisini kurmak</h4>
+<p>Kovaryans matrisi S üç bilgiyi bir arada tutar. Köşegendeki s₁₁ ve s₂₂ her sütunun kendi yayılmasıdır (varyansı); köşegen dışındaki s₁₂ ise iki sütunun birlikte nasıl değiştiğini söyler. s₁₂ pozitifse biri artarken öteki de artma eğilimindedir, negatifse biri artarken öteki azalır. Her terim, tablodaki ilgili sütunun toplamının n − 1 = 3'e bölümüdür:</p>
+<div class="formula">s₁₁ = Σd₁² / (n − 1) = 10/3 &nbsp;&nbsp; s₂₂ = Σd₂² / (n − 1) = 2/3 &nbsp;&nbsp; s₁₂ = Σd₁d₂ / (n − 1) = 3/3 = 1</div>
+<div class="formula">S = [ [10/3, 1], [1, 2/3] ]</div>
+<p>Yorum: x₁ çok daha fazla yayılıyor (10/3, x₂'nin beş katı) ve iki sütun birlikte artıyor (s₁₂ = 1 &gt; 0). Bu yüzden en çok yayılmanın olduğu yönün çoğunlukla x₁ boyunca ve hafifçe yukarı eğik olmasını bekleriz.</p>
+
+<h4>4. adım: Özdeğerleri bulmak</h4>
+<p>Bir yönde ne kadar yayılma olduğunu o yönün <strong>özdeğeri</strong> (λ) söyler. Özdeğerler, <span class="m">det(S − λI) = 0</span> denkleminin kökleridir. Burada I birim matristir; S − λI, S'nin köşegenindeki iki sayıdan λ çıkarılmış hâlidir. 2×2 bir matrisin determinantı “köşegenlerin çarpımı eksi köşegen dışlarının çarpımı” olduğundan:</p>
+<div class="formula">(10/3 − λ)·(2/3 − λ) − 1·1 = 0</div>
+<p>Parantezleri açınca λ² − 4λ + 20/9 − 1 = 0, yani <span class="m">λ² − 4λ + 11/9 = 0</span> çıkar. Kesirlerden kurtulmak için 9 ile çarpalım: 9λ² − 36λ + 11 = 0. İkinci derece denklemin kök formülüyle:</p>
+<div class="formula">λ = (36 ± √(36² − 4·9·11)) / (2·9) = (36 ± √(1296 − 396)) / 18 = (36 ± 30) / 18</div>
+<p>Buradan <strong>λ₁ = 66/18 = 11/3 ≈ 3.667</strong> ve <strong>λ₂ = 6/18 = 1/3 ≈ 0.333</strong> bulunur. İki denetim yapın: özdeğerlerin toplamı köşegenlerin toplamına eşit olmalı (11/3 + 1/3 = 4 = 10/3 + 2/3 ✓), çarpımları da determinanta eşit olmalı (11/3 · 1/3 = 11/9 = 10/3 · 2/3 − 1 ✓).</p>
+<p>Aynı sonucu veren hazır bir formül de var; sınavda zaman kazandırır:</p>
+<div class="formula">λ = (s₁₁ + s₂₂)/2 ± √( ((s₁₁ − s₂₂)/2)² + s₁₂² ) = 2 ± √( (4/3)² + 1² ) = 2 ± 5/3</div>
+
+<h4>5. adım: Özvektörleri (yönleri) bulmak</h4>
+<p>Her özdeğerin bir yönü vardır; bu yöne <strong>özvektör</strong> denir. λ₁'in yönü, <span class="m">(S − λ₁I)·v = 0</span> denklemini sağlayan v vektörüdür. S − λ₁I matrisinin ilk satırı (10/3 − 11/3, 1) = (−1/3, 1)'dir; bu satırla v'nin çarpımı sıfır olmalı:</p>
+<div class="formula">−(1/3)·v₁ + 1·v₂ = 0 &nbsp; ⇒ &nbsp; v₂ = v₁/3</div>
+<p>v₁ = 3 seçersek v₂ = 1 olur: yön <strong>(3, 1)</strong>. (İkinci satır aynı bilgiyi verir; 2×2'de tek satır yeter.) Yönün uzunluğu önemli değildir, ama izdüşüm için uzunluğu 1 olan vektör kullanılır. ‖(3, 1)‖ = √(9 + 1) = √10 ≈ 3.162 olduğundan:</p>
+<div class="formula">PC1 yönü u₁ = (3, 1)/√10 ≈ (0.949, 0.316) &nbsp;&nbsp; PC2 yönü u₂ = (−1, 3)/√10 ≈ (−0.316, 0.949)</div>
+<p>PC2'yi ayrıca hesaplamamıza gerek yok: 2 boyutta PC1'e dik tek yöndür (iki bileşenin yerini değiştirip birinin işaretini çevirmek yeter). İsterseniz denetleyin: λ₂ = 1/3 için ilk satır (3, 1) olur ve 3·(−1) + 1·3 = 0 ✓. İki yönün iç çarpımı da 0'dır: 3·(−1) + 1·3 = 0, yani birbirlerine diktirler. Beklediğimiz gibi PC1 çoğunlukla x₁ boyunca ve hafifçe yukarı eğik.</p>
+
+<h4>6. adım: Her bileşenin açıkladığı varyansı bulmak</h4>
+<p>Toplam yayılma özdeğerlerin toplamıdır (4). PC1'in payı:</p>
+<div class="formula">λ₁ / (λ₁ + λ₂) = (11/3) / 4 = 11/12 ≈ %91.7</div>
+<p>PC2 yalnız %8.3 taşıyor. Yani veriyi tek bir sayıyla (PC1 üzerindeki konumuyla) özetlesek yayılmanın %91.7'sini korumuş oluruz; %90–95 kuralına göre tek boyuta indirmek makuldür.</p>
+
+<h4>7. adım: Noktaları PC1'e izdüşürmek (yeni öznitelik)</h4>
+<p>Her noktanın PC1 üzerindeki konumuna o noktanın <strong>PC1 <span class="no-gl">skoru</span></strong> denir. Merkezlenmiş noktanın u₁ ile iç çarpımıdır: <span class="m">zᵢ = (xᵢ − μ)·u₁</span>. Hesabı kolaylaştırmak için önce (3, 1) ile çarpıp en sonda √10'a bölebiliriz:</p>
+<div class="table-wrap"><table class="simple compact center">
+<thead><tr><th>nokta</th><th>merkezlenmiş (d₁, d₂)</th><th>3·d₁ + 1·d₂</th><th>PC1 skoru z = (3d₁ + d₂)/√10</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>(−2, −1)</td><td>−7</td><td>−2.214</td></tr>
+<tr><td>B</td><td>(−1, 0)</td><td>−3</td><td>−0.949</td></tr>
+<tr><td>C</td><td>(1, 1)</td><td>4</td><td>1.265</td></tr>
+<tr><td>D</td><td>(2, 0)</td><td>6</td><td>1.897</td></tr>
+</tbody></table></div>
+<p>İki boyutlu her nokta artık tek bir sayıyla temsil ediliyor. Güzel bir denetim var: <span class="no-gl">skorların</span> ortalaması 0'dır (−7 − 3 + 4 + 6 = 0) ve varyansları tam olarak λ₁'e eşittir: (49 + 9 + 16 + 36)/10/3 = 110/30 = 11/3. Özdeğerin anlamı budur: <strong>o yöne izdüşürülen noktaların varyansı</strong>.</p>
+
+<h4>8. adım: Ne kaybettiğimizi görmek</h4>
+<p>Tek boyuta indirince her noktanın PC2 yönündeki bileşenini atmış oluruz. B noktasını geri kurmayı deneyelim: <span class="m">x̂ = μ + z·u₁</span> = (2, 1) + (−3/√10)·(3, 1)/√10 = (2, 1) + (−0.9, −0.3) = (1.1, 0.7). Gerçek nokta (1, 1) idi; aradaki uzaklık √(0.1² + 0.3²) ≈ 0.316'dır. Bu uzaklık, B'nin PC2 skorunun büyüklüğüne eşittir: (−1, 0)·u₂ = 1/√10 ≈ 0.316. Atılan bilginin hepsi bu küçük PC2 skorlarındadır.</p>
+
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Sınavda yazılacak sıra</div><ol>
+<li>Ortalamayı bul ve tabloda her noktayı merkezle (sütun toplamlarının 0 olduğunu denetle).</li>
+<li>d₁², d₂², d₁·d₂ sütunlarını doldur; toplamlarını n − 1'e bölerek S'yi yaz.</li>
+<li>det(S − λI) = 0 denklemini kur ve çöz; toplam = iz, çarpım = determinant denetimini yap.</li>
+<li>En büyük özdeğer için (S − λ₁I)v = 0'dan yönü bul ve uzunluğunu 1 yap; PC2 ona diktir.</li>
+<li>Açıklanan varyans oranını λ₁/(λ₁ + λ₂) ile yaz ve kaç bileşen tutulacağını yorumla.</li>
+<li>İstenirse <span class="no-gl">skorları</span> zᵢ = (xᵢ − μ)·u₁ ile hesapla.</li>
+</ol></div>
+<p>Aşağıdaki araç bu örnekle açılıyor: tablodaki her sayıyı orada da görebilir, noktaları değiştirip aynı adımları yeni veriyle deneyebilirsiniz.</p>
+<div data-widget="pca" data-pts="0 0&#10;1 1&#10;3 2&#10;4 1"></div>
 <p>Kaç bileşen tutulmalı? Yaygın kural, birikimli açıklanan varyansın %90–95'e ulaştığı yerde durmaktır; sınıflandırma için kullanılıyorsa bileşen sayısı çapraz doğrulamayla da seçilebilir. Boyut azaltmanın bir nedeni de <strong>boyut lanetidir</strong>: öznitelik sayısı arttıkça uzay o kadar hızlı büyür ki veri noktaları seyrekleşir ve uzaklıklar birbirine benzer. Örneğin 10 boyutlu bir birim küpün hacminin yalnız %10'unu kaplamak için küpün her kenarının %79'unu almak gerekir.</p>
 
 <h2>Veriyi bölmek: eğitim, doğrulama, test ve çapraz doğrulama</h2><p class="h-en" lang="en">Splitting the data: training, validation, test and cross-validation</p>

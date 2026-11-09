@@ -460,7 +460,8 @@ export const TERMS = [
 "week": 5,
 "en": "root",
 "skip": [
-"on-bilgi"
+"on-bilgi",
+"w2-data"
 ]
 },
 {
