@@ -58,7 +58,7 @@
 <h2>Havuzlama ve bir katmandaki parametreleri saymak</h2><p class="h-en" lang="en">Pooling and counting the parameters of a layer</p>
 <p><strong>Havuzlama</strong> katmanı görüntüyü küçük pencerelere böler ve her pencereden tek bir değer bırakır: en büyüğünü (max) ya da ortalamasını. En sık kullanılan biçim 2×2 pencere ve adım 2'dir; bu, yüksekliği ve genişliği yarıya indirir. Havuzlamanın öğrenilen hiçbir parametresi yoktur. Bir desen bir iki piksel kaydığında da aynı pencerede kaldığı için ağa küçük kaymalara karşı dayanıklılık kazandırır.</p>
 <p>Bir evrişim katmanının parametre sayısını bulmak için şunu düşünün: her filtre, girdinin bütün kanallarına bakar; yani k_h × k_w × C_in ağırlığı ve bir bias'ı vardır. Katmanda C_out tane filtre olduğuna göre:</p>
-<div class="formula">evrişim katmanı parametresi = (k_h·k_w·C_in + 1)·C_out</div><p class="formula-legend"><b>Burada:</b> k_h ve k_w filtrenin yüksekliği ve genişliği, C_in girdinin kanal sayısı (renkli görüntüde 3), C_out katmandaki filtre sayısı (aynı zamanda çıktının kanal sayısı), + 1 her filtrenin bias'ıdır.</p>
+<div class="formula">evrişim katmanı parametresi = (k_h·k_w·C_in + 1)·C_out</div><p class="formula-legend"><b>Burada:</b> k_h ve k_w filtrenin yüksekliği ve genişliğidir. C_in girdinin kanal sayısıdır (renkli görüntüde 3). C_out katmandaki filtre sayısıdır ve aynı zamanda çıktının kanal sayısıdır. + 1, her filtrenin bir sabit terimi (bias) olduğu içindir.</p>
 <div class="table-wrap"><table class="simple compact">
 <thead><tr><th>Katman</th><th>Girdi</th><th>Çıktı</th><th>Parametre</th></tr></thead>
 <tbody>
