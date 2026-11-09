@@ -168,12 +168,13 @@ Object.assign(FIG, {
     ${T(285, 278, "yeşil köşegen: doğru tahminler · kırmızı: hatalar", { anchor: "middle", cls: "fig-sub" })}`, "Karmaşıklık matrisi"),
 
   cmread: () => {
+    // four panels in a 2×2 grid so the numbers stay readable on a phone
     const cell = (x, y, t, n, cls) => `<rect x="${x}" y="${y}" width="80" height="56" class="${cls}"/>${T(x + 40, y + 26, t, { anchor: "middle" })}${T(x + 40, y + 44, n, { anchor: "middle", cls: "fig-sub" })}`;
-    const m = (ox, hl, title, formula) => `${T(ox + 80, 18, title, { anchor: "middle" })}
-      ${cell(ox, 30, "TP", "4", hl.includes("TP") ? "fig-hl" : "fig-box")}${cell(ox + 80, 30, "FN", "2", hl.includes("FN") ? "fig-hl" : "fig-box")}
-      ${cell(ox, 86, "FP", "1", hl.includes("FP") ? "fig-hl" : "fig-box")}${cell(ox + 80, 86, "TN", "3", hl.includes("TN") ? "fig-hl" : "fig-box")}
-      ${T(ox + 80, 166, formula, { anchor: "middle", cls: "fig-sub" })}`;
-    return svg(560, 180, m(10, ["TP", "FP"], "Precision: sol sütun", "TP / (TP + FP) = 4/5 = 0.80") + m(200, ["TP", "FN"], "Recall: üst satır", "TP / (TP + FN) = 4/6 = 0.67") + m(390, ["TP", "TN"], "Accuracy: köşegen", "(TP + TN) / n = 7/10 = 0.70"), "Ölçütlerin matristeki yeri");
+    const m = (ox, oy, hl, title, formula) => `${T(ox + 80, oy + 18, title, { anchor: "middle" })}
+      ${cell(ox, oy + 30, "TP", "4", hl.includes("TP") ? "fig-hl" : "fig-box")}${cell(ox + 80, oy + 30, "FN", "2", hl.includes("FN") ? "fig-hl" : "fig-box")}
+      ${cell(ox, oy + 86, "FP", "1", hl.includes("FP") ? "fig-hl" : "fig-box")}${cell(ox + 80, oy + 86, "TN", "3", hl.includes("TN") ? "fig-hl" : "fig-box")}
+      ${T(ox + 80, oy + 166, formula, { anchor: "middle", cls: "fig-sub" })}`;
+    return svg(400, 370, m(15, 0, ["TP", "FP"], "Precision: sol sütun", "TP / (TP + FP) = 4/5 = 0.80") + m(225, 0, ["TP", "FN"], "Recall: üst satır", "TP / (TP + FN) = 4/6 = 0.67") + m(15, 188, ["FP", "TN"], "Specificity: alt satır", "TN / (TN + FP) = 3/4 = 0.75") + m(225, 188, ["TP", "TN"], "Accuracy: köşegen", "(TP + TN) / n = 7/10 = 0.70"), "Ölçütlerin matristeki yeri");
   },
 
   onehot: () => svg(470, 190, `${DEFS}
