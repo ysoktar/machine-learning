@@ -303,12 +303,18 @@ W.pca = (ds) => {
     put(out, 
       h("p", {}, `μ = (${f(r.mean[0])}, ${f(r.mean[1])})`),
       table(["x₁", "x₂", "x₁−μ₁", "x₂−μ₂", "(x₁−μ₁)²", "(x₂−μ₂)²", "çarpım", "PC1 skoru"], rows, { cls: "compact" }),
-      h("div", { class: "two-col" }, h("div", {},
-        h("p", { class: "mat-eq", style: { justifyContent: "flex-start" } }, "S = ", h("span", { class: "mat" }, ...[r.cov[0][0], r.cov[0][1], r.cov[1][0], r.cov[1][1]].map((v) => h("span", {}, f(v)))), ` (toplamlar / ${n1})`),
-        h("p", {}, `λ² − (${f(r.trace)})λ + ${f(r.det)} = 0 denkleminin kökleri λ₁ = `, h("b", {}, f(r.eig[0])), ", λ₂ = ", h("b", {}, f(r.eig[1]))),
-        h("p", {}, "PC1 yönü ≈ ", h("b", {}, vec(r.pc1)), ` · PC1'in açıkladığı varyans: ${f(r.eig[0])}/${f(r.trace)} = `, h("b", {}, `%${f(100 * r.ratio, 1)}`)),
-        h("p", { class: "small muted" }, `Denetim: λ₁ + λ₂ = iz(S) = ${f(r.trace)}, λ₁·λ₂ = det(S) = ${f(r.det)}. Köşegen girdileri eşitse özvektörler (1, 1) ve (1, −1) yönündedir.`),
-        h("p", {}, r.ratio >= 0.9 ? "Tek bileşen varyansın %90'ından fazlasını taşıyor: 1 boyuta indirmek makul." : "PC1 %90'ın altında: tek boyuta inmek çok bilgi kaybettirir.")), plot));
+      h("div", { class: "two-col" }, steps([
+        { what: "Her sütunun ortalamasını bulur ve noktaları merkezleriz (tablonun 3. ve 4. sütunları).", formula: "μ = (Σx₁ / n, Σx₂ / n)", calc: `μ = (${f(r.mean[0])}, ${f(r.mean[1])})` },
+        { what: "Kovaryans matrisini kurarız: tablodaki üç toplamı n − 1'e böleriz.", formula: "s₁₁ = Σd₁² / (n − 1), s₂₂ = Σd₂² / (n − 1), s₁₂ = Σd₁d₂ / (n − 1)",
+          calc: h("span", { class: "mat-eq", style: { justifyContent: "flex-start" } }, `toplamlar / ${n1}: S = `, h("span", { class: "mat" }, ...[r.cov[0][0], r.cov[0][1], r.cov[1][0], r.cov[1][1]].map((v) => h("span", {}, f(v))))) },
+        { what: "Özdeğerleri buluruz: det(S − λI) = 0 denkleminin kökleri. Her özdeğer bir yöndeki yayılmadır.", formula: "λ = (s₁₁ + s₂₂)/2 ± √( ((s₁₁ − s₂₂)/2)² + s₁₂² )",
+          calc: `λ² − ${f(r.trace)}·λ + ${f(r.det)} = 0 ⇒ λ₁ = ${f(r.eig[0])}, λ₂ = ${f(r.eig[1])}`,
+          note: `Denetim: λ₁ + λ₂ = s₁₁ + s₂₂ = ${f(r.trace)} ve λ₁·λ₂ = det(S) = ${f(r.det)} olmalı.` },
+        { what: "PC1'in yönünü buluruz: büyük özdeğerin özvektörü, uzunluğu 1 yapılarak.", formula: "(S − λ₁I)·v = 0, u₁ = v / ‖v‖", calc: `u₁ ≈ ${vec(r.pc1)}` },
+        { what: "PC1'in toplam yayılmanın ne kadarını taşıdığını buluruz.", formula: "λ₁ / (λ₁ + λ₂)", calc: `${f(r.eig[0])} / ${f(r.trace)}`, result: `%${f(100 * r.ratio, 1)}`,
+          note: r.ratio >= 0.9 ? "Tek bileşen yayılmanın %90'ından fazlasını taşıyor: veriyi tek boyuta indirmek makul." : "PC1 %90'ın altında: tek boyuta inmek çok bilgi kaybettirir." },
+        { what: "Tablonun son sütunu, her noktanın PC1 üzerindeki konumudur (PC1 skoru).", formula: "zᵢ = (xᵢ − μ)·u₁" },
+      ]), plot));
   });
   return el;
 };
@@ -637,9 +643,17 @@ W.threshold = (ds) => {
     if (a.length !== b.length || a.length < 2) { put(out, errorBox("Aynı uzunlukta iki dizi girin.")); return; }
     const r = ml.thresholdTable(a, b, crit.get());
     const best = r.rows.reduce((p, q) => (q.gain > p.gain + 1e-12 ? q : p), r.rows[0]);
+    const imp = (cnt) => (crit.get() === "gini" ? ml.gini(cnt) : ml.entropy(cnt));
     put(out, h("p", {}, "Sıralı: ", r.sorted.map(([v, c]) => `${f(v)}(${c})`).join("  "), ` · üst düğüm ${crit.get() === "gini" ? "Gini" : "H"} = ${f(r.parent)}`),
       table(["eşik t (orta nokta)", "sınıf değişiyor mu?", "sol x ≤ t", "sağ x > t", "ağırlıklı", "kazanç"], r.rows.map((q) => ({ row: [f(q.t), q.changes ? "evet" : "hayır", `${q.nl}: ${q.left.join("/")}`, `${q.nr}: ${q.right.join("/")}`, f(q.weighted), f(q.gain)], cls: q === best ? "hl" : "" })), { cls: "compact" }),
-      h("p", {}, "En iyi bölme: ", h("b", {}, `x ≤ ${f(best.t)}`), ` (kazanç ${f(best.gain)}). Sınavda yalnız sınıfın değiştiği eşiklere bakmak yeter: en iyi eşik hep onlardan biridir.`));
+      steps([
+        { what: "Değerleri küçükten büyüğe sıralarız ve aday eşikleri, yan yana duran iki değerin orta noktası olarak alırız.", formula: "aday eşik t = (aᵢ + aᵢ₊₁) / 2", calc: `adaylar: ${r.rows.map((q) => f(q.t)).join(", ")}` },
+        { what: `Bölmeden önceki düğümün ${crit.get() === "gini" ? "Gini" : "entropi"} değerini buluruz.`, formula: crit.get() === "gini" ? "Gini = 1 − Σ pᵢ²" : "H = −Σ pᵢ·log₂ pᵢ", calc: `üst düğüm`, result: f(r.parent) },
+        { what: "Her eşik için iki tarafın değerini, o tarafa düşen örneklerin oranıyla ağırlıklandırıp toplarız (tablonun “ağırlıklı” sütunu).", formula: crit.get() === "gini" ? "ağırlıklı = (n_sol / n)·Gini(sol) + (n_sağ / n)·Gini(sağ)" : "ağırlıklı = (n_sol / n)·H(sol) + (n_sağ / n)·H(sağ)",
+          calc: `en iyi eşik t = ${f(best.t)} için: (${best.nl}/${best.nl + best.nr})·${f(imp(best.left))} + (${best.nr}/${best.nl + best.nr})·${f(imp(best.right))}`, result: f(best.weighted) },
+        { what: "Kazanç, bölmenin belirsizliği ne kadar azalttığıdır; en büyük kazancı veren eşik seçilir.", formula: "kazanç = üst düğüm − ağırlıklı", calc: `${f(r.parent)} − ${f(best.weighted)}`, result: f(best.gain),
+          note: `En iyi bölme x ≤ ${f(best.t)}. Sınavda yalnız sınıfın değiştiği eşiklere bakmak yeter: en iyi eşik her zaman onlardan biridir.` },
+      ]));
   });
   return el;
 };
@@ -657,7 +671,13 @@ W.regtree = () => {
     const best = r.rows.reduce((p, q) => (q.total < p.total ? q : p));
     put(out, h("p", {}, `Kök (tek yaprak): tahmin ȳ = ${f(r.rootMean)}, SSE = ${f(r.root)}`),
       table(["eşik", "sol ortalama", "sol SSE", "sağ ortalama", "sağ SSE", "toplam SSE"], r.rows.map((q) => ({ row: [f(q.t), f(q.meanL), f(q.sseL), f(q.meanR), f(q.sseR), f(q.total)], cls: q === best ? "hl" : "" })), { cls: "compact" }),
-      h("p", {}, `En iyi bölme x ≤ ${f(best.t)}: SSE ${f(r.root)} değerinden ${f(best.total)} değerine iner (azalma ${f(r.root - best.total)}). Her yaprak bir sabit tahmin eder: ağaç bir merdiven fonksiyonudur.`));
+      steps([
+        { what: "Bölmeden önce bütün örnekler tek bir yapraktadır; yaprak ortalamayı tahmin eder ve hatası kareler toplamıdır.", formula: "SSE = Σ(y − ȳ)²", calc: `ȳ = ${f(r.rootMean)}, SSE`, result: f(r.root) },
+        { what: "Her aday eşik için iki yaprağın kendi ortalamasını ve kendi SSE'sini hesaplarız (tablonun sütunları).", formula: "toplam SSE = Σ_sol (y − ȳ_sol)² + Σ_sağ (y − ȳ_sağ)²",
+          calc: `en iyi eşik x ≤ ${f(best.t)} için: ${f(best.sseL)} + ${f(best.sseR)}`, result: f(best.total) },
+        { what: "Toplam SSE'yi en çok düşüren eşik seçilir.", formula: "azalma = SSE(kök) − toplam SSE", calc: `${f(r.root)} − ${f(best.total)}`, result: f(r.root - best.total),
+          note: `Sonuç: x ≤ ${f(best.t)} ise ${f(best.meanL)}, değilse ${f(best.meanR)} tahmin edilir. Her yaprak bir sabit tahmin eder; ağaç bir merdiven işlevidir.` },
+      ]));
   });
   return el;
 };
