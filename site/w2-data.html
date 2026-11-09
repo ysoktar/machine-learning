@@ -44,14 +44,14 @@
 <h2>Öznitelikleri aynı ölçeğe getirmek (min-max ve z-score)</h2><p class="h-en" lang="en">Bringing features to the same scale (min-max and z-score)</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden ölçeklemeliyiz?</div><p>İki müşteriyi karşılaştırıyoruz: yaşları 30 ve 60, gelirleri 40.000 ve 41.000 TL. Ham sayılarla uzaklık hesaplarsak gelirdeki 1000 TL'lik fark, yaştaki 30 yıllık farkı ezer: model yaşı hiç görmez. Ölçekleme bütün öznitelikleri aynı “birime” getirir.</p><p><strong>min-max</strong>: en küçüğü 0, en büyüğü 1 yap. <strong>z-score</strong>: “ortalamadan kaç standart sapma uzakta?” (z = 2: ortalamanın 2 standart sapma üstü).</p></div>
 <p>En sık kullanılan iki yöntem şunlardır:</p>
-<div class="formula">min-max: x′ = (x − min) / (max − min) ∈ [0, 1]&nbsp;&nbsp;&nbsp;&nbsp; z-score: z = (x − μ) / σ</div>
+<div class="formula">min-max: x′ = (x − min) / (max − min) ∈ [0, 1]<br>z-score: z = (x − μ) / σ</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li><b>min-max</b>: değerden en küçük değeri çıkar, aralığa (en büyük − en küçük) böl. En küçük değer 0'a, en büyük 1'e gider. Örneğin değerler 2 ile 9 arasındaysa 5 değeri (5 − 2)/7 = 0.43 olur.</li><li><b>z-score</b>: değerden ortalamayı (μ) çıkar, standart sapmaya (σ) böl. Sonuç “ortalamadan kaç standart sapma uzakta?” sorusunun cevabı: z = 0 tam ortalama, z = 1 bir sapma yukarıda, z = −2 iki sapma aşağıda.</li></ul></div>
 <p><b>Elle bir örnek.</b> x = (2, 4, 4, 4, 5, 5, 7, 9) dizisini ölçekleyelim. En küçük değer 2, en büyük 9, aralık 7. Ortalama μ = 40/8 = 5. Ortalamadan farkların kareleri 9, 1, 1, 1, 0, 0, 4, 16; toplamı 32, varyans 32/8 = 4, standart sapma σ = 2.</p>
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th>x</th><th>2</th><th>4</th><th>4</th><th>4</th><th>5</th><th>5</th><th>7</th><th>9</th></tr></thead><tbody>
 <tr><td>min-max: (x − 2)/7</td><td>0</td><td>0.29</td><td>0.29</td><td>0.29</td><td>0.43</td><td>0.43</td><td>0.71</td><td>1</td></tr>
 <tr><td>z-score: (x − 5)/2</td><td>−1.5</td><td>−0.5</td><td>−0.5</td><td>−0.5</td><td>0</td><td>0</td><td>1</td><td>2</td></tr></tbody></table></div>
 <p>Yukarıdaki σ şu formülle hesaplandı:</p>
-<div class="formula">σ² = (1/n)·Σ (xᵢ − μ)² &nbsp;&nbsp;&nbsp; σ = √σ²</div>
+<div class="formula">σ² = (1/n)·Σ (xᵢ − μ)²<br>σ = √σ²</div>
 <p>Yani farkların karelerini toplayıp veri sayısı n'ye bölüyoruz: 32/8 = 4, σ = √4 = 2. (Bazı kaynaklar n yerine n − 1'e böler; bu derste z-score için n kullanılır.)</p>
 <p>İki yöntemin farkı aykırı değerlerde ortaya çıkar: min-max'ta tek bir uç değer en büyük değer olduğu için bütün ölçeği belirler ve diğer değerleri küçük bir aralığa sıkıştırır; z-score bundan daha az etkilenir. Gelir ya da sözcük sıklığı gibi sağa çarpık (çok sayıda küçük, az sayıda dev değer içeren) verilerde önce logaritma almak iyi bir ilk adımdır.</p>
 <div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>Eğitim verisi 10, 20, 30. Test değeri 40'ın min-max değeri nedir?</p><details><summary>Cevabı göster</summary><p>(40 − 10)/(30 − 10) = <strong>1.5</strong>. Eğitim aralığının dışına taştı: sorun değil, eğitimin min/max'ı kullanılır; testin değerleriyle yeniden hesaplanmaz.</p></details></div>
@@ -92,7 +92,7 @@
 
 <h4>3. adım: Kovaryans matrisini kurmak</h4>
 <p>Kovaryans matrisi S üç bilgiyi bir arada tutar. Köşegendeki s₁₁ ve s₂₂ her sütunun kendi yayılmasıdır (varyansı); köşegen dışındaki s₁₂ ise iki sütunun birlikte nasıl değiştiğini söyler. s₁₂ pozitifse biri artarken öteki de artma eğilimindedir, negatifse biri artarken öteki azalır. Her terim, tablodaki ilgili sütunun toplamının n − 1 = 3'e bölümüdür:</p>
-<div class="formula">s₁₁ = Σd₁² / (n − 1) = 10/3 &nbsp;&nbsp; s₂₂ = Σd₂² / (n − 1) = 2/3 &nbsp;&nbsp; s₁₂ = Σd₁d₂ / (n − 1) = 3/3 = 1</div>
+<div class="formula">s₁₁ = Σd₁² / (n − 1) = 10/3<br>s₂₂ = Σd₂² / (n − 1) = 2/3<br>s₁₂ = Σd₁d₂ / (n − 1) = 3/3 = 1</div>
 <div class="formula">S = [ [10/3, 1], [1, 2/3] ]</div>
 <p>Yorum: x₁ çok daha fazla yayılıyor (10/3, x₂'nin beş katı) ve iki sütun birlikte artıyor (s₁₂ = 1 &gt; 0). Bu yüzden en çok yayılmanın olduğu yönün çoğunlukla x₁ boyunca ve hafifçe yukarı eğik olmasını bekleriz.</p>
 
@@ -109,7 +109,7 @@
 <p>Her özdeğerin bir yönü vardır; bu yöne <strong>özvektör</strong> denir. λ₁'in yönü, <span class="m">(S − λ₁I)·v = 0</span> denklemini sağlayan v vektörüdür. S − λ₁I matrisinin ilk satırı (10/3 − 11/3, 1) = (−1/3, 1)'dir; bu satırla v'nin çarpımı sıfır olmalı:</p>
 <div class="formula">−(1/3)·v₁ + 1·v₂ = 0 &nbsp; ⇒ &nbsp; v₂ = v₁/3</div>
 <p>v₁ = 3 seçersek v₂ = 1 olur: yön <strong>(3, 1)</strong>. (İkinci satır aynı bilgiyi verir; 2×2'de tek satır yeter.) Yönün uzunluğu önemli değildir, ama izdüşüm için uzunluğu 1 olan vektör kullanılır. ‖(3, 1)‖ = √(9 + 1) = √10 ≈ 3.162 olduğundan:</p>
-<div class="formula">PC1 yönü u₁ = (3, 1)/√10 ≈ (0.949, 0.316) &nbsp;&nbsp; PC2 yönü u₂ = (−1, 3)/√10 ≈ (−0.316, 0.949)</div>
+<div class="formula">PC1 yönü u₁ = (3, 1)/√10 ≈ (0.949, 0.316)<br>PC2 yönü u₂ = (−1, 3)/√10 ≈ (−0.316, 0.949)</div>
 <p>PC2'yi ayrıca hesaplamamıza gerek yok: 2 boyutta PC1'e dik tek yöndür (iki bileşenin yerini değiştirip birinin işaretini çevirmek yeter). İsterseniz denetleyin: λ₂ = 1/3 için ilk satır (3, 1) olur ve 3·(−1) + 1·3 = 0 ✓. İki yönün iç çarpımı da 0'dır: 3·(−1) + 1·3 = 0, yani birbirlerine diktirler. Beklediğimiz gibi PC1 çoğunlukla x₁ boyunca ve hafifçe yukarı eğik.</p>
 
 <h4>6. adım: Her bileşenin açıkladığı varyansı bulmak</h4>
@@ -163,7 +163,7 @@
 <p>Saydığımızda TP = 4, FN = 2, FP = 1, TN = 3 çıkar ve matris şöyle olur (denetim: 4 + 2 = 6 gerçek pozitif, 1 + 3 = 4 gerçek negatif):</p>
 <table class="cm"><tr><th></th><th>Tahmin +</th><th>Tahmin −</th></tr><tr><th>Gerçek +</th><td class="d">TP = 4</td><td class="o">FN = 2</td></tr><tr><th>Gerçek −</th><td class="o">FP = 1</td><td class="d">TN = 3</td></tr></table>
 <p>Bu dört sayıdan bütün ölçütler hesaplanır. Aşağıdaki çizim, her ölçütün matrisin hangi hücrelerini kullandığını gösteriyor:</p><div data-widget="fig" data-fig="cmread" data-formula="precision = TP / (TP + FP)   ·   recall = TP / (TP + FN)   ·   accuracy = (TP + TN) / n" data-caption="Precision tahmin sütununa, recall gerçek satırına, accuracy köşegene bakar (yukarıdaki örneğin sayılarıyla)."></div>
-<div class="formula">Accuracy = (TP+TN)/n &nbsp;·&nbsp; Precision = TP/(TP+FP) &nbsp;·&nbsp; Recall = TP/(TP+FN) &nbsp;·&nbsp; F1 = 2PR/(P+R) = 2TP/(2TP+FP+FN)</div>
+<div class="formula">Accuracy = (TP+TN)/n<br>Precision = TP/(TP+FP)<br>Recall = TP/(TP+FN)<br>F1 = 2PR/(P+R) = 2TP/(2TP+FP+FN)</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li><b>Accuracy</b>: doğru tahminler (TP + TN) bölü bütün örnekler.</li><li><b>Precision</b>: paydada <em>pozitif dediklerim</em> (TP + FP) var: “dediklerimin kaçı doğru?”</li><li><b>Recall</b>: paydada <em>gerçek pozitifler</em> (TP + FN) var: “gerçek pozitiflerin kaçını yakaladım?”</li><li><b>F1</b>: ikisinin harmonik ortalaması; biri küçükse F1 de küçük olur. Elle hesapta 2TP/(2TP + FP + FN) biçimi daha kolay.</li></ul></div>
 <div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Sınavda karmaşıklık matrisi sorusu: 5 adım</div><ol>
 <li>Pozitif sınıfı yazın (soru belirtir; çoğu zaman 1 ya da “Evet”).</li>
@@ -196,7 +196,7 @@
 
 <h2>Sayı tahminini ölçmek: MSE, RMSE, MAE ve R²</h2><p class="h-en" lang="en">Evaluating regression: MSE, RMSE, MAE and R²</p>
 <p>Tahmin edilen şey bir sayıysa (fiyat, sıcaklık), hatayı doğrudan gerçek değer ile tahmin arasındaki farktan ölçeriz:</p>
-<div class="formula">MSE = (1/n)Σ(y − ŷ)² &nbsp;·&nbsp; RMSE = √MSE &nbsp;·&nbsp; MAE = (1/n)Σ|y − ŷ| &nbsp;·&nbsp; R² = 1 − Σ(y − ŷ)² / Σ(y − ȳ)²</div>
+<div class="formula">MSE = (1/n)Σ(y − ŷ)²<br>RMSE = √MSE<br>MAE = (1/n)Σ|y − ŷ|<br>R² = 1 − Σ(y − ŷ)² / Σ(y − ȳ)²</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>y gerçek değer, ŷ (“y şapka”) tahmin; y − ŷ hata. Σ (“toplam”) bütün örnekler üzerinden toplar, (1/n) ortalamasını alır.</li><li><b>MSE</b>: hataların karelerinin ortalaması (büyük hatayı çok cezalandırır). <b>RMSE</b>: onun karekökü (birimi y'nin birimiyle aynı). <b>MAE</b>: hataların mutlak değerlerinin ortalaması.</li><li><b>R²</b>: 1 − (modelin hata kareleri toplamı) / (her şeye ortalamayı söyleseydik hata kareleri toplamı). 1 kusursuz, 0 ortalama kadar iyi.</li></ul></div>
 <div data-widget="regmetrics"></div>
 <div data-widget="fig" data-fig="residuals" data-formula="MSE = (1/n)·Σ (yᵢ − ŷᵢ)²   ·   RMSE = √MSE" data-caption="Her noktanın doğruya dikey uzaklığı (kırmızı) bir hatadır; MSE bu hataların karelerinin ortalamasıdır."></div>
