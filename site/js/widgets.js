@@ -445,7 +445,19 @@ W.gates = () => {
     const z = X.map(([a, c]) => w1.get() * a + w2.get() * c + b.get());
     const o = z.map((v) => (v >= 0 ? 1 : 0)).join("");
     const names = { "0001": "AND", "0111": "OR", "1110": "NAND", "1000": "NOR", "0110": "XOR", "1001": "XNOR", "0000": "hep 0", "1111": "hep 1" };
-    put(out, table(["x₁", "x₂", "z", "çıktı"], X.map((x, i) => [x[0], x[1], f(z[i]), z[i] >= 0 ? 1 : 0]), { cls: "center compact" }),
+    // picture: the four inputs coloured by the neuron's output, its line w₁x₁ + w₂x₂ + b = 0 and the two sides
+    const W1 = w1.get(), W2 = w2.get(), B = b.get();
+    const flat = Math.abs(W1) < 1e-12 && Math.abs(W2) < 1e-12;
+    const pic = scatter({ xlim: [-0.5, 1.5], ylim: [-0.5, 1.5], xstep: 0.5, ystep: 0.5, equal: true, labels: true,
+      points: X.map((x, i) => ({ x, y: z[i] >= 0 ? 1 : -1, name: `(${x[0]}, ${x[1]})` })),
+      ...(flat ? { shadeFn: () => (B >= 0 ? 1 : -1), shadeRes: 4 } : { shade: { w: [W1, W2], b: B }, lines: [{ w: [W1, W2], b: B, cls: "accent" }] }),
+      xlabel: "x₁", ylabel: "x₂", aria: "Nöronun sınırı" });
+    const xorPic = scatter({ xlim: [-0.5, 1.5], ylim: [-0.5, 1.5], xstep: 0.5, ystep: 0.5, equal: true, labels: true,
+      points: X.map((x) => ({ x, y: x[0] !== x[1] ? 1 : -1, name: `(${x[0]}, ${x[1]})` })), xlabel: "x₁", ylabel: "x₂", aria: "XOR" });
+    put(out, h("div", { class: "two-col" },
+        h("figure", { class: "fig" }, pic, h("figcaption", {}, `Bu nöronun sınırı ${flat ? "yok (w = 0): bütün düzlem tek sınıf" : `${lin([W1, W2], B)} = 0 doğrusu`}. Mavi taraf çıktı 1, kırmızı taraf çıktı 0; daireler 1, kareler 0 çıkan girdiler.`)),
+        h("figure", { class: "fig" }, xorPic, h("figcaption", {}, "XOR'da 1 çıkması gereken iki girdi (mavi) çapraz köşelerde, 0 çıkması gerekenler (kırmızı) öbür iki köşede. Hangi doğruyu çizerseniz çizin, iki maviyi iki kırmızıdan ayıramazsınız."))),
+      table(["x₁", "x₂", "z", "çıktı"], X.map((x, i) => [x[0], x[1], f(z[i]), z[i] >= 0 ? 1 : 0]), { cls: "center compact" }),
       h("p", {}, "Bu nöron ", h("strong", {}, names[o] || `çıktı ${o}`), " hesaplıyor. XOR (çıktılar 0, 1, 1, 0) ise hiçbir (w₁, w₂, b) ile elde edilemez. Nedeni: (0, 1) ve (1, 0) girdilerinde 1 çıkması için w₂ + b ≥ 0 ve w₁ + b ≥ 0 olmalı; bu ikisini toplayınca w₁ + w₂ + 2b ≥ 0 bulunur. (0, 0) girdisinde 0 çıkması için b < 0 olmalı, bu da w₁ + w₂ + b ≥ −b > 0 demektir. Oysa (1, 1) girdisinde 0 çıkması için w₁ + w₂ + b < 0 gerekir: çelişki."));
   });
   return el;
