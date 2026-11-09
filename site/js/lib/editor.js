@@ -68,6 +68,8 @@ export function pointEditor(opts) {
     /** the two half-planes of w·x + b coloured */
     halves(w, b) {
       const corners = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+      // w = 0: no boundary, z = b everywhere, so the whole plane is one class (z ≥ 0 → +)
+      if (Math.abs(w[0]) < 1e-12 && Math.abs(w[1]) < 1e-12) return `<polygon points="${corners.map(([a, c]) => `${X(a)},${Y(c)}`).join(" ")}" class="${b >= 0 ? "region-pos" : "region-neg"}"/>`;
       const poly = (sign) => {
         const pts = [];
         for (let i = 0; i < 4; i++) {

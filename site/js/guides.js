@@ -82,7 +82,7 @@ export const GUIDE = {
     see: "Doğru aynı kalır; yalnız z'lerin ölçeği değişir.",
   },
   gates: {
-    what: "Tek bir nöronun (z = w₁x₁ + w₂x₂ + b ≥ 0 → 1) hangi mantık kapısını hesapladığını gösterir.",
+    what: "Tek bir nöronun (z = w₁x₁ + w₂x₂ + b ≥ 0 ise çıktı 1) hangi mantık kapısını hesapladığını gösterir.",
     tryit: ["AND, OR, NAND düğmelerine basıp ağırlıkları inceleyin.", "XOR'u (0110) veren bir w, b bulmaya çalışın."],
     see: "AND/OR/NAND tek doğruyla ayrılır; XOR ayrılmaz: bu yüzden gizli katman gerekir.",
   },

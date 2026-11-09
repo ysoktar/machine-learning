@@ -197,7 +197,7 @@ export function perceptron(ds) {
     count.textContent = `adım ${t} / ${steps.length - 1}`;
     if (ed) ed.redraw();
     if (!cur.step) {
-      put(narr, h("b", {}, "Başlangıç. "), `w = ${vec(cur.w)}, b = ${f(cur.b)}. Çizgi bu ağırlıkların sınırı; renkli bölge modelin + dediği taraf. Çarpı işaretli noktalar şu an yanlış sınıflanıyor. ▶ ile ilk örneğe geçin.`);
+      put(narr, h("b", {}, "Başlangıç. "), `w = ${vec(cur.w)}, b = ${f(cur.b)}. ` + (Math.abs(cur.w[0]) < 1e-12 && Math.abs(cur.w[1]) < 1e-12 ? `Ağırlıklar sıfır olduğu için henüz bir sınır yok: her noktada z = b = ${f(cur.b)}, bu yüzden model bütün düzleme ${cur.b >= 0 ? "+" : "−"} diyor.` : "Çizgi bu ağırlıkların karar sınırı; mavi bölge modelin + dediği, kırmızı bölge − dediği taraf.") + " Çarpı işaretli noktalar şu an yanlış sınıflanıyor. ▶ ile ilk örneğe geçin.");
     } else {
       const s = cur.step, x = s.x, p = cur.prev;
       const term = (c, k) => `${c < 0 ? (k ? " − " : "−") : k ? " + " : ""}${f(Math.abs(c))}`;
@@ -291,7 +291,7 @@ export function sigplay() {
     put(out, h("div", { class: "two-col" },
       lines({ series: [{ pts: zs.map((v) => [v, ml.sigmoid(v)]), cls: "curve1", name: "σ(z)", color: "pos" }, { pts: [[Z, 0], [Z, p]], cls: "curve3", dots: true, name: "şu anki z", color: "s3" }], xlim: [-6, 6], ylim: [0, 1], xstep: 2, ystep: 0.25, xlabel: "z" }),
       h("div", {},
-        h("p", {}, `p = σ(${f(Z, 1)}) = 1/(1 + e^${f(-Z, 1)}) = `, h("b", {}, f(p))),
+        h("p", {}, `p = σ(${f(Z, 1)}) = 1/(1 + exp(${f(-Z, 1)})) = `, h("b", {}, f(p))),
         h("p", {}, "Gerçek y = 1 ise kayıp −ln p = ", h("b", {}, f(-Math.log(p)))),
         h("p", {}, "Gerçek y = 0 ise kayıp −ln(1 − p) = ", h("b", {}, f(-Math.log(1 - p)))),
         h("div", { class: "vote-bar" }, h("div", { class: "vp", style: { flex: p } }, p > 0.12 ? `P(1) ${f(p, 2)}` : ""), h("div", { class: "vn", style: { flex: 1 - p } }, 1 - p > 0.12 ? `P(0) ${f(1 - p, 2)}` : "")),
@@ -311,12 +311,12 @@ export function entplay() {
     const A = a.get(), Bn = b.get(), n = A + Bn;
     if (!n) { put(out, h("p", {}, "Düğüm boş.")); return; }
     const p = A / n, H = ml.entropy([A, Bn]), G = ml.gini([A, Bn]);
-    const term = (k) => (k ? `${k}/${n}·log₂(${n}/${k}) = ${f((k / n) * -ml.log2(k / n))}` : "0 (0·log 0 = 0)");
+    const sym = (k) => (k ? `(${k}/${n})·log₂(${n}/${k})` : "0"), val = (k) => (k ? f((k / n) * -ml.log2(k / n)) : "0");
     put(out, h("div", { class: "two-col" },
       lines({ series: [{ pts: Array.from({ length: 101 }, (_, i) => [i / 100, ml.entropy([i, 100 - i])]), cls: "curve1", name: "H(p)", color: "pos" }, { pts: [[p, 0], [p, H]], cls: "curve3", dots: true, name: "bu düğüm", color: "s3" }], xlim: [0, 1], ylim: [0, 1.05], xstep: 0.25, ystep: 0.25, xlabel: "p = Evet oranı" }),
       h("div", {},
         h("div", { class: "vote-bar" }, A ? h("div", { class: "vp", style: { flex: A } }, `Evet ${A}`) : null, Bn ? h("div", { class: "vn", style: { flex: Bn } }, `Hayır ${Bn}`) : null),
-        h("p", {}, "H = ", term(A), " + ", term(Bn), " = ", h("b", {}, f(H)), " bit"),
+        h("p", {}, `H = ${sym(A)} + ${sym(Bn)} = ${val(A)} + ${val(Bn)} = `, h("b", {}, f(H)), " bit", A && Bn ? "" : " (0·log 0 = 0 kabul edilir)"),
         h("p", {}, "Gini = 1 − (", `${A}/${n})² − (${Bn}/${n})² = `, h("b", {}, f(G))),
         h("p", { class: "small" }, H === 0 ? "Saf düğüm: belirsizlik yok, burası yaprak olur." : Math.abs(p - 0.5) < 1e-9 ? "Yarı yarıya: en belirsiz durum (1 bit)." : "Karışık düğüm: bölmeye devam etmek kazanç getirebilir."))));
   }
