@@ -158,10 +158,35 @@
 <p>Aşağıdaki problemler sınavdaki biçimdedir. Her birini önce kâğıtta çözmeye çalış (5–10 dakika), sonra “çözümü aç”a bas: çözümde her adımın <em>neden</em> öyle yapıldığı da yazıyor. Takılırsan sayfanın ilgili bölümüne dön.</p>
 <h3>Problem 1: perceptron, bir epoch ve yakınsama</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H4)</span></div><p>Eğitim örnekleri sırayla: P1 = (1, 1) sınıf +1, P2 = (2, 0) +1, P3 = (0, 1) −1, P4 = (−1, 0) −1, P5 = (1, −1) +1. Başlangıç w = (0, 0), b = 0, öğrenme oranı η = 1. Kural: z = w·x + b ≥ 0 ise tahmin +1, değilse −1; yanlış tahminde w ← w + η·y·x ve b ← b + η·y. (a) Bir epoch'u tablo hâlinde uygulayın. (b) Epoch sonundaki ağırlıklarla bütün örnekleri sınıflayıp karmaşıklık matrisini ve accuracy'yi bulun. (c) Veri doğrusal ayrılabilir mi, algoritma bir gün durur mu?</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Perceptron örnekleri sırayla dolaşır. Her örnekte önce z'yi hesaplar ve tahmin yapar; tahmin doğruysa hiçbir şeye dokunmaz, yanlışsa ağırlıkları o örneğin doğru tarafa geçeceği yöne kaydırır.</p><p>(a) Başta bütün ağırlıklar 0 olduğu için P1 ve P2'de z = 0 çıkar; kurala göre 0 da +1 sayılır ve ikisi de doğru tahmin edilir. P3'te de z = 0 ve tahmin +1, ama gerçek sınıf −1: ilk hata. Güncelleme w ← (0, 0) + 1·(−1)·(0, 1) = (0, −1) ve b ← 0 − 1 = −1 olur. P4'te z = 0·(−1) + (−1)·0 − 1 = −1, tahmin −1, doğru. P5'te z = 0·1 + (−1)·(−1) − 1 = 0, tahmin +1, doğru.</p><div class="table-wrap"><table class="simple compact"><thead><tr><th>örnek</th><th>z</th><th>tahmin</th><th>gerçek</th><th>güncelleme</th><th>sonra w, b</th></tr></thead><tbody>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Perceptron örnekleri sırayla, birer birer işler. Her örnekte yapılacak iş hep aynıdır; önce bu üç kuralı hatırlayalım:</p>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Her örnekte yapılan</div><ol>
+<li><strong>Skoru hesapla:</strong> z = w₁·x₁ + w₂·x₂ + b.</li>
+<li><strong>Tahmin et:</strong> z ≥ 0 ise tahmin +1, değilse −1.</li>
+<li><strong>Karşılaştır:</strong> tahmin doğruysa hiçbir şey değişmez. Yanlışsa w ← w + η·y·x ve b ← b + η·y. (η = 1 olduğu için: gerçek sınıf +1 ise x eklenir, −1 ise x çıkarılır.)</li>
+</ol></div>
+<p><strong>(a) Bir epoch.</strong> Başlangıçta w = (0, 0) ve b = 0. Örnekleri sırayla işleyelim:</p>
+<ol class="walk">
+<li><strong>P1 = (1, 1), gerçek sınıf +1.</strong> z = 0·1 + 0·1 + 0 = 0. z ≥ 0 olduğu için tahmin +1. Tahmin doğru, ağırlıklar değişmez.</li>
+<li><strong>P2 = (2, 0), gerçek sınıf +1.</strong> z = 0·2 + 0·0 + 0 = 0, tahmin +1. Doğru, değişiklik yok.</li>
+<li><strong>P3 = (0, 1), gerçek sınıf −1.</strong> z = 0·0 + 0·1 + 0 = 0, tahmin +1. <em>Yanlış</em>: ilk güncelleme. Gerçek sınıf −1 olduğu için x çıkarılır: w = (0, 0) − (0, 1) = <strong>(0, −1)</strong> ve b = 0 − 1 = <strong>−1</strong>.</li>
+<li><strong>P4 = (−1, 0), gerçek sınıf −1.</strong> Yeni ağırlıklarla z = 0·(−1) + (−1)·0 − 1 = −1. z &lt; 0 olduğu için tahmin −1. Doğru, değişiklik yok.</li>
+<li><strong>P5 = (1, −1), gerçek sınıf +1.</strong> z = 0·1 + (−1)·(−1) − 1 = 0, tahmin +1. Doğru, değişiklik yok.</li>
+</ol>
+<p>Epoch sonunda w = (0, −1) ve b = −1. Sınavda bu adımlar şöyle bir tabloyla yazılır:</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>örnek</th><th>z</th><th>tahmin</th><th>gerçek</th><th>güncelleme</th><th>sonra w, b</th></tr></thead><tbody>
 <tr><td>P1</td><td>0</td><td>+1</td><td>+1</td><td>yok</td><td>(0, 0), 0</td></tr><tr><td>P2</td><td>0</td><td>+1</td><td>+1</td><td>yok</td><td>(0, 0), 0</td></tr>
-<tr class="hl"><td>P3</td><td>0</td><td>+1</td><td>−1</td><td>w − (0, 1), b − 1</td><td>(0, −1), −1</td></tr>
-<tr><td>P4</td><td>−1</td><td>−1</td><td>−1</td><td>yok</td><td>(0, −1), −1</td></tr><tr><td>P5</td><td>0</td><td>+1</td><td>+1</td><td>yok</td><td>(0, −1), −1</td></tr></tbody></table></div><p>(b) Epoch sonundaki w = (0, −1), b = −1 ile örnekleri yeniden sınıflarız: P1 için z = −2 (tahmin −1, ama gerçek +1: FN), P2 için z = −1 (FN), P3 için z = −2 (TN), P4 için z = −1 (TN), P5 için z = 0 (TP). Sonuç TP 1, FN 2, FP 0, TN 2; accuracy 3/5 = 0.6. Güncelleme P3'ü düzeltti ama P1 ile P2'yi bozdu; tek epoch çoğu zaman yetmez.</p><p>(c) Veri doğrusal ayrılabilir; örneğin x₁ − 0.5x₂ − 0.25 = 0 doğrusu iki sınıfı ayırır. Ayıran bir doğru varsa perceptron yakınsama teoremi, algoritmanın sonlu sayıda güncellemeden sonra hatasız bir tur yapıp duracağını garanti eder. Burada 2. epoch sonunda w = (1, −1), b = −1; 3. epoch sonunda w = (2, −1), b = −1 olur ve 4. epoch hiç hata yapmaz. Aşağıdaki araçta bunu adım adım izleyebilirsiniz.</p><div data-widget="perceptron" data-pts="1 1 +
+<tr class="hl"><td>P3</td><td>0</td><td>+1</td><td>−1</td><td>x çıkarılır</td><td>(0, −1), −1</td></tr>
+<tr><td>P4</td><td>−1</td><td>−1</td><td>−1</td><td>yok</td><td>(0, −1), −1</td></tr><tr><td>P5</td><td>0</td><td>+1</td><td>+1</td><td>yok</td><td>(0, −1), −1</td></tr></tbody></table></div>
+<p><strong>(b) Son ağırlıklarla sınıflama.</strong> Şimdi bütün örnekleri, epoch sonundaki w = (0, −1), b = −1 ile yeniden sınıflarız; bu ağırlıklarla z = −x₂ − 1 olur:</p>
+<ol class="walk">
+<li>P1 = (1, 1): z = −1 − 1 = −2, tahmin −1. Gerçek +1: kaçırılmış pozitif (<strong>FN</strong>).</li>
+<li>P2 = (2, 0): z = 0 − 1 = −1, tahmin −1. Gerçek +1: <strong>FN</strong>.</li>
+<li>P3 = (0, 1): z = −1 − 1 = −2, tahmin −1. Gerçek −1: <strong>TN</strong>.</li>
+<li>P4 = (−1, 0): z = −1, tahmin −1. Gerçek −1: <strong>TN</strong>.</li>
+<li>P5 = (1, −1): z = 1 − 1 = 0, tahmin +1. Gerçek +1: <strong>TP</strong>.</li>
+</ol>
+<p>Sayınca TP = 1, FN = 2, FP = 0, TN = 2. Accuracy = (TP + TN)/n = (1 + 2)/5 = <strong>0.6</strong>. Tek güncelleme P3'ü düzeltti ama P1 ile P2'yi bozdu; bir epoch çoğu zaman yetmez.</p>
+<p><strong>(c) Algoritma durur mu?</strong> Evet. Veri doğrusal ayrılabilir: örneğin x₁ − 0.5·x₂ − 0.25 = 0 doğrusu pozitifleri negatiflerden ayırır. Ayıran bir doğru varsa perceptron, sonlu sayıda güncellemeden sonra hatasız bir tur yapar ve durur (yakınsama teoremi). Bu örnekte 2. epoch sonunda w = (1, −1), b = −1; 3. epoch sonunda w = (2, −1), b = −1 olur ve 4. epoch hiç hata yapmaz. Aşağıdaki araçta bütün adımları tek tek izleyebilirsiniz.</p><div data-widget="perceptron" data-pts="1 1 +
 2 0 +
 0 1 -
 -1 0 -
