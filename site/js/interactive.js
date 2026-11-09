@@ -1,6 +1,6 @@
 // Teaching widgets built on the interactive point editor: drag, add and remove points; step through algorithms with
 // a narration of what happens and why; explore formulas with sliders. Registered into widgets.js (W.*).
-import { h, table, frame, area, parseRows, errorBox } from "./lib/ui.js";
+import { h, table, frame, area, parseRows, parseNums, readNumber, errorBox } from "./lib/ui.js";
 import * as ml from "./lib/ml.js";
 import { lines } from "./lib/plot.js";
 // "0.5x₁ + x₂ − 2" (no "1x₂", no "+ −2")
@@ -178,7 +178,7 @@ export function perceptron(ds) {
   const pts = () => (ed ? ed.points : start);
   function recompute() {
     stop();
-    const W0 = wIn.value.trim().split(/[\s,;]+/).map(Number), b0 = Number(bIn.value), eta = Number(eIn.value);
+    const W0 = parseNums(wIn.value), b0 = readNumber(bIn.value), eta = readNumber(eIn.value);
     if (W0.length !== dims || W0.some((v) => !Number.isFinite(v))) { put(out, errorBox(`w ${dims} sayı olmalı.`)); return; }
     const P = pts();
     result = ml.perceptron(P, W0, b0, eta, { epochs: Math.min(30, Math.max(1, Number(epIn.value) || 1)) });

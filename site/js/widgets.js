@@ -1,6 +1,6 @@
 // Interactive widgets. A page places <div data-widget="name" data-…></div>; mountAll() replaces each one.
 // Every number shown here comes from lib/ml.js, which is unit-tested against the course's worked examples.
-import { h, $, $$, table, frame, num, select, checkbox, button, area, parseNums, parseRows, errorBox, store } from "./lib/ui.js";
+import { h, $, $$, table, frame, num, select, checkbox, button, area, parseNums, parseRows, errorBox, store, parseBits, parsePosNeg, parseLabels, readNumber } from "./lib/ui.js";
 import * as ml from "./lib/ml.js";
 import { scatter, lines } from "./lib/plot.js";
 import { figure } from "./figures.js";
@@ -218,7 +218,7 @@ W.confusion = (ds) => {
     vecRow.hidden = !vm; cntRow.hidden = vm;
     let c, extra = null;
     if (vm) {
-      const a = parseNums(y.value), b = parseNums(p.value);
+      const a = parseBits(y.value), b = parseBits(p.value);
       if (a.length !== b.length || !a.length) { put(out, errorBox("İki dizi aynı uzunlukta olmalı (1 = pozitif, 0 = negatif).")); return; }
       c = ml.confusion(a, b, 1);
       extra = table(["örnek", ...a.map((_, i) => i + 1)], [["gerçek", ...a], ["tahmin", ...b], ["durum", ...c.tags.map(tag)]], { cls: "center compact" });
@@ -233,9 +233,9 @@ W.roc = (ds) => {
   const { el, body } = frame("Sıralı skorlardan ROC eğrisi ve AUC");
   const inp = h("input", { type: "text", value: ds.seq || "+ + − + − + − −", style: { width: "18rem" } });
   const out = outBox();
-  body.append(h("div", { class: "controls" }, h("label", {}, "Skora göre sıralı (en yüksek önce) gerçek sınıflar: ", inp)), h("p", { class: "field-hint" }, "+ / − (ya da 1 / 0) yazın. Eşik “ilk k örnek pozitif” diye kaydırılır."), out);
+  body.append(h("div", { class: "controls" }, h("label", {}, "Skora göre sıralı (en yüksek önce) gerçek sınıflar: ", inp)), h("p", { class: "field-hint" }, "+ / − (ya da 1 / 0) yazın; aralara boşluk ya da virgül koymak isteğe bağlıdır (++−+ de olur). Eşik “ilk k örnek pozitif” diye kaydırılır."), out);
   live(body, () => {
-    const labs = inp.value.trim().split(/[\s,]+/).filter(Boolean).map((s) => ["+", "1", "p"].includes(s));
+    const labs = parsePosNeg(inp.value);
     if (labs.length < 2) return;
     const r = ml.roc(labs);
     const plot = lines({ series: [{ pts: r.table.map((t) => [t.FPR, t.TPR]), cls: "curve1", name: "ROC", color: "pos" }, { pts: [[0, 0], [1, 1]], cls: "curve3", name: "rastgele (AUC 0.5)", color: "s3" }], xlim: [0, 1], ylim: [0, 1], xstep: 0.25, ystep: 0.25, xlabel: "FPR", ylabel: "TPR" });
@@ -603,7 +603,7 @@ W.threshold = (ds) => {
   const out = outBox();
   body.append(h("div", { class: "controls" }, h("label", {}, "değerler: ", x), h("label", {}, "sınıflar: ", y), crit.label), out);
   live(body, () => {
-    const a = parseNums(x.value), b = y.value.trim().split(/[\s,]+/).filter(Boolean);
+    const a = parseNums(x.value), b = parseLabels(y.value, a.length);
     if (a.length !== b.length || a.length < 2) { put(out, errorBox("Aynı uzunlukta iki dizi girin.")); return; }
     const r = ml.thresholdTable(a, b, crit.get());
     const best = r.rows.reduce((p, q) => (q.gain > p.gain + 1e-12 ? q : p), r.rows[0]);
@@ -1178,7 +1178,7 @@ W.drill = (ds) => {
     const check = () => {
       let all = true;
       for (const { fl, input } of inputs) {
-        const v = Number(input.value.replace(",", ".").replace("−", "-"));
+        const v = readNumber(input.value);
         const ok = input.value.trim() !== "" && Number.isFinite(v) && (Number.isNaN(fl.v) ? false : Math.abs(v - fl.v) <= (fl.tol ?? 0.006 + Math.abs(fl.v) * 0.002));
         input.classList.toggle("ok", ok); input.classList.toggle("no", !ok);
         all &&= ok;

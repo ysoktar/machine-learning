@@ -63,13 +63,39 @@ export function area(value, rows = 6, oninput) {
   if (oninput) t.addEventListener("input", oninput);
   return t;
 }
-/** Parse "1, 2, 3" / "1 2 3" into numbers (accepts decimal commas only when separated by spaces/semicolons). */
+// Readers type numbers in many ways: "−1" (typographic minus), "1,2,3", "1;2", extra spaces. All of them must work.
+const normMinus = (s) => String(s).replace(/[−–]/g, "-");
+/** Parse "1, 2, 3" / "1 2 3" / "1;2;3" into numbers; typographic minus signs are accepted, junk tokens dropped. */
 export function parseNums(s) {
-  return s.trim().split(/[\s;,]+/).filter(Boolean).map(Number);
+  return normMinus(s).trim().split(/[\s;,]+/).filter(Boolean).map(Number).filter(Number.isFinite);
+}
+/** 0/1 sequences: "1 1 0", "1,1,0" and also "110" with no separators at all. */
+export function parseBits(s) {
+  const t = normMinus(s).trim();
+  if (/^[01\s,;]+$/.test(t)) return t.replace(/[\s,;]/g, "").split("").map(Number);
+  return parseNums(t);
+}
+/** Positive/negative labels: "+ + −", "++−", "1 1 0", "110", "p p n", "+,+,-". Returns true for positive. */
+export function parsePosNeg(s) {
+  const t = normMinus(s).toLowerCase().replace(/[\s,;]/g, "");
+  return t.split("").filter((c) => "+-10pnye".includes(c)).map((c) => "+1py".includes(c));
+}
+/** Class labels for n values: "E E H", "E,E,H" or "EEH" (single-letter labels typed together). */
+export function parseLabels(s, n) {
+  const toks = s.trim().split(/[\s,;]+/).filter(Boolean);
+  if (toks.length !== n) { const joined = toks.join(""); if (joined.length === n) return joined.split(""); }
+  return toks;
+}
+/** One number typed by a reader: "0,5", "−1", "4/5", " 2 " all work. NaN if it is not a number. */
+export function readNumber(s) {
+  const t = normMinus(s).trim().replace(",", ".").replace(/\s+/g, "");
+  const fr = t.match(/^(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)$/);
+  if (fr) return Number(fr[1]) / Number(fr[2]);
+  return t === "" ? NaN : Number(t);
 }
 /** Lines of whitespace/comma separated tokens, ignoring empty lines and # comments. */
 export function parseRows(s) {
-  return s.split("\n").map((l) => l.replace(/#.*/, "").trim()).filter(Boolean).map((l) => l.split(/[\s,;|]+/).filter(Boolean));
+  return normMinus(s).split("\n").map((l) => l.replace(/#.*/, "").trim()).filter(Boolean).map((l) => l.split(/[\s,;|]+/).filter(Boolean));
 }
 export function errorBox(msg) { return h("p", { class: "err" }, "⚠ " + msg); }
 export const sup = (s) => h("sup", {}, s);
