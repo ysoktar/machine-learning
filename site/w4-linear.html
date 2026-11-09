@@ -84,12 +84,11 @@
 <div class="formula">L = −[ y·ln p + (1 − y)·ln(1 − p) ]</div>
 <p class="formula-legend"><b>Burada:</b> y örneğin gerçek etiketi (0 ya da 1), p = σ(z) modelin “bu örnek 1'dir” olasılığı, z = w·x + b skor, ln doğal logaritma.</p>
 <p>Köşeli parantezin içinde her seferinde yalnız bir terim çalışır. y = 1 ise ikinci terim (1 − y = 0 ile çarpıldığı için) kaybolur ve kayıp −ln p olur; y = 0 ise ilk terim kaybolur ve kayıp −ln(1 − p) olur. Yani kayıp, “modelin doğru sınıfa verdiği olasılığın eksi logaritması”dır: doğru sınıfa 1'e yakın olasılık verilirse kayıp 0'a yakın, 0'a yakın olasılık verilirse çok büyük olur.</p>
-<p><strong>Gradyan.</strong> Gradyan inişi için kaybın w ve b'ye göre türevi gerekir. Sigmoid ile log-loss birlikte kullanıldığında bu türev şu kısa sonuca iner; sınavda doğrudan bunu kullanırsınız:</p>
-<div class="formula" style="font-size:1.3rem">∂L/∂w = (p − y)·x</div>
-<div class="formula" style="font-size:1.3rem">∂L/∂b = p − y</div>
-<p class="formula-legend"><b>Burada:</b> p modelin tahmini olasılığı, y gerçek etiket (0 ya da 1), p − y tahmin hatası, x örneğin öznitelik vektörü. Kısaca: <strong>gradyan = tahmin hatası × girdi</strong>.</p>
-<p>Örneğin p = 0.8 ve y = 1 ise hata p − y = −0.2'dir; güncelleme w ← w − η·(−0.2)·x ağırlıkları x yönünde artırır ve bir sonraki tahmini 1'e yaklaştırır. y = 0 olsaydı hata +0.8 olur, ağırlıklar ters yönde azalırdı.</p>
-<details class="aside"><summary>Bu formül nereden geliyor? (sınavda istenmez)</summary>
+<p><strong>Ağırlıkları güncellemek.</strong> Her adımda ağırlıklar şu iki formülle güncellenir; sınavda doğrudan bunları kullanırsınız:</p>
+<div class="formula" style="font-size:1.3rem">w ← w − η·(p − y)·x<br>b ← b − η·(p − y)</div>
+<p class="formula-legend"><b>Burada:</b> ← “yeni değeri şudur”, η öğrenme oranı (adım boyu), p modelin tahmini olasılığı, y gerçek etiket (0 ya da 1), p − y tahmin hatası, x örneğin öznitelik vektörü.</p>
+<p>Formüldeki (p − y)·x kaybın gradyanıdır; eksi işareti kaybı azaltmak için gradyanın tersine gittiğimizi gösterir. Örneğin p = 0.8 ve y = 1 ise hata p − y = −0.2'dir; w ← w − η·(−0.2)·x = w + 0.2·η·x olur, yani ağırlıklar x yönünde artar ve bir sonraki tahmin 1'e yaklaşır. y = 0 olsaydı hata +0.8 olur ve ağırlıklar ters yönde azalırdı.</p>
+<details class="aside"><summary>Gradyan neden (p − y)·x? (sınavda istenmez)</summary>
 <p>L, w'ye üç adımda bağlıdır: w → z = w·x + b → p = σ(z) → L. Zincir kuralıyla ∂L/∂w = (∂L/∂p)·(∂p/∂z)·(∂z/∂w). Bu üç türev sırasıyla (p − y)/(p(1 − p)), p(1 − p) ve x'tir. Çarpınca p(1 − p)'ler sadeleşir ve geriye (p − y)·x kalır. Sade sonucun nedeni budur: log-loss'un türevindeki kesir, sigmoidin türeviyle tam olarak götürülür.</p>
 </details>
 <p><strong>Bütün veri için.</strong> Eğitimde n örneğin ortalama kaybı küçültülür; ortalamanın türevi, türevlerin ortalamasıdır. Bu yüzden aynı formüller her örnek için hesaplanıp ortalaması alınır:</p>
