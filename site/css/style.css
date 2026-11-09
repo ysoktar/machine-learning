@@ -492,3 +492,6 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 
 /* the hidden attribute must win over display rules such as .controls { display: flex } */
 [hidden] { display: none !important; }
+/* long inline formulas (glossary, tables) wrap on phones instead of widening the page */
+.glossary .m { display: block; white-space: normal; margin: 0.25rem 0; }
+.glossary dd { overflow-wrap: anywhere; }
