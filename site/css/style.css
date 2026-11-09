@@ -524,3 +524,4 @@ details.aside .m { white-space: normal; overflow-wrap: anywhere; }
 /* a worked example walked one item at a time */
 ol.walk { padding-left: 1.4rem; }
 ol.walk > li { margin: 0.35rem 0; padding: 0.35rem 0.6rem; background: var(--surface-2); border-radius: 8px; list-style-position: outside; }
+ol.walk.parts { list-style: none; padding-left: 0; }
