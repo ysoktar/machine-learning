@@ -381,7 +381,7 @@ export const TERMS = [
 },
 {
 "term": "Karar kütüğü",
-"def": "Tek bölmeli (derinliği 1) karar ağacı: “x₂ ≥ 0.5 ise Evet”. AdaBoost'un tipik zayıf öğrenicisi.",
+"def": "Tek bölmeli (derinliği 1) karar ağacı: “x₂ ≥ 0.5 ise Evet”. AdaBoost'ta en sık kullanılan zayıf model.",
 "id": "t-karar-kutugu",
 "match": "karar kütüğü",
 "week": 6,
@@ -734,7 +734,7 @@ export const TERMS = [
 },
 {
 "term": "Tümevarımsal yanlılık",
-"def": "Bir öğrenicinin veriyle eşit uyumlu hipotezler arasından birini seçmesini sağlayan varsayımları (doğrusal, basit, pürüzsüz…). Hiç varsayımı olmayan öğrenici genelleyemez.",
+"def": "Bir öğrenme algoritmasının veriyle eşit uyumlu hipotezler arasından birini seçmesini sağlayan varsayımları (doğrusal, basit, pürüzsüz…). Hiç varsayımı olmayan bir öğrenme algoritması genelleyemez.",
 "id": "t-tumevarimsal-yanlilik",
 "match": "tümevarımsal yanlılık",
 "week": 1,

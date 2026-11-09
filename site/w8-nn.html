@@ -14,29 +14,30 @@
 <main><div class="content">
 
 <h1>Yapay sinir ağları</h1>
-<p class="lead">Algılayıcıdan çok katmanlı ağa (MLP): XOR, etkinleştirme işlevleri, sign/step nöronlarıyla Boole ifadesi ve bölge tasarımı, ileri yayılım, geri yayılım (elle gradyan), SGD/momentum/Adam, evrensel yaklaşım. <strong>Ara sınavda yok</strong> (8. haftanın iki dersi sınavdan önce ama kapsam 1–7); finalin ağırlıklı konularından.</p>
+<p class="lead">Bu hafta tek bir algılayıcıdan çok katmanlı bir ağa (MLP) geçiyoruz. Önce tek doğrunun çözemediği XOR problemini iki gizli nöronla çözeceğiz; sonra nöronların çıktısını biçimleyen etkinleştirme işlevlerini, step ve sign nöronlarıyla elle ağ tasarlamayı, ağın bir tahmini nasıl hesapladığını (ileri yayılım) ve hatasından nasıl öğrendiğini (geri yayılım) göreceğiz. <strong>Bu konu ara sınavda yok</strong>: 8. haftanın iki dersi sınavdan önce işlense de ara sınav 1–7. haftaları kapsıyor. Finalde ise en ağırlıklı konulardan biri.</p>
 <!-- enriched -->
 <div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
-<tr><td>Boole ifadesi için MLP</td><td>4–8 girdili ifade, step etkinleştirme: mimariyi çiz, bütün ağırlık ve eşikleri yaz</td><td>her terim/parantez için doğru nöron + çıktıda AND/OR eşiği</td></tr>
-<tr><td>Bölge için MLP</td><td>düzlemde bölgeler/noktalar; sign gizli, step çıktı</td><td>her kenar için doğru yönlü sign nöronu + çıktı eşiği k − 0.5</td></tr>
-<tr><td>İleri/geri yayılım</td><td>2-2-1 ağ, bir örnek: h, ŷ, kayıp, birkaç gradyan, bir güncelleme</td><td>delta kuralını adım adım; ReLU′ = 0 durumunu fark etmek</td></tr>
-<tr><td>Kavram</td><td>tanh vs sign, ReLU vs tanh, softmax ve one-hot, geri yayılım neden, erken durdurma, dropout, BN, kaybolan gradyan</td><td>iki gerekçe</td></tr>
+<tr><td>Boole ifadesi için MLP</td><td>4–8 girdili bir mantık ifadesi verilir ve step etkinleştirmeli bir ağ istenir; mimariyi çizip bütün ağırlık ve eşikleri yazarsınız.</td><td>Her terim ya da parantez için doğru kurulmuş bir gizli nöron ve çıktıda doğru VE (∧)/VEYA (∨) eşiği.</td></tr>
+<tr><td>Bölge için MLP</td><td>Düzlemde bir bölge ya da birkaç nokta verilir; gizli katmanı sign, çıktısı step olan bir ağ istenir.</td><td>Bölgenin her kenarı için doğru yöne bakan bir sign nöronu ve k − 0.5 çıktı eşiği.</td></tr>
+<tr><td>İleri ve geri yayılım</td><td>2-2-1 bir ağ ve tek bir örnek verilir; h, ŷ, kayıp, birkaç gradyan ve bir güncelleme istenir.</td><td>Delta kuralını adım adım yazmak ve ReLU'nun türevinin 0 olduğu durumu fark etmek.</td></tr>
+<tr><td>Kavram</td><td>“Neden sign yerine tanh?”, “ReLU mu tanh mı?”, softmax ve one-hot, geri yayılım neden gerekli, erken durdurma, dropout, toplu normalleştirme, kaybolan gradyan.</td><td>Her soruda iki gerekçe yazmak.</td></tr>
 </tbody></table></div><p class="small">Bu hafta ara sınavda yok; finalde ağırlıklı.</p></div>
 <!-- taught -->
 <div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-mlp-cok-katmanli-algilayici">MLP</a> · <a href="sozluk.html#t-etkinlestirme-islevi">Etkinleştirme işlevi</a> · <a href="sozluk.html#t-i-leri-yayilim">İleri yayılım</a> · <a href="sozluk.html#t-geri-yayilim">Geri yayılım</a> · <a href="sozluk.html#t-erken-durdurma">Erken durdurma</a> · <a href="sozluk.html#t-softmax">Softmax</a></div>
 
 
-<h2>Tek algılayıcıdan çok katmanlı ağa (MLP) geçiş</h2>
+<h2>Tek algılayıcıdan çok katmanlı ağa (MLP) geçiş</h2><p class="h-en" lang="en">From a single perceptron to a multilayer network (MLP)</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden katman?</div><p>Tek bir nöron yalnız bir doğru çizebilir; XOR gibi problemlerde bu yetmez. Birkaç nöronu yan yana koyarsak her biri ayrı bir doğru çizer (“en az biri 1 mi?”, “ikisi de 1 mi?”); bir sonraki nöron bu cevapları birleştirir. Gizli katman, problemi çözülebilir yeni özniteliklere çevirir; ağ bu öznitelikleri kendisi öğrenir.</p></div><div data-widget="fig" data-fig="mlp" data-caption="2-2-1 ağı: iki girdi, iki gizli nöron, bir çıktı. Her ok bir ağırlık."></div>
-<p>Tek nöron = doğrusal model + doğrusal olmayan etkinleştirme: <span class="m">ŷ = g(w·x + b)</span>. Nöronları katmanlara dizip bağlayınca <strong>çok katmanlı algılayıcı</strong>: <span class="m">h = g(Wx + b), ŷ = σ(v·h + c)</span>. Gizli katman girdiyi yeni bir öznitelik uzayına taşır; elle öznitelik mühendisliği yerine bu dönüşüm veriden öğrenilir. Tam bağlı (dense) katmanda her nöron önceki katmanın bütün çıktılarına bağlıdır.</p>
+<p>Tek bir nöron, 4. haftadaki doğrusal modelin çıktısına doğrusal olmayan bir işlev (etkinleştirme) uygulanmış hâlidir: <span class="m">ŷ = g(w·x + b)</span>. Burada w ağırlıklar, b sabit terim, g ise etkinleştirme işlevidir. Nöronları katmanlar hâlinde dizip birinin çıktısını ötekinin girdisi yapınca <strong>çok katmanlı algılayıcı</strong> (MLP) elde ederiz: önce gizli katman <span class="m">h = g(Wx + b)</span> hesaplanır, sonra çıktı <span class="m">ŷ = σ(v·h + c)</span>. W'nin her satırı bir gizli nöronun ağırlıklarıdır; v ise gizli nöronlardan çıktıya giden ağırlıklardır.</p>
+<p>Gizli katmanın yaptığı iş, girdiyi yeni bir öznitelik uzayına taşımaktır. Klasik yöntemlerde iyi öznitelikleri insan tasarlar; MLP'de bu dönüşüm de veriden öğrenilir. Bu sayfadaki ağların hepsi <strong>tam bağlı</strong> (dense) katmanlardan oluşur: her nöron önceki katmanın bütün çıktılarına bağlıdır.</p>
 <h3>Tek çizginin çözemediği XOR'u iki gizli nöronla çözmek</h3>
 <div class="table-wrap"><table class="simple compact center">
 <thead><tr><th>x₁</th><th>x₂</th><th>h₁ = step(x₁+x₂−0.5) “en az biri”</th><th>h₂ = step(x₁+x₂−1.5) “ikisi de”</th><th>ŷ = step(h₁ − h₂ − 0.5)</th></tr></thead>
 <tbody><tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr><tr><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td></tr><tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td></tr></tbody></table></div>
-<p>Gizli katman (0,1) ve (1,0)'ı (h₁, h₂) = (1, 0)'a taşır; orada tek doğruyla ayrılır. step(z) = 1 ⇔ z &gt; 0.</p>
+<p>Tabloyu satır satır okuyun. h₁ “girdilerden en az biri 1 mi?”, h₂ “ikisi de 1 mi?” sorusunu cevaplar. XOR'un 1 olduğu iki girdi, (0, 1) ve (1, 0), gizli katmanda aynı noktaya, (h₁, h₂) = (1, 0)'a taşınır. Bu yeni uzayda pozitifler ile negatifler tek bir doğruyla ayrılabilir; çıktı nöronu da tam olarak bunu yapar: “en az biri 1 ama ikisi birden değil”. Burada step(z), z &gt; 0 ise 1, değilse 0 verir.</p>
 
-<h2>Nöronun çıktısını biçimleyen etkinleştirme işlevleri</h2>
+<h2>Nöronun çıktısını biçimleyen etkinleştirme işlevleri</h2><p class="h-en" lang="en">Activation functions that shape a neuron's output</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden doğrusal olmayan bir fonksiyon?</div><p>Gizli nöronlar yalnız toplama-çarpma yapsaydı, iki doğrusal katman üst üste yine tek bir doğrusal fonksiyon olurdu: ne kadar katman eklerseniz ekleyin XOR'u çözemezdiniz. Etkinleştirme fonksiyonu (ReLU, tanh, sigmoid) her katmana “bükülme” katar.</p></div>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>İşlev</th><th>g(z)</th><th>g′(z)</th><th>Aralık</th><th>Nerede</th><th>Sorun</th></tr></thead>
@@ -51,14 +52,14 @@
 </tbody></table></div>
 <div data-widget="activations"></div>
 <ul>
-<li><strong>Neden sign yerine tanh?</strong> (1) Türevlenebilir: gradyanla eğitilebilir. (2) Sürekli çıktı: “ne kadar emin” bilgisini taşır; sıfır merkezli olduğu için eniyileme sigmoide göre daha iyi.</li>
-<li><strong>ReLU vs tanh</strong>: ReLU hesabı ucuz, pozitif bölgede türevi 1 (kaybolan gradyan yok), seyrek etkinleşme; dezavantajı z ≤ 0'da türevi 0 (ölü ReLU) ve sınırsız çıktı. tanh sınırlı ve sıfır merkezli ama uçlarda doyar.</li>
-<li>Çıktı katmanı göreve uyar: regresyon → doğrusal + MSE, ikili → sigmoid + BCE, çok sınıflı → softmax + çapraz entropi (etiket one-hot). Bu eşleşmelerde çıktı gradyanı hep <strong>ŷ − y</strong>.</li>
+<li><strong>Neden sign yerine tanh?</strong> İki gerekçe yazılır. Birincisi, tanh türevlenebilir; bu yüzden ağ gradyan inişiyle eğitilebilir. sign'ın türevi her yerde 0'dır ve gradyan hiçbir bilgi taşımaz. İkincisi, tanh sürekli bir çıktı verir; yalnız “hangi taraf” değil, “ne kadar emin” bilgisini de taşır. Sıfır merkezli olduğu için eniyileme sigmoide göre de daha rahat ilerler.</li>
+<li><strong>ReLU mu, tanh mı?</strong> ReLU'nun hesabı ucuzdur ve pozitif bölgede türevi 1'dir; derin ağlarda gradyanı küçültmeden geçirir (kaybolan gradyan olmaz) ve nöronların bir kısmı 0 vererek seyrek bir temsil oluşur. Zayıf yanı, z ≤ 0 olduğunda türevinin 0 olmasıdır: sürekli negatif kalan bir nöron hiç güncellenmez (ölü ReLU). Çıktısı da sınırsızdır. tanh ise sınırlı ve sıfır merkezlidir ama uç değerlerde düzleşir (doyar) ve türevi neredeyse 0 olur.</li>
+<li><strong>Çıktı katmanı göreve göre seçilir.</strong> Regresyonda doğrusal çıktı ve MSE, ikili sınıflandırmada sigmoid ve ikili çapraz entropi (BCE), çok sınıflı sınıflandırmada softmax ve çapraz entropi kullanılır; çok sınıflıda etiket one-hot vektör olarak yazılır. Bu üç eşleşmenin güzel bir ortak yanı vardır: çıktıdaki gradyan her seferinde <strong>ŷ − y</strong>, yani tahmin eksi gerçek değer olur.</li>
 </ul>
 
-<h2>Ağı elle tasarlamak: step ve sign nöronlarıyla</h2>
+<h2>Ağı elle tasarlamak: step ve sign nöronlarıyla</h2><p class="h-en" lang="en">Designing a network by hand with step and sign neurons</p>
 <h3>Tek nöronla VE, VEYA, DEĞİL kapıları kurmak</h3>
-<p>İkili girdilerde ağırlıkları +1 / −1 seç, eşiği “istenen toplam − 0.5” yap: <span class="m">y = step(Σwᵢxᵢ − K)</span>.</p>
+<p>Girdiler 0 ya da 1 olduğunda bir step nöronu, ağırlıklı toplam bir eşiği geçince 1 verir: <span class="m">y = step(Σwᵢxᵢ − K)</span>. Kural basittir: “1 olması istenen” girdilere +1, “0 olması istenen” girdilere −1 ağırlık verin; eşiği de koşul tam sağlandığında ulaşılan toplamın 0.5 altına koyun. 0.5'lik pay, toplam tam eşiğe eşit olduğunda tereddüt kalmasın diye konur. Aşağıdaki tablo en sık kullanılan kapıları özetler.</p>
 <div class="table-wrap"><table class="simple compact">
 <thead><tr><th>İstenen</th><th>Ağırlıklar</th><th>Eşik K</th></tr></thead>
 <tbody>
@@ -66,43 +67,48 @@
 <tr><td>OR (en az biri 1)</td><td>hepsi +1</td><td>0.5</td></tr>
 <tr><td>En az K girdi 1</td><td>hepsi +1</td><td>K − 0.5</td></tr>
 <tr><td>En çok K girdi 1</td><td>hepsi −1</td><td>−K − 0.5 (yani y = step(K + 0.5 − Σx))</td></tr>
-<tr><td>x₁..x_L = 1 ve geri kalanı 0 (tam örüntü)</td><td>+1 (ilk L), −1 (kalan)</td><td>L − 0.5</td></tr>
+<tr><td>x₁, …, x_L hepsi 1 ve geri kalanı 0 (tam örüntü)</td><td>+1 (ilk L), −1 (kalan)</td><td>L − 0.5</td></tr>
 <tr><td>NOT x</td><td>−1</td><td>−0.5</td></tr>
 </tbody></table></div>
-<p><strong>Tam olarak K tanesi 1</strong>: iki gizli nöron (“en az K” ve “en az K+1”), çıktı = step(h₁ − h₂ − 0.5); XOR bunun K = 1 hâlidir.</p>
+<p><strong>“Tam olarak K tanesi 1”</strong> koşulu tek nöronla kurulamaz, çünkü hem alttan hem üstten sınır ister. İki gizli nöron kullanılır: h₁ “en az K tanesi 1 mi?”, h₂ “en az K + 1 tanesi 1 mi?” sorusunu cevaplar. Çıktı y = step(h₁ − h₂ − 0.5), yalnız h₁ = 1 ve h₂ = 0 olduğunda, yani tam K tane 1 varken 1 verir. XOR bu kuralın K = 1 hâlidir.</p>
 
 <h3>Bir Boole ifadesini adım adım ağa çevirmek</h3>
-<p>Reçete: ifadeyi VE'lerin VEYA'sı (DNF) olarak yaz; <strong>her VE terimine bir gizli nöron</strong> (pozitif değişmez +1, olumsuz −1, bias −(pozitif sayısı) + 0.5), <strong>çıktı VEYA</strong> (ağırlıklar 1, bias −0.5). Dıştaki işlem VE ise çıktı “k koşulun hepsi” = step(Σh − k + 0.5) de olur; parantez başına bir nöron koymak (8. hafta çözümü) daha az nöron kullanabilir. Araç bütün doğruluk tablosunu denetler.</p>
+<p>Her Boole ifadesi “VE'lerin VEYA'sı” biçiminde (DNF) yazılabilir; bu biçim ağa çevirmeyi mekanik hâle getirir. Her VE terimi için bir gizli nöron kurulur: terimde olumlu geçen değişkene +1, olumsuz (¬) geçene −1 ağırlık verilir ve sabit terim “−(olumlu değişken sayısı) + 0.5” olur. Çıktı nöronu bu terimlerin VEYA'sını alır: bütün ağırlıklar 1, sabit terim −0.5.</p>
+<p>İfadenin en dıştaki işlemi VE ise çıktı nöronu “k koşulun hepsi” kapısı olur: step(Σh − k + 0.5). Derste olduğu gibi her parantez için bir nöron kurmak da doğrudur ve çoğu zaman DNF'ye açmaktan çok daha az nöron gerektirir. Aşağıdaki araca bir ifade yazdığınızda kurduğu ağı bütün doğruluk tablosu üzerinde denetler.</p>
 <div data-widget="boolmlp"></div>
-<div class="callout"><div class="callout-title">Ders çözümleri</div><p>Y = (¬x₁ ∧ ¬x₂) ∧ (¬x₃ ∨ ¬x₄): h₁ = step(−x₁ − x₂ + 0.5) [ikisi de 0], h₂ = step(−x₃ − x₄ + 1.5) [en az biri 0], ŷ = step(h₁ + h₂ − 1.5) (AND).<br>
-Y = (x₁ ∧ ¬x₂) ∨ (x₃ ∨ ¬x₄): h₁ = step(x₁ − x₂ − 0.5), h₂ = step(x₃ − x₄ + 0.5) [x₃ = 1 ya da x₄ = 0], ŷ = step(h₁ + h₂ − 0.5) (OR).<br>
-Aracı bu ifadelerle ve geçmiş final listesindekilerle deneyin: <code>(x1 ∧ x2 ∧ ¬x3) ∨ ¬x4 ∨ ¬x5</code>, <code>¬x1 ∨ (x2 ∧ ¬x3 ∧ ¬x4) ∨ (x5 ∧ x6 ∧ x7 ∧ ¬x8)</code>, <code>x1 ∧ (¬x2 ∨ ¬x3 ∨ ¬x4) ∧ (x5 ∨ x6 ∨ ¬x7 ∨ ¬x8)</code> (sonuncusu DNF'de 12 terime açılır; parantez başına nöron + çıktıda AND çok daha kısadır: 3 gizli nöron).</p></div>
+<div class="callout"><div class="callout-title">Ders çözümleri</div><p><strong>Y = (¬x₁ ∧ ¬x₂) ∧ (¬x₃ ∨ ¬x₄).</strong> Birinci parantez “x₁ ile x₂'nin ikisi de 0” demektir: h₁ = step(−x₁ − x₂ + 0.5). İkinci parantez “x₃ ile x₄'ten en az biri 0” demektir: h₂ = step(−x₃ − x₄ + 1.5). Dıştaki işlem VE olduğu için çıktı ikisinin de 1 olmasını ister: ŷ = step(h₁ + h₂ − 1.5).<br>
+<strong>Y = (x₁ ∧ ¬x₂) ∨ (x₃ ∨ ¬x₄).</strong> Birinci parantez için h₁ = step(x₁ − x₂ − 0.5); bu nöron yalnız x₁ = 1 ve x₂ = 0 iken 1 verir. İkinci parantez “x₃ = 1 ya da x₄ = 0” demektir: h₂ = step(x₃ − x₄ + 0.5). Dıştaki işlem VEYA olduğu için ŷ = step(h₁ + h₂ − 0.5).<br>
+Aracı bu ifadelerle ve geçmiş final listesindekilerle deneyin: <code>(x1 ∧ x2 ∧ ¬x3) ∨ ¬x4 ∨ ¬x5</code>, <code>¬x1 ∨ (x2 ∧ ¬x3 ∧ ¬x4) ∨ (x5 ∧ x6 ∧ x7 ∧ ¬x8)</code>, <code>x1 ∧ (¬x2 ∨ ¬x3 ∨ ¬x4) ∧ (x5 ∨ x6 ∨ ¬x7 ∨ ¬x8)</code> Sonuncusu DNF'ye açılınca 12 terim çıkar; her parantez için bir nöron kurup çıktıda VE almak ise yalnız 3 gizli nöron ister.</p></div>
 
 <h3>Düzlemde bir bölgeyi ağla tanımak (gizli katman sign, çıktı step)</h3>
+<p>Düzlemdeki bir üçgen ya da dikdörtgen gibi bir bölge, birkaç yarı düzlemin kesişimidir: her kenar bir doğrudur ve bölge her doğrunun belirli bir tarafında kalır. Bu yüzden tasarım üç adımda yapılır:</p>
 <ol>
-<li>Bölge = yarı düzlemlerin kesişimi (ya da birleşimi). Her kenar bir doğru.</li>
-<li>Her doğru için bir gizli <strong>sign</strong> nöronu; bölgenin <em>içinde</em> +1 verecek yönde yaz.</li>
-<li>Çıktı: k koşulun hepsi sağlanınca 1 → <span class="m">ŷ = step(Σh − (k − 0.5))</span>. (sign çıktıları ±1 olduğu için: hepsi sağlanırsa Σh = k, biri bozulursa k − 2.)</li>
+<li>Bölgenin her kenarını bir doğru denklemi olarak yazın.</li>
+<li>Her doğru için bir gizli <strong>sign</strong> nöronu kurun ve denklemi, bölgenin <em>içindeki</em> noktalarda +1 verecek biçimde yazın. Emin olmak için bölgenin içinden bir nokta seçip yerine koyun; sonuç negatifse denklemin işaretini ters çevirin.</li>
+<li>Çıktı nöronu, k koşulun hepsi sağlandığında 1 vermelidir: <span class="m">ŷ = step(Σh − (k − 0.5))</span>. Neden bu eşik? sign çıktıları +1 ya da −1 olduğu için bütün koşullar sağlanınca Σh = k olur; tek bir koşul bozulunca bir +1, −1'e döner ve toplam k − 2'ye düşer. k − 0.5 eşiği bu iki değerin arasındadır.</li>
 </ol>
 <div class="table-wrap"><table class="simple compact">
 <thead><tr><th>Bölge</th><th>Gizli katman</th><th>Çıktı</th></tr></thead>
 <tbody>
 <tr><td>Üçgenin içi: x₁ ≥ 0, x₂ ≥ 0, x₁ + x₂ ≤ 4</td><td>h₁ = sign(x₁), h₂ = sign(x₂), h₃ = sign(4 − x₁ − x₂)</td><td>step(h₁ + h₂ + h₃ − 2.5)</td></tr>
-<tr><td>Dikdörtgenin <strong>dışı</strong>: 1 ≤ x₁ ≤ 3, 1 ≤ x₂ ≤ 2 değil</td><td>h₁ = sign(x₁ − 1), h₂ = sign(3 − x₁), h₃ = sign(x₂ − 1), h₄ = sign(2 − x₂)</td><td>step(3.5 − Σh) (içeride Σh = 4 → 0; dışarıda Σh ≤ 2 → 1)</td></tr>
+<tr><td>Dikdörtgenin <strong>dışı</strong>: 1 ≤ x₁ ≤ 3, 1 ≤ x₂ ≤ 2 değil</td><td>h₁ = sign(x₁ − 1), h₂ = sign(3 − x₁), h₃ = sign(x₂ − 1), h₄ = sign(2 − x₂)</td><td>step(3.5 − Σh); içeride Σh = 4 olduğu için çıktı 0, dışarıda Σh ≤ 2 olduğu için çıktı 1 olur</td></tr>
 <tr><td>Kama: x₂ ≥ 3x₁ ve x₂ ≤ 6</td><td>h₁ = sign(x₂ − 3x₁), h₂ = sign(6 − x₂)</td><td>step(h₁ + h₂ − 1.5)</td></tr>
 <tr><td>XOR (sign ile)</td><td>h₁ = sign(x₁ + x₂ − 0.5), h₂ = sign(x₁ + x₂ − 1.5)</td><td>step(h₁ − h₂ − 1.5)</td></tr>
 </tbody></table></div>
-<p>Birden çok bölgenin birleşimi (“1 ya da 4. bölge”): her bölge için bir VE nöronu (ikinci gizli katman) ve çıktıda VEYA; ya da bölgeler doğruların işaret örüntüsüyle tanımlanıyorsa her örüntü için bir “tam örüntü” nöronu. Step gizli birimlerle (0/1) aynı tasarımda eşikler değişir: k koşul için step(Σh − k + 0.5).</p>
+<p>İstenen alan birden çok bölgenin birleşimiyse (“1. ya da 4. bölge” gibi), önce her bölge için yukarıdaki gibi bir VE nöronu kurulur; bunlar ikinci bir gizli katman oluşturur. Çıktı nöronu da bu nöronların VEYA'sını alır. Bölgeler doğruların işaret örüntüsüyle tanımlanıyorsa, her örüntü için bir “tam örüntü” nöronu kurmak da aynı işi görür. Gizli katmanda sign yerine step (0/1) kullanılırsa eşikler değişir: k koşulun hepsi için step(Σh − k + 0.5) yazılır.</p>
 
-<h2>Ağ nasıl hesaplar ve nasıl öğrenir? İleri ve geri yayılım</h2>
+<h2>Ağ nasıl hesaplar ve nasıl öğrenir? İleri ve geri yayılım</h2><p class="h-en" lang="en">How a network computes and learns: forward pass and backpropagation</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Suçu paylaştırmak</div><p>Ağ yanlış bir tahmin yaptı; hangi ağırlık ne kadar suçlu? Geri yayılım hatayı çıktıdan başlayıp geriye doğru dağıtır: çıktı nöronunun hatası, ona bağlanan her gizli nörona “ağırlığı kadar” pay edilir; gizli nöron o sırada etkin değilse (ReLU'da z ≤ 0) hiç pay almaz. Her ağırlık kendi payı × kendi girdisi kadar düzeltilir.</p></div>
-<p>2-2-1 ağı: gizli <span class="m">zⱼ = wⱼ₁x₁ + wⱼ₂x₂ + bⱼ, hⱼ = g(zⱼ)</span>; çıktı <span class="m">u = v₁h₁ + v₂h₂ + c, ŷ = σ(u)</span>; kayıp BCE. Geri yayılım zincir kuralını çıktıdan girdiye doğru, ara sonuçları yeniden kullanarak uygular (delta kuralı):</p>
+<p>Sınavda genellikle iki girdili, iki gizli nöronlu ve tek çıktılı (2-2-1) bir ağ verilir. <strong>İleri yayılımda</strong> hesap girdiden çıktıya doğru ilerler: her gizli nöron için önce ağırlıklı toplam <span class="m">zⱼ = wⱼ₁x₁ + wⱼ₂x₂ + bⱼ</span>, sonra çıktısı <span class="m">hⱼ = g(zⱼ)</span> bulunur. Çıktı nöronu bu değerleri toplar, <span class="m">u = v₁h₁ + v₂h₂ + c</span>, ve sigmoidden geçirir: <span class="m">ŷ = σ(u)</span>. Kayıp ikili çapraz entropidir (BCE).</p>
+<p><strong>Geri yayılım</strong> ise kaybın her ağırlığa göre türevini bulur. Zincir kuralını çıktıdan girdiye doğru uygular ve her katmanda bulduğu ara sonucu (δ, “bu nöronun hatası”) bir önceki katmanda yeniden kullanır. Bu adımlara delta kuralı denir:</p>
 <div class="formula left">δ_out = ŷ − y &nbsp;·&nbsp; ∂L/∂vⱼ = δ_out·hⱼ &nbsp;·&nbsp; δⱼ = δ_out·vⱼ·g′(zⱼ) &nbsp;·&nbsp; ∂L/∂wⱼᵢ = δⱼ·xᵢ &nbsp;·&nbsp; θ ← θ − η·∂L/∂θ</div>
+<ul class="reading"><li><strong>δ_out = ŷ − y</strong>: çıktının hatası, tahmin eksi gerçek değer.</li><li><strong>∂L/∂vⱼ = δ_out·hⱼ</strong>: çıktıya giden ağırlığın gradyanı, çıktı hatası çarpı o ağırlığın taşıdığı değer.</li><li><strong>δⱼ = δ_out·vⱼ·g′(zⱼ)</strong>: gizli nöronun hatası; çıktı hatası, nöronu çıktıya bağlayan ağırlıkla ve nöronun etkinleştirme türeviyle çarpılır.</li><li><strong>∂L/∂wⱼᵢ = δⱼ·xᵢ</strong>: gizli ağırlığın gradyanı, nöronun hatası çarpı o ağırlığın girdisi.</li><li><strong>θ ← θ − η·∂L/∂θ</strong>: her parametre gradyanın tersi yönünde, öğrenme oranı η kadar adım atar.</li></ul>
 <div data-widget="mlp"></div>
-<p>Varsayılan değerler ders örneğidir: x = (1, 2), y = 1 → h = (1.5, 0.5), u = 0, ŷ = 0.5, L = 0.693; δ_out = −0.5, ∂L/∂v₁ = −0.75, ∂L/∂w₁₁ = −0.5, ∂L/∂w₁₂ = −1.0, ∂L/∂w₂₁ = +0.5; η = 0.1 ile v₁ → 1.075, w₁₁ → 0.55. Sezgi: ŷ büyümeli; h₁ &gt; 0 olduğundan v₁'i artırmak ŷ'yi artırır. v₂ = −1 olduğundan h₂'yi artırmak ŷ'yi düşürür: w₂₁ azaltılır. z ≤ 0 olan ReLU nöronunun girişleri hiç güncellenmez (ölü ReLU). Kodda gradyan, sonlu farkla denetlenir: (L(θ + 10⁻⁶) − L(θ))/10⁻⁶.</p>
-<p><strong>Neden şart?</strong> Gizli ağırlıkların kayba etkisi doğrudan görülmez; geri yayılım bütün gradyanları tek bir geri geçişte, ileri geçiş maliyetiyle aynı mertebede hesaplar (otomatik türev / autograd bunu her hesap grafiği için yapar).</p>
+<p>Araçtaki varsayılan değerler ders örneğidir. Girdi x = (1, 2) ve etiket y = 1 iken ileri yayılım h = (1.5, 0.5), u = 0 ve ŷ = 0.5 verir; kayıp L = −ln 0.5 = 0.693'tür. Geri yayılımda önce δ_out = 0.5 − 1 = −0.5 bulunur. Buradan ∂L/∂v₁ = −0.5·1.5 = −0.75, ∂L/∂w₁₁ = −0.5, ∂L/∂w₁₂ = −1.0 ve ∂L/∂w₂₁ = +0.5 çıkar. Öğrenme oranı η = 0.1 ile v₁ 1'den 1.075'e, w₁₁ 0.5'ten 0.55'e güncellenir.</p>
+<p>Bu sayıların bir sezgisi var. Gerçek etiket 1 olduğu için ŷ büyümelidir. h₁ pozitif olduğundan v₁'i artırmak ŷ'yi artırır; bu yüzden v₁ artar. v₂ = −1 olduğu için h₂'nin büyümesi ŷ'yi düşürür; bu yüzden h₂'yi besleyen w₂₁ azaltılır. z ≤ 0 olan bir ReLU nöronunun türevi 0 olduğundan, o nörona giren ağırlıklar bu örnekte hiç güncellenmez. Programda yazılan gradyanlar, ağırlığı çok küçük bir miktar oynatıp kaybın değişimine bakarak (sonlu farkla) denetlenebilir: (L(θ + 10⁻⁶) − L(θ))/10⁻⁶.</p>
+<p><strong>Geri yayılım neden şart?</strong> Gizli katmandaki bir ağırlığın kaybı nasıl etkilediği doğrudan görülmez, çünkü arada başka nöronlar vardır. Geri yayılım bütün gradyanları tek bir geri geçişte, ileri geçişle aynı mertebede bir maliyetle hesaplar. Bugünkü derin öğrenme kütüphanelerindeki otomatik türev (autograd) bu işi her hesap grafiği için kendiliğinden yapar.</p>
 
-<h2>Ağı eğitmek: öğrenme hızı, mini yığın ve eniyileyiciler</h2>
+<h2>Ağı eğitmek: öğrenme hızı, mini yığın ve eniyileyiciler</h2><p class="h-en" lang="en">Training the network: learning rate, mini-batches and optimizers</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Yöntem</th><th>Güncelleme</th><th>Sezgi</th><th>Tipik</th></tr></thead>
 <tbody>
@@ -111,43 +117,45 @@ Aracı bu ifadelerle ve geçmiş final listesindekilerle deneyin: <code>(x1 ∧ 
 <tr><td>RMSProp</td><td>s ← ρs + (1−ρ)g²; θ ← θ − ηg/√(s+ε)</td><td>her parametreye kendi ölçeğinde adım</td><td>ρ = 0.99</td></tr>
 <tr><td>Adam</td><td>m ve s birlikte, yanlılık düzeltmeli</td><td>momentum + RMSProp; varsayılan ilk seçim</td><td>η = 10⁻³, β₁ = 0.9, β₂ = 0.999</td></tr>
 </tbody></table></div>
-<p><strong>Eğitim reçetesi</strong>: (1) küçük rastgele ağırlık (sıfır değil: simetri kırılmalı; büyük değil: doyma); (2) eğitim kümesinde mini-batch gradyan inişi, epoch epoch; (3) <strong>erken durdurma</strong>: her epoch sonunda doğrulama kaybı, “patience” epoch boyunca iyileşmezse dur ve en iyi ağırlıklara dön; (4) hiperparametreleri doğrulamaya göre seç, teste en sonda bir kez bak.</p>
-<p><strong>Evrensel yaklaşım teoremi</strong> (Cybenko 1989, Hornik 1991): tek gizli katmanlı, yeterince geniş bir ağ tıkız küme üzerindeki her sürekli işlevi istenen doğrulukta yaklaşıklar. “Vardır” der; kaç nöron gerektiğini ya da nasıl öğrenileceğini söylemez. Derinlik aynı işlevi çok daha az nöronla ifade edebilir.</p>
-<p><strong>MLP vs SVM</strong>: SVM sabit bir öznitelik dönüşümünün (çekirdek) üstünde dışbükey bir problem çözer: tek global çözüm, az veride güçlü. MLP dönüşümü de öğrenir (temsil öğrenme): dışbükey değil, çok veri ve ayar ister, büyük veride ölçeklenir.</p>
+<p>Tablodaki yöntemlerin hepsi gradyan inişinin çeşitleridir; farkları adımın nasıl hesaplandığındadır. Düz SGD her adımda küçük bir rastgele örnek kümesinin (mini yığın) gradyanını kullanır. Momentum önceki adımların yönünü de hesaba katar; böylece dar bir vadide sağa sola salınmak yerine vadi boyunca hızlanır. RMSProp her parametreye kendi gradyan büyüklüğüne göre ayrı bir adım boyu verir. Adam bu iki fikri birleştirir ve bugün çoğu problemde ilk denenen yöntemdir.</p>
+<p><strong>Bir ağ şu sırayla eğitilir.</strong> Önce ağırlıklar küçük rastgele sayılarla başlatılır. Sıfırla başlatılmazlar, çünkü o zaman aynı katmandaki bütün nöronlar aynı gradyanı alır ve hep birbirinin aynısı kalır; çok büyük de seçilmezler, çünkü sigmoid ve tanh nöronları doyar. Sonra eğitim kümesi üzerinde mini yığınlarla gradyan inişi yapılır; verinin tamamından bir kez geçmeye bir epoch denir. Her epoch sonunda doğrulama kaybına bakılır: kayıp belirli sayıda epoch (sabır, “patience”) boyunca iyileşmezse eğitim durdurulur ve en iyi doğrulama kaybını veren ağırlıklara dönülür. Buna <strong>erken durdurma</strong> denir ve aşırı uyumu sınırlar. Hiperparametreler doğrulama kümesine göre seçilir; test kümesine yalnız en sonda bir kez bakılır.</p>
+<p><strong>Evrensel yaklaşım teoremi</strong> (Cybenko 1989, Hornik 1991), tek gizli katmanı olan ama yeterince geniş bir ağın, sınırlı bir bölge üzerindeki her sürekli işlevi istenen doğrulukta yaklaşıklayabileceğini söyler. Teorem böyle bir ağın <em>var olduğunu</em> söyler; kaç nöron gerektiğini ya da ağırlıkların nasıl bulunacağını söylemez. Pratikte derin ağlar aynı işlevi çok daha az nöronla ifade edebildiği için tercih edilir.</p>
+<p><strong>MLP ile SVM'yi karşılaştırırsak:</strong> SVM, önceden seçilmiş bir öznitelik dönüşümünün (çekirdeğin) üzerinde dışbükey bir eniyileme problemi çözer. Bu yüzden tek bir en iyi çözümü vardır ve az veride güçlüdür. MLP ise dönüşümün kendisini de veriden öğrenir (temsil öğrenme). Karşılığında problemi dışbükey değildir, daha çok veri ve ayar ister; buna karşılık çok büyük verilere iyi ölçeklenir.</p>
 
-<h2>Sınav tipi problemler ve adım adım çözümleri</h2>
+<h2>Sınav tipi problemler ve adım adım çözümleri</h2><p class="h-en" lang="en">Exam-style problems with step-by-step solutions</p>
 <h3>Problem 1: Girdilerden tam olarak K tanesi 1 ise 1 veren ağ</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(geçmiş final listesi)</span></div><p>N ikili girdi xᵢ ∈ {0, 1}. Tam olarak K tanesi 1 olduğunda 1 veren MLP'yi (a) step gizli + step çıktı, (b) sign gizli + step çıktı ile tasarlayın.</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol><li><strong>Step</strong>: h₁ = step(Σx − K + 0.5) (“en az K”), h₂ = step(Σx − K − 0.5) (“en az K + 1”). Çıktı y = step(h₁ − h₂ − 0.5): yalnız h₁ = 1, h₂ = 0 iken 1.</li>
-<li><strong>sign</strong>: h₁ = sign(Σx − K + 0.5), h₂ = sign(K + 0.5 − Σx) (“en çok K”). İkisi de +1 olmalı: y = step(h₁ + h₂ − 1.5). (Σh = 2 → 0.5 &gt; 0; biri −1 olursa Σh = 0 → −1.5.)</li></ol>
-<p class="small muted">K = 1, N = 2 XOR'dur; step sürümü yukarıdaki XOR tablosunun aynısı.</p></div></details>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>“Tam olarak K” koşulunu iki koşula bölelim: “en az K tane 1” ve “K + 1 tane 1 değil”. Her biri bir gizli nöron olacak.</p><ol><li><strong>Step gizli katmanla:</strong> h₁ = step(Σx − K + 0.5) “en az K tanesi 1 mi?”, h₂ = step(Σx − K − 0.5) “en az K + 1 tanesi 1 mi?” sorusunu cevaplar. Çıktı y = step(h₁ − h₂ − 0.5), yalnız h₁ = 1 ve h₂ = 0 olduğunda 1 verir; bu da tam K tane 1 olması demektir.</li>
+<li><strong>sign gizli katmanla:</strong> h₁ = sign(Σx − K + 0.5) yine “en az K” sorusunu, h₂ = sign(K + 0.5 − Σx) ise “en çok K” sorusunu cevaplar. İkisinin birden +1 olması gerekir, bu yüzden çıktı y = step(h₁ + h₂ − 1.5) olur. İkisi de +1 iken Σh = 2 ve 2 − 1.5 = 0.5 &gt; 0 çıkar; biri −1 olursa Σh = 0 ve sonuç −1.5'e düşer.</li></ol>
+<p class="small muted">K = 1 ve N = 2 seçilirse problem XOR'a dönüşür; step sürümü yukarıdaki XOR tablosunun aynısıdır.</p></div></details>
 <h3>Problem 2: Verilen Boole ifadesini hesaplayan ağ</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(geçmiş final listesi)</span></div><p>Y = (x₁ ∧ x₂ ∧ ¬x₃) ∨ ¬x₄ ∨ ¬x₅; step etkinleştirme. Mimariyi ve parametreleri yazın.</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Üç VEYA terimi; her biri için bir gizli nöron:</p>
-<ul><li>h₁ = step(x₁ + x₂ − x₃ − 1.5) (iki pozitif değişmez → b = −2 + 0.5)</li><li>h₂ = step(−x₄ + 0.5) (¬x₄)</li><li>h₃ = step(−x₅ + 0.5) (¬x₅)</li></ul>
-<p>Çıktı VEYA: y = step(h₁ + h₂ + h₃ − 0.5). Kısaltma: ¬x₄ ∨ ¬x₅ tek nöronda da olur: h = step(−x₄ − x₅ + 1.5) (“en az biri 0”). Aşağıdaki araca yazıp doğruluk tablosunu denetleyin.</p>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>İfade zaten DNF biçiminde: VEYA (∨) ile bağlanmış üç terim var. Her terim için bir gizli nöron kuralım.</p>
+<ul><li>h₁ = step(x₁ + x₂ − x₃ − 1.5). Terimde iki olumlu değişken (x₁, x₂) olduğu için sabit terim −2 + 0.5 = −1.5'tir; ¬x₃ için ağırlık −1'dir.</li><li>h₂ = step(−x₄ + 0.5). Bu nöron yalnız x₄ = 0 iken 1 verir, yani ¬x₄'tür.</li><li>h₃ = step(−x₅ + 0.5). Aynı biçimde ¬x₅'tir.</li></ul>
+<p>Çıktı nöronu üç terimin VEYA'sını alır: y = step(h₁ + h₂ + h₃ − 0.5). İsterseniz ¬x₄ ∨ ¬x₅ kısmını tek nöronla da yazabilirsiniz: h = step(−x₄ − x₅ + 1.5), yani “x₄ ile x₅'ten en az biri 0”. Aşağıdaki araca ifadeyi yazıp kurduğunuz ağı doğruluk tablosu üzerinde denetleyin.</p>
 <div data-widget="boolmlp" data-expr="(x1 ∧ x2 ∧ ¬x3) ∨ ¬x4 ∨ ¬x5"></div></div></details>
 <h3>Problem 3: Düzlemdeki bir bölgeyi tanıyan ağ</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(8. hafta derste)</span></div><p>x₁ ≥ 0, x₂ ≥ 0 ve x₁ + x₂ ≤ 4 üçgeninin içi pozitif. sign gizli, step çıktı ile MLP; (1, 1), (2, 2), (−1, 1) noktalarında denetleyin.</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>h₁ = sign(x₁), h₂ = sign(x₂), h₃ = sign(4 − x₁ − x₂) (hepsi içeride +1 olacak yönde). ŷ = step(h₁ + h₂ + h₃ − 2.5).</p>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Üçgenin üç kenarı var, bu yüzden üç gizli nöron kuracağız ve her birini üçgenin içinde +1 verecek yönde yazacağız: h₁ = sign(x₁), h₂ = sign(x₂), h₃ = sign(4 − x₁ − x₂). Üçüncüsünü “x₁ + x₂ − 4” diye değil “4 − x₁ − x₂” diye yazdık, çünkü içerideki (1, 1) noktası için 4 − 2 = 2 &gt; 0 çıkmalı. Üç koşulun hepsi sağlanmalı, bu yüzden çıktı ŷ = step(h₁ + h₂ + h₃ − 2.5) olur. Şimdi noktaları tek tek deneyelim:</p>
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th>nokta</th><th>h₁</th><th>h₂</th><th>h₃</th><th>Σh − 2.5</th><th>ŷ</th></tr></thead><tbody>
-<tr><td>(1, 1)</td><td>+1</td><td>+1</td><td>+1</td><td>0.5</td><td>1</td></tr><tr><td>(2, 2)</td><td>+1</td><td>+1</td><td>−1 (sınırda, z = 0 → −1)</td><td>−1.5</td><td>0</td></tr><tr><td>(−1, 1)</td><td>−1</td><td>+1</td><td>+1</td><td>−1.5</td><td>0</td></tr></tbody></table></div>
-<p class="small muted">sign(0) = −1 alındığı için tam kenardaki noktalar dışarıda sayılır; sınavda sınır kuralını belirtin.</p></div></details>
+<tr><td>(1, 1)</td><td>+1</td><td>+1</td><td>+1</td><td>0.5</td><td>1</td></tr><tr><td>(2, 2)</td><td>+1</td><td>+1</td><td>−1 (tam sınırda: z = 0 ve sign(0) = −1)</td><td>−1.5</td><td>0</td></tr><tr><td>(−1, 1)</td><td>−1</td><td>+1</td><td>+1</td><td>−1.5</td><td>0</td></tr></tbody></table></div>
+<p class="small muted">(2, 2) noktası tam kenarın üzerindedir (2 + 2 = 4). sign(0) = −1 kabul edildiği için kenardaki noktalar dışarıda sayılır. Sınavda hangi sınır kuralını kullandığınızı mutlaka yazın.</p></div></details>
 <h3>Problem 4: Aynı ağda farklı bir örnekle geri yayılım</h3>
 <div class="problem"><div class="ptitle">Soru</div><p>Ders ağı: W = [[0.5, 0.5], [−1, 1]], b = (0, −0.5), v = (1, −1), c = −1, ReLU gizli, sigmoid çıktı, BCE. Örnek x = (2, 0), y = 0. h, ŷ, δ'lar ve ∂L/∂w₁₁'i bulun.</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>z₁ = 1 + 0 + 0 = 1 → h₁ = 1; z₂ = −2 + 0 − 0.5 = −2.5 → h₂ = 0 (ReLU). u = 1·1 − 1·0 − 1 = 0 → ŷ = 0.5, L = −ln 0.5 = 0.693. δ_out = ŷ − y = 0.5. ∂L/∂v₁ = 0.5·1 = 0.5, ∂L/∂v₂ = 0.5·0 = 0. δ₁ = 0.5·1·1 = 0.5 → ∂L/∂w₁₁ = 0.5·2 = <strong>1.0</strong>, ∂L/∂w₁₂ = 0. δ₂ = 0.5·(−1)·ReLU′(−2.5) = <strong>0</strong>: ikinci gizli nöronun ağırlıkları bu örnekte güncellenmez (ölü ReLU).</p>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p><strong>İleri yayılım.</strong> Birinci gizli nöronun toplamı z₁ = 0.5·2 + 0.5·0 + 0 = 1'dir; ReLU pozitif değeri olduğu gibi geçirir, h₁ = 1. İkinci nöronun toplamı z₂ = −1·2 + 1·0 − 0.5 = −2.5'tir; ReLU negatif değeri 0'a çevirir, h₂ = 0. Çıktının toplamı u = 1·1 + (−1)·0 − 1 = 0, dolayısıyla ŷ = σ(0) = 0.5 ve kayıp L = −ln(1 − 0.5) = 0.693 olur.</p>
+<p><strong>Geri yayılım.</strong> Çıktı hatası δ_out = ŷ − y = 0.5 − 0 = 0.5'tir. Çıktıya giden ağırlıkların gradyanları ∂L/∂v₁ = 0.5·1 = 0.5 ve ∂L/∂v₂ = 0.5·0 = 0'dır. Birinci gizli nöronun hatası δ₁ = 0.5·1·ReLU′(1) = 0.5·1·1 = 0.5 olduğundan ∂L/∂w₁₁ = δ₁·x₁ = 0.5·2 = <strong>1.0</strong> ve ∂L/∂w₁₂ = 0.5·0 = 0 çıkar. İkinci gizli nöronun hatası δ₂ = 0.5·(−1)·ReLU′(−2.5) = <strong>0</strong>'dır, çünkü ReLU'nun negatif bölgedeki türevi 0'dır. Bu yüzden ikinci gizli nöronun ağırlıkları bu örnekte hiç güncellenmez.</p>
 <p class="small muted">Yukarıdaki 2-2-1 aracında x = 2 0, y = 0 girerek denetleyin.</p></div></details>
-<h2>Sınavda sık yapılan hatalar</h2>
+<h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
-<li>sign gizli nöronlarla step'in eşiğini kullanmak: sign çıktısı ±1, “k koşulun hepsi” eşiği k − 0.5 (Σh = k ya da k − 2).</li>
-<li>Olumsuz değişmezin ağırlığını +1 yazmak (¬xᵢ → −1).</li>
-<li>AND nöronunda bias'ı toplam değişmez sayısından hesaplamak: yalnız <em>pozitif</em> değişmezler sayılır.</li>
-<li>Gizli katmanda doğrusal etkinleştirme kullanmak (katmanlar tek doğrusala çöker).</li>
-<li>Geri yayılımda g′(z)'yi unutmak; ReLU'da z ≤ 0 iken gradyanın 0 olduğunu atlamak.</li>
-<li>Güncellemede işaret: θ ← θ <strong>−</strong> η∂L/∂θ.</li>
+<li>Gizli nöronlar sign iken step'e göre yazılmış eşiği kullanmak. sign çıktısı +1 ya da −1 olduğu için “k koşulun hepsi” eşiği k − 0.5'tir; bütün koşullar sağlanınca Σh = k, biri bozulunca k − 2 olur.</li>
+<li>Olumsuz (¬) geçen bir değişkenin ağırlığını +1 yazmak; ¬xᵢ için ağırlık −1 olmalıdır.</li>
+<li>VE (∧) nöronunun sabit terimini terimdeki bütün değişkenleri sayarak hesaplamak. Yalnız <em>olumlu</em> geçen değişkenler sayılır.</li>
+<li>Gizli katmanda doğrusal etkinleştirme kullanmak. Doğrusal katmanlar üst üste tek bir doğrusal işleve çöker ve ağ XOR'u bile çözemez.</li>
+<li>Geri yayılımda etkinleştirme türevi g′(z)'yi unutmak, özellikle ReLU'da z ≤ 0 iken gradyanın 0 olduğunu atlamak.</li>
+<li>Güncellemede işareti karıştırmak. Kaybı azaltmak için gradyanın tersine gidilir: θ ← θ <strong>−</strong> η·∂L/∂θ.</li>
 </ul>
 
-<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2>
+<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
 <tbody>
@@ -159,36 +167,36 @@ Aracı bu ifadelerle ve geçmiş final listesindekilerle deneyin: <code>(x1 ∧ 
 <tr><td>Öğrenme oranı η · batch boyutu</td><td colspan="3">eniyileme ekseninde</td><td>büyük η ıraksar; küçük η yavaş</td></tr>
 </tbody></table></div>
 
-<h2>Kendini sına: kısa sorular</h2>
+<h2>Kendini sına: kısa sorular</h2><p class="h-en" lang="en">Self-check: short questions</p>
 <div class="quiz" data-answer="2"><p>“En az 2 girdisi 1 olunca 1” veren 3 girdili step nöronu?</p><ol>
 <li data-why="Bu AND (hepsi): eşik 2.5.">w = (1, 1, 1), y = step(Σx − 2.5)</li>
 <li data-why="">w = (1, 1, 1), y = step(Σx − 1.5)</li>
 <li data-why="Bu OR.">w = (1, 1, 1), y = step(Σx − 0.5)</li>
-<li data-why="Negatif ağırlıklar “en çok” içindir.">w = (−1, −1, −1), y = step(2.5 − Σx)</li></ol></div>
+<li data-why="Negatif ağırlıklar “en çok” içindir.">w = (−1, −1, −1), y = step(2.5 − Σx)</li></ol><div class="explain">“En az 2 girdi 1” koşulu için bütün ağırlıklar +1 olur ve eşik, koşulun sağlandığı en küçük toplamın (2) 0.5 altına konur: 1.5. İki girdi 1 iken Σx − 1.5 = 0.5 &gt; 0 olduğu için çıktı 1, yalnız bir girdi 1 iken −0.5 olduğu için çıktı 0 olur.</div></div>
 
 <div class="quiz" data-answer="3"><p>sign gizli nöronlarla “4 koşulun hepsi sağlansın” çıktısı?</p><ol>
 <li data-why="Bu step gizli nöronlar (0/1) içindir.">step(Σh − 3.5) ama h ∈ {0,1}</li>
 <li data-why="Σh = 4 iken 4 − 4.5 &lt; 0: hiç 1 vermez.">step(Σh − 4.5)</li>
 <li data-why="">step(Σh − 3.5): hepsi +1 iken 0.5, biri bozulunca Σh = 2 → −1.5</li>
-<li data-why="Biri bozulsa da Σh = 2 &gt; 0.5.">step(Σh − 0.5)</li></ol></div>
+<li data-why="Biri bozulsa da Σh = 2 &gt; 0.5.">step(Σh − 0.5)</li></ol><div class="explain">sign nöronları +1 ya da −1 verir. Dört koşulun hepsi sağlanınca Σh = 4 ve 4 − 3.5 = 0.5 &gt; 0 olduğu için çıktı 1 olur. Tek bir koşul bozulursa bir +1, −1'e döner, Σh = 2 olur ve 2 − 3.5 = −1.5 çıktıyı 0 yapar. Eşik bu iki değerin arasında olduğu için doğru çalışır.</div></div>
 
 <div class="quiz" data-answer="1"><p>Sigmoid + BCE çıktısında ∂L/∂u nedir?</p><ol>
 <li data-why="">ŷ − y</li>
 <li data-why="σ′ çarpanı log-loss ile sadeleşir.">(ŷ − y)·σ′(u)</li>
 <li data-why="Bu MSE'nin türevine benzer ama işaret ve çarpan farklı.">2(y − ŷ)</li>
-<li data-why="Türevi vardır.">Tanımsız</li></ol></div>
+<li data-why="Türevi vardır.">Tanımsız</li></ol><div class="explain">BCE kaybının sigmoid çıktıya göre türevi ile sigmoidin kendi türevi σ′(u) = ŷ(1 − ŷ) çarpılınca paydadaki ŷ(1 − ŷ) sadeleşir ve geriye yalnız ŷ − y kalır. Bu sade sonuç, sigmoid ile BCE'nin birlikte kullanılmasının bir nedenidir.</div></div>
 
 <div class="quiz" data-answer="4"><p>Bütün ağırlıklar 0 ile ilklendirilirse?</p><ol>
 <li data-why="Simetri kırılmaz.">En iyi başlangıç budur</li>
 <li data-why="Gradyanlar sıfır olmayabilir ama hepsi eşit.">Gradyan hiç hesaplanamaz</li>
 <li data-why="Sorun hız değil.">Yalnız eğitim yavaşlar</li>
-<li data-why="">Bir katmandaki bütün gizli nöronlar aynı gradyanı alır, hep aynı kalır: simetri kırılmaz</li></ol></div>
+<li data-why="">Bir katmandaki bütün gizli nöronlar aynı gradyanı alır, hep aynı kalır: simetri kırılmaz</li></ol><div class="explain">Ağırlıkların hepsi aynıysa aynı katmandaki gizli nöronlar aynı girdiden aynı değeri hesaplar ve geri yayılımda aynı gradyanı alır. Böylece her güncellemeden sonra yine birbirinin aynısı kalırlar; katmanda kaç nöron olursa olsun hepsi tek bir nöron gibi davranır. Küçük rastgele ilk değerler bu simetriyi bozar.</div></div>
 
 <div class="quiz" data-answer="2"><p>Kaybolan gradyan sorunu en çok hangisinde ortaya çıkar?</p><ol>
 <li data-why="ReLU'nun pozitif bölgedeki türevi 1'dir.">Derin ReLU ağında</li>
 <li data-why="">Derin, sigmoid gizli katmanlı ağda (σ′ ≤ 0.25 her katmanda çarpılır)</li>
 <li data-why="Tek katmanda zincir uzun değildir.">Tek nöronlu lojistik regresyonda</li>
-<li data-why="Karar ağaçları gradyanla eğitilmez.">Derin karar ağacında</li></ol></div>
+<li data-why="Karar ağaçları gradyanla eğitilmez.">Derin karar ağacında</li></ol><div class="explain">Geri yayılımda her katmanda etkinleştirme türevi gradyanla çarpılır. Sigmoidin türevi en fazla 0.25 olduğu için on katmanlı bir ağda gradyan en az 0.25¹⁰ kadar küçülür ve ilk katmanlara neredeyse hiç ulaşmaz. ReLU'nun pozitif bölgedeki türevi 1 olduğu için bu sorunu büyük ölçüde gidermiştir.</div></div>
 
 </div></main>
 </body>
