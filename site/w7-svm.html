@@ -45,10 +45,39 @@
 
 <h2>İki boyutta w ve b'yi elle bulmak (sınav kalıbı)</h2><p class="h-en" lang="en">Finding w and b by hand in two dimensions (exam pattern)</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden “= ±1” denklemleri?</div><p>w ve b'yi 2 ile çarparsak aynı doğruyu elde ederiz; ölçeği sabitlemek için “destek vektörlerinde w·x + b tam +1 ya da −1 olsun” deriz (kanonik biçim). Böylece destek vektörlerini bildiğimizde her biri bize bir denklem verir; üç bilinmeyen (w₁, w₂, b) için genelde üç denklem yeter.</p></div>
-<p>Sınavda iki boyutlu küçük bir veri için w ve b'yi bulmanız istenir. İzlenecek yol dört adımdır. Önce noktaları çizin ve iki sınıfın birbirine en yakın olduğu yeri bulun; sokağa değecek noktalar oradadır. Sonra her destek vektörü için kanonik denklemi yazın: pozitif bir destek vektöründe w·x + b = +1, negatif birinde −1. Üç bilinmeyen (w₁, w₂, b) için genelde üç denklem yeter. Denklemleri çözüp sınırı, ‖w‖'yi ve marjı yazın. Son olarak bütün diğer noktaların yᵢ(w·xᵢ + b) ≥ 1 koşulunu sağladığını denetleyin; sağlamıyorsa yanlış destek vektörleri seçilmiştir.</p>
-<div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>Pozitif (2, 0), negatif (0, 0). Destek vektörleri bu iki nokta. w = (w₁, 0) varsayarak w ve b?</p><details><summary>Cevabı göster</summary><p>2w₁ + b = +1 ve 0 + b = −1 denklemlerinden b = <strong>−1</strong> ve w₁ = <strong>1</strong> bulunur. Sınır x₁ = 1 (iki noktanın tam ortası), marj 1/‖w‖ = 1.</p></details></div>
+<p>Sınavda iki boyutlu küçük bir veri verilir ve sert marjlı SVM'nin w ve b'sini bulmanız istenir. Hiçbir şey ezberlemeden şu sırayla gidilir:</p>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Sıfırdan SVM çözümü: 5 adım</div><ol>
+<li><strong>Noktaları çiz.</strong> İki sınıfı farklı işaretlerle koordinat düzlemine yerleştir.</li>
+<li><strong>Destek vektörlerini tahmin et.</strong> İki sınıfın birbirine en yakın olduğu yere bak: karşı sınıftaki en yakın noktalar sokağın kenarına değecek olanlardır. Çoğu zaman 2 ya da 3 noktadır.</li>
+<li><strong>Her destek vektörü için bir denklem yaz.</strong> Pozitif destek vektöründe w·x + b = +1, negatif destek vektöründe w·x + b = −1. (Bu “±1” kuralı ölçeği sabitlemek içindir.)</li>
+<li><strong>Denklemleri çöz.</strong> Bilinmeyenler w₁, w₂ ve b. Sonra sınırı (w·x + b = 0), ‖w‖'yi ve marjı (1/‖w‖) yaz.</li>
+<li><strong>Denetle.</strong> Bütün noktalar için y·(w·x + b) ≥ 1 olmalı. Bir nokta bu koşulu bozuyorsa destek vektörü tahminin yanlıştır: o noktayı da destek vektörü olarak ekleyip 3. adıma dön.</li>
+</ol></div>
+<h3>Durum 1: iki destek vektörü (kısa yol)</h3>
+<p>Destek vektörü olarak yalnız bir pozitif nokta x₊ ve bir negatif nokta x₋ varsa, sınır bu iki noktayı birleştiren doğruya dik ve tam ortalarından geçer. Bu yüzden w, iki noktanın farkıyla aynı yöndedir ve şu kısa formülle bulunur:</p>
+<div class="formula" style="font-size:1.2rem">w = 2·(x₊ − x₋) / ‖x₊ − x₋‖²<br>b = 1 − w·x₊</div>
+<p class="formula-legend"><b>Burada:</b> x₊ pozitif, x₋ negatif destek vektörüdür; x₊ − x₋ aralarındaki fark vektörü, ‖x₊ − x₋‖² bu farkın bileşenlerinin karelerinin toplamıdır. b, pozitif destek vektörünün denkleminden (w·x₊ + b = 1) gelir.</p>
+<p><strong>Örnek.</strong> Pozitif x₊ = (2, 0), negatif x₋ = (0, 0).</p>
+<ol class="walk">
+<li><strong>Fark.</strong> x₊ − x₋ = (2, 0); ‖x₊ − x₋‖² = 2² + 0² = 4.</li>
+<li><strong>w.</strong> w = 2·(2, 0)/4 = <strong>(1, 0)</strong>.</li>
+<li><strong>b.</strong> b = 1 − w·x₊ = 1 − (1·2 + 0·0) = <strong>−1</strong>.</li>
+<li><strong>Sonuç.</strong> Sınır x₁ − 1 = 0, yani x₁ = 1: iki noktanın tam ortası. ‖w‖ = 1, marj 1/‖w‖ = 1.</li>
+<li><strong>Denetim.</strong> x₋ için w·x₋ + b = −1 ✓. Başka nokta varsa her biri için y·(w·x + b) ≥ 1 olmalı.</li>
+</ol>
+<h3>Durum 2: üç destek vektörü (denklem sistemi)</h3>
+<p>Bir sınıftan iki, öbüründen bir nokta sokağın kenarına değiyorsa kısa yol işe yaramaz; üç denklemi yazıp çözeriz. Aşağıdaki aracın varsayılan verisinde pozitifler (2, 2) ve (3, 1), negatifler (0, 0) ve (1, 0)'dır.</p>
+<ol class="walk">
+<li><strong>Destek vektörlerini tahmin et.</strong> Negatiflerden pozitiflere en yakın olan (1, 0)'dır. İki pozitif de ona yakın ve aynı uzaklıkta göründüğü için destek vektörü adayları (2, 2), (3, 1) ve (1, 0).</li>
+<li><strong>Denklemler.</strong> (2, 2) için 2w₁ + 2w₂ + b = 1. (3, 1) için 3w₁ + w₂ + b = 1. (1, 0) için w₁ + b = −1.</li>
+<li><strong>b'yi yok et.</strong> İlk iki denklemi birbirinden çıkarınca −w₁ + w₂ = 0, yani w₁ = w₂. Bu ortak değere a diyelim.</li>
+<li><strong>Kalan iki denklem.</strong> İlk denklem 4a + b = 1, üçüncüsü a + b = −1 olur. Çıkarınca 3a = 2, yani a = 2/3; buradan b = −1 − 2/3 = −5/3.</li>
+<li><strong>Sonuç.</strong> <strong>w = (2/3, 2/3), b = −5/3.</strong> Sınır (2/3)x₁ + (2/3)x₂ − 5/3 = 0, yani x₁ + x₂ = 2.5. ‖w‖ = √(4/9 + 4/9) ≈ 0.943, marj 1/0.943 ≈ 1.06.</li>
+<li><strong>Denetim.</strong> Destek vektörü olmayan (0, 0) için skor 0 + 0 − 5/3 ≈ −1.67; y = −1 olduğu için y·f = 1.67 ≥ 1 ✓, nokta sokağın dışında.</li>
+</ol>
+<p class="small">İpucu: hangi noktaların destek vektörü olduğundan emin değilseniz önce en yakın iki noktayla Durum 1'i deneyin. Denetimde bir nokta y·f ≥ 1 koşulunu bozarsa onu da ekleyip Durum 2'ye geçin. Aşağıdaki araçta noktaları sürükleyerek destek vektörlerinin nasıl değiştiğini görebilirsiniz.</p>
 <div data-widget="hardsvm"></div>
-<p>Araçtaki varsayılan veride pozitifler (2, 2) ve (3, 1), negatifler (0, 0) ve (1, 0)'dır. En yakın bölge, (1, 0) noktası ile pozitiflerin arasındaki kenardır ve yön (1, 1)'dir. (2, 2), (3, 1) ve (1, 0) için yazılan üç denklem 2w₁ + 2w₂ + b = 1, 3w₁ + w₂ + b = 1 ve w₁ + b = −1'dir. Bunlar çözülünce w₁ = w₂ = 2/3 ve b = −5/3 bulunur: sınır x₁ + x₂ = 2.5 doğrusu, marj yaklaşık 1.06'dır. (0, 0) noktasında skor −1.67'dir; −1'den küçük olduğu için sokağın dışındadır ve destek vektörü değildir.</p>
+<div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>Pozitif (3, 3), negatif (1, 1); başka nokta yok. w, b ve marj?</p><details><summary>Cevabı göster</summary><p>Fark x₊ − x₋ = (2, 2), ‖x₊ − x₋‖² = 8. w = 2·(2, 2)/8 = <strong>(0.5, 0.5)</strong>. b = 1 − (0.5·3 + 0.5·3) = <strong>−2</strong>. Sınır 0.5x₁ + 0.5x₂ − 2 = 0, yani x₁ + x₂ = 4 (iki noktanın ortası (2, 2) bunun üzerinde). ‖w‖ = √0.5 ≈ 0.707, marj ≈ 1.414; bu da iki nokta arasındaki uzaklığın (√8 ≈ 2.83) yarısıdır.</p></details></div>
 <p>SVM'nin bir de <strong>ikil biçimi</strong> vardır: w, destek vektörlerinin ağırlıklı toplamı olarak yazılır (w = Σαᵢyᵢxᵢ) ve katsayılar Σαᵢyᵢ = 0 koşulunu sağlar; destek vektörü olmayan noktalarda α = 0'dır. Yukarıdaki örnekte α'lar pozitifler için 2/9 ve 2/9, negatif için 4/9'dur: tek negatif destek vektörü, iki pozitifi dengeler. Bazen bir nokta sokağın kenarında durduğu hâlde katsayısı sıfır çıkabilir.</p>
 <div class="callout"><div class="callout-title">Geniş marj neden daha iyi genelleme demek?</div><p>Bir model ailesinin kapasitesini ölçmenin bir yolu <strong>VC boyutudur</strong>. Bir aile n noktayı “parçalayabiliyorsa”, yani bu noktaların 2ⁿ farklı etiketlemesinin her biri için hepsini doğru sınıflayan bir model bulunabiliyorsa, VC boyutu en az n'dir. Düzlemdeki doğruların VC boyutu 3'tür: aynı doğru üzerinde olmayan üç nokta her biçimde ayrılabilir, ama dört noktada çaprazların aynı sınıfta olduğu (XOR) etiketleme hiçbir doğruyla ayrılamaz. Kapasite büyükse eğitim ve test hatası arasındaki açık büyüyebilir. Marjı en az belli bir değer olan sınırların etkin kapasitesi, marj büyüdükçe küçülür; geniş marj bu yüzden daha küçük bir genelleme açığı demektir.</p></div>
 
