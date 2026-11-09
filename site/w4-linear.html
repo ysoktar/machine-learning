@@ -109,16 +109,18 @@
 <p>Yukarıdaki araçtaki varsayılan değerler sınavda çıkan kalıptır: x = (1, 2), y = 1, w = 0, b = 0, η = 0.4. Başta z = 0 ve p = 0.5 olduğu için kayıp ln 2 = 0.693'tür. Gradyan (p − y)·x = (−0.5, −1) çıkar; bunun tersi yönünde adım atınca w = (0.2, 0.4), b = 0.2 olur. Yeni skor 1.2, yeni olasılık 0.769, yeni kayıp 0.263'tür: adım kaybı düşürdü. Adım kaybı düşürmüyorsa ya öğrenme oranı çok büyüktür ya da işaret yanlış alınmıştır.</p>
 <div class="tryit"><div class="tryit-title"><span class="ic ic-try" aria-hidden="true"></span>Hemen dene</div><p>z = 0 iken p kaç, y = 1 ise kayıp ne?</p><details><summary>Cevabı göster</summary><p>p = σ(0) = <strong>0.5</strong>; kayıp −ln 0.5 = ln 2 = <strong>0.693</strong>. Model kararsız; gradyan adımı p'yi 1'e doğru itecek.</p></details></div>
 <div class="callout"><div class="callout-title">Üç modelin ortak kalıbı: hata çarpı girdi</div>
-<p>Doğrusal regresyon, lojistik regresyon ve perceptron'un güncelleme kuralları aynı biçimdedir: (tahmin − gerçek) × girdi. Değişen yalnız tahminin nasıl üretildiğidir.</p>
+<p>Doğrusal regresyon, lojistik regresyon ve perceptron'un güncelleme kuralları aynı biçimdedir: <strong>w ← w − η·(tahmin − gerçek)·x</strong>. Değişen yalnız tahminin nasıl üretildiği ve etiketlerin nasıl yazıldığıdır. Tablodaki kayıp ve güncellemeler tek bir örnek içindir.</p>
 <div class="table-wrap"><table class="simple compact">
 <thead><tr><th></th><th>Doğrusal regresyon</th><th>Lojistik regresyon</th><th>Perceptron</th></tr></thead>
 <tbody>
-<tr><td>Çıktı</td><td>w·x + b (bir sayı)</td><td>σ(w·x + b) (olasılık)</td><td>sign(w·x + b) (±1)</td></tr>
-<tr><td>Kayıp</td><td>MSE</td><td>log-loss</td><td>yalnız yanlış örneklerde</td></tr>
-<tr><td>Güncelleme</td><td>(ŷ − y)·x</td><td>(p − y)·x</td><td>yanlışsa w += η·y·x</td></tr>
+<tr><td>Etiket y</td><td>herhangi bir sayı</td><td>0 ya da 1</td><td>−1 ya da +1</td></tr>
+<tr><td>Çıktı</td><td>ŷ = w·x + b</td><td>p = σ(w·x + b)</td><td>ŷ = sign(w·x + b)</td></tr>
+<tr><td>Kayıp</td><td>(ŷ − y)²</td><td>−[y·ln p + (1 − y)·ln(1 − p)]</td><td>max(0, −y·(w·x + b))</td></tr>
+<tr><td>Güncelleme</td><td>w ← w − η·(ŷ − y)·x<br>b ← b − η·(ŷ − y)</td><td>w ← w − η·(p − y)·x<br>b ← b − η·(p − y)</td><td>yalnız yanlışsa:<br>w ← w + η·y·x<br>b ← b + η·y</td></tr>
 <tr><td>Kapalı çözüm</td><td>var</td><td>yok</td><td>yok</td></tr>
 <tr><td>Olasılık verir mi?</td><td>hayır</td><td>evet</td><td>hayır</td></tr>
-</tbody></table></div></div>
+</tbody></table></div>
+<p class="formula-legend"><b>Notlar:</b> Doğrusal regresyonda karenin türevinden bir 2 çarpanı gelir, 2·(ŷ − y)·x; bu 2 genelde öğrenme oranının içine katılır. Perceptron'un kaybı yalnız yanlış sınıflanan örneklerde sıfırdan büyüktür. Perceptron da aynı kalıba uyar: yanlış tahminde ŷ = −y olduğu için ŷ − y = −2y olur ve kural w ← w + η·y·x'e dönüşür (2 yine η'ya katılır).</p></div>
 
 <h2>Hatadan öğrenen doğru: perceptron</h2><p class="h-en" lang="en">A line that learns from its mistakes: the perceptron</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Hatadan öğrenen doğru</div><p>Perceptron en basit öğrenme kuralıdır: örnekleri tek tek dolaş; doğru sınıflıyorsan hiçbir şey yapma; yanlış sınıflıyorsan doğruyu o örneğin doğru tarafa geçeceği yöne biraz çevir. “Biraz çevirmek” = ağırlıklara η·y·x eklemek: pozitif örnek kaçırıldıysa ağırlıklar örneğe doğru, negatif örneğe yanlışlıkla + dendiyse örnekten uzağa itilir.</p></div>
