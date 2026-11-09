@@ -31,7 +31,7 @@
 <div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-oznitelik">Öznitelik</a> · <a href="sozluk.html#t-one-hot-kodlama">One-hot kodlama</a> · <a href="sozluk.html#t-normallestirme">Normalleştirme</a> · <a href="sozluk.html#t-z-score">z-score</a> · <a href="sozluk.html#t-pca">PCA</a> · <a href="sozluk.html#t-capraz-dogrulama">Çapraz doğrulama</a> · <a href="sozluk.html#t-test-kumesi">Test kümesi</a> · <a href="sozluk.html#t-karmasiklik-matrisi">Karmaşıklık matrisi</a> · <a href="sozluk.html#t-precision-kesinlik">Precision</a> · <a href="sozluk.html#t-recall-duyarlilik-tpr">Recall</a> · <a href="sozluk.html#t-f1">F1</a> · <a href="sozluk.html#t-auc">AUC</a> · <a href="sozluk.html#t-veri-sizintisi">Veri sızıntısı</a></div>
 
 
-<h2>Veri türleri ve kategorileri sayıya çevirmek (kodlama)</h2>
+<h2>Veri türleri ve kategorileri sayıya çevirmek (kodlama)</h2><p class="h-en" lang="en">Data types and turning categories into numbers (encoding)</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Model yalnız sayı anlar</div><p>Bir modelin gördüğü şey bir sayılar tablosudur: her satır bir <span data-gl="t-ornek-gozlem">örnek</span> (bir müşteri), her sütun bir öznitelik (yaş, gelir, şehir). “Ankara” gibi bir kelimeyi modele verebilmek için önce sayıya çevirmeliyiz; bunun yolu kelimenin türüne bağlıdır.</p><p>Kural basit: değerler arasında <em>sıra</em> yoksa (şehir, renk) her değere ayrı bir 0/1 sütunu açılır (one-hot); sıra varsa (S &lt; M &lt; L) sıra numarası kullanılabilir; zaten sayıysa (yaş) olduğu gibi kalır ama ölçeklenir.</p></div>
 <p>Bir veri tablosunda her sütunun bir <strong>türü</strong> vardır ve sayıya nasıl çevrileceğini bu tür belirler. Üç temel tür vardır.</p>
 <p><strong>Sayısal</strong> öznitelikler (yaş, gelir, sıcaklık) zaten sayıdır; onlarla toplama ve ortalama gibi işlemler anlamlıdır. Bunlar olduğu gibi kullanılır, yalnız ölçeklenmeleri gerekebilir (bir sonraki bölüm).</p>
@@ -41,7 +41,7 @@
 <p>İki durum ayrıca dikkat ister. <strong>Zaman serisi</strong> gibi sıralı verilerde ardışık örnekler birbirine bağlıdır; bu yüzden veriyi bölerken rastgele karıştırmak yerine zamana göre bölmek gerekir (geçmişle eğit, gelecekle sına). Görüntü, ses ve metin gibi <strong>yapısız</strong> veriler ise önce sayısal bir vektöre çevrilir; derin öğrenme bu çeviriyi kendisi öğrenir. Çok sayıda değeri olan bir sütun (örneğin 10.000 farklı ürün kodu) için one-hot 10.000 sütun demektir; böyle durumlarda hedef kodlaması ya da gömme (embedding) kullanılır.</p>
 <div class="callout"><div class="callout-title">One-hot ile ikili (binary) kodlamanın farkı</div><p>One-hot'ta her kategori ayrı bir sütundur ve bir satırda tam olarak bir sütun 1'dir. İkili kodlamada ise kategorinin sıra numarası ikili sayıyla yazılır; k kategori için yalnız ⌈log₂k⌉ sütun yeter ama bu sütunların tek başına bir anlamı yoktur. Sinir ağlarında one-hot hem girdide (kategorik öznitelikler) hem de çıktıda (çok sınıflı etiket, softmax'la karşılaştırılır) kullanılır.</p></div>
 
-<h2>Öznitelikleri aynı ölçeğe getirmek (min-max ve z-score)</h2>
+<h2>Öznitelikleri aynı ölçeğe getirmek (min-max ve z-score)</h2><p class="h-en" lang="en">Bringing features to the same scale (min-max and z-score)</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden ölçeklemeliyiz?</div><p>İki müşteriyi karşılaştırıyoruz: yaşları 30 ve 60, gelirleri 40.000 ve 41.000 TL. Ham sayılarla uzaklık hesaplarsak gelirdeki 1000 TL'lik fark, yaştaki 30 yıllık farkı ezer: model yaşı hiç görmez. Ölçekleme bütün öznitelikleri aynı “birime” getirir.</p><p><strong>min-max</strong>: en küçüğü 0, en büyüğü 1 yap. <strong>z-score</strong>: “ortalamadan kaç standart sapma uzakta?” (z = 2: ortalamanın 2 standart sapma üstü).</p></div>
 <p>En sık kullanılan iki yöntem şunlardır:</p>
 <div class="formula">min-max: x′ = (x − min) / (max − min) ∈ [0, 1]&nbsp;&nbsp;&nbsp;&nbsp; z-score: z = (x − μ) / σ</div>
@@ -58,12 +58,12 @@
 <div class="callout warn"><div class="callout-title">Altın kural: test verisini ön işlemede asla kullanmayın</div>
 <p>Ölçekleme için gereken sayılar (min, max, μ, σ), PCA'nın eksenleri, one-hot'un kategori listesi ya da eksik değerleri doldurmak için kullanılan ortalama yalnız <strong>eğitim verisinden</strong> hesaplanır ve test verisine aynen uygulanır. Test verisini bu hesaplara katmak, modelin “geleceği” görmesi demektir; buna <strong>veri sızıntısı</strong> denir ve test sonucu olduğundan iyi çıkar. Çapraz doğrulamada da aynı kural geçerlidir: ölçekleyici bir <code>Pipeline</code> içinde her katın yalnız eğitim kısmına uydurulmalıdır.</p></div>
 
-<h2>Öznitelik sayısını azaltmak: seçim mi, çıkarım mı?</h2>
+<h2>Öznitelik sayısını azaltmak: seçim mi, çıkarım mı?</h2><p class="h-en" lang="en">Reducing the number of features: selection or extraction?</p>
 <p>Çok sayıda öznitelik hem eğitimi yavaşlatır hem de aşırı uyum riskini artırır. Sayıyı azaltmanın iki yolu vardır ve sınavda farkları sorulur.</p>
 <p><strong>Öznitelik seçimi</strong>, var olan sütunların bir kısmını tutup gerisini atmaktır. Sütunlar değişmediği için model yorumlanabilir kalır (“gelir önemli, şehir değil” diyebiliriz). Seçim üç yolla yapılabilir: her sütunu tek başına bir ölçütle puanlayan <em>filtre</em> yöntemleri (korelasyon, karşılıklı bilgi), sütun alt kümelerini bir modelle deneyen <em>sarmalayıcı</em> yöntemler (ileri/geri seçim, RFE) ve seçimi eğitim sırasında kendiliğinden yapan <em>gömülü</em> yöntemler (lasso katsayıları, ağaçların öznitelik önemleri).</p>
 <p><strong>Öznitelik çıkarımı</strong> ise eski sütunlardan yeni sütunlar türetmektir; örneğin PCA, ilişkili birçok sütunu birkaç yeni eksende özetler. Bilgi daha az sütunda toplanır ama yeni sütunlar eski sütunların karışımı olduğu için yorumlamak zorlaşır. Doğrusal olmayan çıkarım yöntemleri (t-SNE, UMAP, otokodlayıcılar) daha çok görselleştirme ve derin öğrenmede kullanılır.</p>
 
-<h2>Veriyi az sayıda yönle özetlemek: temel bileşen analizi (PCA)</h2>
+<h2>Veriyi az sayıda yönle özetlemek: temel bileşen analizi (PCA)</h2><p class="h-en" lang="en">Summarising data with a few directions: principal component analysis (PCA)</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>PCA ne yapar?</div><p>Bir yemek tarifini 20 malzemeyle anlatmak yerine “ne kadar tatlı, ne kadar acı” diye iki sayıyla özetlediğinizi düşünün: bilgi kaybı az, anlatım çok daha kısa. PCA bunu sayılarla yapar: veride en çok değişkenlik (yayılma) olan yönü bulur (PC1), sonra ona dik ikinci yönü (PC2)… İlk birkaç yön çoğu bilgiyi taşıyorsa gerisini atarız.</p><p>Hesap: (1) her sütunun ortalamasını çıkar (merkezle), (2) sütunların birlikte nasıl değiştiğini gösteren kovaryans matrisini kur, (3) bu matrisin özdeğerleri “o yöndeki yayılma miktarı”, özvektörleri “yön”dür.</p></div>
 <p>PCA'nın adımları her zaman aynıdır. Önce her sütunun ortalaması çıkarılarak veri merkezlenir. Sonra sütunların ne kadar yayıldığını ve birlikte nasıl değiştiğini gösteren <strong>kovaryans matrisi</strong> kurulur (sınavda n − 1'e bölünür). Bu matrisin <strong>özdeğerleri</strong> her yöndeki yayılmanın büyüklüğünü, <strong>özvektörleri</strong> o yönleri verir. En büyük özdeğerin yönü PC1'dir, PC2 ona diktir. Bir bileşenin açıkladığı varyans oranı, kendi özdeğerinin bütün özdeğerlerin toplamına oranıdır.</p>
 <div data-widget="fig" data-fig="pcaaxes" data-caption="Altı nokta, ortalamaları ve iki temel bileşen. Noktaların PC1 üzerine izdüşümü (kesikli çizgiler) verinin çoğunu korur."></div>
@@ -71,7 +71,7 @@
 <div data-widget="pca"></div>
 <p>Kaç bileşen tutulmalı? Yaygın kural, birikimli açıklanan varyansın %90–95'e ulaştığı yerde durmaktır; sınıflandırma için kullanılıyorsa bileşen sayısı çapraz doğrulamayla da seçilebilir. Boyut azaltmanın bir nedeni de <strong>boyut lanetidir</strong>: öznitelik sayısı arttıkça uzay o kadar hızlı büyür ki veri noktaları seyrekleşir ve uzaklıklar birbirine benzer. Örneğin 10 boyutlu bir birim küpün hacminin yalnız %10'unu kaplamak için küpün her kenarının %79'unu almak gerekir.</p>
 
-<h2>Veriyi bölmek: eğitim, doğrulama, test ve çapraz doğrulama</h2>
+<h2>Veriyi bölmek: eğitim, doğrulama, test ve çapraz doğrulama</h2><p class="h-en" lang="en">Splitting the data: training, validation, test and cross-validation</p>
 <div data-widget="fig" data-fig="split" data-caption="Veri üçe bölünür: model eğitimde öğrenir, ayarlar doğrulamada seçilir, test yalnız en sonda bir kez kullanılır."></div>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Neden üç parça?</div><p>Test kümesi “final sınavı”dır. Ayarları (k kaç olsun?) test sonuçlarına bakarak seçersek, final sorularına bakıp çalışmış oluruz: not şişer ama gerçek başarıyı göstermez. Bu yüzden ayarlar için ayrı bir “deneme sınavı” (doğrulama kümesi) kullanırız.</p><p>Veri azsa tek bir deneme sınavı şansa bağlı olur; <strong>çapraz doğrulama</strong> veriyi k parçaya bölüp her parçayı bir kez deneme sınavı yapar ve sonuçların ortalamasını alır.</p></div>
 <p>Veri genelde üç parçaya bölünür. <strong>Eğitim kümesi</strong> (%60–80) modelin parametrelerini, örneğin ağırlıklarını ya da ağacın bölmelerini öğrenmek için kullanılır. <strong>Doğrulama kümesi</strong> (%10–20) hiperparametreleri seçmek ve modelleri karşılaştırmak içindir: kNN'de k kaç olsun, ağaç ne kadar derin olsun gibi. <strong>Test kümesi</strong> (%10–20) ise yalnız en sonda, bir kez, modelin gerçek başarısını tahmin etmek için kullanılır. k'yı test sonucuna bakarak seçmek ya da beş denemenin en iyi test sonucunu raporlamak, test kümesini karar vermek için kullanmaktır; bu durumda raporlanan sayı olduğundan iyi çıkar.</p>
@@ -79,7 +79,7 @@
 <p><strong>k-katlı çapraz doğrulamada</strong> eğitim verisi k parçaya bölünür. Her turda bir parça doğrulama, kalanı eğitim olarak kullanılır; k model eğitilir ve her örnek tam bir kez doğrulamada yer alır. Sonuç, k skorun <strong>ortalaması ± standart sapması</strong> olarak raporlanır. Örneğin 1000 örnekle 5 katlı çapraz doğrulamada 5 model eğitilir; her biri 800 örnekle eğitilip 200 örnekle sınanır. Katmanlı (stratified) çapraz doğrulama her katta sınıf oranlarını korur; k = n olduğunda yönteme birini dışarıda bırakma (LOO) denir.</p>
 <p>Çapraz doğrulamayla ayar seçildikten sonra kat modelleri atılır ve son model <strong>bütün eğitim verisiyle</strong> yeniden eğitilir. Standart sapma büyükse model veriye göre kararsızdır; iki modelin ortalamaları arasındaki fark standart sapmalardan küçükse, aralarında gerçek bir fark olduğunu söylemek zordur. Zaman serisinde katlar da zamana göre oluşturulmalıdır: geçmişle eğitip sonraki dönemle doğrulamak gerekir.</p>
 
-<h2>Sınıflandırıcıyı ölçmek: karmaşıklık matrisi, precision, recall, F1</h2>
+<h2>Sınıflandırıcıyı ölçmek: karmaşıklık matrisi, precision, recall, F1</h2><p class="h-en" lang="en">Evaluating a classifier: confusion matrix, precision, recall, F1</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Dört kutu</div><p>Bir hastalık testi düşünün. Hasta birine “hasta” derse <strong>TP</strong> (doğru pozitif), sağlıklıya “sağlıklı” derse <strong>TN</strong>. Sağlıklıya “hasta” derse <strong>FP</strong> (yanlış alarm), hastaya “sağlıklı” derse <strong>FN</strong> (kaçırılan hasta). İsimlerin okunuşu: ikinci harf tahmin (Positive/Negative), birinci harf tahminin doğru (True) mu yanlış (False) mı olduğu.</p><p><strong>Precision</strong> “alarm verdiklerimin kaçı gerçekten hasta?”; <strong>recall</strong> “hastaların kaçını yakaladım?”. Bir test herkese “hasta” derse recall 1 olur ama precision düşer; çok temkinli olursa precision yükselir, recall düşer.</p></div>
 <p>Karmaşıklık matrisinde satırlar gerçek sınıfı, sütunlar tahmini gösterir (scikit-learn'ün kuralı budur; bazı kaynaklarda tersi olabilir). Bütün sınıflandırma ölçütleri bu dört sayıdan hesaplanır:</p>
 <div data-widget="fig" data-fig="cm" data-caption="Karmaşıklık matrisi: satırlar gerçek sınıf, sütunlar tahmin. Köşegen doğru, köşegen dışı yanlış tahminlerdir."></div><p><b>Elle bir örnek.</b> 10 test örneğinin gerçek sınıfları ve modelin tahminleri aşağıda. Her örneğe önce gerçek sınıfına (pozitif mi?), sonra tahmine bakarak bir etiket yazıyoruz:</p>
@@ -104,7 +104,7 @@
 <div class="callout warn"><div class="callout-title">%98 accuracy tuzağı</div><p>1000 kredi kartı işleminin 20'si sahte olsun. Her işleme “normal” diyen A modeli %98 accuracy alır, ama hiçbir sahteyi yakalamaz: recall 0, F1 0. Sahtelerin 15'ini yakalayıp 30 yanlış alarm veren B modelinin accuracy'si biraz daha düşüktür (%96.5), ama recall'u 0.75, F1'i 0.46'dır ve işe yarayan modeldir. Sınıflar dengesizse accuracy yerine precision, recall ve F1'e bakılmalı; her zaman çoğunluk sınıfını tahmin etmenin (taban çizgisinin) sonucu da raporlanmalıdır.</p></div>
 <p>Hangi ölçütün önemli olduğunu, hangi hatanın daha pahalı olduğu belirler. Kanser taramasında ya da acil triyajda bir hastayı kaçırmak (FN) çok pahalıdır, bu yüzden recall önemlidir. İş e-postasındaki bir spam filtresinde önemli bir e-postayı silmek (FP) pahalıdır, bu yüzden precision önemlidir. Müşterileri sıralayıp en üsttekileri aramak gibi sıralama problemlerinde ise eşikten bağımsız olan ROC-AUC uygundur.</p>
 
-<h2>Bütün eşikleri birden değerlendirmek: ROC eğrisi ve AUC</h2>
+<h2>Bütün eşikleri birden değerlendirmek: ROC eğrisi ve AUC</h2><p class="h-en" lang="en">Evaluating all thresholds at once: ROC curve and AUC</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Eşik ve sıralama</div><p>Model çoğu zaman doğrudan “evet/hayır” değil bir skor (0.9, 0.4…) verir; biz bir eşik seçeriz (≥ 0.5 ise evet). Eşiği düşürdükçe daha çok örneğe “evet” deriz: daha çok hastayı yakalarız (TPR ↑) ama daha çok yanlış alarm veririz (FPR ↑). ROC eğrisi bütün eşikleri tek resimde gösterir.</p><p>AUC tek bir sayıyla “model pozitifleri negatiflerin önüne ne kadar iyi diziyor?” sorusunu cevaplar.</p></div>
 <p>ROC eğrisini çizmek için örnekleri skora göre büyükten küçüğe sıralar ve eşiği yukarıdan aşağı kaydırırız. Her eşikte yakalanan pozitiflerin oranı (TPR, recall) ile yanlış alarm oranını (FPR) hesaplar ve (FPR, TPR) noktasını işaretleriz. Eğri sol üst köşeye ne kadar yakınsa model o kadar iyidir; köşegen çizgi rastgele tahmini gösterir.</p>
 <div data-widget="fig" data-fig="rocex" data-caption="8 örnekli bir modelin ROC eğrisi: sıralı sınıflar + + − + − + − −. Her + yukarı, her − sağa bir adım."></div>
@@ -121,7 +121,7 @@
 <div data-widget="roc"></div>
 <p class="small muted">İlgili bir kavram olan <strong>lift</strong>, skorlara göre sıralanmış listenin en üstündeki dilimde pozitiflerin oranının genel orana bölümüdür. Örneğin alıcıların %42'si en üstteki %10'da toplanmışsa lift 4.2'dir; yani rastgele postalamaya göre 4.2 kat daha verimlidir.</p>
 
-<h2>Sayı tahminini ölçmek: MSE, RMSE, MAE ve R²</h2>
+<h2>Sayı tahminini ölçmek: MSE, RMSE, MAE ve R²</h2><p class="h-en" lang="en">Evaluating regression: MSE, RMSE, MAE and R²</p>
 <p>Tahmin edilen şey bir sayıysa (fiyat, sıcaklık), hatayı doğrudan gerçek değer ile tahmin arasındaki farktan ölçeriz:</p>
 <div class="formula">MSE = (1/n)Σ(y − ŷ)² &nbsp;·&nbsp; RMSE = √MSE &nbsp;·&nbsp; MAE = (1/n)Σ|y − ŷ| &nbsp;·&nbsp; R² = 1 − Σ(y − ŷ)² / Σ(y − ȳ)²</div>
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>y gerçek değer, ŷ (“y şapka”) tahmin; y − ŷ hata. Σ (“toplam”) bütün örnekler üzerinden toplar, (1/n) ortalamasını alır.</li><li><b>MSE</b>: hataların karelerinin ortalaması (büyük hatayı çok cezalandırır). <b>RMSE</b>: onun karekökü (birimi y'nin birimiyle aynı). <b>MAE</b>: hataların mutlak değerlerinin ortalaması.</li><li><b>R²</b>: 1 − (modelin hata kareleri toplamı) / (her şeye ortalamayı söyleseydik hata kareleri toplamı). 1 kusursuz, 0 ortalama kadar iyi.</li></ul></div>
@@ -129,7 +129,7 @@
 <div data-widget="fig" data-fig="residuals" data-caption="Her noktanın doğruya dikey uzaklığı (kırmızı) bir hatadır; MSE bu hataların karelerinin ortalamasıdır."></div>
 <p>MSE hataların karesini aldığı için tek bir büyük hatadan çok etkilenir; MAE ise aykırı değerlere karşı daha dayanıklıdır. R² modeli “her örneğe ortalamayı söylemek” ile karşılaştırır: 1 kusursuz uyum, 0 ortalama kadar iyi demektir; test verisinde negatif bile çıkabilir, bu da modelin ortalamadan kötü olduğunu gösterir.</p>
 
-<h2>Sınav tipi problemler ve adım adım çözümleri</h2>
+<h2>Sınav tipi problemler ve adım adım çözümleri</h2><p class="h-en" lang="en">Exam-style problems with step-by-step solutions</p>
 <p>Aşağıdaki problemler sınavdaki biçimdedir. Her birini önce kâğıtta çözmeye çalış (5–10 dakika), sonra “çözümü aç”a bas: çözümde her adımın <em>neden</em> öyle yapıldığı da yazıyor. Takılırsan sayfanın ilgili bölümüne dön.</p>
 <h3>Problem 1: dört sayıdan bütün ölçütler</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(2. hafta derste)</span></div><p>Bir sınıflandırıcının test sonuçları: TN = 120, TP = 60, FN = 60, FP = 40 (toplam 280 örnek). Karmaşıklık matrisini çizin; accuracy, precision, recall, specificity, F1 ve dengeli accuracy değerlerini hesaplayın.</p></div>
@@ -150,7 +150,7 @@
 <h3>Problem 5: metriği seç</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H2)</span></div><p>Aşağıdaki durumlarda recall, precision ve ROC-AUC'den hangisine bakardınız? (a) Acil serviste hastayı hemen doktora gönderme kararı, (b) iş e-postasında spam filtresi, (c) bütün müşterileri satın alma olasılığına göre sıralayıp en üstteki %10'u aramak.</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Metrik seçerken önce “hangi hata daha pahalı?” sorusunu cevaplarız; doğru metrik oradan çıkar.</p><p>(a) Acil bir hastayı kaçırmak (FN) çok pahalıdır, gereksiz yere doktora göndermek (FP) ise ucuzdur. Bu yüzden kaçırılanları cezalandıran <strong>recall</strong> önemlidir.</p><p>(b) Gerçek bir iş e-postasını spam diye silmek (FP) pahalıdır, birkaç spamin gelen kutusuna düşmesi kabul edilebilir. Bu yüzden yanlış alarmları cezalandıran <strong>precision</strong> önemlidir.</p><p>(c) Burada tek bir eşik değil, bir sıralama kararı veriyoruz. Modelin pozitifleri negatiflerin önüne ne kadar iyi dizdiğini ölçen <strong>ROC-AUC</strong> (ya da en üstteki %10'daki precision) uygundur.</p></div></details>
-<h2>Sınavda sık yapılan hatalar</h2>
+<h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
 <li>FP ile FN'yi karıştırmak: FN = <em>gerçekte pozitif</em> ama negatif denmiş (kaçırılan).</li>
 <li>Precision'ı satırdan (TP/(TP+FN)) hesaplamak: o recall'dır.</li>
@@ -161,7 +161,7 @@
 <li>CV'den sonra kat modellerinden birini seçmek: son model <em>bütün</em> eğitim verisiyle yeniden eğitilir.</li>
 </ul>
 
-<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2>
+<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>
 <p><b>Bu tablo nasıl okunur?</b> Her satır bir ayarın (hiperparametrenin) değeri <em>artırıldığında</em> ne olduğunu söyler. <b>Yanlılık</b> “model çok mu basit, sistematik hata yapıyor mu?”, <b>varyans</b> “model veriye göre çok mu oynuyor?”, <b>aşırı uyum riski</b> “ezberleme tehlikesi”. Kural: ayar modeli daha esnek yapıyorsa yanlılık ↓, varyans ↑, risk ↑; daha katı yapıyorsa tersi. Sınavda “X artarsa ne olur, neden?” diye tam bu biçimde sorulur. <span class="down">Yeşil</span> = azalır, <span class="up">kırmızı</span> = artar.</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
@@ -173,7 +173,7 @@
 <tr><td>CV kat sayısı k</td><td colspan="2">puan <em>kestiriminin</em> yanlılığı azalır, varyansı artar</td><td>—</td><td>modelin değil, kestirimin özelliği; k = 5–10</td></tr>
 </tbody></table></div>
 
-<h2>Kendini sına: kısa sorular</h2>
+<h2>Kendini sına: kısa sorular</h2><p class="h-en" lang="en">Self-check: short questions</p>
 <div class="quiz" data-answer="2"><p>x = (1, 2, 2, 4, 5, 10) eğitim verisi. Test değeri 7'nin z-skoru nedir? (σ: n'ye bölünen)</p><ol>
 <li data-why="Bu min-max değeri: (7 − 1)/9.">0.67</li>
 <li data-why="">1.0</li>

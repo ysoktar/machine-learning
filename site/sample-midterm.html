@@ -18,7 +18,7 @@
 
 <div class="callout warn"><div class="callout-title">Dikkat: iki tuzak</div><p>2(d)'de P2 (z = −0.05) ve P4 (z = +0.05) sınıra çok yakın: işaretleri yanlış okumak bütün karmaşıklık matrisini ve 2(e)'yi bozar. 2(f)'de en yakın komşu P2 (Evet) ama k = 3'te karar Hayır'a döner.</p></div>
 
-<h2>Soru 1 (10 p): dron verisinden ID3 ile karar ağacı</h2>
+<h2>Soru 1 (10 p): dron verisinden ID3 ile karar ağacı</h2><p class="h-en" lang="en">Question 1 (10 pts): a decision tree from the drone data with ID3</p>
 <p>Dron teslimat uçuşu: 7 gözlem, öznitelikler Rüzgar (Hafif/Kuvvetli), Yağış (Yok/Var), Görüş (İyi/Kötü), sınıf Uçuş (Evet/Hayır).</p>
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th>No</th><th>Rüzgar</th><th>Yağış</th><th>Görüş</th><th>Uçuş?</th></tr></thead><tbody>
 <tr><td>1</td><td>Hafif</td><td>Yok</td><td>İyi</td><td>Evet</td></tr><tr><td>2</td><td>Hafif</td><td>Yok</td><td>Kötü</td><td>Evet</td></tr><tr><td>3</td><td>Hafif</td><td>Yok</td><td>İyi</td><td>Evet</td></tr><tr><td>4</td><td>Kuvvetli</td><td>Var</td><td>İyi</td><td>Hayır</td></tr><tr><td>5</td><td>Kuvvetli</td><td>Yok</td><td>Kötü</td><td>Hayır</td></tr><tr><td>6</td><td>Hafif</td><td>Var</td><td>Kötü</td><td>Hayır</td></tr><tr><td>7</td><td>Kuvvetli</td><td>Yok</td><td>İyi</td><td>Hayır</td></tr></tbody></table></div>
@@ -42,7 +42,7 @@ Kuvvetli Yok Kötü Hayır
 Hafif Var Kötü Hayır
 Kuvvetli Yok İyi Hayır"></div></div></details>
 
-<h2>Soru 2 (50 p): aynı veride sayısal ölçümlerle yedi model</h2>
+<h2>Soru 2 (50 p): aynı veride sayısal ölçümlerle yedi model</h2><p class="h-en" lang="en">Question 2 (50 pts): seven models on the same numeric data</p>
 <p>x₁ = rüzgar hızı (km/sa), x₂ = görüş (km); Evet = +1, Hayır = −1.</p>
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th>Örnek</th><th>x₁</th><th>x₂</th><th>Sınıf</th></tr></thead><tbody>
 <tr><td>P1</td><td>8</td><td>10</td><td>+1</td></tr><tr><td>P2</td><td>14</td><td>4</td><td>+1</td></tr><tr><td>P3</td><td>5</td><td>8</td><td>+1</td></tr><tr><td>P4</td><td>26</td><td>8</td><td>−1</td></tr><tr><td>P5</td><td>35</td><td>2</td><td>−1</td></tr><tr><td>P6</td><td>17</td><td>2</td><td>−1</td></tr><tr><td>P7</td><td>29</td><td>6</td><td>−1</td></tr></tbody></table></div>
@@ -145,7 +145,7 @@ Kuvvetli Yok İyi Hayır"></div></div></details>
 <p>Seçilecek değer, ortalama doğrulama hatasının en düşük olduğu <strong>λ = 0.1</strong>'dir (0.14); orada eğitim ile doğrulama hataları da birbirine yakındır. Tablonun sol ucu (λ = 0 ve 0.01) <strong>aşırı öğrenmeye</strong> karşılık gelir: eğitim hatası çok düşük ama doğrulama hatası yüksek, aralarında büyük bir açık var. Sağ ucu (λ = 10, kısmen λ = 1) <strong>yetersiz öğrenmeye</strong> karşılık gelir: iki hata da yüksek ve birbirine yakın.</p>
 <p>λ seçildikten sonra çapraz doğrulamadaki beş model atılır; nihai model λ = 0.1 ile <strong>bütün eğitim verisinde</strong> (200 örnek) yeniden eğitilir. Raporda çapraz doğrulama sonucu ortalama ± standart sapma olarak verilir ve ayrı bir test kümesi varsa model orada yalnız bir kez değerlendirilir; test sonucuna bakarak λ değiştirilmez.</p></div></details>
 
-<h2>Soru 3 (48 p): on iki kısa kavram sorusu</h2>
+<h2>Soru 3 (48 p): on iki kısa kavram sorusu</h2><p class="h-en" lang="en">Question 3 (48 pts): twelve short concept questions</p>
 <p>Her biri için 2–4 cümle yeter. Önce kendi cevabınızı söyleyin, sonra açın.</p>
 <details class="solution"><summary>1) Aynı öznitelik bir yolda birden çok kullanılabilir mi?</summary><div class="body"><p>Bu, özniteliğin türüne bağlıdır. <strong>Kategorik</strong> bir öznitelikte her değere ayrı bir dal açılır; bir dala girildiğinde o özniteliğin artık tek bir değeri kalmıştır, yeniden sormak hiçbir şey kazandırmaz. Bu yüzden aynı yolda ikinci kez kullanılmaz. <strong>Sayısal</strong> bir öznitelikte ise her bölme yalnız bir eşiktir; “x ≤ 5” dalında “x ≤ 2” diye yeniden sormak aralığı daha da daraltır. Bu yüzden aynı yolda birden çok kez kullanılabilir.</p></div></details>
 <details class="solution"><summary>2) Lojistik regresyonu 4 sınıfta nasıl kullanırsınız?</summary><div class="body"><p>İki yol vardır. <strong>Birine karşı geri kalanlar</strong> (one-vs-rest) yönteminde dört ayrı ikili model eğitilir (“bu örnek A sınıfı mı, değil mi?” gibi) ve tahmin olarak olasılığı en yüksek modelin sınıfı seçilir. <strong>Softmax</strong> (çok terimli lojistik regresyon) ise tek bir modeldir: her sınıf için bir ağırlık vektörü vardır ve dört sınıfın skorları toplamı 1 olan olasılıklara çevrilir. İlki basittir ve paralel eğitilebilir ama farklı modellerin skorları tam karşılaştırılabilir değildir ve her ikili problem dengesizdir; softmax tutarlı tek bir olasılık dağılımı verir.</p></div></details>

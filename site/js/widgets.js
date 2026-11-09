@@ -1069,7 +1069,7 @@ const GEN = {
     const w0 = [R.pick([-1, -0.5, 0, 0.5]), R.pick([-0.5, 0, 0.5, 1])], b0 = R.pick([-0.5, 0, 0.5]), eta = R.pick([0.5, 1]);
     const r = ml.perceptron(pts, w0, b0, eta, { epochs: 1 });
     return {
-      prompt: [h("p", {}, `Başlangıç w = ${vec(w0)}, b = ${f(b0)}, η = ${f(eta)}. z ≥ 0 ise ŷ = +1. Örnekleri sırayla bir kez işleyin; son w ve b nedir?`), table(["#", "x₁", "x₂", "y"], pts.map((p, i) => [i + 1, p.x[0], p.x[1], signTxt(p.y)]), { cls: "center compact" })],
+      prompt: [h("p", {}, `Başlangıç w = ${vec(w0)}, b = ${f(b0)}, η = ${f(eta)}. z ≥ 0 ise ŷ = +1. Örnekleri sırayla bir kez işleyin; son w ve b nedir?`), table(["#", "x₁", "x₂", "y"], pts.map((p, i) => [i + 1, f(p.x[0]), f(p.x[1]), signTxt(p.y)]), { cls: "center compact" })],
       fields: [{ label: "w₁", v: r.w[0] }, { label: "w₂", v: r.w[1] }, { label: "b", v: r.b }],
       solution: () => [table(["#", "z", "ŷ", "hata?", "w", "b"], r.passes[0].steps.map((s) => [s.i + 1, f(s.z), signTxt(s.pred), s.wrong ? "evet" : "hayır", vec(s.w), f(s.b)]), { cls: "compact" })],
     };

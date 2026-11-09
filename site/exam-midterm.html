@@ -16,7 +16,7 @@
 <h1>Ara sınav rehberi</h1>
 <p class="lead"><strong>9 Kasım 2026 Pazartesi, 16:30</strong>, ders saatinde, her zamanki derslikte. Kâğıt üzerinde, 100 dakika, kitap ve not kapalı, hesap makinesi ve elektronik cihaz yok; logaritma ve üstel tablolar soru kâğıdında verilir. Kapsam <strong>1–7. haftalar</strong>.</p>
 
-<h2>Sınavın bölümleri, puanları ve önerilen süreler</h2>
+<h2>Sınavın bölümleri, puanları ve önerilen süreler</h2><p class="h-en" lang="en">Exam sections, points and suggested times</p>
 <p>8. haftanın ilk dersinde açıklanan biçim:</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Bölüm</th><th>Soru türü</th><th class="num">Puan</th><th class="num">Önerilen süre</th><th>Çalışma sayfası</th></tr></thead>
@@ -37,7 +37,7 @@
 </ul></div>
 <p>Örnek sınav 110 dakika / 108 puandı ve içinde bir de “her şey aynı veride” büyük sorusu (sırasıyla ölçekleme, çizim, doğrusal regresyon, perceptron, kNN, eşik seçimi, SVM ve λ seçimi soruluyordu) vardı. <a href="sample-midterm.html">Çözümü burada</a>.</p>
 
-<h2>Her haftadan neyi bilmeniz gerekiyor?</h2>
+<h2>Her haftadan neyi bilmeniz gerekiyor?</h2><p class="h-en" lang="en">What you need to know from each week</p>
 <p>Her hafta için iki şey sıralanıyor: sınavda <em>elle</em> yapmanız beklenen hesaplar ve kısa sorularda sorulabilecek kavramlar. Bir maddeyi rahatça yapamıyorsanız haftanın sayfasındaki ilgili bölüme dönün.</p>
 <h3><a href="w1-intro.html">1. hafta: giriş ve temel kavramlar</a></h3>
 <p><b>Hesap:</b> bir öznitelik kümesi için örnek ve hipotez sayısını bulmak (örnek = değer sayılarının çarpımı, hipotez = 1 + (değer sayısı + 1)'lerin çarpımı) ve Find-S algoritmasını birkaç örnek üzerinde adım adım uygulamak. <b>Kavram:</b> bir sistemin görevini, deneyimini ve başarım ölçüsünü (T, E, P) yazmak; gözetimli (sınıflandırma ve regresyon), gözetimsiz ve pekiştirmeli öğrenmeyi ayırmak; tümevarımsal yanlılığın neden gerekli olduğunu ve aşırı/yetersiz uyumun ne olduğunu açıklamak.</p>
@@ -54,7 +54,7 @@
 <h3><a href="w7-svm.html">7. hafta: destek vektör makineleri</a></h3>
 <p><b>Hesap:</b> verilen w, b için marj, bir noktanın uzaklığı ve menteşe kaybı; iki boyutta destek vektörlerini seçip w ve b'yi kanonik denklemlerden bulmak; iki aday sınırı yumuşak marj amacıyla karşılaştırmak; polinom ve RBF çekirdek değerleri. <b>Kavram:</b> sert ve yumuşak marj farkı, C ve γ'nın etkisi, çekirdek hilesi, VC boyutu, SVM ile lojistik regresyonun karşılaştırması.</p>
 
-<h2>Sınavda en sık kaybedilen puanlar</h2>
+<h2>Sınavda en sık kaybedilen puanlar</h2><p class="h-en" lang="en">Where points are most often lost</p>
 <ul>
 <li><strong>FP ile FN'yi karıştırmak.</strong> Önce her örneğe TP/FN/FP/TN yazın; TP + FN = pozitif sayısı denetimini yapın.</li>
 <li>z-score'da σ'yı n − 1'e bölmek (ders n'ye böler); PCA kovaryansında ise n − 1.</li>
@@ -68,7 +68,7 @@
 <li>Öklid uzaklığında karekök almaya uğraşmak: sıralama için d² yeter.</li>
 </ul>
 
-<h2>Kısa kavram soruları ve cevapları</h2>
+<h2>Kısa kavram soruları ve cevapları</h2><p class="h-en" lang="en">Short concept questions and answers</p>
 <p>Ders slaytlarında, alıştırma kâğıtlarında ve önceki dönemin ara sınav listesinde geçen kalıplar. Cevabı söyleyin, sonra açın.</p>
 <details class="solution"><summary>Öznitelik normalleştirme nedir, neden ve nasıl?</summary><div class="body"><p>Öznitelikleri karşılaştırılabilir ölçeğe getirmek. Uzaklık temelli (kNN, SVM, k-ortalamalar) ve gradyan temelli (LR, sinir ağı) yöntemlerde büyük ölçekli öznitelik baskın olur / eniyileme yavaşlar. Sınırları belli, kabaca düzgün veride min-max; yaklaşık normal veride z-score; sağa çarpıkta önce log; uç değerde kırpma. Parametreler yalnız eğitimden; ağaçlar etkilenmez.</p></div></details>
 <details class="solution"><summary>PCA nedir, faydası, ne zaman?</summary><div class="body"><p>Veriyi varyansın en büyük olduğu dik yönlere izdüşüren denetimsiz doğrusal dönüşüm (kovaryansın özvektörleri). Boyut indirgeme (hız, bellek, boyut lanetine karşı), ilişkili öznitelikleri birleştirme, gürültü azaltma, 2B görselleştirme. Öznitelikler çok ilişkiliyse işe yarar; etiketleri görmediği için ayırt edici yönü kaçırabilir; önce ölçekleyin.</p></div></details>
@@ -83,7 +83,10 @@
 <details class="solution"><summary>Rastgele ormanda ağaç sayısı artarken doğrulama hatası?</summary><div class="body"><p>Hızla düşer, sonra bir platoya oturur; aşırı uyum yüzünden yeniden yükselmez (ortalamanın varyansı azalır, yanlılık sabit). Bedeli süre ve bellek.</p></div></details>
 <details class="solution"><summary>kNN, karar ağacı, MLP hiperparametrelerinin yanlılık/varyansa etkisi</summary><div class="body"><p>kNN'de k arttıkça yanlılık artar, varyans azalır. Karar ağacında en büyük derinlik arttıkça yanlılık azalır, varyans artar; yaprak başına en az örnek sayısı arttıkça tersi olur. Sinir ağında gizli nöron sayısı, katman sayısı ve epoch sayısı arttıkça yanlılık azalır, varyans artar; L2 cezası ya da dropout arttıkça tersi olur. <a href="hyper.html">Tam tablo</a>.</p></div></details>
 
-<h2>Son tekrar için kullanılacak sayfalar</h2>
+<h2>Soru İngilizce gelirse: sık kullanılan soru kalıpları</h2><p class="h-en" lang="en">If the questions are in English: common phrasings</p>
+<p>Dersin slaytları ve alıştırma soruları İngilizce olduğu için sınavda İngilizce ifadelerle karşılaşabilirsiniz. Aşağıdaki tablo, soru metinlerinde sık geçen kalıpların ne istediğini anlatır. Terimlerin İngilizcesi için <a href="sozluk.html">sözlüğe</a> ya da <a href="cheatsheet.html">formül kâğıdındaki</a> Türkçe–İngilizce listeye bakın; sitede altı çizili terimlerin yanında da İngilizcesi küçük harflerle yazıyor (üst çubuktaki <strong>EN</strong> düğmesiyle açıp kapatabilirsiniz).</p>
+<div class="table-wrap"><table class="simple"><thead><tr><th>İngilizce kalıp</th><th>Türkçesi</th><th>Ne bekleniyor?</th></tr></thead><tbody><tr><td lang="en"><strong>Compute / calculate …</strong></td><td>… hesaplayın</td><td>Sayısal sonuç ister; formülü, yerine koymayı ve sonucu yazın.</td></tr><tr><td lang="en"><strong>Show your work.</strong></td><td>Ara adımları gösterin.</td><td>Yalnız sonucu yazmak puanın çoğunu kaybettirir.</td></tr><tr><td lang="en"><strong>Justify your answer. / Explain why.</strong></td><td>Cevabınızı gerekçelendirin. / Nedenini açıklayın.</td><td>Bir iki cümlelik “çünkü …” bekler.</td></tr><tr><td lang="en"><strong>State / name …</strong></td><td>… belirtin / adını verin</td><td>Kısa cevap yeterlidir; açıklama istenmez.</td></tr><tr><td lang="en"><strong>Which of the following …?</strong></td><td>Aşağıdakilerden hangisi …?</td><td>Çoktan seçmeli; bazen birden çok doğru şık olabilir, “all that apply” yazıyorsa hepsini işaretleyin.</td></tr><tr><td lang="en"><strong>True or false? Briefly explain.</strong></td><td>Doğru mu yanlış mı? Kısaca açıklayın.</td><td>Yalnız D/Y yazmak yetmez; bir cümle gerekçe ekleyin.</td></tr><tr><td lang="en"><strong>Draw / sketch …</strong></td><td>… çizin</td><td>Eksenleri, noktaları ve sınırı etiketleyerek kabaca çizin.</td></tr><tr><td lang="en"><strong>Round to two decimals.</strong></td><td>İki ondalığa yuvarlayın.</td><td>Ara adımlarda üç ondalık taşıyıp sonda yuvarlayın.</td></tr><tr><td lang="en"><strong>Break ties by …</strong></td><td>Eşitlikleri … ile bozun</td><td>kNN'de eşit uzaklık ya da ID3'te eşit kazanç olunca hangi kuralın uygulanacağını söyler.</td></tr><tr><td lang="en"><strong>Use the table of logarithms provided.</strong></td><td>Verilen logaritma tablosunu kullanın.</td><td>log₂ ve ln değerlerini tablodan okuyup cevapta yazın.</td></tr><tr><td lang="en"><strong>One pass / one epoch over the data</strong></td><td>Veri üzerinden bir tur</td><td>Perceptron'da örnekleri sırayla bir kez işleyin.</td></tr><tr><td lang="en"><strong>Assume … / Suppose …</strong></td><td>… varsayın</td><td>Sorunun koşuludur; çözümde bu varsayımı kullanın.</td></tr><tr><td lang="en"><strong>Increase / decrease the hyperparameter …</strong></td><td>Hiperparametreyi artırın / azaltın</td><td>Yanlılık, varyans, aşırı uyum ve sınır şekli üzerindeki etkisini sorar.</td></tr><tr><td lang="en"><strong>What would you try first?</strong></td><td>İlk ne denersiniz?</td><td>Tek, en mantıklı adımı ve gerekçesini yazın.</td></tr></tbody></table></div>
+<h2>Son tekrar için kullanılacak sayfalar</h2><p class="h-en" lang="en">Pages for the final review</p>
 <div class="cards">
 <a class="card" href="sample-midterm.html"><h3>Örnek sınav çözümü</h3><p>Bütün soru tiplerinin bir arada olduğu tek belge.</p></a>
 <a class="card" href="drill.html"><h3>Alıştırma üreteci</h3><p>12 hesap türünde sınırsız soru, cevap denetimiyle.</p></a>

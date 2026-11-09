@@ -468,3 +468,17 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 .plot .fig-proj { stroke: var(--muted); stroke-dasharray: 2 3; }
 .plot .fig-err { stroke: var(--bad); stroke-width: 2; }
 .plot .fig-dot { fill: var(--bad); }
+
+/* English names: next to the first use of a term in each section, and under each section heading */
+.en-tag { font-size: 0.82em; font-style: italic; color: var(--muted); margin-left: 0.2em; white-space: nowrap; }
+.en-tag::before { content: "("; } .en-tag::after { content: ")"; }
+.h-en { margin: -0.55rem 0 0.9rem; font-size: 0.9rem; font-style: italic; color: var(--muted); }
+.hide-en .en-tag, .hide-en .h-en { display: none; }
+.en-btn .en-mark { font-weight: 700; font-size: 0.75rem; letter-spacing: 0.04em; padding: 1px 4px; border: 1.5px solid currentColor; border-radius: 4px; }
+.en-btn[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+@media (max-width: 520px) {
+  .site-header .brand { min-width: 0; flex-shrink: 1; overflow: hidden; }
+  .site-header .brand-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .site-header .header-actions a.icon-btn[href*="github"] { display: none; }
+  .site-header .header-actions { flex-shrink: 0; gap: 0.3rem; }
+}

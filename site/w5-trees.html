@@ -30,7 +30,7 @@
 <div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-entropi">Entropi</a> · <a href="sozluk.html#t-bilgi-kazanci">Bilgi kazancı</a> · <a href="sozluk.html#t-id3">ID3</a> · <a href="sozluk.html#t-gini-safsizligi">Gini safsızlığı</a> · <a href="sozluk.html#t-kazanc-orani">Kazanç oranı</a> · <a href="sozluk.html#t-esik">Eşik</a> · <a href="sozluk.html#t-budama">Budama</a> · <a href="sozluk.html#t-karar-kutugu">Karar kütüğü</a></div>
 
 
-<h2>Bir grup ne kadar karışık? Entropi ve bilgi kazancı</h2>
+<h2>Bir grup ne kadar karışık? Entropi ve bilgi kazancı</h2><p class="h-en" lang="en">How mixed is a group? Entropy and information gain</p>
 <div data-widget="fig" data-fig="tree" data-caption="Bir karar ağacı: her düğüm bir soru, her dal bir cevap, her yaprak bir karar."></div>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>“20 soru” oyunu</div><p>Karar ağacı, “20 soru” oyunu gibi sorular sorarak karar verir: “Acele var mı? Yoksa tatlı alır. Varsa bir soru daha: kiminle? Yalnızsa almaz…”. İyi bir oyuncu ilk soruyu öyle seçer ki cevap, olasılıkları olabildiğince “saf” gruplara ayırsın. Ağaç da böyle yapar; “saflığı” ölçmek için <strong>entropi</strong> kullanır.</p><p>Entropi bir grubun ne kadar karışık olduğunu söyler: grupta herkes aynı sınıftaysa 0 (hiç belirsizlik yok), yarı yarıyaysa 1 bit (en belirsiz). Bir soru sorup grubu bölünce dalların ortalama entropisi düşer; bu düşüş <strong>bilgi kazancıdır</strong>. En çok kazandıran soru önce sorulur.</p></div>
 <p>Bir düğümün entropisi ve bir bölmenin bilgi kazancı şöyle hesaplanır:</p>
@@ -43,7 +43,7 @@
 <div class="callout tip"><div class="callout-title">Sık kullanılan değerler (sınavda tablo verilir)</div>
 <p>İki sınıflı entropi: H(1/2) = 1, H(1/3) = 0.918, H(1/4) = 0.811, H(2/5) = 0.971, H(1/5) = 0.722, H(2/7) = 0.863, H(3/7) = 0.985, H(3/8) = 0.954, H(1/6) = 0.650. Logaritmalar: −log₂ ½ = 1, −log₂ ⅓ = 1.585, −log₂ ⅔ = 0.585, −log₂ ¼ = 2, −log₂ ¾ = 0.415, −log₂ ⅖ = 1.322, −log₂ ⅗ = 0.737. <a href="cheatsheet.html#log2-tablosu">Tam tablo</a>.</p></div>
 
-<h2>Ağacı kurmak: ID3 algoritması adım adım</h2>
+<h2>Ağacı kurmak: ID3 algoritması adım adım</h2><p class="h-en" lang="en">Building the tree: the ID3 algorithm step by step</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Algoritma tek cümleyle</div><p>Bütün sorular (öznitelikler) için “bu soruyu sorsam belirsizlik ne kadar azalır?” hesapla, en çok azaltanı sor, her cevap dalında kalan örneklerle aynı şeyi tekrarla; bir dal saflaşınca (hepsi aynı sınıf) yaprak yap.</p></div>
 <div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>ID3 sorusu kâğıtta: şablon</div><ol>
 <li>Sınıf sayılarını yazın: örneğin 5 Evet ve 2 Hayır varsa H(D) = −(5/7)log₂(5/7) − (2/7)log₂(2/7) = (5/7)(0.485) + (2/7)(1.807).</li>
@@ -73,7 +73,7 @@
 <div class="read-formula"><b>Nasıl okunur?</b><ul><li>Sınıf oranlarının karelerini topla, 1'den çıkar. Saf düğüm 0, yarı yarıya düğüm 0.5. Log gerektirmediği için elle daha hızlı.</li></ul></div>
 <p>Bu kez ağırlıklı Gini'si <em>en küçük</em> olan bölme seçilir (yani safsızlığı en çok azaltan). Çoğu veride entropiyle aynı kökü seçer ve logaritma gerektirmediği için elle daha hızlıdır. CART her zaman iki dala ayırır.</p>
 
-<h2>Sayısal öznitelikte nereden bölmeli? En iyi eşik</h2>
+<h2>Sayısal öznitelikte nereden bölmeli? En iyi eşik</h2><p class="h-en" lang="en">Where to split a numeric feature? The best threshold</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Sayıları nasıl sorarız?</div><p>“Rüzgâr hızı kaç?” sorusunun sonsuz cevabı var; ağaç bunun yerine evet/hayır sorusu sorar: “rüzgâr ≤ 20 mi?”. Hangi eşik? Değerleri sırala, ardışık iki değerin ortasını aday yap, her adayın kazancını hesapla. Sınıfın değişmediği yere eşik koymak hiçbir şey kazandırmaz, o yüzden yalnız sınıfın değiştiği yerlere bakmak yeter.</p></div>
 <p>Yöntem şöyledir: değerleri küçükten büyüğe sıralayın, ardışık iki değerin ortasını aday eşik olarak alın ve her aday için “x ≤ eşik” bölmesinin kazancını hesaplayın. Kısa yol olarak yalnız sınıfın değiştiği yerlerdeki orta noktalara bakmak yeter, çünkü en iyi eşik her zaman bunlardan biridir.</p>
 <div data-widget="threshold"></div>
@@ -81,12 +81,12 @@
 <p>Varsayılan örnekte hesap tutarları 2, 3, 5, 7, 8 ve bahşiş durumu Evet, Evet, Hayır, Hayır, Evet. Sınıf 3 ile 5 arasında (eşik 4) ve 7 ile 8 arasında (eşik 7.5) değişiyor. Eşik 4'te sol dal (2 ve 3) saftır, sağ dal (5, 7, 8) bir Evet iki Hayır içerir ve entropisi 0.918'dir; ağırlıklı entropi 0.551, kazanç 0.420 olur. Eşik 7.5'in kazancı yalnız 0.171'dir. En iyi bölme “tutar ≤ 4”tür.</p>
 <div class="callout exam"><div class="callout-title">Aynı öznitelik bir yolda iki kez kullanılabilir mi?</div><p>Kategorik bir öznitelik (her değerine bir dal açılan) aynı yolda ikinci kez kullanılmaz: o dalda özniteliğin zaten tek bir değeri kalmıştır ve kazancı sıfırdır. Sayısal bir öznitelik ise kullanılabilir, çünkü her bölme yalnız bir eşiktir: “x ≤ 5” dalında “x ≤ 2.5” diye yeniden bölmek aralığı daha da daraltır.</p></div>
 
-<h2>Sayı tahmin eden ağaçlar: regresyon ağaçları</h2>
+<h2>Sayı tahmin eden ağaçlar: regresyon ağaçları</h2><p class="h-en" lang="en">Trees that predict numbers: regression trees</p>
 <p>Tahmin edilen şey bir sayıysa ağaç yine aynı biçimde kurulur, ama iki şey değişir. Her yaprak, o yapraktaki örneklerin ortalamasını tahmin eder. Bölme ölçütü olarak entropi yerine kareler toplamındaki (SSE) azalma kullanılır: en iyi bölme, iki tarafı kendi içinde en tutarlı yapan bölmedir. Çok derin bir regresyon ağacı her yaprakta tek örnek bırakarak eğitim noktalarından (gürültüleriyle birlikte) geçen bir merdiven fonksiyonuna dönüşür; bu da aşırı uyumdur.</p>
 <div data-widget="fig" data-fig="regstep" data-caption="Altı nokta ve tek bölmeli bir regresyon ağacı: x ≤ 3.5 ise sol yaprağın ortalaması (1.67), değilse sağınki (10.33) tahmin edilir."></div>
 <div data-widget="regtree"></div>
 
-<h2>Ağacın ezberlemesini önlemek: budama</h2>
+<h2>Ağacın ezberlemesini önlemek: budama</h2><p class="h-en" lang="en">Stopping the tree from memorising: pruning</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Çok soru sormanın tehlikesi</div><p>Yeterince soru sorarsanız her örneği ayrı bir yaprağa koyabilirsiniz: eğitim hatası 0. Ama son sorular genelde gürültüye göre sorulmuştur (“bu müşteri salı günü geldi”); yeni müşteride işe yaramaz. Budama, ağacı genellemeye yetecek kadar küçük tutmaktır.</p></div>
 <p>Ağacın büyümesini sınırlamanın iki yolu vardır. <strong>Ön budama</strong>, ağaç büyürken bir koşulla durmaktır: en büyük derinlik, bir yaprakta en az kaç örnek olacağı ya da bir bölmenin en az ne kadar kazanç getirmesi gerektiği. Ucuzdur, çünkü ağaç hiç büyümez. Ama bir tuzağı vardır: XOR benzeri verilerde tek başına hiçbir bölme kazanç getirmez (her bölme yarı yarıya dallar bırakır), bu yüzden “en az şu kadar kazanç” kuralı ilk bölmeyi reddeder; oysa iki bölme birlikte veriyi kusursuz ayırırdı.</p>
 <p><strong>Sonradan budama</strong> önce ağacı tam büyütür, sonra işe yaramayan dalları keser. Daha sonra işe yarayacak bir bölmeyi kaçırmaz. En yaygın biçimi maliyet-karmaşıklık budamasıdır: ağacın hatasına yaprak sayısıyla orantılı bir ceza eklenir, R_α(T) = R(T) + α·|T|, ve α çapraz doğrulamayla seçilir. Örneğin α = 0 (40 yaprak) doğrulamada 0.82, α = 0.03 (7 yaprak) 0.90, α = 0.1 (3 yaprak) 0.85 veriyorsa α = 0.03 seçilir.</p>
@@ -97,7 +97,7 @@
 </div>
 <p>Bir veride ağaç çok iyi, doğrusal model çok kötü olabilir mi? Evet: XOR ya da “içi pozitif bir kare” gibi eksenlere hizalı ama doğrusal olmayan bir yapıda ağaç birkaç bölmeyle kusursuz sonuç verir, doğrusal model ise rastgele düzeyde kalır. Tersi de olabilir: sınıfları ayıran sınır çapraz bir doğruysa doğrusal model tek doğruyla çözer, ağaç ise onu çok sayıda basamakla taklit etmek zorunda kalır ve az veride kötü genelleşir.</p>
 
-<h2>Sınav tipi problemler ve adım adım çözümleri</h2>
+<h2>Sınav tipi problemler ve adım adım çözümleri</h2><p class="h-en" lang="en">Exam-style problems with step-by-step solutions</p>
 <p>Aşağıdaki problemler sınavdaki biçimdedir. Her birini önce kâğıtta çözmeye çalış (5–10 dakika), sonra “çözümü aç”a bas: çözümde her adımın <em>neden</em> öyle yapıldığı da yazıyor. Takılırsan sayfanın ilgili bölümüne dön.</p>
 <h3>Problem 1: kafe verisi, tam ID3</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H5)</span></div><p>Bir kafe müşterinin tatlı sipariş edip etmediğini kaydediyor:</p>
@@ -129,7 +129,7 @@
 <h3>Problem 5: cep bankası (iki öznitelik, üçer değer)</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(5. hafta derste)</span></div><p>Sekiz müşteri, Bakiye (düşük/orta/yüksek) ve Yaş (genç/orta yaşlı/yaşlı) öznitelikleriyle kayıtlı; vadeli mevduat alıp almadıkları: A düşük-genç Hayır, B düşük-orta yaşlı Hayır, C düşük-yaşlı Evet, D orta-genç Hayır, E orta-orta yaşlı Evet, F orta-yaşlı Evet, G yüksek-orta yaşlı Evet, H yüksek-yaşlı Evet. Kökü seçin, ağacı kurun ve (yüksek bakiye, genç) müşteri için karar verin.</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Veride 5 Evet ve 3 Hayır var: H(D) = H(3/8) ≈ 0.954. Kök için iki özniteliğin kazancını karşılaştırıyoruz.</p><p>Yaş'a göre bölersek genç dalında A ve D (ikisi de Hayır, saf), yaşlı dalında C, F ve H (hepsi Evet, saf), orta yaşlı dalında B, E ve G (2 Evet, 1 Hayır, entropi 0.918) kalır. Ağırlıklı entropi (3/8)·0.918 ≈ 0.344, kazanç ≈ <strong>0.610</strong>.</p><p>Bakiye'ye göre bölersek düşük dalı A, B, C (1 Evet, 2 Hayır), orta dalı D, E, F (2 Evet, 1 Hayır) ikisi de karışık (0.918), yüksek dalı G, H saf. Ağırlıklı entropi ≈ 0.689, kazanç ≈ 0.266. Kök <strong>Yaş</strong> olur.</p><p>Tek karışık dal orta yaşlılar dalıdır ve orada yalnız Bakiye kalır: düşük bakiyeli B Hayır, orta ve yüksek bakiyeli E ile G Evet; iki dal da saf. Ağaç: Yaş genç ise Hayır, yaşlı ise Evet, orta yaşlı ise Bakiye'ye bak (bakiye düşükse Hayır, değilse Evet). (yüksek, genç) müşteri genç dalına düşer: karar <strong>Hayır</strong>; bakiye hiç sorulmaz.</p></div></details>
-<h2>Sınavda sık yapılan hatalar</h2>
+<h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
 <li>Ağırlıklı entropide n_dal/n çarpanını unutmak.</li>
 <li>Alt dalda bütün verinin entropisiyle (H(D)) hesap yapmak: o dalın kendi H'si kullanılır.</li>
@@ -140,7 +140,7 @@
 <li>Ağacı çizerken dal değerlerini ya da yaprak sınıflarını yazmamak.</li>
 </ul>
 
-<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2>
+<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>
 <p><b>Bu tablo nasıl okunur?</b> Her satır bir ayarın (hiperparametrenin) değeri <em>artırıldığında</em> ne olduğunu söyler. <b>Yanlılık</b> “model çok mu basit, sistematik hata yapıyor mu?”, <b>varyans</b> “model veriye göre çok mu oynuyor?”, <b>aşırı uyum riski</b> “ezberleme tehlikesi”. Kural: ayar modeli daha esnek yapıyorsa yanlılık ↓, varyans ↑, risk ↑; daha katı yapıyorsa tersi. Sınavda “X artarsa ne olur, neden?” diye tam bu biçimde sorulur. <span class="down">Yeşil</span> = azalır, <span class="up">kırmızı</span> = artar.</p>
 <div class="table-wrap"><table class="simple">
 <thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
@@ -153,7 +153,7 @@
 <tr><td>criterion (gini / entropy)</td><td colspan="3">çoğunlukla aynı ağaç</td><td>genelleme düğmesi değil</td></tr>
 </tbody></table></div>
 
-<h2>Kendini sına: kısa sorular</h2>
+<h2>Kendini sına: kısa sorular</h2><p class="h-en" lang="en">Self-check: short questions</p>
 <div class="quiz" data-answer="3"><p>Bir düğümde 6 Evet / 0 Hayır var. Entropi?</p><ol>
 <li data-why="1 bit 50/50 düğümdür.">1</li>
 <li data-why="Saf düğümün belirsizliği yoktur.">0.5</li>

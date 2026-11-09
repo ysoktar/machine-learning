@@ -74,6 +74,17 @@ function buildHeader() {
   const paint = () => { const t = getTheme(); themeBtn.innerHTML = THEME_ICONS[t] + `<span class="label">${THEME_NAMES[t]}</span>`; themeBtn.title = `Tema: ${THEME_NAMES[t]}`; };
   themeBtn.addEventListener("click", () => { const o = ["auto", "light", "dark"]; setTheme(o[(o.indexOf(getTheme()) + 1) % 3]); paint(); });
   paint();
+  // English names next to Turkish terms and headings: on by default, remembered per reader
+  const enBtn = h("button", { class: "icon-btn en-btn", type: "button" });
+  const paintEn = () => {
+    const on = store.get("show-en", true);
+    document.documentElement.classList.toggle("hide-en", !on);
+    enBtn.setAttribute("aria-pressed", String(on));
+    enBtn.title = on ? "İngilizce karşılıklar gösteriliyor (gizlemek için tıklayın)" : "İngilizce karşılıklar gizli (göstermek için tıklayın)";
+    enBtn.innerHTML = `<span class="en-mark">EN</span><span class="label">${on ? "İngilizce açık" : "İngilizce kapalı"}</span>`;
+  };
+  enBtn.addEventListener("click", () => { store.set("show-en", !store.get("show-en", true)); paintEn(); });
+  paintEn();
   const menu = h("button", { class: "icon-btn menu-btn", type: "button", "aria-label": "Menüyü aç", "aria-expanded": "false" });
   menu.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" stroke="currentColor" stroke-width="1.8"><path d="M2 4.5h14M2 9h14M2 13.5h14"/></svg>';
   menu.addEventListener("click", () => { const open = document.body.classList.toggle("nav-open"); menu.setAttribute("aria-expanded", String(open)); });
@@ -86,7 +97,7 @@ function buildHeader() {
     : h("a", { class: "exam-pill", href: "exam-final.html", title: "Final: 7–18 Aralık" }, "Final: 7–18 Aralık");
   const gh = h("a", { class: "icon-btn", href: REPO, target: "_blank", rel: "noopener", title: "GitHub'daki kaynak kod", "aria-label": "GitHub'daki kaynak kod" });
   gh.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.5 7.5 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.5.8.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg>';
-  return h("header", { class: "site-header" }, menu, brand, h("div", { class: "header-spacer" }), h("div", { class: "header-actions" }, pill, gh, themeBtn));
+  return h("header", { class: "site-header" }, menu, brand, h("div", { class: "header-spacer" }), h("div", { class: "header-actions" }, pill, enBtn, gh, themeBtn));
 }
 
 const studiedKey = (id) => `studied:${id}`;

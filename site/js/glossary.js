@@ -3,7 +3,7 @@
 // the same list as sozluk.html).
 import { TERMS } from "./glossary-data.js";
 
-const SKIP = "h1, h2, h3, h4, a, code, pre, button, summary, textarea, input, select, svg, .widget, .fig, .formula, .m, .term, .words, .quiz-options, .page-toc, .section-toc, .toc-rail, .toc-bar, .kicker, .studied, .tree, .glossary, .letter-nav, .table-wrap th";
+const SKIP = "h1, h2, h3, h4, .h-en, .en-tag, a, code, pre, button, summary, textarea, input, select, svg, .widget, .fig, .formula, .m, .term, .words, .quiz-options, .page-toc, .section-toc, .toc-rail, .toc-bar, .kicker, .studied, .tree, .glossary, .letter-nav, .table-wrap th";
 // a term may take Turkish suffixes (entropisi, marjı, kNN'de…) but must start at a word boundary
 const L = "\\p{L}\\p{N}";
 
@@ -19,6 +19,7 @@ export function annotateTerms(root, pageWeek = 0, pageId = "") {
     const t = TERMS.find((x) => x.id === el.dataset.gl);
     if (!t) continue;
     el.className = "term"; el.tabIndex = 0; el.dataset.term = t.term; el.dataset.def = t.def; el.dataset.id = t.id;
+    if (t.en) el.dataset.en = t.en;
   }
   const src = terms.map((t, i) => `(?<g${i}>(?:${t.match})[${L}'’]*)`).join("|");
   const re = new RegExp(`(?<![${L}])(?:${src})`, "giu");
@@ -54,12 +55,24 @@ export function annotateTerms(root, pageWeek = 0, pageId = "") {
       span.dataset.term = t.term;
       span.dataset.def = t.def;
       span.dataset.id = t.id;
+      if (t.en) span.dataset.en = t.en;
       span.textContent = m[0];
       parts.push(text.slice(last, m.index), span);
+      if (showEnglish(t, m[0])) { const en = document.createElement("span"); en.className = "en-tag"; en.lang = "en"; en.textContent = t.en; parts.push(en); }
       last = m.index + m[0].length;
     }
     if (parts.length) node.replaceWith(...parts, text.slice(last));
   }
+}
+
+/** The English name is shown next to a Turkish term; it is left out where the word on the page already is the English
+ * one (accuracy, epoch, parametre ≈ parameter) or an abbreviation (SVM, kNN, AUC). */
+function showEnglish(t, word) {
+  if (!t.en) return false;
+  const w = word.toLocaleLowerCase("tr"), en = t.en.toLowerCase();
+  if ((word.match(/[A-Z]/g) || []).length >= 2 || /\d/.test(word)) return false;
+  if (/^[a-z'’-]+$/.test(w) && en.includes(w.slice(0, 4))) return false;
+  return true;
 }
 
 /** One shared popover: hover or focus shows it, tap toggles it, Escape closes it. */
@@ -75,7 +88,7 @@ export function installTermPopover() {
     current = el;
     pop.innerHTML = "";
     const b = document.createElement("strong");
-    b.textContent = el.dataset.term + ": ";
+    b.textContent = el.dataset.term + (el.dataset.en ? ` (İng. ${el.dataset.en})` : "") + ": ";
     const more = document.createElement("a");
     more.href = "sozluk.html#" + el.dataset.id;
     more.textContent = "Sözlükte aç →";
