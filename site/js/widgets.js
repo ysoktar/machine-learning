@@ -290,7 +290,7 @@ W.pca = (ds) => {
       h("p", {}, `μ = (${f(r.mean[0])}, ${f(r.mean[1])})`),
       table(["x₁", "x₂", "x₁−μ₁", "x₂−μ₂", "(x₁−μ₁)²", "(x₂−μ₂)²", "çarpım", "PC1 skoru"], rows, { cls: "compact" }),
       h("div", { class: "two-col" }, h("div", {},
-        h("p", {}, `S = [[${f(r.cov[0][0])}, ${f(r.cov[0][1])}], [${f(r.cov[1][0])}, ${f(r.cov[1][1])}]]  (toplamlar / ${n1})`),
+        h("p", { class: "mat-eq", style: { justifyContent: "flex-start" } }, "S = ", h("span", { class: "mat" }, ...[r.cov[0][0], r.cov[0][1], r.cov[1][0], r.cov[1][1]].map((v) => h("span", {}, f(v)))), ` (toplamlar / ${n1})`),
         h("p", {}, `λ² − (${f(r.trace)})λ + ${f(r.det)} = 0 denkleminin kökleri λ₁ = `, h("b", {}, f(r.eig[0])), ", λ₂ = ", h("b", {}, f(r.eig[1]))),
         h("p", {}, "PC1 yönü ≈ ", h("b", {}, vec(r.pc1)), ` · PC1'in açıkladığı varyans: ${f(r.eig[0])}/${f(r.trace)} = `, h("b", {}, `%${f(100 * r.ratio, 1)}`)),
         h("p", { class: "small muted" }, `Denetim: λ₁ + λ₂ = iz(S) = ${f(r.trace)}, λ₁·λ₂ = det(S) = ${f(r.det)}. Köşegen girdileri eşitse özvektörler (1, 1) ve (1, −1) yönündedir.`),

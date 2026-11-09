@@ -498,3 +498,11 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 /* "Burada: …" line under a formula: what every symbol stands for */
 .formula-legend { font-size: 0.9rem; color: var(--text-2); margin: -0.35rem 0 0.9rem; line-height: 1.55; }
 .fig .formula-legend { text-align: left; margin: 0.1rem 0 0.4rem; }
+
+/* a real matrix: numbers in a grid between square brackets */
+.mat { position: relative; display: inline-grid; grid-template-columns: repeat(var(--cols, 2), auto); column-gap: 0.9em; row-gap: 0.1em; padding: 0.15em 0.55em; margin: 0.15em 0.15em; vertical-align: middle; text-align: center; font-family: "Cambria Math", "STIX Two Math", Georgia, serif; line-height: 1.35; white-space: nowrap; }
+.mat::before, .mat::after { content: ""; position: absolute; top: 0; bottom: 0; width: 0.35em; border: 1.6px solid currentColor; }
+.mat::before { left: 0; border-right: none; }
+.mat::after { right: 0; border-left: none; }
+.mat > span { padding: 0 0.1em; }
+.mat-eq { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35em; justify-content: center; }
