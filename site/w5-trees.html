@@ -104,13 +104,26 @@
 <div class="table-wrap"><table class="simple compact center"><thead><tr><th>#</th><th>Kiminle</th><th>Zaman</th><th>Acelesi var mı?</th><th>Tatlı?</th></tr></thead><tbody>
 <tr><td>1</td><td>yalnız</td><td>öğle</td><td>hayır</td><td>Evet</td></tr><tr><td>2</td><td>yalnız</td><td>öğle</td><td>evet</td><td>Hayır</td></tr><tr><td>3</td><td>yalnız</td><td>akşam</td><td>hayır</td><td>Evet</td></tr><tr><td>4</td><td>yalnız</td><td>akşam</td><td>evet</td><td>Hayır</td></tr><tr><td>5</td><td>arkadaşlarla</td><td>öğle</td><td>hayır</td><td>Evet</td></tr><tr><td>6</td><td>arkadaşlarla</td><td>öğle</td><td>evet</td><td>Evet</td></tr><tr><td>7</td><td>arkadaşlarla</td><td>akşam</td><td>hayır</td><td>Evet</td></tr></tbody></table></div>
 <p>(a) H(D). (b) Her öznitelik için kazanç; kök. (c) Ağacı tamamlayın. (d) (arkadaşlarla, akşam, acelesi var) için tahmin.</p></div>
-<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p><strong>(a)</strong> Bütün verinin entropisi H(D) = −Σ pᵢ log₂ pᵢ formülüyle bulunur; pᵢ her sınıfın oranıdır. 7 örneğin 5'i Evet, 2'si Hayır: p = 5/7 ve 2/7. Tablodan −log₂(5/7) = 0.485 ve −log₂(2/7) = 1.807 alınır: H(D) = (5/7)·0.485 + (2/7)·1.807 = 0.346 + 0.516 = <strong>0.863</strong>. (Entropi tablosundaki H(2/7) satırı da aynı değeri verir.)</p>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Kullanılan üç formül</div><ol>
+<li><strong>Entropi:</strong> H = −Σ pᵢ·log₂ pᵢ; pᵢ her sınıfın oranı, −log₂ değerleri tablodan okunur.</li>
+<li><strong>Ağırlıklı entropi:</strong> her dalın entropisini, o dala düşen örneklerin oranıyla (n_dal/n) çarpıp topla.</li>
+<li><strong>Bilgi kazancı:</strong> IG = H(D) − ağırlıklı entropi. En büyük IG'yi veren öznitelik seçilir.</li>
+</ol></div>
+<p><strong>(a)</strong> Bütün verinin entropisi H(D) = −Σ pᵢ log₂ pᵢ formülüyle bulunur; pᵢ her sınıfın oranıdır. 7 örneğin 5'i Evet, 2'si Hayır: p = 5/7 ve 2/7. Tablodan −log₂(5/7) = 0.485 ve −log₂(2/7) = 1.807 alınır: H(D) = (5/7)·0.485 + (2/7)·1.807 = 0.346 + 0.516 = <strong>0.863</strong>. (Entropi tablosundaki H(2/7) satırı da aynı değeri verir.)</p>
+<p>Şimdi her öznitelik için dalları ayrı ayrı yazarız. Tabloda her dal için önce örnek sayısı, parantez içinde Evet/Hayır sayıları, sonra o dalın entropisi var; ağırlıklı H sütunu ikinci formülü, IG sütunu üçüncü formülü uygular. Örneğin Acele için: “hayır” dalı 4 örnekli ve saf (H = 0), “evet” dalı 3 örnekli (1 Evet, 2 Hayır, H = 0.918); ağırlıklı H = (4/7)·0 + (3/7)·0.918 = 0.393 ve IG = 0.863 − 0.393 = 0.470.</p>
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>Öznitelik</th><th>Dallar: n (E/H) H</th><th>Ağırlıklı H</th><th>IG</th></tr></thead><tbody>
 <tr><td>Kiminle</td><td>yalnız 4 (2/2) 1.000 · arkadaşlarla 3 (3/0) 0</td><td>(4/7)·1 = 0.571</td><td>0.292</td></tr>
 <tr><td>Zaman</td><td>öğle 4 (3/1) 0.811 · akşam 3 (2/1) 0.918</td><td>0.464 + 0.393 = 0.857</td><td>0.006</td></tr>
 <tr class="hl"><td>Acele</td><td>hayır 4 (4/0) 0 · evet 3 (1/2) 0.918</td><td>(3/7)·0.918 = 0.393</td><td><strong>0.470</strong></td></tr></tbody></table></div>
 <p><strong>(b)</strong> Kök: <strong>Acele</strong>. Zaman neredeyse işe yaramaz (0.006).</p>
-<p><strong>(c)</strong> “Hayır” dalındaki {1, 3, 5, 7} örneklerinin hepsi Evet olduğu için bu dal bir yaprak olur. “Evet” dalında {2, 4, 6} örnekleri vardır: 1 Evet ve 2 Hayır, entropi H = 0.918. Kiminle özniteliğine bakalım: yalnız dalı {2, 4} iki Hayır içerir, entropisi 0; arkadaşlarla dalı {6} bir Evet içerir, entropisi 0; bu yüzden kazanç IG = 0.918. Zaman özniteliğine bakalım: öğle dalı {2, 6} bir Evet bir Hayır içerir, entropisi 1; akşam dalı {4} saftır, entropisi 0; ağırlıklı entropi 0.667 ve kazanç IG = 0.251. Kazancı büyük olan Kiminle seçilir.</p>
+<p><strong>(c)</strong> Kökün altındaki her dala aynı işlemi, yalnız o dalın örnekleriyle uygularız:</p>
+<ol class="walk">
+<li><strong>“Hayır” dalı {1, 3, 5, 7}.</strong> Dört örneğin hepsi Evet: dal saf, yaprak olur ve “Evet” der.</li>
+<li><strong>“Evet” dalı {2, 4, 6}.</strong> 1 Evet, 2 Hayır var; bu dalın entropisi H = 0.918. Kalan iki özniteliği deneriz.</li>
+<li><strong>Kiminle.</strong> “Yalnız” {2, 4}: iki Hayır, H = 0. “Arkadaşlarla” {6}: bir Evet, H = 0. Ağırlıklı H = 0, kazanç IG = 0.918 − 0 = <strong>0.918</strong>.</li>
+<li><strong>Zaman.</strong> “Öğle” {2, 6}: bir Evet bir Hayır, H = 1. “Akşam” {4}: saf, H = 0. Ağırlıklı H = (2/3)·1 + (1/3)·0 = 0.667, kazanç IG = 0.918 − 0.667 = <strong>0.251</strong>.</li>
+<li><strong>Seçim.</strong> Kazancı büyük olan <strong>Kiminle</strong> seçilir; iki dalı da saf olduğu için ağaç burada biter.</li>
+</ol>
 <div class="tree">Acele? [5/2]
     hayır: → Evet [4/0]
     evet: Kiminle? [1/2]
