@@ -136,6 +136,15 @@ W.finds = () => {
   return el;
 };
 
+/** Worked solution as numbered steps: what we compute (a sentence), the formula, the numbers put in, the result. */
+function steps(items) {
+  return h("ol", { class: "steps-box" }, items.filter(Boolean).map((it) => h("li", {},
+    h("p", { class: "st-what" }, it.what),
+    it.formula ? h("p", { class: "st-formula" }, it.formula) : null,
+    it.calc ? h("p", { class: "st-calc" }, it.calc, it.result != null ? [" = ", h("b", {}, it.result)] : null) : null,
+    it.note ? h("p", { class: "st-note" }, it.note) : null)));
+}
+
 // polynomial fit (bias–variance in one picture). Fitted in u = 2x − 1 ∈ [−1, 1]: with raw x ∈ [0, 1] the degree-9
 // normal equations are too ill-conditioned for double precision and the solver gave up (flat zero curve).
 function polyfit(xs, ys, deg, lambda = 0) {
@@ -263,7 +272,12 @@ W.regmetrics = () => {
       ["y", ...a.map((v) => f(v)), f(ml.sum(a))], ["ŷ", ...b.map((v) => f(v)), ""], ["y − ŷ", ...r.errors.map((v) => f(v)), ""],
       ["(y − ŷ)²", ...r.errors.map((v) => f(v * v)), f(r.sse)], ["|y − ŷ|", ...r.errors.map((v) => f(Math.abs(v))), f(ml.sum(r.errors.map(Math.abs)))],
       [`(y − ȳ)², ȳ = ${f(r.ybar)}`, ...a.map((v) => f((v - r.ybar) ** 2)), f(r.sst)]], { cls: "center compact" }),
-    h("div", { class: "kv" }, h("span", {}, "MSE = ", h("b", {}, `${f(r.sse)}/${a.length} = ${f(r.mse)}`)), h("span", {}, "RMSE = ", h("b", {}, f(r.rmse))), h("span", {}, "MAE = ", h("b", {}, f(r.mae))), h("span", {}, "R² = 1 − SSE/SST = ", h("b", {}, `1 − ${f(r.sse)}/${f(r.sst)} = ${f(r.r2)}`))));
+    steps([
+      { what: "MSE, hataların karelerinin ortalamasıdır; kare aldığı için büyük hataları ağır cezalandırır.", formula: "MSE = (1/n)·Σ(y − ŷ)²", calc: `MSE = ${f(r.sse)}/${a.length}`, result: f(r.mse) },
+      { what: "RMSE, MSE'nin kareköküdür; sonucu yeniden y'nin birimine getirir.", formula: "RMSE = √MSE", calc: `RMSE = √${f(r.mse)}`, result: f(r.rmse) },
+      { what: "MAE, hataların mutlak değerlerinin ortalamasıdır; büyük hatalara MSE kadar duyarlı değildir.", formula: "MAE = (1/n)·Σ|y − ŷ|", calc: `MAE = ${f(ml.sum(r.errors.map(Math.abs)))}/${a.length}`, result: f(r.mae) },
+      { what: "R², modelin hatasını her şeye ortalamayı (ȳ) söylemenin hatasıyla karşılaştırır; 1 kusursuz, 0 ortalama kadar iyi demektir.", formula: "R² = 1 − Σ(y − ŷ)² / Σ(y − ȳ)²", calc: `ȳ = ${f(r.ybar)}; R² = 1 − ${f(r.sse)}/${f(r.sst)}`, result: f(r.r2) },
+    ]));
   });
   return el;
 };
@@ -370,11 +384,27 @@ W.lsq = (ds) => {
     rows.push({ row: ["Σ", `x̄ = ${f(r.xbar)}`, `ȳ = ${f(r.ybar)}`, "0", "0", f(r.sxy), f(r.sxx), "", f(r.sse)], cls: "hl" });
     const pts = a.map((xi, i) => ({ x: [xi, b[i]], y: 1 }));
     const plot = scatter({ ...bounds(pts, 0.2), points: pts, labels: false, lines: [{ w: [r.w1, -1], b: r.w0, cls: "accent" }], xlabel: "x", ylabel: "y" });
-    put(out, table(["i", "x", "y", "x − x̄", "y − ȳ", "(x−x̄)(y−ȳ)", "(x−x̄)²", "ŷ", "(y−ŷ)²"], rows, { cls: "compact" }),
-      h("div", { class: "two-col" }, h("div", {},
-        h("p", {}, "w₁ = ", h("b", {}, `${f(r.sxy)}/${f(r.sxx)} = ${f(r.w1)}`)), h("p", {}, "w₀ = ȳ − w₁x̄ = ", h("b", {}, `${f(r.ybar)} − ${f(r.w1)}·${f(r.xbar)} = ${f(r.w0)}`)),
-        h("p", {}, `ŷ = ${f(r.w0)} + ${f(r.w1)}x · MSE = ${f(r.sse)}/${a.length} = `, h("b", {}, f(r.mse)), ` · R² = 1 − ${f(r.sse)}/${f(r.sst)} = `, h("b", {}, f(r.r2))),
-        h("p", { class: "small muted" }, `Denetim: artıkların toplamı Σ(y − ŷ) = ${f(ml.sum(r.residuals))} (bias terimli her en küçük kareler çözümünde 0).`)), plot));
+    const n = a.length, sst = r.sst;
+    put(out,
+      h("p", { class: "small" }, "Hesap tablosu: her satır bir nokta. Son satırdaki toplamlar aşağıdaki formüllerde kullanılır."),
+      table(["i", "x", "y", "x − x̄", "y − ȳ", "(x − x̄)(y − ȳ)", "(x − x̄)²", "ŷ", "(y − ŷ)²", "(y − ȳ)²"], [
+        ...a.map((xi, i) => [i + 1, f(xi), f(b[i]), f(xi - r.xbar), f(b[i] - r.ybar), f((xi - r.xbar) * (b[i] - r.ybar)), f((xi - r.xbar) ** 2), f(r.pred[i]), f(r.residuals[i] ** 2), f((b[i] - r.ybar) ** 2)]),
+        { row: ["Σ", f(ml.sum(a)), f(ml.sum(b)), "0", "0", f(r.sxy), f(r.sxx), "", f(r.sse), f(sst)], cls: "hl" }], { cls: "compact" }),
+      h("div", { class: "two-col" }, steps([
+        { what: "Önce x ve y'nin ortalamalarını buluruz; doğru her zaman (x̄, ȳ) noktasından geçer.", formula: "x̄ = Σx / n, ȳ = Σy / n",
+          calc: `x̄ = ${f(ml.sum(a))}/${n} = ${f(r.xbar)}, ȳ = ${f(ml.sum(b))}/${n}`, result: f(r.ybar) },
+        { what: "Eğimi buluruz: x ile y'nin birlikte değişiminin, x'in kendi değişimine oranı.", formula: "w₁ = Σ(x − x̄)(y − ȳ) / Σ(x − x̄)²",
+          calc: `Tablodaki iki sütunun toplamları: w₁ = ${f(r.sxy)}/${f(r.sxx)}`, result: f(r.w1) },
+        { what: "Kesişimi buluruz: doğru (x̄, ȳ)'den geçtiği için ȳ = w₀ + w₁·x̄ olmalı.", formula: "w₀ = ȳ − w₁·x̄",
+          calc: `w₀ = ${f(r.ybar)} − ${f(r.w1)}·${f(r.xbar)}`, result: f(r.w0) },
+        { what: "Doğruyu yazarız; tablodaki ŷ sütunu her x için bu doğrunun tahminidir.", formula: "ŷ = w₀ + w₁·x",
+          calc: `ŷ = ${f(r.w0)} + ${f(r.w1)}·x` },
+        { what: "Hatayı ölçeriz: tahmin hatalarının karelerinin ortalaması.", formula: "MSE = (1/n)·Σ(y − ŷ)²",
+          calc: `MSE = ${f(r.sse)}/${n}`, result: f(r.mse) },
+        { what: "Doğrunun, her şeye ortalamayı söylemekten ne kadar iyi olduğunu ölçeriz (1'e yakınsa iyi).", formula: "R² = 1 − Σ(y − ŷ)² / Σ(y − ȳ)²",
+          calc: `R² = 1 − ${f(r.sse)}/${f(sst)}`, result: f(r.r2),
+          note: `Denetim: artıkların toplamı Σ(y − ŷ) = ${f(ml.sum(r.residuals))}; sabit terimi olan her en küçük kareler çözümünde 0 çıkar.` },
+      ]), plot));
   });
   return el;
 };

@@ -513,3 +513,11 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--text-2); text-align: ce
 details.aside { margin: 0.6rem 0 1rem; padding: 0.4rem 0.8rem; border: 1px dashed var(--border-strong); border-radius: 8px; color: var(--text-2); font-size: 0.95rem; }
 details.aside > summary { cursor: pointer; font-weight: 600; color: var(--muted); }
 details.aside .m { white-space: normal; overflow-wrap: anywhere; }
+/* worked solution steps inside widgets: sentence, formula, numbers */
+.steps-box { margin: 0.4rem 0; padding-left: 1.4rem; }
+.steps-box > li { margin-bottom: 0.7rem; }
+.steps-box p { margin: 0.1rem 0; }
+.steps-box .st-what { color: var(--text); }
+.steps-box .st-formula { font-family: "Cambria Math", "STIX Two Math", Georgia, serif; background: var(--surface-2); border-radius: 6px; padding: 0.15rem 0.5rem; display: inline-block; }
+.steps-box .st-calc { color: var(--text-2); }
+.steps-box .st-note { font-size: 0.88rem; color: var(--muted); }
