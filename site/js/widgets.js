@@ -206,6 +206,7 @@ W.scaling = () => {
     put(out, 
       h("div", { class: "kv" }, h("span", {}, "min = ", h("b", {}, f(mm.min))), h("span", {}, "max = ", h("b", {}, f(mm.max))), h("span", {}, "μ = ", h("b", {}, `${f(ml.sum(x))}/${x.length} = ${f(z.mean)}`)),
         h("span", {}, "σ² = Σ(x−μ)²/n = ", h("b", {}, `${f(ml.sum(dev))}/${x.length} = ${f(z.sd ** 2)}`)), h("span", {}, "σ = ", h("b", {}, f(z.sd)))),
+      scalingSvg(x, mm.values, z.values, t), h("p", { class: "small muted" }, "Üç doğru aynı noktaları gösterir: ölçekleme noktaların sırasını ve aralarındaki oranları korur, yalnız ekseni kaydırıp esnetir. min-max her şeyi [0, 1]'e, z-score ortalamayı 0'a ve yayılımı 1'e getirir."),
       table(["x", "min-max (x−min)/(max−min)", "x − μ", "(x − μ)²", "z = (x−μ)/σ"], rows),
       t.length ? h("p", {}, "Test değerleri ", h("strong", {}, "eğitimin"), " min/max/μ/σ'sıyla dönüştürülür: ", t.map((v) => `${f(v)} → min-max ${f2(ml.minmax([v], x).values[0])}, z ${f2(ml.zscore([v], x).values[0])}`).join("; "), ". (min-max [0,1] dışına taşabilir; bu normaldir.)") : null);
   });
@@ -541,14 +542,16 @@ W.softmax = () => {
   const { el, body } = frame("Softmax ve çapraz entropi");
   const z = h("input", { type: "text", value: "2 1 0", style: { width: "9rem" } });
   const y = num("doğru sınıf (1'den) ", 1, { step: 1, min: 1, width: "4rem" });
+  const tmp = h("input", { type: "range", min: "0.25", max: "4", step: "0.25", value: "1", style: { width: "8rem" } }), tl = h("span", { class: "small" }, "T = 1");
   const out = outBox();
-  body.append(h("div", { class: "controls" }, h("label", {}, "skorlar z: ", z), y.label), out);
+  body.append(h("div", { class: "controls" }, h("label", {}, "skorlar z: ", z), y.label, h("label", {}, "sıcaklık (skorları T'ye böl) ", tmp, tl)), out);
   live(body, () => {
-    const Z = parseNums(z.value);
+    const Tt = Number(tmp.value); tl.textContent = `T = ${Tt}`;
+    const Z = parseNums(z.value).map((v) => v / Tt);
     if (!Z.length) return;
     const p = ml.softmax(Z), e = Z.map(Math.exp), s = ml.sum(e);
     const k = Math.min(Z.length, Math.max(1, Math.round(y.get()))) - 1;
-    put(out, table(["sınıf", ...Z.map((_, i) => i + 1)], [["z", ...Z.map((v) => f(v))], ["eᶻ", ...e.map((v) => f(v))], [`p = eᶻ / ${f(s)}`, ...p.map((v) => f(v))]], { cls: "center compact" }),
+    put(out, softmaxBars(Z, p, k), Tt !== 1 ? h("p", { class: "small" }, `Skorlar ${Tt}'e bölündü: T büyüdükçe olasılıklar eşitlenir, küçüldükçe en büyük skora yığılır. Sınavdaki softmax T = 1'dir.`) : null, table(["sınıf", ...Z.map((_, i) => i + 1)], [[Tt !== 1 ? "z/T" : "z", ...Z.map((v) => f(v))], ["eᶻ", ...e.map((v) => f(v))], [`p = eᶻ / ${f(s)}`, ...p.map((v) => f(v))]], { cls: "center compact" }),
       h("p", {}, `Tahmin: ${p.indexOf(Math.max(...p)) + 1}. sınıf (olasılığı en yüksek olan). Doğru sınıf ${k + 1} olduğu için kayıp −ln p${sub(k + 1)} = −ln ${f(p[k])} = `, h("b", {}, f(-Math.log(p[k])))));
   });
   return el;
@@ -659,7 +662,7 @@ W.id3 = (ds) => {
     const visible = blocks.filter((b) => b.depth <= state.shown).flatMap((b) => b.part);
     const more = state.shown < maxDepth ? h("div", { class: "stepbar" }, h("button", { type: "button", class: "btn small primary", onclick: () => { state.shown++; run(); } }, `Sonraki seviyeyi göster (${state.shown + 2}. seviye) ▶`),
       h("button", { type: "button", class: "btn small", onclick: () => { state.shown = maxDepth; run(); } }, "Hepsini göster")) : null;
-    put(out, verdict, ...visible, more, state.shown >= maxDepth ? [h("p", {}, h("strong", {}, "Son ağaç"), " (köşeli parantezde sınıf sayıları):"), h("div", { class: "tree" }, treeText(tree))] : null);
+    put(out, verdict, ...visible, more, state.shown >= maxDepth ? [h("p", {}, h("strong", {}, "Son ağaç"), " (köşeli parantezde sınıf sayıları):"), treeSvg(tree), h("details", {}, h("summary", { class: "small" }, "Ağacın metin hâli"), h("div", { class: "tree" }, treeText(tree)))] : null);
   });
   return el;
 };
@@ -677,7 +680,7 @@ W.threshold = (ds) => {
     const r = ml.thresholdTable(a, b, crit.get());
     const best = r.rows.reduce((p, q) => (q.gain > p.gain + 1e-12 ? q : p), r.rows[0]);
     const imp = (cnt) => (crit.get() === "gini" ? ml.gini(cnt) : ml.entropy(cnt));
-    put(out, h("p", {}, "Sıralı: ", r.sorted.map(([v, c]) => `${f(v)}(${c})`).join("  "), ` · üst düğüm ${crit.get() === "gini" ? "Gini" : "H"} = ${f(r.parent)}`),
+    put(out, thresholdSvg(r.sorted, r.rows, best), h("p", {}, "Sıralı: ", r.sorted.map(([v, c]) => `${f(v)}(${c})`).join("  "), ` · üst düğüm ${crit.get() === "gini" ? "Gini" : "H"} = ${f(r.parent)}`),
       table(["eşik t (orta nokta)", "sınıf değişiyor mu?", "sol x ≤ t", "sağ x > t", "ağırlıklı", "kazanç"], r.rows.map((q) => ({ row: [f(q.t), q.changes ? "evet" : "hayır", `${q.nl}: ${q.left.join("/")}`, `${q.nr}: ${q.right.join("/")}`, f(q.weighted), f(q.gain)], cls: q === best ? "hl" : "" })), { cls: "compact" }),
       steps([
         { what: "Değerleri küçükten büyüğe sıralarız ve aday eşikleri, yan yana duran iki değerin orta noktası olarak alırız.", formula: "aday eşik t = (aᵢ + aᵢ₊₁) / 2", calc: `adaylar: ${r.rows.map((q) => f(q.t)).join(", ")}` },
@@ -981,6 +984,7 @@ W.boolmlp = (ds) => {
     const bad = X.filter((x) => ml.evalMLP(net, x).y !== (evalAst(r.ast, x) ? 1 : 0));
     const single = net.units.length === 1;
     put(out, h("p", {}, "VE'lerin VEYA'sı (DNF): ", h("strong", {}, r.terms.map((t) => "(" + t.map(lit).join(" ∧ ") + ")").join(" ∨ "))),
+      mlpSvg(net, r.nVars),
       table(["gizli nöron", "terim (VE)", "z = w·x + b", "neden bu bias?"], unitRows, { cls: "compact" }),
       h("p", {}, single ? "Tek terim var: bu nöronun kendisi çıktı olabilir (gizli katman gerekmez)." : `Çıktı nöronu (VEYA): y = step(${net.units.map((_, k) => `h${sub(k + 1)}`).join(" + ")} − 0.5).`),
       h("p", { class: "small" }, `Doğruluk tablosunun ${X.length} satırı denetlendi: `, bad.length ? h("span", { class: "bad" }, `${bad.length} satır tutmuyor!`) : h("span", { class: "good" }, "hepsi tutuyor ✓")),
@@ -1124,7 +1128,7 @@ W.hyper = (ds) => {
 // ======================================================================= drill (random problems with answer checking)
 const LN_TABLE = "ln 2 = 0.693, ln 3 = 1.099, ln 5 = 1.609, ln 7 = 1.946";
 const GEN = {
-  ig: { title: "Bilgi kazancı (ID3 kökü)", make(R) {
+  ig: { title: "Bilgi kazancı (ID3 kökü)", wk: 5, make(R) {
     const feats = ["A", "B", "C"], vals = [["a1", "a2"], ["b1", "b2", "b3"], ["c1", "c2"]];
     const n = R.int(6, 8);
     let rows;
@@ -1141,7 +1145,7 @@ const GEN = {
         h("p", {}, "Kök: ", h("b", {}, stats.reduce((a, b) => (b.gain > a.gain + 1e-12 ? b : a)).feature))],
     };
   } },
-  metrics: { title: "Karmaşıklık matrisi ve ölçütler", make(R) {
+  metrics: { title: "Karmaşıklık matrisi ve ölçütler", wk: 2, make(R) {
     const n = R.int(10, 14);
     const y = Array.from({ length: n }, () => (R() < 0.45 ? 1 : 0)), p = y.map((t) => (R() < 0.75 ? t : 1 - t));
     if (!y.includes(1)) y[0] = 1;
@@ -1153,7 +1157,7 @@ const GEN = {
       solution: () => [table(["örnek", ...y.map((_, i) => i + 1)], [["durum", ...c.tags.map(tag)]], { cls: "center compact" }), cmTable(c), metricRows(m, c)],
     };
   } },
-  knn: { title: "kNN elle", make(R) {
+  knn: { title: "kNN elle", wk: 3, make(R) {
     const pts = [];
     const used = new Set();
     while (pts.length < 7) { const x = [R.int(0, 7), R.int(0, 7)]; const k = x.join(); if (used.has(k)) continue; used.add(k); pts.push({ x, y: x[0] + x[1] + R.int(-2, 2) > 7 ? -1 : 1, name: String.fromCharCode(65 + pts.length) }); }
@@ -1166,7 +1170,7 @@ const GEN = {
       solution: () => [table(["sıra", "nokta", "d²", "sınıf"], rank.map((p, i) => [i + 1, p.name, f(p.d), signTxt(p.y)]), { cls: "compact" }), h("p", {}, ans.map((a, i) => `k=${[1, 3, 5][i]}: ${signTxt(a)}`).join(" · "))],
     };
   } },
-  perceptron: { title: "Perceptron, bir epoch", make(R) {
+  perceptron: { title: "Perceptron, bir epoch", wk: 4, make(R) {
     const pts = Array.from({ length: 4 }, () => { const x = [R.int(-1, 3), R.int(-1, 3)]; return { x, y: x[0] - x[1] + R.pick([-0.5, 0.5]) > 0 ? 1 : -1 }; });
     const w0 = [R.pick([-1, -0.5, 0, 0.5]), R.pick([-0.5, 0, 0.5, 1])], b0 = R.pick([-0.5, 0, 0.5]), eta = R.pick([0.5, 1]);
     const r = ml.perceptron(pts, w0, b0, eta, { epochs: 1 });
@@ -1176,7 +1180,7 @@ const GEN = {
       solution: () => [table(["#", "z", "ŷ", "hata?", "w", "b"], r.passes[0].steps.map((s) => [s.i + 1, f(s.z), signTxt(s.pred), s.wrong ? "evet" : "hayır", vec(s.w), f(s.b)]), { cls: "compact" })],
     };
   } },
-  logistic: { title: "Lojistik regresyon adımı", make(R) {
+  logistic: { title: "Lojistik regresyon adımı", wk: 4, make(R) {
     const x = [R.int(-1, 2), R.int(0, 2)], y = R.pick([0, 1]), eta = R.pick([0.2, 0.4, 0.5]);
     const r = ml.logisticStep([0, 0], 0, x, y, eta);
     return {
@@ -1185,7 +1189,7 @@ const GEN = {
       solution: () => [h("p", {}, `Başlangıçta w = 0 olduğu için z = 0 ve p = σ(0) = 0.5 olur. Çıktı hatası p − y = ${f(r.gb)}. ∇w = ${vec(r.gw)}. w = ${vec(r.w)}, b = ${f(r.b)}. Yeni p = σ(${f(r.z2)}) = ${f(r.p2)}.`)],
     };
   } },
-  scaling: { title: "min-max ve z-score", make(R) {
+  scaling: { title: "min-max ve z-score", wk: 2, make(R) {
     let xs; do { xs = Array.from({ length: R.int(4, 6) }, () => R.int(0, 12)); } while (ml.uniq(xs).length < 3);
     const t = R.int(0, 14);
     const mm = ml.minmax([t], xs).values[0], z = ml.zscore([t], xs);
@@ -1195,7 +1199,7 @@ const GEN = {
       solution: () => [h("p", {}, `min = ${Math.min(...xs)}, max = ${Math.max(...xs)}, μ = ${f(z.mean)}, σ = ${f(z.sd)}. Bu değerlerle min-max sonucu ${f(mm)}, z-skoru ${f(z.values[0])} olur.`)],
     };
   } },
-  auc: { title: "ROC-AUC (çift sayma)", make(R) {
+  auc: { title: "ROC-AUC (çift sayma)", wk: 2, make(R) {
     const n = R.int(6, 9);
     let l; do { l = Array.from({ length: n }, () => R() < 0.5); } while (!l.includes(true) || !l.includes(false));
     const r = ml.roc(l);
@@ -1205,7 +1209,7 @@ const GEN = {
       solution: () => [h("p", {}, `${r.P} pozitif, ${r.N} negatif. Her negatifin önündeki pozitifler toplamı ${r.goodPairs} olduğu için AUC = ${r.goodPairs}/${r.pairs} = ${f(r.auc)}.`)],
     };
   } },
-  adaboost: { title: "AdaBoost turu", make(R) {
+  adaboost: { title: "AdaBoost turu", wk: 6, make(R) {
     const n = R.pick([8, 10]), k = R.int(1, 3);
     const w = Array(n).fill(1 / n), y = Array(n).fill(1), hh = y.map((_, i) => (i < k ? -1 : 1));
     const r = ml.adaboostRound(w, y, hh);
@@ -1215,7 +1219,7 @@ const GEN = {
       solution: () => [h("p", {}, `ε = ${k}/${n} = ${f(r.eps)}; α = ½ ln(${f(1 - r.eps)}/${f(r.eps)}) = ${f(r.alpha)}. Kestirme: yanlışlar × 1/(2ε) = ${f(r.factorWrong)} → ${f(r.next[0])}; doğrular × 1/(2(1−ε)) = ${f(r.factorRight)} → ${f(r.next[n - 1])}. Yanlışların toplamı 0.5.`)],
     };
   } },
-  svm: { title: "SVM: f(x), uzaklık, menteşe", make(R) {
+  svm: { title: "SVM: f(x), uzaklık, menteşe", wk: 7, make(R) {
     const w = [R.int(-2, 2) || 1, R.int(-2, 2) || 1], b = R.int(-3, 3), x = [R.int(-1, 3), R.int(-1, 3)], y = R.pick([1, -1]);
     const p = ml.svmPoint(w, b, x, y);
     return {
@@ -1224,7 +1228,7 @@ const GEN = {
       solution: () => [h("p", {}, `f = ${f(p.f)}, ‖w‖ = ${f(ml.norm(w))}, uzaklık |f|/‖w‖ = ${f(p.distance)}, y·f = ${f(p.yf)}; menteşe kaybı max(0, 1 − y·f) = ${f(p.hinge)} (${p.where}).`)],
     };
   } },
-  lsq: { title: "En küçük kareler", make(R) {
+  lsq: { title: "En küçük kareler", wk: 4, make(R) {
     const x = [1, 2, 3, 4], a = R.pick([0.5, 1, 1.5, 2]), c = R.int(0, 2);
     const y = x.map((v) => Math.round(c + a * v + R.pick([-1, 0, 0, 1]) * 0.5 * 2) );
     const r = ml.leastSquares1(x, y);
@@ -1234,12 +1238,12 @@ const GEN = {
       solution: () => [h("p", {}, `x̄ = ${f(r.xbar)}, ȳ = ${f(r.ybar)}, Σ(x−x̄)(y−ȳ) = ${f(r.sxy)}, Σ(x−x̄)² = ${f(r.sxx)}; buradan w₁ = ${f(r.w1)}, w₀ = ${f(r.w0)}; MSE = ${f(r.mse)}.`)],
     };
   } },
-  vote: { title: "Çoğunluk oyu hatası", make(R) {
+  vote: { title: "Çoğunluk oyu hatası", wk: 6, make(R) {
     const n = R.pick([3, 5]), p = R.pick([0.6, 0.7, 0.8, 0.9]);
     return { prompt: [h("p", {}, `${n} bağımsız sınıflandırıcı, her biri %${Math.round(p * 100)} doğru. Çoğunluk oyunun hata olasılığı?`)], fields: [{ label: "hata", v: ml.majorityError(n, p) }],
       solution: () => [h("p", {}, `En az ${Math.floor(n / 2) + 1} üye yanılmalı: Σ C(${n},k)·${f(1 - p, 1)}^k·${f(p, 1)}^(${n}−k) = ${f(ml.majorityError(n, p), 4)}.`)] };
   } },
-  softmax: { title: "Softmax", make(R) {
+  softmax: { title: "Softmax", wk: 4, make(R) {
     const z = [R.int(-1, 2), R.int(-1, 2), R.int(-1, 2)], k = R.int(0, 2);
     const p = ml.softmax(z);
     return { prompt: [h("p", {}, `Skorlar z = (${z.join(", ")}). Olasılıklar ve doğru sınıf ${k + 1} iken çapraz entropi kaybı? (e = 2.718, e⁻¹ = 0.368, e² = 7.389)`)],
@@ -1380,7 +1384,7 @@ const GEN = {
 };
 W.drill = (ds) => {
   const scope = ds.week ? ds.week.split(",") : ds.set === "final" ? ["9", "10", "11", "12"] : null;
-  const { el, body } = frame(scope ? `Sınırsız alıştırma: ${ds.week ? ds.week.replace(/,/g, ", ") + ". hafta" : "final konuları"}` : "Alıştırma üreteci", "Alıştırma");
+  const { el, body } = frame(scope ? `Sınırsız alıştırma: ${ds.week ? ds.week.replace(/,/g, ", ") + ". hafta" : "9–12. haftalar"}` : "Alıştırma üreteci", "Alıştırma");
   const types = Object.entries(GEN).filter(([, g]) => !scope || scope.includes(String(g.wk)));
   const skey = "drill-type" + (scope ? scope.join("") : "");
   const saved = store.get(skey, "any");
@@ -1428,19 +1432,21 @@ W.drill = (ds) => {
 // ======================================================================= index
 W.countdown = () => {
   const box = h("div", { class: "countdown" });
-  const target = new Date("2026-11-09T16:30:00+03:00");
+  // the final period opens on 7 December; the exact exam slot comes from the academic calendar
+  const target = new Date("2026-12-07T09:00:00+03:00"), end = new Date("2026-12-18T23:59:00+03:00");
   const paint = () => {
-    const ms = target - new Date();
-    if (ms <= 0) { box.replaceChildren(h("div", { class: "label" }, "Ara sınav"), h("div", { class: "when" }, "9 Kasım 2026 Pazartesi, 16:30 — geçti"), h("p", { class: "small" }, "Sıradaki: final, 7–18 Aralık (kesin tarih akademik takvimden). Final rehberine bakın.")); return; }
+    const now = new Date(), ms = target - now;
+    if (ms <= 0) { box.replaceChildren(h("div", { class: "label" }, now < end ? "Final dönemi başladı" : "Final dönemi bitti"), h("div", { class: "when" }, "7–18 Aralık 2026"), h("p", { class: "small" }, "Kesin sınav günü ve saati için akademik takvime ve ders platformuna bakın.")); return; }
     const d = Math.floor(ms / 864e5), hh = Math.floor((ms % 864e5) / 36e5), mm = Math.floor((ms % 36e5) / 6e4), ss = Math.floor((ms % 6e4) / 1e3);
-    box.replaceChildren(h("div", { class: "label" }, "Ara sınava kalan"), h("div", { class: "when" }, "9 Kasım 2026 Pazartesi, 16:30 · ders saatinde, her zamanki derslik"),
+    box.replaceChildren(h("div", { class: "label" }, "Final dönemine kalan"), h("div", { class: "when" }, "Final dönemi 7–18 Aralık 2026 (kesin gün akademik takvimden)"),
       h("div", { class: "digits" }, [[d, "gün"], [hh, "saat"], [mm, "dakika"], [ss, "saniye"]].map(([v, l]) => h("div", {}, h("b", {}, String(v).padStart(2, "0")), h("span", {}, l)))),
-      h("p", { class: "small muted", style: { margin: "0.6rem 0 0" } }, "Kâğıt üzerinde · 1–7. haftalar · hesap makinesi yok · log ve üstel tablolar verilir"));
+      h("p", { class: "small muted", style: { margin: "0.6rem 0 0" } }, "Kâğıt üzerinde · dersin tamamı, ağırlık 8–12. haftalarda · hesap makinesi yok · log ve üstel tablolar verilir"));
   };
   paint();
   setInterval(paint, 1000);
   return box;
 };
+
 
 // ======================================================================= interactive versions (drag, step, explore)
 // ======================================================================= week 10: sequences, attention, embeddings
@@ -2120,6 +2126,92 @@ W.template = () => {
   queueMicrotask(() => draw(true));
   return el;
 };
+
+// ======================================================================= pictures for the midterm-week calculators
+function svgWrap(w, hh, inner, maxW, label = "Şekil") {
+  const e = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  e.setAttribute("viewBox", `0 0 ${w} ${hh}`); e.setAttribute("class", "plot fig-svg"); e.setAttribute("role", "img"); e.setAttribute("aria-label", label);
+  if (maxW) e.style.maxWidth = maxW + "px";
+  e.innerHTML = `<defs><marker id="ahv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fig-head"/></marker></defs>` + inner;
+  return e;
+}
+const esc_ = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+/** Decision tree drawn as boxes: internal nodes ask a question, leaves give the class; counts under every node. */
+function treeSvg(tree) {
+  const leaves = (n) => (n.leaf ? 1 : n.children.reduce((s, c) => s + leaves(c.child), 0));
+  const depth = (n) => (n.leaf ? 0 : 1 + Math.max(...n.children.map((c) => depth(c.child))));
+  const L = leaves(tree), D = depth(tree), colW = 118, rowH = 86, W = Math.max(260, L * colW), H = (D + 1) * rowH + 10;
+  let s = "", slot = 0;
+  const place = (n) => {
+    if (n.leaf) { n._x = (slot++ + 0.5) * colW; return; }
+    n.children.forEach((c) => place(c.child));
+    n._x = (n.children[0].child._x + n.children.at(-1).child._x) / 2;
+  };
+  place(tree);
+  const draw = (n, d) => {
+    const y = 10 + d * rowH, bw = 104, bh = 40;
+    if (!n.leaf) n.children.forEach((c) => {
+      const ch = c.child, y2 = 10 + (d + 1) * rowH;
+      s += `<line x1="${n._x}" y1="${y + bh}" x2="${ch._x}" y2="${y2}" class="fig-arrow"/>`;
+      s += `<text x="${(n._x + ch._x) / 2}" y="${(y + bh + y2) / 2 + 4}" text-anchor="middle" class="fig-sub tree-edge">${esc_(c.value)}</text>`;
+      draw(ch, d + 1);
+    });
+    s += `<rect x="${n._x - bw / 2}" y="${y}" width="${bw}" height="${bh}" rx="${n.leaf ? 18 : 6}" class="${n.leaf ? "fig-box3" : "fig-box2"}"/>`;
+    s += `<text x="${n._x}" y="${y + 17}" text-anchor="middle" class="lab">${esc_(n.leaf ? n.label : n.feature + "?")}</text>`;
+    s += `<text x="${n._x}" y="${y + 32}" text-anchor="middle" class="fig-sub">[${n.counts.join(" / ")}]</text>`;
+  };
+  draw(tree, 0);
+  return h("div", { class: "scroll-x" }, svgWrap(W, H, s, Math.max(420, W), "Karar ağacı"));
+}
+
+/** Points on a number line with candidate thresholds; the best one highlighted. */
+function thresholdSvg(sorted, rows, best) {
+  const xs = sorted.map(([v]) => v), lo = Math.min(...xs), hi = Math.max(...xs), pad = (hi - lo || 1) * 0.08;
+  const W = 520, X = (v) => 30 + ((v - lo + pad) / (hi - lo + 2 * pad)) * (W - 60);
+  const cls = ml.uniq(sorted.map(([, c]) => c));
+  let s = `<line x1="20" y1="60" x2="${W - 20}" y2="60" class="fig-grid"/>`;
+  for (const q of rows) s += `<line x1="${X(q.t)}" y1="30" x2="${X(q.t)}" y2="86" class="${q === best ? "line accent" : "line dash"}"/><text x="${X(q.t)}" y="${q === best ? 24 : 100}" text-anchor="middle" class="fig-sub">${f(q.t)}${q === best ? " (en iyi)" : ""}</text>`;
+  sorted.forEach(([v, c], i) => { const dup = sorted.slice(0, i).filter(([u]) => u === v).length; s += `<circle cx="${X(v)}" cy="${60 - dup * 14}" r="7" class="kc${cls.indexOf(c) % 4}"/><text x="${X(v)}" y="${78 + 0}" text-anchor="middle" class="fig-sub">${f(v)}</text>`; });
+  s += cls.map((c, i) => `<circle cx="${30 + i * 70}" cy="116" r="6" class="kc${i % 4}"/><text x="${40 + i * 70}" y="120" class="fig-sub">${esc_(c)}</text>`).join("");
+  return svgWrap(W, 126, s, 560, "Eşik adayları");
+}
+
+/** Raw values and their min-max and z-score positions on three aligned number lines. */
+function scalingSvg(x, mm, z, tests = []) {
+  const W = 520, rows = [["ham x", x, Math.min(...x, ...tests), Math.max(...x, ...tests)], ["min-max", mm, Math.min(0, ...mm), Math.max(1, ...mm)], ["z-score", z, Math.min(-2, ...z), Math.max(2, ...z)]];
+  let s = "";
+  rows.forEach(([name, vals, lo, hi], r) => {
+    const y = 30 + r * 52, X = (v) => 90 + ((v - lo) / (hi - lo || 1)) * (W - 120);
+    s += `<text x="4" y="${y + 4}" class="fig-sub">${name}</text><line x1="90" y1="${y}" x2="${W - 30}" y2="${y}" class="fig-grid"/>`;
+    const ticks = name === "min-max" ? [0, 0.5, 1] : name === "z-score" ? [-2, -1, 0, 1, 2] : [lo, (lo + hi) / 2, hi];
+    s += ticks.map((t) => `<line x1="${X(t)}" y1="${y - 4}" x2="${X(t)}" y2="${y + 4}" class="fig-grid"/><text x="${X(t)}" y="${y + 18}" text-anchor="middle" class="fig-sub">${f(t, 2)}</text>`).join("");
+    vals.forEach((v, i) => { const dup = vals.slice(0, i).filter((u) => Math.abs(u - v) < 1e-9).length; s += `<circle cx="${X(v)}" cy="${y - dup * 9}" r="5" class="kc0" opacity="0.85"/>`; });
+  });
+  return svgWrap(W, 170, s, 560, "Ölçekleme");
+}
+
+/** Softmax probabilities as bars, the correct class marked. */
+function softmaxBars(Z, p, k) {
+  const W = 420, bw = Math.min(60, (W - 40) / Z.length - 10);
+  let s = `<line x1="20" y1="140" x2="${W - 10}" y2="140" class="fig-grid"/>`;
+  p.forEach((v, i) => { const x = 30 + i * (bw + 10), hh = 120 * v; s += `<rect x="${x}" y="${140 - hh}" width="${bw}" height="${hh}" class="${i === k ? "kc2" : "kc0"}"/><text x="${x + bw / 2}" y="${134 - hh}" text-anchor="middle" class="fig-sub">${f(v, 2)}</text><text x="${x + bw / 2}" y="156" text-anchor="middle" class="fig-sub">${i + 1}${i === k ? " (doğru)" : ""}</text>`; });
+  return svgWrap(W, 164, s, 440, "Softmax olasılıkları");
+}
+
+/** Step-unit network from inputs through AND units to an OR output, every weight and bias written. */
+function mlpSvg(net, n) {
+  const units = net.units, single = units.length === 1, H = Math.max(n, units.length) * 46 + 40, W = 470;
+  const yIn = (i) => 30 + (i + 0.5) * ((H - 40) / n), yH = (k) => 30 + (k + 0.5) * ((H - 40) / units.length);
+  let s = `<text x="40" y="16" text-anchor="middle" class="fig-sub">girdi</text><text x="230" y="16" text-anchor="middle" class="fig-sub">${single ? "çıktı (VE)" : "gizli: VE nöronları"}</text>${single ? "" : `<text x="410" y="16" text-anchor="middle" class="fig-sub">çıktı: VEYA</text>`}`;
+  units.forEach((u, k) => u.w.forEach((w, i) => { if (!w) return; const y1 = yIn(i), y2 = yH(k); s += `<line x1="58" y1="${y1}" x2="204" y2="${y2}" class="${w > 0 ? "line accent" : "line dash"}"/>`; }));
+  if (!single) units.forEach((_, k) => { s += `<line x1="256" y1="${yH(k)}" x2="384" y2="${H / 2 + 10}" class="line accent"/>`; });
+  for (let i = 0; i < n; i++) s += `<circle cx="40" cy="${yIn(i)}" r="18" class="fig-box2"/><text x="40" y="${yIn(i) + 5}" text-anchor="middle" class="lab">x${"₁₂₃₄₅₆₇₈₉"[i] || i + 1}</text>`;
+  units.forEach((u, k) => { s += `<circle cx="230" cy="${yH(k)}" r="24" class="fig-box"/><text x="230" y="${yH(k) + 5}" text-anchor="middle" class="lab">h${"₁₂₃₄₅₆₇₈₉"[k] || k + 1}</text><text x="260" y="${yH(k) - 18}" class="fig-sub">b = ${f(u.bias)}</text>`; });
+  if (!single) s += `<circle cx="410" cy="${H / 2 + 10}" r="24" class="fig-box3"/><text x="410" y="${H / 2 + 15}" text-anchor="middle" class="lab">y</text><text x="410" y="${H / 2 + 50}" text-anchor="middle" class="fig-sub">b = −0.5</text>`;
+  s += `<text x="4" y="${H - 4}" class="fig-sub">düz çizgi: ağırlık +1 · kesikli: −1 · bağlantı yoksa ağırlık 0 · her nöron step(w·x + b)</text>`;
+  return svgWrap(W, H + 6, s, 520, "MLP şeması");
+}
 
 W.knn = I.knn;
 W.hardsvm = I.hardsvm;

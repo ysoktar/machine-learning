@@ -553,3 +553,4 @@ td.hlc { background: var(--accent-wash); font-weight: 600; }
 .bridge { margin: 0.6rem 0 1rem; padding: 0.6rem 1rem; border-radius: var(--radius); border: 1px dashed var(--border); background: var(--surface); }
 .bridge-title { font-weight: 700; margin-bottom: 0.2rem; }
 .bridge p { margin: 0.3rem 0; }
+.plot .tree-edge { paint-order: stroke; stroke: var(--surface); stroke-width: 5px; stroke-linejoin: round; }

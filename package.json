@@ -2,7 +2,7 @@
   "name": "machine-learning",
   "version": "1.0.0",
   "private": true,
-  "description": "BİL/YAP 470 Yapay Öğrenme: ara sınav ve final için etkileşimli çalışma sitesi",
+  "description": "BİL/YAP 470 Yapay Öğrenme: dersin tamamı için etkileşimli çalışma sitesi",
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",

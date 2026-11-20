@@ -6,41 +6,37 @@ export const REPO = "https://github.com/ysoktar/machine-learning";
 /** Midterm: 9 November 2026, 16:30 Istanbul time (UTC+3). */
 export const MIDTERM = new Date("2026-11-09T16:30:00+03:00");
 
-/** Site map. scope: "midterm" (weeks 1–7) or "final" (week 8 onward; the final covers everything, weighted to 8–12). */
+/** Site map: one list of topics for the whole course, then exams and practice. */
 export const NAV = [
   { part: "Başlangıç", items: [
-    { id: "index", title: "Genel bakış ve takvim", desc: "Sınav tarihleri, kapsam, haftalık plan ve sitenin kullanımı." },
+    { id: "index", title: "Genel bakış ve takvim", desc: "Sınav tarihleri, haftalık plan, dersin akışı ve sitenin kullanımı." },
     { id: "on-bilgi", title: "Matematik ön bilgisi", desc: "Semboller, log ve üstel, vektör ve iç çarpım, türev ve zincir kuralı, olasılık: elle hesap püf noktalarıyla." },
     { id: "sozluk", title: "Terim ve formül sözlüğü", desc: "Bütün terimler sade Türkçeyle, formüller sembol sembol, aranabilir." },
   ] },
-  { part: "Bölüm I · Temeller", short: "H1–3", items: [
+  { part: "Konular", short: "H1–12", items: [
     { id: "w1-intro", week: 1, title: "Giriş ve temel kavramlar", desc: "T/E/P, öğrenme türleri, hipotez uzayı, Find-S, ezber ve genelleme." },
     { id: "w2-data", week: 2, title: "Veri, öznitelik, değerlendirme", desc: "Kodlama, ölçekleme, PCA, CV, karmaşıklık matrisi, ROC-AUC, regresyon ölçütleri." },
     { id: "w3-knn", week: 3, title: "kNN ve model seçimi", desc: "Kayıp ve risk, kNN, yanlılık-varyans, düzenlileştirme, veri sızıntısı." },
-  ] },
-  { part: "Bölüm II · Klasik modeller", short: "H4–7", items: [
     { id: "w4-linear", week: 4, title: "Doğrusal modeller", desc: "En küçük kareler, gradyan inişi, lojistik regresyon, perceptron, softmax." },
     { id: "w5-trees", week: 5, title: "Karar ağaçları", desc: "Entropi, bilgi kazancı (ID3), kazanç oranı, Gini, sürekli eşik, budama." },
     { id: "w6-ensembles", week: 6, title: "Topluluk yöntemleri", desc: "Bagging, OOB, rastgele orman, AdaBoost, gradyan artırma, stacking." },
     { id: "w7-svm", week: 7, title: "Destek vektör makineleri", desc: "Marj, destek vektörleri, elle w ve b, yumuşak marj ve C, çekirdekler." },
+    { id: "w8-nn", week: 8, title: "Yapay sinir ağları", desc: "XOR, etkinleştirmeler, MLP tasarımı (Boole, bölge), ileri/geri yayılım, Adam." },
+    { id: "w9-cnn", week: 9, title: "Derin öğrenme ve CNN", desc: "Eğitim püf noktaları, evrişim hesabı, çıktı boyutu ve parametre sayısı." },
+    { id: "w10-seq", week: 10, title: "Diziler, dikkat, Transformer", desc: "RNN, LSTM ve GRU, elle dikkat hesabı, Transformer, gömmeler ve kosinüs, Word2Vec, LLM." },
+    { id: "w11-unsup", week: 11, title: "Gözetimsiz öğrenme, Naive Bayes", desc: "k-ortalamalar elle, dendrogram, siluet, DBSCAN, GMM/EM, otokodlayıcı, Naive Bayes, anomali tespiti." },
+    { id: "w12-rl", week: 12, title: "Pekiştirmeli öğrenme", desc: "MDP, değer yinelemesi, Q-öğrenme, ε-greedy, TD ve Monte Carlo, DQN; adillik ve MLOps." },
   ] },
-  { part: "Ara sınav", short: "9 Kasım", items: [
-    { id: "exam-midterm", title: "Ara sınav rehberi", desc: "Biçim, hafta hafta bilinmesi gerekenler, sık hatalar, kısa sorular." },
+  { part: "Sınavlar ve alıştırma", items: [
+    { id: "exam-final", title: "Final rehberi", desc: "Bütün dersin kapsamı, soru kalıpları, geçmiş final soruları ve adım adım çözümlü deneme soruları." },
+    { id: "exam-midterm", title: "Ara sınav rehberi", desc: "1–7. haftaların soru kalıpları, sık hatalar, kısa sorular." },
     { id: "sample-midterm", title: "Örnek ara sınav: çözüm", desc: "Örnek sınavın bütün soruları adım adım, hesaplar sitede doğrulandı." },
-    { id: "drill", title: "Alıştırma üreteci", desc: "Sınırsız rastgele soru: entropi, kNN, perceptron, metrikler, AdaBoost, SVM…" },
+    { id: "drill", title: "Alıştırma üreteci", desc: "Bütün haftaların hesap kalıplarından sınırsız rastgele soru, cevap denetimi ve adım adım çözüm." },
     { id: "hyper", title: "Hiperparametre tablosu", desc: "Her hafta sorulan “X artarsa yanlılık / varyans / aşırı uyum?” tablosu, alıştırmalı." },
-    { id: "cheatsheet", title: "Formül kâğıdı ve sözlük", desc: "Bütün formüller, log₂ ve eˣ tabloları, Türkçe–İngilizce terimler." },
-  ] },
-  { part: "Final", short: "H8+", items: [
-    { id: "w8-nn", week: 8, scope: "final", title: "Yapay sinir ağları", desc: "XOR, etkinleştirmeler, MLP tasarımı (Boole, bölge), ileri/geri yayılım, Adam." },
-    { id: "w9-cnn", week: 9, scope: "final", title: "Derin öğrenme ve CNN", desc: "Eğitim püf noktaları, evrişim hesabı, çıktı boyutu ve parametre sayısı." },
-    { id: "w10-seq", week: 10, scope: "final", title: "Diziler, dikkat, Transformer", desc: "RNN, LSTM ve GRU, elle dikkat hesabı, Transformer, gömmeler ve kosinüs, Word2Vec, LLM." },
-    { id: "w11-unsup", week: 11, scope: "final", title: "Gözetimsiz öğrenme, Naive Bayes", desc: "k-ortalamalar elle, dendrogram, siluet, DBSCAN, GMM/EM, otokodlayıcı, Naive Bayes, anomali tespiti." },
-    { id: "w12-rl", week: 12, scope: "final", title: "Pekiştirmeli öğrenme", desc: "MDP, değer yinelemesi, Q-öğrenme, ε-greedy, TD ve Monte Carlo, DQN; adillik ve MLOps." },
-    { id: "exam-final", scope: "final", title: "Final rehberi", desc: "Kapsam, soru kalıpları, geçmiş final soruları ve adım adım çözümlü deneme soruları." },
+    { id: "cheatsheet", title: "Formül kâğıdı", desc: "Bütün formüller, log₂ ve eˣ tabloları, Türkçe–İngilizce terimler." },
   ] },
 ];
-const ALL = NAV.flatMap((p) => p.items.map((it) => ({ ...it, part: p.part, scope: it.scope ?? (it.week ? "midterm" : "none") })));
+const ALL = NAV.flatMap((p) => p.items.map((it) => ({ ...it, part: p.part })));
 export const PAGES = ALL;
 export const pageInfo = (id) => ALL.find((p) => p.id === id);
 export const href = (id) => (id === "index" ? "index.html" : `${id}.html`);
@@ -109,9 +105,8 @@ function buildSidebar(current) {
   for (const part of NAV) {
     const ol = h("ol");
     for (const it of part.items) {
-      const info = pageInfo(it.id);
       const a = h("a", { href: href(it.id) },
-        h("span", {}, it.title, info.scope === "final" ? h("span", { class: "nav-tag", title: "Ara sınav kapsamı dışında; finalde" }, "final") : null,
+        h("span", {}, it.title,
           store.get(studiedKey(it.id), false) ? h("span", { class: "nav-check", title: "Çalıştım olarak işaretlendi" }, "✓") : null),
         it.week ? h("span", { class: "nav-week" }, `H${it.week}`) : null);
       if (it.id === current) a.setAttribute("aria-current", "page");
@@ -126,8 +121,6 @@ function buildKicker(info) {
   if (!info || info.id === "index") return null;
   const k = h("div", { class: "kicker" }, h("span", {}, info.part));
   if (info.week) k.append(h("span", { class: "chip" }, `${info.week}. hafta`));
-  if (info.scope === "midterm") k.append(h("span", { class: "chip midterm", title: "Ara sınav kapsamı: 1–7. haftalar" }, "Ara sınavda"));
-  if (info.scope === "final") k.append(h("span", { class: "chip final", title: "Ara sınavda yok; final 8–12. haftalara ağırlık verir" }, "Finalde (ara sınavda yok)"));
   return k;
 }
 function buildPager(id) {

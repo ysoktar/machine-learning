@@ -16,7 +16,7 @@
 <!-- gaps -->
 <!-- clarified -->
 <h1>Gözetimli öğrenme, kNN ve model seçimi</h1>
-<p class="lead">Veriden fonksiyona: neyi, hangi ölçüte göre, hangi varsayım altında öğreniyoruz? Kayıp ve risk, i.i.d. varsayımı, taban çizgisi, k en yakın komşu, yanlılık-varyans ayrışımı, düzenlileştirme ve veri sızıntısı. Ara sınavda kNN elle hesap (kare uzaklıklarla sıralama) ve “k artarsa?” sorusu kesin gibi.</p>
+<p class="lead">Veriden fonksiyona: neyi, hangi ölçüte göre, hangi varsayım altında öğreniyoruz? Kayıp ve risk, i.i.d. varsayımı, taban çizgisi, k en yakın komşu, yanlılık-varyans ayrışımı, düzenlileştirme ve veri sızıntısı. Sınavda kNN elle hesap (kare uzaklıklarla sıralama) ve “k artarsa?” sorusu kesin gibi.</p>
 <div class="bridge"><div class="bridge-title">Nereden geldik, nereye gidiyoruz?</div><p><strong>Neden bu hafta?</strong> 2. haftada modeli doğru ölçmeyi öğrendik. Şimdi ilk modeli kuruyoruz: hiçbir şey öğrenmeden yalnız komşulara bakan kNN. Bu basit model, her modelde karşımıza çıkacak esneklik sorusunu (yanlılık ve varyans) en çıplak hâliyle gösteriyor.</p><p><strong>Sırada ne var?</strong> kNN her tahminde bütün veriyi tarar ve bir formül öğrenmez. 4. hafta veriden birkaç sayılık bir formül (w ve b) öğrenen doğrusal modellere geçiyor. <a href="w4-linear.html">Sonraki sayfa</a></p></div>
 <!-- enriched -->
 <div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
@@ -151,6 +151,9 @@
 <h3>Problem 5: kategorik verilerde kNN</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(3. hafta derste)</span></div><p>Kredi verisinde öznitelikler kategorik olduğu için uzaklık olarak <em>Hamming uzaklığı</em>, yani iki başvuru arasında farklı olan öznitelik sayısı kullanılıyor. Yeni başvuru q = (yaşlı, işi yok, evi yok, kredi notu iyi). Kayıtlardaki 15 başvurudan beşi q'ya uzaklık 1'de; bunların onay durumları: Hayır, Hayır, Evet, Evet, Hayır. Diğer başvuruların hepsi daha uzak. (a) k = 1 için karar nedir, bir sorun var mı? (b) k = 5 için karar nedir?</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Hamming uzaklığında iki kaydı öznitelik öznitelik karşılaştırıp farklı olanları sayarız; uzaklık 1, yalnız bir öznitelikte fark var demektir.</p><ol class="walk parts"><li><strong>(a)</strong> En yakın uzaklıkta (1) tek bir başvuru değil beş başvuru var. k = 1 için hangisinin “en yakın” olduğu belli değildir, yani karar <strong>tanımsızdır</strong>. Böyle durumlarda bir kural koymak gerekir: rastgele seçmek, en küçük kayıt numarasını almak ya da eşit uzaklıktaki hepsini saymak.</li><li><strong>(b)</strong> k = 5 tam bu beş başvuruyu kapsar: üç Hayır, iki Evet. Çoğunluk kararı <strong>Hayır</strong>dır.</li></ol></div></details>
+<h3>Sınırsız alıştırma</h3>
+<p>Aşağıdaki üreteç bu haftanın hesap kalıplarından her basışta yeni bir soru üretir. Cevabı yazıp denetleyin; takılırsanız çözüm adım adım açılır.</p>
+<div data-widget="drill" data-week="3"></div>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
 <li><strong>k'yı eğitim doğruluğuna bakarak seçmek.</strong> k = 1'de her eğitim noktasının en yakın komşusu kendisidir, bu yüzden eğitim doğruluğu her zaman %100 çıkar ve hiçbir şey söylemez. k, doğrulama kümesiyle ya da birini dışarıda bırakma (LOO) ile seçilmelidir.</li>

@@ -272,6 +272,9 @@
 <h3>Problem 5: metriği seç</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(alıştırma kâğıdı H2)</span></div><p>Aşağıdaki durumlarda recall, precision ve ROC-AUC'den hangisine bakardınız? (a) Acil serviste hastayı hemen doktora gönderme kararı, (b) iş e-postasında spam filtresi, (c) bütün müşterileri satın alma olasılığına göre sıralayıp en üstteki %10'u aramak.</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><p>Metrik seçerken önce “hangi hata daha pahalı?” sorusunu cevaplarız; doğru metrik oradan çıkar.</p><ol class="walk parts"><li><strong>(a)</strong> Acil bir hastayı kaçırmak (FN) çok pahalıdır, gereksiz yere doktora göndermek (FP) ise ucuzdur. Bu yüzden kaçırılanları cezalandıran <strong>recall</strong> önemlidir.</li><li><strong>(b)</strong> Gerçek bir iş e-postasını spam diye silmek (FP) pahalıdır, birkaç spamin gelen kutusuna düşmesi kabul edilebilir. Bu yüzden yanlış alarmları cezalandıran <strong>precision</strong> önemlidir.</li><li><strong>(c)</strong> Burada tek bir eşik değil, bir sıralama kararı veriyoruz. Modelin pozitifleri negatiflerin önüne ne kadar iyi dizdiğini ölçen <strong>ROC-AUC</strong> (ya da en üstteki %10'daki precision) uygundur.</li></ol></div></details>
+<h3>Sınırsız alıştırma</h3>
+<p>Aşağıdaki üreteç bu haftanın hesap kalıplarından her basışta yeni bir soru üretir. Cevabı yazıp denetleyin; takılırsanız çözüm adım adım açılır.</p>
+<div data-widget="drill" data-week="2"></div>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
 <li><strong>FP ile FN'yi karıştırmak.</strong> FN (yanlış negatif), gerçekte pozitif olduğu hâlde negatif denmiş, yani kaçırılmış örnektir. FP (yanlış pozitif), gerçekte negatif olduğu hâlde pozitif denmiş, yani yanlış alarmdır.</li>

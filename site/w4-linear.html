@@ -234,6 +234,9 @@
 <h3>Problem 6: mantık kapısı ve XOR</h3>
 <div class="problem"><div class="ptitle">Soru</div><p>Bir nöron, z = w₁x₁ + w₂x₂ + b ≥ 0 ise 1, değilse 0 veriyor (x₁, x₂ ∈ {0, 1}). (a) NAND kapısı için w₁, w₂ ve b verin. (b) XOR'un tek nöronla yapılamayacağını gösterin.</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body"><ol class="walk parts"><li><strong>(a)</strong> NAND, AND'in tersidir: yalnız iki girdi de 1 iken 0 verir. AND için w = (1, 1), b = −1.5 kullanılır; bütün işaretleri ters çevirince NAND elde edilir: w = (−1, −1), <strong>b = 1.5</strong>. Denetim: (1, 1) için z = −0.5 < 0, çıktı 0; diğer üç girdide z en az 0.5, çıktı 1.</li><li><strong>(b)</strong> XOR'un (0, 1) ve (1, 0) için 1 vermesi gerekir; bu, w₂ + b ≥ 0 ve w₁ + b ≥ 0 demektir. (0, 0) için 0 vermesi b < 0, (1, 1) için 0 vermesi w₁ + w₂ + b < 0 demektir. İlk iki eşitsizliği toplarsak w₁ + w₂ + 2b ≥ 0, yani w₁ + w₂ + b ≥ −b elde ederiz. b negatif olduğu için −b pozitiftir; dolayısıyla w₁ + w₂ + b pozitif çıkar. Bu, son koşulla çelişir. Demek ki hiçbir w₁, w₂, b XOR'u veremez; bunun için gizli katmanlı bir ağ gerekir (8. hafta).</li></ol></div></details>
+<h3>Sınırsız alıştırma</h3>
+<p>Aşağıdaki üreteç bu haftanın hesap kalıplarından her basışta yeni bir soru üretir. Cevabı yazıp denetleyin; takılırsanız çözüm adım adım açılır.</p>
+<div data-widget="drill" data-week="4"></div>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
 <li><strong>Perceptron'da z = 0'ı −1 saymak.</strong> Bu dersteki kural “z ≥ 0 ise +1” der; z tam 0 çıkarsa tahmin +1'dir.</li>

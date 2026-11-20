@@ -1,27 +1,45 @@
-# Yapay Öğrenme: ara sınav ve final çalışma sitesi
+# Yapay Öğrenme: etkileşimli ders çalışma sitesi
 
-BİL/YAP 470 – BİL 570 Yapay Öğrenme (TOBB ETÜ, 2026–2027 Güz) için etkileşimli bir çalışma sitesi.
-**Ara sınav: 9 Kasım 2026 Pazartesi 16:30** (ders saati, 1–7. haftalar, kâğıt üzerinde, hesap makinesi yok).
+BİL/YAP 470 – BİL 570 Yapay Öğrenme (TOBB ETÜ, 2026–2027 Güz) dersinin baştan sona çalışma sitesi. Dersin 12 haftası
+tek bir akış olarak anlatılır: her hafta bir önceki haftanın eksiğini kapatır ve bir sonrakine bağlanır. Sınavlar kâğıt
+üzerinde ve hesap makinesizdir; site bu yüzden her elle hesabı adım adım öğretir ve sınırsız alıştırma üretir.
 
-- **Hafta sayfaları (1–7)**: veri ve değerlendirme, kNN ve model seçimi, doğrusal modeller, karar ağaçları, topluluk
-  yöntemleri, SVM. Her sayfada kısa anlatım, sınav kalıpları, o haftanın hiperparametre satırları ve sınama soruları.
-- **Hesaplayıcılar**: sınavda elle yapılan her hesap için tabloyu adım adım kuran bir araç: ölçekleme, karmaşıklık
-  matrisi ve ölçütler, ROC-AUC, 2B PCA, kNN (grafiğe tıklayarak), LOO, en küçük kareler, gradyan inişi, lojistik
-  regresyon adımı, perceptron (epoch epoch), softmax, ID3 (her düğümde bütün adaylar; Gini ve kazanç oranı), sayısal eşik,
-  regresyon ağacı, çoğunluk oyu, bootstrap, AdaBoost, gradyan artırma, SVM marjı, sert marjlı SVM (destek vektörleri,
-  w, b ve α), yumuşak marj karşılaştırması, çekirdekler.
-- **Ara sınav**: rehber (biçim, süre planı, sık hatalar, kısa sorular), örnek ara sınavın tam çözümü, alıştırma üreteci
-  (12 hesap türünde sınırsız rastgele soru, cevap denetimiyle), hiperparametre tablosu alıştırması, formül kâğıdı ve
-  sözlük.
-- **Final**: yapay sinir ağları (Boole ifadesinden MLP tasarlayan ve doğruluk tablosunu denetleyen araç, 2-2-1 ağında
-  ileri/geri yayılım), CNN (elle evrişim, çıktı boyutu, parametre sayısı) ve final rehberi.
+**Site:** https://ysoktar.github.io/machine-learning/
 
-Bütün hesaplar `site/js/lib/ml.js` içinde; `test/ml.test.mjs` bunları ders slaytlarındaki, alıştırma kâğıtlarındaki ve
-örnek sınavdaki çözümlü örneklere karşı denetler. Site statiktir, bağımlılığı yoktur; hiçbir veri tarayıcıdan çıkmaz
-(“çalıştım” işaretleri ve alıştırma skoru yalnız tarayıcının yerel deposunda).
+## Ne var?
+
+**Konular (12 hafta, tek bölüm).** Giriş ve temel kavramlar; veri, öznitelik ve değerlendirme (PCA, ROC-AUC); kNN ve
+model seçimi; doğrusal modeller (en küçük kareler, gradyan inişi, lojistik regresyon, perceptron); karar ağaçları;
+topluluk yöntemleri; SVM; yapay sinir ağları; derin öğrenme pratiği ve CNN; diziler, dikkat ve Transformer (RNN, LSTM,
+GRU, gömmeler, LLM); gözetimsiz öğrenme ve Naive Bayes (k-ortalamalar, dendrogram, DBSCAN, GMM/EM, otokodlayıcı);
+pekiştirmeli öğrenme (MDP, değer yinelemesi, Q-öğrenme) ve güvenilir makine öğrenmesi.
+
+Her hafta sayfası aynı akışı izler:
+
+1. **Nereden geldik, nereye gidiyoruz?** Konunun neden şimdi geldiği ve sonraki haftaya bağı.
+2. **Özün özü.** Bütün sayfa beş cümlede; geri kalanı bu cümlelerin açılımı.
+3. **Anlatım.** Sezgi kutusu, bağlantılı Türkçe metin, her formülün altında bütün sembolleri açıklayan bir “Burada:”
+   kutusu, çizimler; sınavda istenmeyen türetmeler kapalı kutularda.
+4. **Etkileşimli araçlar.** Öğrenci kendi verisini, filtresini, ağırlıklarını yazar ya da tıklayarak çizer; ön ayarlar
+   ders örneklerini yükler. Her araç sonucu numaralı adımlarla (ne yapılıyor, formül, sayılar, sonuç) ve bir çizimle verir.
+   Örnekler: 1B/2B evrişimi konum konum izlemek, kendi görüntüne ve filtrene öznitelik haritası, katman katman CNN
+   çizimi, sorguyu taşıyarak dikkat ağırlıkları, koridorda Q-öğrenme ajanı eğitmek, ID3'ün kurduğu ağacın çizimi,
+   sürüklenebilir noktalarla kNN, perceptron ve SVM, Boole ifadesinden MLP şeması.
+5. **Sınav tipi problemler.** Her çözüm “kullanılan formüller” kutusu ve kısa adımlarla.
+6. **Sınırsız alıştırma.** O haftanın hesap kalıplarından her basışta yeni soru, cevap denetimi ve adım adım çözüm.
+7. **Sık hatalar, hiperparametre tablosu, kısa sorular** (her yanlış şık için neden yanlış olduğu yazar).
+
+**Sınavlar ve alıştırma.** Final rehberi (bütün dersin kapsamı, soru kalıpları, geçmiş final sorularının sitede nerede
+çözüldüğü, adım adım çözümlü deneme soruları, çalışma planı), ara sınav rehberi ve örnek ara sınavın tam çözümü,
+alıştırma üreteci (22 hesap türü), hiperparametre tablosu alıştırması, formül kâğıdı, terim ve formül sözlüğü
+(terimler sayfalarda altı çizili; üzerine gelince tanım ve İngilizce karşılık çıkar) ve matematik ön bilgisi.
+
+11. ve 12. hafta sayfaları, bu haftaların slaytları yayımlanmadan önce izlencedeki konu listesine ve önceki dönemin
+ders notlarına dayanarak hazırlandı; slaytlar yayımlanınca güncellenebilir.
 
 Bu resmî bir ders sitesi değildir ve ders slaytlarını içermez; anlatımlar yeniden yazılmıştır. Tarih ve kurallar için
-ders platformunu ve izlenceyi esas alın.
+ders platformunu ve izlenceyi esas alın. Site statiktir, bağımlılığı yoktur; hiçbir veri tarayıcıdan çıkmaz
+(“çalıştım” işaretleri ve alıştırma skoru yalnız tarayıcının yerel deposunda).
 
 ## Geliştirme
 
@@ -29,8 +47,8 @@ Node 20 veya üstü gerekir.
 
 ```sh
 npm run dev     # site/ klasörünü http://localhost:8000 adresinde sunar
-npm test        # hesaplayıcı testleri ve site yapısı (bağlantılar, çapalar, araçlar, sorular)
-npm run build   # yayımlanacak siteyi dist/ altına yazar
+npm test        # hesap testleri ve site yapısı (bağlantılar, çapalar, araçlar, sorular)
+npm run build   # yayımlanacak siteyi dist/ altına yazar (CSS ve betiklere sürüm etiketi ekler)
 ```
 
 `main` dalına her gönderimde GitHub Actions testleri çalıştırır ve siteyi GitHub Pages'e yayımlar
@@ -40,12 +58,18 @@ npm run build   # yayımlanacak siteyi dist/ altına yazar
 
 ```
 site/
-  index.html, w1-intro.html … w9-cnn.html, exam-*.html, sample-midterm.html, drill.html, hyper.html, cheatsheet.html
-  css/style.css        açık/koyu tema
-  js/layout.js         menü, başlık, geri sayım, sınama soruları, "çalıştım" işaretleri
-  js/widgets.js        bütün etkileşimli araçlar (<div data-widget="…">)
-  js/lib/ml.js         hesaplar (DOM yok, test edilir)
-  js/lib/plot.js       SVG grafikler
-test/                  node:test
-scripts/               build ve yerel sunucu
+  index.html                 genel bakış, takvim, çalışma sırası
+  w1-intro.html … w12-rl.html hafta sayfaları
+  exam-final.html, exam-midterm.html, sample-midterm.html, drill.html, hyper.html, cheatsheet.html, sozluk.html, on-bilgi.html
+  css/style.css              açık/koyu tema
+  js/layout.js               site haritası, menü, başlık, sınama soruları, “çalıştım” işaretleri, İngilizce terimler düğmesi
+  js/widgets.js              etkileşimli araçlar ve alıştırma üreteci (<div data-widget="…">)
+  js/interactive.js          sürüklenebilir noktalı araçlar (kNN, perceptron, SVM, …)
+  js/figures.js              açıklayıcı SVG çizimler (<div data-widget="fig" data-fig="…">)
+  js/guides.js               her aracın “ne gösteriyor, nasıl kullanılır” kutusu
+  js/glossary.js, glossary-data.js   altı çizili terimler ve tanımları
+  js/lib/ml.js               hesaplar (DOM yok, test edilir)
+  js/lib/plot.js, editor.js, ui.js   grafikler, nokta düzenleyici, girdi okuma yardımcıları
+test/                        node:test (ml.test.mjs: hesaplar; site.test.mjs: yapı)
+scripts/                     build ve yerel sunucu
 ```

@@ -16,7 +16,7 @@
 <!-- gaps -->
 <!-- clarified -->
 <h1>Topluluk yöntemleri</h1>
-<p class="lead">Birçok zayıf ya da kararsız modelin oyu, tek bir iyi modelden daha iyi olabilir. Bagging ve rastgele orman <strong>varyansı</strong>, boosting <strong>yanlılığı</strong> azaltır. Ara sınavda: bootstrap/OOB hesabı, AdaBoost ağırlık güncellemesi (küçük örnek), gradyan artırmanın sezgisi, kısa kavram soruları.</p>
+<p class="lead">Birçok zayıf ya da kararsız modelin oyu, tek bir iyi modelden daha iyi olabilir. Bagging ve rastgele orman <strong>varyansı</strong>, boosting <strong>yanlılığı</strong> azaltır. Sınavda: bootstrap/OOB hesabı, AdaBoost ağırlık güncellemesi (küçük örnek), gradyan artırmanın sezgisi, kısa kavram soruları.</p>
 <div class="bridge"><div class="bridge-title">Nereden geldik, nereye gidiyoruz?</div><p><strong>Neden bu hafta?</strong> Tek ağaç ya ezberliyor ya da yetersiz kalıyordu. Topluluklar birçok modeli birleştirir: torbalama varyansı, artırma yanlılığı düşürür.</p><p><strong>Sırada ne var?</strong> Topluluklar güçlüdür ama tek bir sınırın neden seçildiğini söylemez. 7. hafta doğrusal modele geri dönüp “en iyi sınır hangisi?” sorusunu marjla cevaplayan SVM'yi gösteriyor. <a href="w7-svm.html">Sonraki sayfa</a></p></div>
 <!-- enriched -->
 <div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
@@ -123,6 +123,9 @@
 <li><strong>Yaprak değerleri.</strong> Her yaprak kendi örneklerinin kalıntılarının ortalamasını tahmin eder: sol (−3 − 1)/2 = −2, sağ (1 + 3)/2 = 2.</li>
 <li><strong>Küçük adımla ekle.</strong> Düzeltmenin yalnız η = 0.5 kadarı eklenir: F₁ = F₀ + 0.5·(−2, −2, 2, 2) = 4 + (−1, −1, 1, 1) = <strong>(3, 3, 5, 5)</strong>.</li>
 </ol><ol class="walk parts"><li><strong>(c)</strong> MSE, kalıntıların karelerinin ortalamasıdır. Başta kalıntılar −3, −1, 1, 3 olduğu için MSE = (9 + 1 + 1 + 9)/4 = 5'ti. F₁ = (3, 3, 5, 5) ile yeni kalıntılar y − F₁ = −2, 0, 0, 2 ve MSE = (4 + 0 + 0 + 4)/4 = <strong>2</strong> oldu; tek bir küçük ağaç hatayı 5'ten 2'ye indirdi.</li><li><strong>(d)</strong> η = 1 olsaydı ilk tur tahmini doğrudan (2, 2, 6, 6)'ya taşırdı ve aynı kütük ikinci turda hiçbir şey ekleyemezdi. Küçük adımlarla ilerlemek, her turda kalıntının gürültüsüne hemen uymayı engeller ve daha iyi genelleşen, daha pürüzsüz bir model verir; kaç tur gerektiği erken durdurmayla seçilir.</li></ol></div></details>
+<h3>Sınırsız alıştırma</h3>
+<p>Aşağıdaki üreteç bu haftanın hesap kalıplarından her basışta yeni bir soru üretir. Cevabı yazıp denetleyin; takılırsanız çözüm adım adım açılır.</p>
+<div data-widget="drill" data-week="6"></div>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
 <li><strong>α formülünde ½'yi unutmak ya da yanlış logaritma kullanmak.</strong> Formül α = ½·ln((1 − ε)/ε)'dir; ln doğal logaritmadır, log₁₀ değil.</li>
