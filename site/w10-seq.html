@@ -24,6 +24,7 @@
 <tr><td>Kavram</td><td>RNN neden MLP'den iyidir, BPTT nedir, LSTM kapıları ne yapar, GRU farkı, dikkat neden gerekir, gömmeler one-hot'tan neden iyidir, BERT ile GPT farkı.</td><td>Her mekanizmanın ne yaptığını ve hangi sorunu çözdüğünü birlikte yazmak.</td></tr>
 </tbody></table></div><p class="small">Ara sınavda yok; finalde.</p></div>
 <div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-rnn-ozyinelemeli-sinir-agi">RNN</a> · <a href="sozluk.html#t-gizli-durum">Gizli durum</a> · <a href="sozluk.html#t-bptt-zamanda-geri-yayilim">BPTT</a> · <a href="sozluk.html#t-lstm">LSTM</a> · <a href="sozluk.html#t-gru">GRU</a> · <a href="sozluk.html#t-dikkat-mekanizmasi">Dikkat mekanizması</a> · <a href="sozluk.html#t-transformer">Transformer</a> · <a href="sozluk.html#t-gomme-vektoru">Gömme vektörü</a> · <a href="sozluk.html#t-kosinus-benzerligi">Kosinüs benzerliği</a> · <a href="sozluk.html#t-word2vec">Word2Vec</a></div>
+<div class="essence"><div class="essence-title"><span class="ic ic-idea" aria-hidden="true"></span>Özün özü: bu sayfa beş cümlede</div><ol><li>Sıra anlam taşır; RNN geçmişi tek bir gizli durumda taşır ve her adımda aynı ağırlıkları kullanır.</li><li>Uzun dizide gradyan her adımda çarpılarak söner; LSTM ve GRU belleği toplayarak günceller ve kapılarla neyin kalacağını seçer.</li><li>Dikkat yumuşak bir aramadır: sorgu anahtarlarla karşılaştırılır, benzerlikler softmax ile ağırlığa, ağırlıklar da değerlerin karışımına dönüşür.</li><li>Transformer, dikkat, ileri beslemeli ağ, artık bağlantı ve konum bilgisinden oluşur; her kelime tek adımda bütün kelimelere bakar.</li><li>Gömme anlamı geometriye çevirir: benzer kelimeler birbirine yakın düşer, ilişkiler yönlere dönüşür ve benzerlik kosinüsle ölçülür.</li></ol><p class="small">Sayfanın geri kalanı bu beş cümlenin açılımıdır. Bitirdiğinizde her birini kendi sözcüklerinizle bir örnekle anlatabiliyorsanız konu oturmuştur.</p></div>
 
 <h2>Dizi verisi: sıra neden önemli ve neden ayrı bir model gerekir?</h2><p class="h-en" lang="en">Sequence data: why order matters and why it needs its own model</p>
 <p>Şimdiye kadarki modellerin hepsi sabit uzunlukta bir öznitelik vektörü alıyordu: bir müşterinin yaşı, geliri, şehri. Oysa bir cümle 3 kelime de olabilir 30 kelime de, ve kelimelerin <strong>sırası</strong> anlamı değiştirir. “Köpek adamı ısırdı” ile “adam köpeği ısırdı” aynı kelimelerden oluşur ama anlamları çok farklıdır. Kelimeleri sırasız bir torbaya atan klasik yöntem (kelime torbası ve üstüne lojistik regresyon) bu farkı göremez.</p>
@@ -131,6 +132,8 @@
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Kütüphane benzetmesi</div><p>Kütüphanede bir konu arıyorsunuz. Aklınızdaki konu <strong>sorgudur</strong> (q). Her kitabın sırtındaki etiket bir <strong>anahtardır</strong> (k), kitabın içeriği ise <strong>değerdir</strong> (v). Sorgunuzu her etiketle karşılaştırıp ne kadar benzediğine bakarsınız. Tek bir kitap seçmek yerine bütün kitaplardan, benzerlikleri oranında birer parça alıp karıştırırsınız. Dikkat tam olarak budur: benzerlikler ağırlığa, ağırlıklar da değerlerin karışımına dönüşür.</p></div>
 <div class="formula" style="font-size:1.25rem">Attention(Q, K, V) = softmax(Q·Kᵀ / √dₖ) · V</div>
 <p class="formula-legend"><b>Burada:</b> Q sorgu matrisidir; her satırı bir kelimenin “ne arıyorum?” vektörü qᵢ'dir. K anahtar matrisidir; her satırı bir kelimenin “kendimi nasıl tanıtırım?” vektörü kⱼ'dir. V değer matrisidir; her satırı bir kelimenin taşıdığı bilgi vⱼ'dir. Kᵀ, K'nın devriğidir; Q·Kᵀ bütün qᵢ·kⱼ iç çarpımlarını (skorları) bir tabloda verir. dₖ anahtar vektörlerinin boyutudur; √dₖ'ye bölmek skorların boyutla büyüyüp softmax'ı tek bir kelimeye kilitlemesini önler. softmax her satıra ayrı uygulanır ve skorları toplamı 1 olan ağırlıklara çevirir.</p>
+<p>Hesaba geçmeden önce ne olduğunu görelim. Aşağıda sorguyu düzlemde taşıyın: hangi anahtara benzerse onun ağırlığı büyür, sorgu uzadıkça seçim sertleşir.</p>
+<div data-widget="attnplay"></div>
 <div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Dikkati elle hesaplamak: 4 adım</div><ol>
 <li><strong>Skorlar:</strong> her sorgu ile her anahtarın iç çarpımı, sᵢⱼ = qᵢ·kⱼ.</li>
 <li><strong>Ölçekle:</strong> her skoru √dₖ'ye böl.</li>
@@ -311,6 +314,9 @@
 <li><strong>(e)</strong> One-hot vektörler sözlük boyutunda uzun ve seyrektir, ve her iki kelime arasındaki uzaklık aynıdır. Gömmeler kısa ve yoğundur, ve anlamca benzer kelimeleri birbirine yakın yerleştirdiği için benzerlik ve ilişkiler (kral − erkek + kadın ≈ kraliçe) geometrik olarak ifade edilir.</li>
 </ol></div></details>
 
+<h3>Sınırsız alıştırma</h3>
+<p>Aşağıdaki üreteç bu haftanın hesap kalıplarından her basışta yeni bir soru üretir. Cevabı yazıp denetleyin; takılırsanız çözüm, sayfadaki adımlarla aynı sırada açılır.</p>
+<div data-widget="drill" data-week="10"></div>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
 <li><strong>Softmax'ı sütun sütun uygulamak.</strong> Dikkatte softmax her satıra (her sorguya) ayrı uygulanır; her satırın ağırlıkları toplamı 1 olmalıdır.</li>

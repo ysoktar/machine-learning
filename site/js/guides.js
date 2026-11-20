@@ -1,6 +1,41 @@
 // "How to use this tool" boxes shown at the top of each widget: what it shows, what to try, what you should notice.
 // The point is that a tool supports the explanation around it instead of being thrown at the reader.
 export const GUIDE = {
+  conv1step: {
+    what: "Filtreyi sinyalin üzerinde konum konum kaydırır; dolguyu (yok, sıfır, kenar tekrarı) ve adımı değiştirebilirsiniz. Altta sinyal ile çıktı aynı grafikte çizilir.",
+    tryit: ["“sonraki konum” ile ilk üç hücrenin 3, 0, 0 olduğunu izleyin.", "Uçları “sıfır dolgu” yapın: ilk hücre 7/3 olur ve çıktı 10 uzunluğa çıkar.", "“basamak sinyali”ni seçip kutu ve fark filtreleri arasında geçiş yapın: biri yumuşatır, öteki sıçramaları yakalar."],
+    see: "Alçak geçiren filtre ani değişimleri bastırır, yüksek geçiren filtre yalnız değişimleri bırakır; adım 2 çıktıyı yaklaşık yarıya indirir.",
+  },
+  poolstep: {
+    what: "Görüntüyü bloklara böler ve her bloğun en büyüğünü ya da ortalamasını alır; şu anki blok ve çıktı hücresi birlikte vurgulanır.",
+    tryit: ["Max havuzlamada sonucun [[2, 3], [2, 2]] olduğunu görün.", "Ortalamaya geçin.", "Sol üst bloktaki 2'yi bir hücre kaydırın (blok içinde kalacak biçimde): çıktı değişiyor mu?"],
+    see: "Havuzlama parametresizdir ve boyutu küçültür; blok içindeki küçük kaymalar çıktıyı değiştirmez.",
+  },
+  template: {
+    what: "3×3 piksellik dört harfe iki 2×2 şablon filtresi uygular ve öznitelik haritalarını gösterir; harfi kaydırıp haritanın da kaydığını görebilirsiniz.",
+    tryit: ["X ve O harflerinde “\\” filtresinin 4 verdiği yerleri karşılaştırın.", "Harfi kaydırın: haritadaki 4'ler de kayar."],
+    see: "Aynı küçük ağırlıkları her konumda kullanmak hem parametre sayısını küçültür hem de desen kayınca yeniden öğrenmeyi gereksiz kılar.",
+  },
+  cnnstack: {
+    what: "Katmanları satır satır yazdığınız bir CNN'in her katmanında çıktı boyutunu ve parametre sayısını hesaplar; parametrelerin hangi katmanda toplandığını çubuklarla gösterir.",
+    tryit: ["Derslerdeki SmallCNN'de toplamın 25,578 olduğunu görün.", "“LeNet benzeri” ile Problem 6'yı (5,994) denetleyin.", "SmallCNN'e üçüncü bir “pool 2” ekleyin: tam bağlı katmanın parametresi ne kadar düşüyor?"],
+    see: "Parametrelerin çoğunu genellikle son tam bağlı katman taşır; havuzlama ya da adım 2 ile boyutu küçültmek onu doğrudan azaltır.",
+  },
+  convstep: {
+    what: "Filtreyi görüntünün üzerinde konum konum kaydırır: sarı pencere, filtre ve doldurulan çıktı hücresi birlikte görünür; her hücrenin çarpım toplamı yazılır.",
+    tryit: ["“sonraki” ile dört konumu gezip çıktının 0, 2, −1, −1 olduğunu görün.", "Dolguyu 1 yapın: gri sıfır kenarı belirir ve çıktı 4×4 olur.", "Adımı 2 yapın: pencerenin ikişer atladığını ve bazı konumların hiç kullanılmadığını izleyin."],
+    see: "Çıktı boyutu formülü, pencerenin sığabildiği konum sayısını sayar; adım büyüdükçe konum sayısı azalır.",
+  },
+  attnplay: {
+    what: "Üç anahtarın sabit olduğu bir düzlemde sorgu vektörünü tıklayarak taşırsınız; dikkat ağırlıkları çubuklarda ve noktaların büyüklüğünde anında değişir.",
+    tryit: ["Sorguyu (1, 0) yönüne getirin: “kedi” ve “üstünde” ağırlık kazanır.", "Kaydırıcıyla sorguyu uzatın: ağırlık tek bir anahtara yığılır.", "√dₖ kutusunu kapatın: aynı sorguda dağılım daha keskin olur."],
+    see: "Dikkat, sorguya en çok benzeyen anahtarlara daha çok ağırlık veren yumuşak bir aramadır; ölçek ne kadar büyükse arama o kadar “sert” olur.",
+  },
+  qcorridor: {
+    what: "Dört kareli bir koridorda ε-greedy davranan bir ajanı adım adım ya da bölüm bölüm eğitir; her adımda yapılan Q güncellemesini yazar.",
+    tryit: ["Birkaç kez “bir adım”a basın: ilk bölümde yalnız hedefin yanındaki kare olumlu değer alır.", "“20 bölüm”e basın: değerler 4.58, 6.2, 8, 10'a yaklaşır, oklar sağı gösterir.", "ε'u 0 yapıp sıfırlayın: ajan hiç keşif yapmazsa ne oluyor?"],
+    see: "Ödül hedeften geriye doğru, her bölümde bir iki kare yayılır; Q-öğrenme, keşif yaparken bile en iyi değerleri öğrenir.",
+  },
   kmeans: {
     what: "Verdiğiniz noktalar ve başlangıç merkezleriyle k-ortalamaları yineleme yineleme yürütür: her yinelemede uzaklık kareleri tablosu, atama, yeni merkezler ve SSE.",
     tryit: ["Varsayılan veri sayfadaki örnektir: 2. yinelemede B'nin birinci kümeye geçtiğini görün.", "Merkezleri “1 1” ve “5 5” yapın: tek yinelemede doğru kümeler bulunur.", "Tek boyutlu Problem 1'i deneyin: noktalar 1 2 3 4 6 12 (her biri ayrı satırda), merkezler 2, 3, 4."],

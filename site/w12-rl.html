@@ -24,6 +24,7 @@
 <tr><td>Hiperparametre tablosu</td><td>Durum sayısı, az keşif ve aşırı sömürü arttıkça yanlılık, varyans ve aşırı uyuma ne olur?</td><td>Yönü doğru seçip bir cümleyle gerekçelendirmek.</td></tr>
 </tbody></table></div><p class="small">Ara sınavda yok; finalde.</p></div>
 <div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-pekistirmeli-ogrenme">Pekiştirmeli öğrenme</a> · <a href="sozluk.html#t-mdp-markov-karar-sureci">MDP</a> · <a href="sozluk.html#t-politika">Politika</a> · <a href="sozluk.html#t-deger-fonksiyonu">Değer fonksiyonu</a> · <a href="sozluk.html#t-q-ogrenme">Q-öğrenme</a> · <a href="sozluk.html#t-greedy">ε-greedy</a> · <a href="sozluk.html#t-td-ogrenme">TD öğrenme</a> · <a href="sozluk.html#t-adillik">Adillik</a></div>
+<div class="essence"><div class="essence-title"><span class="ic ic-idea" aria-hidden="true"></span>Özün özü: bu sayfa beş cümlede</div><ol><li>Doğru cevap söylenmez, yalnız ödül gelir; amaç tek adımın değil, gelecekteki indirimli toplam ödülün en büyük olmasıdır.</li><li>Bir durumun değeri, en iyi eylemin hemen getirdiği ödül ile varılan durumun indirimli değerinin toplamıdır (Bellman).</li><li>Q-öğrenme bu eşitliği deneyimle tahmin eder: Q'yu her geçişte hedefe (r + γ·max Q) doğru α kadar çeker.</li><li>Bilmediğini öğrenmek için keşfetmek, bildiğinden yararlanmak için sömürmek gerekir; ε-greedy ikisini dengeler.</li><li>Durumlar tabloya sığmayacak kadar çoksa Q'yu bir sinir ağı tahmin eder (DQN).</li></ol><p class="small">Sayfanın geri kalanı bu beş cümlenin açılımıdır. Bitirdiğinizde her birini kendi sözcüklerinizle bir örnekle anlatabiliyorsanız konu oturmuştur.</p></div>
 
 <h2>Pekiştirmeli öğrenme nedir? Ajan, çevre, ödül</h2><p class="h-en" lang="en">What is reinforcement learning? Agent, environment, reward</p>
 <div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Bisiklete binmeyi öğrenmek</div><p>Bisiklete binmeyi öğrenen bir çocuğa kimse her an hangi kası ne kadar kasacağını söylemez. Çocuk bir şeyler dener; düşerse (ceza) o davranıştan kaçınmayı, dengede kalırsa (ödül) onu sürdürmeyi öğrenir. Bazen hemen kötü görünen bir hareket (hızlanmak) birkaç saniye sonra dengeyi sağlar: ödül gecikmeli gelir. Pekiştirmeli öğrenme budur.</p></div>
@@ -93,6 +94,8 @@
 <li><strong>2. bölüm, B'den C'ye.</strong> C'deki en büyük Q artık 5: Q(B, sağ) = −0.5 + 0.5·(−1 + 0.9·5 + 0.5) = −0.5 + 0.5·4 = <strong>1.5</strong>. Hedefteki ödül bir adım geriye taşındı.</li>
 <li><strong>2. bölüm, C'den G'ye.</strong> Q(C, sağ) = 5 + 0.5·(10 − 5) = <strong>7.5</strong>. Bölümler tekrarlandıkça Q(C, sağ) 10'a, Q(B, sağ) 8'e, Q(A, sağ) 6.2'ye yaklaşır: değer yinelemesinin bulduğu değerler.</li>
 </ol>
+<p>Aynı süreci kendiniz yürütün: ajanı adım adım ilerletin ve ödülün hedeften geriye doğru nasıl yayıldığını izleyin.</p>
+<div data-widget="qcorridor"></div>
 <p>Q-öğrenmenin dikkat çekici bir özelliği, ajan en iyi olmayan eylemler yapsa bile (yeterince keşif yapıldığı ve α uygun biçimde küçültüldüğü sürece) en iyi Q değerlerine yakınsamasıdır. Çünkü hedefte ajanın gerçekte seçeceği eylem değil, en iyi eylemin değeri (max) kullanılır. Buna <strong>politika dışı</strong> (off-policy) öğrenme denir.</p>
 
 <h2>Keşif ile sömürü dengesi ve ε-greedy</h2><p class="h-en" lang="en">The exploration–exploitation trade-off and ε-greedy</p>
@@ -151,6 +154,9 @@
 <li><strong>(d)</strong> DQN, Q tablosunun yerine durumdan Q değerlerini tahmin eden bir sinir ağı kullanır; deneyim tekrarı ve hedef ağ ile eğitilir. Çok büyük ya da sürekli durum uzaylarında (görüntü girdisi) çalışabilir ve benzer durumlar arasında genelleme yapar; tablo tabanlı Q-öğrenme bunu yapamaz.</li>
 </ol></div></details>
 
+<h3>Sınırsız alıştırma</h3>
+<p>Aşağıdaki üreteç bu haftanın hesap kalıplarından her basışta yeni bir soru üretir. Cevabı yazıp denetleyin; takılırsanız çözüm, sayfadaki adımlarla aynı sırada açılır.</p>
+<div data-widget="drill" data-week="12"></div>
 <h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
 <ul class="mistakes">
 <li><strong>Q hedefinde max yerine yapılan eylemin değerini almak.</strong> Q-öğrenmede hedef, varılan durumdaki en büyük Q değeriyle hesaplanır; ajanın orada sonra ne yaptığı önemli değildir.</li>
