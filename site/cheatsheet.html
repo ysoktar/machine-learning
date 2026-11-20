@@ -93,6 +93,28 @@
 </tbody></table></div>
 <p class="formula-legend"><b>Semboller:</b> x girdi, W ağırlık matrisi (her satırı bir nöron), b sabit terimler, g etkinleştirme işlevi, h katmanın çıktısıdır. ŷ tahmin, y gerçek değer, δ bir nöronun hatasıdır; v_kj j'inci gizli nörondan k'inci çıktıya giden ağırlık, g′ etkinleştirmenin türevi, z_j nöronun ağırlıklı toplamıdır. m momentum, g gradyan, θ herhangi bir parametre, η öğrenme oranı, β momentum katsayısıdır. n girdi uzunluğu, k filtre uzunluğu, p dolgu, s adımdır; F filtre sayısı, k_h ve k_w filtre boyutu, C_in girdinin kanal sayısıdır.</p>
 
+<h2>Diziler, gömmeler, kümeleme ve pekiştirmeli öğrenme (yalnızca final)</h2><p class="h-en" lang="en">Sequences, embeddings, clustering and reinforcement learning (final only)</p>
+<div class="table-wrap"><table class="simple"><tbody>
+<tr><td>Toplu normalleştirme</td><td class="m">x̂ = (x − μ_B)/√(σ²_B + ε), y = γx̂ + β</td></tr>
+<tr><td>Dropout (eğitimde)</td><td class="m">h̃ = (m ⊙ h)/(1 − p)</td></tr>
+<tr><td>RNN</td><td class="m">hₜ = tanh(W·xₜ + U·hₜ₋₁ + b)</td></tr>
+<tr><td>LSTM</td><td class="m">cₜ = fₜ⊙cₜ₋₁ + iₜ⊙gₜ, hₜ = oₜ⊙tanh(cₜ)</td></tr>
+<tr><td>GRU</td><td class="m">hₜ = (1 − zₜ)⊙hₜ₋₁ + zₜ⊙h′ₜ</td></tr>
+<tr><td>RNN / LSTM / GRU parametresi</td><td class="m">k·(h·(d + h) + h), k = 1 / 4 / 3</td></tr>
+<tr><td>Dikkat</td><td class="m">softmax(Q·Kᵀ/√dₖ)·V (softmax her satıra)</td></tr>
+<tr><td>Kosinüs benzerliği</td><td class="m">u·v / (‖u‖·‖v‖)</td></tr>
+<tr><td>Skip-gram çift sayısı</td><td class="m">her kelimenin penceredeki komşu sayılarının toplamı (pencere 1: 2(n − 1))</td></tr>
+<tr><td>k-ortalamalar</td><td class="m">ata: en yakın merkez; güncelle: mⱼ = kümenin ortalaması; SSE = Σ‖x − mⱼ‖²</td></tr>
+<tr><td>Siluet</td><td class="m">s = (b − a)/max(a, b)</td></tr>
+<tr><td>Tek / tam bağlantı</td><td class="m">min d(a, b) / max d(a, b)</td></tr>
+<tr><td>Naive Bayes</td><td class="m">P(C)·Π (sayı(w, C) + 1)/(toplam(C) + |V|)</td></tr>
+<tr><td>İndirimli getiri</td><td class="m">G = r₁ + γr₂ + γ²r₃ + …</td></tr>
+<tr><td>Q-öğrenme</td><td class="m">Q ← Q + α·[r + γ·max Q(s′, ·) − Q]</td></tr>
+<tr><td>TD(0)</td><td class="m">V(s) ← V(s) + α·[r + γV(s′) − V(s)]</td></tr>
+<tr><td>ε-greedy</td><td class="m">P(en iyi) = 1 − ε + ε/|A|, öteki eylemler ε/|A|</td></tr>
+</tbody></table></div>
+<p class="formula-legend"><b>Semboller:</b> μ_B ve σ²_B mini yığının ortalaması ve varyansı, γ ve β öğrenilen ölçek ve kaydırmadır; m dropout maskesi, p kapatma olasılığıdır. xₜ girdi, hₜ gizli durum, cₜ hücre durumu; f, i, o unutma, girdi ve çıktı kapıları, g aday, z güncelleme kapısıdır; ⊙ eleman eleman çarpımdır. d girdi boyutu, h gizli boyuttur. Q, K, V sorgu, anahtar ve değer matrisleri, dₖ anahtar boyutudur. mⱼ küme merkezi; a kendi kümesine, b en yakın komşu kümeye ortalama uzaklıktır. |V| sözlükteki farklı kelime sayısıdır. r ödül, γ indirim çarpanı, α öğrenme oranı, s′ sonraki durum, |A| eylem sayısıdır.</p>
+
 <h2 id="log2-tablosu">Hesap makinesiz sınav için log₂ ve entropi tablosu</h2><p class="h-en" lang="en">log₂ and entropy table for the no-calculator exam</p>
 <div class="two-col">
 <div class="table-wrap"><table class="simple compact"><thead><tr><th>p = k/n</th><th class="num">−log₂ p</th><th class="num">H(p) iki sınıf</th></tr></thead><tbody>
