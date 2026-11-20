@@ -1806,15 +1806,20 @@ W.convstep = () => {
 
 W.attnplay = () => {
   const { el, body } = frame("Dikkat bir yumuşak aramadır: sorguyu taşı, ağırlıkları izle");
-  const keys = [{ k: [1, 0], v: "kedi", c: "kc0" }, { k: [0, 1], v: "hasır", c: "kc1" }, { k: [1, 1], v: "üstünde", c: "kc2" }];
+  let keys = [];
+  const keySrc = area("kedi: 1 0\nhasır: 0 1\nüstünde: 1 1", 4);
+  const readKeys = () => { keys = keySrc.value.split("\n").map((l) => l.match(/^\s*([^:]+):(.*)$/)).filter(Boolean).map((m, i) => ({ v: m[1].trim(), k: parseNums(m[2]).slice(0, 2), c: "kc" + (i % 4) })).filter((x) => x.k.length === 2).slice(0, 4); };
+  readKeys();
   let q = [1, 1];
   const scale = checkbox(" √dₖ ile böl", true);
   const temp = h("input", { type: "range", min: "0.5", max: "4", step: "0.1", value: "1", style: { width: "9rem" } });
   const pic = h("div"), info = h("div");
-  body.append(h("p", { class: "small" }, "Düzleme tıklayarak sorgu vektörünü q (sarı) taşıyın. Anahtarlara (renkli noktalar) yönü benzeyen ve uzun bir sorgu, o anahtarın ağırlığını büyütür."),
-    h("div", { class: "controls" }, scale.label, h("label", {}, "sorgunun uzunluğunu çarp ", temp)), pic, info);
+  body.append(h("p", { class: "small" }, "Düzleme tıklayarak sorgu vektörünü q (sarı) taşıyın. Anahtarlara (renkli noktalar) yönü benzeyen ve uzun bir sorgu, o anahtarın ağırlığını büyütür. Anahtarları ve kelimeleri aşağıdan değiştirebilir, en çok dört anahtar yazabilirsiniz (koordinatlar −0.5 ile 3 arasında görünür)."),
+    h("div", { class: "two-col" }, h("div", {}, h("p", { class: "field-hint" }, "anahtarlar (kelime: x y)"), keySrc), h("div", { class: "controls" }, scale.label, h("label", {}, "sorgunun uzunluğunu çarp ", temp))), pic, info);
   const S = 70, o = 30, X = (v) => o + (v + 0.5) * S, Y = (v) => 250 - (v + 0.5) * S;
   const draw = () => {
+    readKeys();
+    if (!keys.length) return put(info, errorBox("En az bir anahtar yazın: kelime: x y"));
     const m = Number(temp.value), qq = q.map((x) => x * m), sq = scale.get() ? Math.SQRT2 : 1;
     const sc = keys.map((kk) => dot(qq, kk.k) / sq), e = sc.map(Math.exp), a = e.map((x) => x / ml.sum(e));
     let s = `<line x1="${X(-0.5)}" y1="${Y(0)}" x2="${X(3)}" y2="${Y(0)}" class="fig-grid"/><line x1="${X(0)}" y1="${Y(-0.5)}" x2="${X(0)}" y2="${Y(3)}" class="fig-grid"/>`;
@@ -1841,38 +1846,38 @@ W.attnplay = () => {
 
 W.qcorridor = () => {
   const { el, body } = frame("Q-öğrenme oyun alanı: koridorda ajanı eğit");
-  const N = 4; // A, B, C, D then goal G
-  const names = ["A", "B", "C", "D", "G"];
+  let N = 4, names = [];
   const mk = (lab, val) => { const i = h("input", { type: "text", value: val, style: { width: "3.5rem" } }); return { i, label: h("label", {}, lab, i) }; };
-  const al = mk("α ", "0.5"), ga = mk("γ ", "0.9"), ep = mk("ε ", "0.2");
+  const al = mk("α ", "0.5"), ga = mk("γ ", "0.9"), ep = mk("ε ", "0.2"), nn = mk("kare sayısı ", "4"), rg = mk("hedef ödülü ", "10"), rs = mk("adım ödülü ", "-1");
   let Q, s, epi, steps_, last, R;
-  const reset = () => { Q = Array.from({ length: N }, () => [0, 0]); s = 0; epi = 0; steps_ = 0; last = null; R = ml.rng(470); };
+  const reset = () => { N = Math.max(2, Math.min(7, Math.round(readNumber(nn.i.value)) || 4)); names = [...Array.from({ length: N }, (_, i) => String.fromCharCode(65 + i)), "G"]; Q = Array.from({ length: N }, () => [0, 0]); s = 0; epi = 0; steps_ = 0; last = null; R = ml.rng(470); };
   reset();
   const pic = h("div"), info = h("div");
   const stepOnce = () => {
     const A = readNumber(al.i.value), G = readNumber(ga.i.value), E = readNumber(ep.i.value);
     const greedy = Q[s][1] > Q[s][0] ? 1 : Q[s][0] > Q[s][1] ? 0 : R() < 0.5 ? 0 : 1;
     const explore = R() < E, act = explore ? (R() < 0.5 ? 0 : 1) : greedy;
-    const s2 = act ? s + 1 : Math.max(0, s - 1), done = s2 === N, r = done ? 10 : -1;
+    const s2 = act ? s + 1 : Math.max(0, s - 1), done = s2 === N, r = done ? readNumber(rg.i.value) : readNumber(rs.i.value);
     const mx = done ? 0 : Math.max(...Q[s2]), old = Q[s][act], tgt = r + G * mx, nq = old + A * (tgt - old);
     Q[s][act] = nq; last = { s, act, s2, r, mx, old, tgt, nq, explore, A, G };
     steps_++; s = done ? 0 : s2; if (done) epi++;
     return done;
   };
   const runEp = (k) => { for (let t = 0; t < k; t++) { let g = 0; while (!stepOnce() && g++ < 200); } draw(); };
-  body.append(h("div", { class: "controls" }, al.label, ga.label, ep.label, button("bir adım", () => { stepOnce(); draw(); }, "primary"), button("bir bölüm", () => runEp(1)), button("20 bölüm", () => runEp(20)), button("sıfırla", () => { reset(); draw(); })), pic, info);
+  [nn.i, rg.i, rs.i].forEach((x) => x.addEventListener("change", () => { reset(); draw(); }));
+  body.append(h("div", { class: "controls" }, nn.label, rg.label, rs.label), h("div", { class: "controls" }, al.label, ga.label, ep.label, button("bir adım", () => { stepOnce(); draw(); }, "primary"), button("bir bölüm", () => runEp(1)), button("20 bölüm", () => runEp(20)), button("sıfırla", () => { reset(); draw(); })), pic, info);
   const draw = () => {
     let sv = "";
     names.forEach((nm, i) => {
-      const x = 10 + i * 104;
-      sv += `<rect x="${x}" y="20" width="84" height="46" rx="8" class="${i === N ? "fig-box3" : i === s ? "fig-hl" : "fig-box2"}"/><text x="${x + 42}" y="48" text-anchor="middle" class="lab">${nm}${i === s ? " (ajan)" : ""}</text>`;
+      const bw = 520 / names.length - 14, x = 10 + i * (520 / names.length), cx = x + bw / 2;
+      sv += `<rect x="${x}" y="20" width="${bw}" height="46" rx="8" class="${i === N ? "fig-box3" : i === s ? "fig-hl" : "fig-box2"}"/><text x="${cx}" y="48" text-anchor="middle" class="lab">${nm}${i === s ? (names.length > 6 ? "*" : " (ajan)") : ""}</text>`;
       if (i < N) {
         const best = Q[i][1] > Q[i][0] ? "→" : Q[i][0] > Q[i][1] ? "←" : "·";
-        sv += `<text x="${x + 42}" y="86" text-anchor="middle" class="fig-sub">sol ${f(Q[i][0], 2)} | sağ ${f(Q[i][1], 2)}</text><text x="${x + 42}" y="106" text-anchor="middle" class="lab">${best}</text>`;
+        sv += `<text x="${cx}" y="84" text-anchor="middle" class="fig-sub">sol ${f(Q[i][0], 2)}</text><text x="${cx}" y="98" text-anchor="middle" class="fig-sub">sağ ${f(Q[i][1], 2)}</text><text x="${cx}" y="114" text-anchor="middle" class="lab">${best}</text>`;
       }
     });
-    sv += `<text x="10" y="12" class="fig-sub">Her hareket −1, G'ye girmek +10. Kutunun altında Q(sol) | Q(sağ); ok, şu anki en iyi (açgözlü) eylem.</text>`;
-    const e2 = document.createElementNS(SVGNS, "svg"); e2.setAttribute("viewBox", "0 0 530 116"); e2.setAttribute("class", "plot fig-svg"); e2.innerHTML = sv;
+    sv += `<text x="10" y="12" class="fig-sub">Kutunun altında Q(sol) ve Q(sağ); ok, şu anki en iyi (açgözlü) eylem.</text>`;
+    const e2 = document.createElementNS(SVGNS, "svg"); e2.setAttribute("viewBox", "0 0 530 120"); e2.setAttribute("class", "plot fig-svg"); e2.innerHTML = sv;
     put(pic, e2, h("p", { class: "small" }, `Bölüm: ${epi} · adım: ${steps_}`));
     put(info, last ? steps([
       { what: `${names[last.s]} durumunda ${last.act ? "sağa" : "sola"} gidildi (${last.explore ? "keşif: rastgele seçim" : "sömürü: en iyi bilinen eylem"}); ödül ${last.r}, varılan durum ${names[last.s2]}.` },

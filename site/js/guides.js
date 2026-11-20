@@ -27,12 +27,12 @@ export const GUIDE = {
     see: "Çıktı boyutu formülü, pencerenin sığabildiği konum sayısını sayar; adım büyüdükçe konum sayısı azalır.",
   },
   attnplay: {
-    what: "Üç anahtarın sabit olduğu bir düzlemde sorgu vektörünü tıklayarak taşırsınız; dikkat ağırlıkları çubuklarda ve noktaların büyüklüğünde anında değişir.",
+    what: "Kendi yazdığınız (en çok dört) anahtarın bulunduğu bir düzlemde sorgu vektörünü tıklayarak taşırsınız; dikkat ağırlıkları çubuklarda ve noktaların büyüklüğünde anında değişir.",
     tryit: ["Sorguyu (1, 0) yönüne getirin: “kedi” ve “üstünde” ağırlık kazanır.", "Kaydırıcıyla sorguyu uzatın: ağırlık tek bir anahtara yığılır.", "√dₖ kutusunu kapatın: aynı sorguda dağılım daha keskin olur."],
     see: "Dikkat, sorguya en çok benzeyen anahtarlara daha çok ağırlık veren yumuşak bir aramadır; ölçek ne kadar büyükse arama o kadar “sert” olur.",
   },
   qcorridor: {
-    what: "Dört kareli bir koridorda ε-greedy davranan bir ajanı adım adım ya da bölüm bölüm eğitir; her adımda yapılan Q güncellemesini yazar.",
+    what: "Bir koridorda ε-greedy davranan bir ajanı adım adım ya da bölüm bölüm eğitir; her adımda yapılan Q güncellemesini yazar. Kare sayısını, ödülleri, α, γ ve ε değerlerini serbestçe değiştirebilirsiniz.",
     tryit: ["Birkaç kez “bir adım”a basın: ilk bölümde yalnız hedefin yanındaki kare olumlu değer alır.", "“20 bölüm”e basın: değerler 4.58, 6.2, 8, 10'a yaklaşır, oklar sağı gösterir.", "ε'u 0 yapıp sıfırlayın: ajan hiç keşif yapmazsa ne oluyor?"],
     see: "Ödül hedeften geriye doğru, her bölümde bir iki kare yayılır; Q-öğrenme, keşif yaparken bile en iyi değerleri öğrenir.",
   },
