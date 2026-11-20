@@ -12,14 +12,14 @@ export const GUIDE = {
     see: "Havuzlama parametresizdir ve boyutu küçültür; blok içindeki küçük kaymalar çıktıyı değiştirmez.",
   },
   template: {
-    what: "3×3 piksellik dört harfe iki 2×2 şablon filtresi uygular ve öznitelik haritalarını gösterir; harfi kaydırıp haritanın da kaydığını görebilirsiniz.",
-    tryit: ["X ve O harflerinde “\\” filtresinin 4 verdiği yerleri karşılaştırın.", "Harfi kaydırın: haritadaki 4'ler de kayar."],
-    see: "Aynı küçük ağırlıkları her konumda kullanmak hem parametre sayısını küçültür hem de desen kayınca yeniden öğrenmeyi gereksiz kılar.",
+    what: "Kendi görüntünüzü (6×6, piksellere tıklayarak) ve kendi filtrenizi (hücrelere tıklayarak, boyutu serbest) çizersiniz; filtrenin her konumdaki iç çarpımı renkli bir öznitelik haritası olarak çıkar.",
+    tryit: ["X harfinde “\\” ve “/” köşegen filtrelerini karşılaştırın: güçlü yanıt nerelerde?", "Görüntüyü ok düğmeleriyle kaydırın: harita da kayar, filtre aynı kalır.", "Dikey kenar 3×3 filtresini seçip kendi bir kenarınızı çizin; sonra filtrenin bir hücresini değiştirip haritanın nasıl bozulduğunu izleyin."],
+    see: "Bir filtre, kendisine benzeyen deseni bulan küçük bir şablondur; aynı birkaç ağırlık her konumda kullanıldığı için parametre azdır ve desen nereye kayarsa kaysın bulunur.",
   },
   cnnstack: {
-    what: "Katmanları satır satır yazdığınız bir CNN'in her katmanında çıktı boyutunu ve parametre sayısını hesaplar; parametrelerin hangi katmanda toplandığını çubuklarla gösterir.",
-    tryit: ["Derslerdeki SmallCNN'de toplamın 25,578 olduğunu görün.", "“LeNet benzeri” ile Problem 6'yı (5,994) denetleyin.", "SmallCNN'e üçüncü bir “pool 2” ekleyin: tam bağlı katmanın parametresi ne kadar düşüyor?"],
-    see: "Parametrelerin çoğunu genellikle son tam bağlı katman taşır; havuzlama ya da adım 2 ile boyutu küçültmek onu doğrudan azaltır.",
+    what: "Katmanları satır satır yazdığınız (ya da düğmelerle eklediğiniz) bir CNN'i çizer: her katmanın çıktısı, yüksekliği uzamsal boyutu, derinliği kanal sayısını gösteren bir blok olur; altta boyutlar ve parametrelerin tablosu.",
+    tryit: ["SmallCNN'de toplamın 25,578 olduğunu ve parametrenin %80'inin son tam bağlı katmanda toplandığını görün.", "“+ pool 2” ekleyerek tam bağlı katmanın parametresini nasıl düşürdüğünü izleyin.", "“havuzlamasız (MLP gibi)” ön ayarıyla aynı görüntüde parametre sayısının nasıl patladığını görün."],
+    see: "CNN'ler derine indikçe kanal sayısını artırıp uzamsal boyutu küçültür; parametreler filtrelerde değil çoğunlukla son tam bağlı katmanda toplanır.",
   },
   convstep: {
     what: "Filtreyi görüntünün üzerinde konum konum kaydırır: sarı pencere, filtre ve doldurulan çıktı hücresi birlikte görünür; her hücrenin çarpım toplamı yazılır.",

@@ -17,6 +17,7 @@
 <!-- clarified -->
 <h1>Topluluk yöntemleri</h1>
 <p class="lead">Birçok zayıf ya da kararsız modelin oyu, tek bir iyi modelden daha iyi olabilir. Bagging ve rastgele orman <strong>varyansı</strong>, boosting <strong>yanlılığı</strong> azaltır. Ara sınavda: bootstrap/OOB hesabı, AdaBoost ağırlık güncellemesi (küçük örnek), gradyan artırmanın sezgisi, kısa kavram soruları.</p>
+<div class="bridge"><div class="bridge-title">Nereden geldik, nereye gidiyoruz?</div><p><strong>Neden bu hafta?</strong> Tek ağaç ya ezberliyor ya da yetersiz kalıyordu. Topluluklar birçok modeli birleştirir: torbalama varyansı, artırma yanlılığı düşürür.</p><p><strong>Sırada ne var?</strong> Topluluklar güçlüdür ama tek bir sınırın neden seçildiğini söylemez. 7. hafta doğrusal modele geri dönüp “en iyi sınır hangisi?” sorusunu marjla cevaplayan SVM'yi gösteriyor. <a href="w7-svm.html">Sonraki sayfa</a></p></div>
 <!-- enriched -->
 <div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
 <p class="small"><b>Bu tablo nasıl kullanılır?</b> Sayfayı okumadan önce göz gezdir: neye odaklanacağını söyler. Terimleri henüz bilmiyorsan sorun değil; sayfanın sonunda geri dön ve her satırı kendin yapabiliyor musun diye kontrol et.</p>
@@ -29,6 +30,7 @@
 </tbody></table></div></div>
 <!-- taught -->
 <div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-bagging-torbalama">Bagging</a> · <a href="sozluk.html#t-bootstrap-orneklemi">Bootstrap örneklemi</a> · <a href="sozluk.html#t-oob-torba-disi-hata">OOB</a> · <a href="sozluk.html#t-rastgele-orman">Rastgele orman</a> · <a href="sozluk.html#t-boosting-artirma">Boosting</a> · <a href="sozluk.html#t-adaboost">AdaBoost</a> · <a href="sozluk.html#t-karar-kutugu">Karar kütüğü</a> · <a href="sozluk.html#t-gradyan-artirma">Gradyan artırma</a></div>
+<div class="essence"><div class="essence-title"><span class="ic ic-idea" aria-hidden="true"></span>Özün özü: bu sayfa beş cümlede</div><ol><li>Birbirinden farklı hatalar yapan modellerin oylaması tek tek modellerden daha az hata yapar.</li><li>Bagging aynı modeli bootstrap örneklemleriyle eğitip ortalar: varyansı düşürür; rastgele orman buna her bölmede rastgele öznitelik seçimini ekler.</li><li>Bir bootstrap örnekleminde verinin yaklaşık üçte biri hiç seçilmez; bu torba dışı örnekler bedava bir doğrulama verir.</li><li>Boosting zayıf modelleri sırayla eğitir: AdaBoost hatalı örneklerin ağırlığını artırır, gradyan artırma kalıntılara yeni bir model uydurur; yanlılığı düşürür.</li><li>AdaBoost'ta modelin oy gücü α = ½·ln((1 − ε)/ε)'dur: hatası küçük model daha çok söz sahibidir.</li></ol><p class="small">Sayfanın geri kalanı bu beş cümlenin açılımıdır. Bitirdiğinizde her birini kendi sözcüklerinizle bir örnekle anlatabiliyorsanız konu oturmuştur.</p></div>
 
 
 <h2>Neden birçok model? Kalabalığın bilgeliği</h2><p class="h-en" lang="en">Why many models? The wisdom of the crowd</p>

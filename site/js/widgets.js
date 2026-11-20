@@ -1976,68 +1976,143 @@ W.poolstep = () => {
   return el;
 };
 
-W.template = () => {
-  const { el, body } = frame("Neden evrişim? Aynı küçük şablonu görüntünün üzerinde kaydırmak");
-  const IMG = { "X": [[1, -1, 1], [-1, 1, -1], [1, -1, 1]], "O": [[-1, 1, -1], [1, -1, 1], [-1, 1, -1]], "\\": [[1, -1, -1], [-1, 1, -1], [-1, -1, 1]], "/": [[-1, -1, 1], [-1, 1, -1], [1, -1, -1]] };
-  const FIL = { "\\": [[1, -1], [-1, 1]], "/": [[-1, 1], [1, -1]] };
-  let im = "X", sh = 0;
-  const pic = h("div"), info = h("div");
-  const imBtns = h("span", { class: "btn-group" }, Object.keys(IMG).map((k) => button(`harf ${k}`, () => { im = k; sh = 0; draw(); })));
-  const shift = button("harfi bir sütun kaydır", () => { sh = (sh + 1) % 2; draw(); });
-  body.append(h("p", { class: "small" }, "Her harf 3×3 piksel (+1 koyu, −1 açık). İki 2×2 filtre (“\\” ve “/”) görüntünün dört konumunda uygulanır; çıktıdaki 4, “bu konumda bu desen var” demektir."), h("div", { class: "controls" }, imBtns, shift), pic, info);
-  const draw = () => {
-    let I = IMG[im];
-    if (sh) I = I.map((r) => [-1, ...r.slice(0, 2)]);
-    const conv = (K) => [0, 1].map((i) => [0, 1].map((j) => K[0][0] * I[i][j] + K[0][1] * I[i][j + 1] + K[1][0] * I[i + 1][j] + K[1][1] * I[i + 1][j + 1]));
-    const A = conv(FIL["\\"]), B = conv(FIL["/"]);
-    const cs = 30;
-    const hlc = (M) => (i, j) => (M[i][j] === 4 ? "fig-hl" : M[i][j] === -4 ? "fig-box" : "fig-box2");
-    let sv = gridSvg(I, 4, 24, cs, (i, j) => (I[i][j] > 0 ? "fig-box3" : "fig-box2"), (v) => (v > 0 ? "+1" : "−1"));
-    sv += `<text x="4" y="14" class="fig-sub">görüntü</text>`;
-    sv += `<text x="130" y="14" class="fig-sub">“\\” filtresi ve haritası</text>` + gridSvg(FIL["\\"], 130, 24, cs, () => "fig-box3", (v) => (v > 0 ? "+1" : "−1")) + gridSvg(A, 210, 24, cs, hlc(A));
-    sv += `<text x="300" y="14" class="fig-sub">“/” filtresi ve haritası</text>` + gridSvg(FIL["/"], 300, 24, cs, () => "fig-box3", (v) => (v > 0 ? "+1" : "−1")) + gridSvg(B, 380, 24, cs, hlc(B));
-    put(pic, svgBox(450, 120, sv, 560));
-    const where = (M) => { const c = []; M.forEach((r, i) => r.forEach((v, j) => v === 4 && c.push(`(${i + 1}, ${j + 1})`))); return c.length ? c.join(", ") : "hiçbir yerde"; };
-    put(info, steps([
-      { what: `“\\” deseni ${where(A)} konumlarında tam eşleşiyor; “/” deseni ${where(B)} konumlarında.`, note: "Toplam yalnız 8 ağırlık (iki 2×2 filtre) dört harfi de ayırt eder: X'te “\\” köşegende, O'da ters köşegende çıkar." },
-      { what: sh ? "Harf bir sütun kaydı: haritalar da aynı yöne kaydı ama filtreler hiç değişmedi. Tam bağlı bir ağ bu kaymayı yeniden öğrenmek zorunda kalırdı." : "“harfi bir sütun kaydır” düğmesine basın: desen kayınca harita da kayar (öteleme eşdeğişkenliği)." },
-    ]));
-  };
-  queueMicrotask(draw);
-  return el;
-};
+/** Draw a CNN as a row of feature-map blocks: height ∝ spatial size, depth ∝ channels; vectors as thin bars. */
+function cnnDiagram(shapes) {
+  // shapes: [{label, kind, C, H, W, flat, params}] starting with the input
+  const maxHW = Math.max(...shapes.filter((s) => !s.flat).map((s) => s.H), 1), maxC = Math.max(...shapes.filter((s) => !s.flat).map((s) => s.C), 1);
+  const totalP = shapes.reduce((a, s) => a + (s.params || 0), 0);
+  let x = 10, sv = "";
+  const base = 190;
+  shapes.forEach((s, i) => {
+    if (s.flat) {
+      const hh = Math.max(14, Math.min(150, 14 + 22 * Math.log10(s.flat)));
+      sv += `<rect x="${x}" y="${base - hh}" width="12" height="${hh}" class="fig-box3"/>`;
+      sv += `<text x="${x + 6}" y="${base + 16}" text-anchor="middle" class="fig-sub">${s.flat}</text>`;
+      s.cx = x + 6; x += 12;
+    } else {
+      const hh = 20 + 130 * Math.sqrt(s.H / maxHW), d = 6 + 34 * Math.sqrt(s.C / maxC), w = 8 + 26 * Math.sqrt(s.W / maxHW) * 0.4;
+      const y = base - hh;
+      // front face, top face, side face (pseudo 3D)
+      sv += `<polygon points="${x},${y} ${x + d},${y - d * 0.5} ${x + d + w},${y - d * 0.5} ${x + w},${y}" class="fig-box"/>`;
+      sv += `<polygon points="${x + w},${y} ${x + w + d},${y - d * 0.5} ${x + w + d},${base - d * 0.5} ${x + w},${base}" class="fig-box2"/>`;
+      sv += `<rect x="${x}" y="${y}" width="${w}" height="${hh}" class="${i === 0 ? "fig-box3" : "fig-box2"}"/>`;
+      sv += `<text x="${x + (w + d) / 2}" y="${base + 16}" text-anchor="middle" class="fig-sub">${s.C}×${s.H}×${s.W}</text>`;
+      s.cx = x + (w + d) / 2; x += w + d;
+    }
+    if (i < shapes.length - 1) {
+      const n = shapes[i + 1];
+      sv += `<line x1="${x + 6}" y1="${base - 40}" x2="${x + 50}" y2="${base - 40}" class="fig-arrow" marker-end="url(#ahc)"/>`;
+      sv += `<text x="${x + 28}" y="${base - 48}" text-anchor="middle" class="fig-sub">${n.kind}</text>`;
+      if (n.params) sv += `<text x="${x + 28}" y="${base - 24}" text-anchor="middle" class="fig-sub">${n.params.toLocaleString("en-US")} p.</text><text x="${x + 28}" y="${base - 12}" text-anchor="middle" class="fig-sub">%${Math.round((100 * n.params) / totalP)}</text>`;
+      x += 58;
+    }
+  });
+  sv += `<text x="10" y="${base + 36}" class="fig-sub">blok yüksekliği: uzamsal boyut (H×W) · blok derinliği: kanal sayısı</text><text x="10" y="${base + 52}" class="fig-sub">okun altındaki sayı: o katmanın parametresi (p.) ve toplamdaki payı</text>`;
+  const W = Math.max(x + 14, 560), e = document.createElementNS(SVGNS, "svg");
+  e.setAttribute("viewBox", `0 0 ${W} ${base + 60}`); e.setAttribute("class", "plot fig-svg"); e.setAttribute("role", "img"); e.setAttribute("aria-label", "CNN mimarisi");
+  e.innerHTML = `<defs><marker id="ahc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fig-head"/></marker></defs>` + sv;
+  return h("div", { class: "scroll-x" }, e);
+}
 
 W.cnnstack = () => {
-  const { el, body } = frame("Katman katman: boyutlar ve parametreler");
+  const { el, body } = frame("Katman katman: boyutlar ve parametreler, çizimiyle");
   const inp = h("input", { type: "text", value: "3 32 32", style: { width: "7rem" } });
   const src = area("conv 16 3 1 1\npool 2\nconv 32 3 1 1\npool 2\nflatten\nfc 10", 6);
+  const set = (i, s) => { inp.value = i; src.value = s; run(); };
+  const add = (line) => { src.value = src.value.replace(/\s*$/, "") + "\n" + line; run(); };
   const presets = h("span", { class: "btn-group" },
-    button("derste: SmallCNN", () => { inp.value = "3 32 32"; src.value = "conv 16 3 1 1\npool 2\nconv 32 3 1 1\npool 2\nflatten\nfc 10"; run(); }),
-    button("LeNet benzeri (Problem 6)", () => { inp.value = "1 28 28"; src.value = "conv 8 5 0 1\npool 2\nconv 16 5 0 1\npool 2\nflatten\nfc 10"; run(); }),
-    button("Deneme 3", () => { inp.value = "3 64 64"; src.value = "conv 32 5 2 1\npool 2\nconv 64 3 1 2"; run(); }));
+    button("SmallCNN (derste)", () => set("3 32 32", "conv 16 3 1 1\npool 2\nconv 32 3 1 1\npool 2\nflatten\nfc 10")),
+    button("LeNet benzeri (Problem 6)", () => set("1 28 28", "conv 8 5 0 1\npool 2\nconv 16 5 0 1\npool 2\nflatten\nfc 10")),
+    button("VGG tarzı blok", () => set("3 64 64", "conv 32 3 1 1\nconv 32 3 1 1\npool 2\nconv 64 3 1 1\nconv 64 3 1 1\npool 2\nflatten\nfc 100\nfc 10")),
+    button("havuzlamasız (MLP gibi)", () => set("3 32 32", "flatten\nfc 256\nfc 10")));
+  const adders = h("span", { class: "btn-group" }, button("+ conv 3×3", () => add("conv 32 3 1 1")), button("+ adım 2 conv", () => add("conv 64 3 1 2")), button("+ pool 2", () => add("pool 2")), button("+ flatten", () => add("flatten")), button("+ fc 10", () => add("fc 10")), button("son satırı sil", () => { src.value = src.value.trim().split("\n").slice(0, -1).join("\n"); run(); }));
   const out = outBox();
-  body.append(h("div", { class: "controls" }, h("label", {}, "girdi C H W ", inp), presets),
-    h("p", { class: "field-hint" }, "Her satır bir katman: conv F k p s · pool k · flatten · fc çıktı"), src, out);
+  body.append(h("div", { class: "controls" }, h("label", {}, "girdi C H W ", inp)), h("div", { class: "controls" }, presets), h("div", { class: "controls" }, adders),
+    h("p", { class: "field-hint" }, "Her satır bir katman: conv F k p s (filtre sayısı, filtre boyu, dolgu, adım) · pool k · flatten · fc çıktı. Satırları istediğiniz gibi yazın, silin, sıralayın."), src, out);
   const run = live(body, () => {
     let [C, H, Wd] = parseNums(inp.value);
     if (!(C > 0 && H > 0 && Wd > 0)) return put(out, errorBox("Girdiyi C H W olarak yazın."));
-    let flat = null; const rows = []; let total = 0, err = null;
+    let flat = null; const rows = [], shapes = [{ kind: "girdi", C, H, W: Wd }]; let total = 0, err = null;
     for (const line of src.value.split("\n").map((l) => l.trim()).filter(Boolean)) {
-      const [t, ...a] = line.split(/\s+/); const n = a.map(Number); const inS = flat ? String(flat) : `${C}×${H}×${Wd}`;
-      if (t === "conv") { const [F, k, p = 0, s = 1] = n; const oh = Math.floor((H + 2 * p - k) / s) + 1, ow = Math.floor((Wd + 2 * p - k) / s) + 1, par_ = (k * k * C + 1) * F;
-        if (oh < 1) { err = `“${line}”: filtre girdiden büyük.`; break; }
-        rows.push([line, inS, `${F}×${oh}×${ow}`, `(${k}·${k}·${C} + 1)·${F}`, par_]); C = F; H = oh; Wd = ow; total += par_; }
-      else if (t === "pool") { const [k] = n; H = Math.floor(H / k); Wd = Math.floor(Wd / k); rows.push([line, inS, `${C}×${H}×${Wd}`, "yok", 0]); }
-      else if (t === "flatten") { flat = C * H * Wd; rows.push([line, inS, String(flat), "yok", 0]); }
-      else if (t === "fc") { const [o] = n; const i = flat ?? C * H * Wd; const par_ = i * o + o; rows.push([line, String(i), String(o), `${i}·${o} + ${o}`, par_]); flat = o; total += par_; }
-      else { err = `Anlaşılmayan satır: “${line}”.`; break; }
+      const [t, ...a] = line.toLowerCase().split(/\s+/); const n = a.map(Number); const inS = flat ? String(flat) : `${C}×${H}×${Wd}`;
+      if (t === "conv") {
+        if (flat) { err = `“${line}”: düzleştirmeden sonra evrişim yapılamaz.`; break; }
+        const [F, k, p = 0, s = 1] = n; const oh = Math.floor((H + 2 * p - k) / s) + 1, ow = Math.floor((Wd + 2 * p - k) / s) + 1, pr = (k * k * C + 1) * F;
+        if (!(F > 0 && k > 0) || oh < 1 || ow < 1) { err = `“${line}”: filtre girdiden büyük ya da sayılar eksik.`; break; }
+        rows.push([line, inS, `${F}×${oh}×${ow}`, `(${k}·${k}·${C} + 1)·${F}`, pr]); C = F; H = oh; Wd = ow; total += pr; shapes.push({ kind: `conv ${k}×${k}${s > 1 ? ", s=" + s : ""}`, C, H, W: Wd, params: pr });
+      } else if (t === "pool") {
+        const [k = 2] = n; if (flat || H < k) { err = `“${line}”: havuzlanacak görüntü kalmadı.`; break; }
+        H = Math.floor(H / k); Wd = Math.floor(Wd / k); rows.push([line, inS, `${C}×${H}×${Wd}`, "yok", 0]); shapes.push({ kind: `pool ${k}`, C, H, W: Wd, params: 0 });
+      } else if (t === "flatten") {
+        flat = C * H * Wd; rows.push([line, inS, String(flat), "yok", 0]); shapes.push({ kind: "flatten", flat, params: 0 });
+      } else if (t === "fc") {
+        const [o] = n; if (!(o > 0)) { err = `“${line}”: çıktı sayısı eksik.`; break; }
+        const i = flat ?? C * H * Wd; const pr = i * o + o; rows.push([line, String(i), String(o), `${i}·${o} + ${o}`, pr]); flat = o; total += pr; shapes.push({ kind: `fc ${o}`, flat: o, params: pr });
+      } else { err = `Anlaşılmayan satır: “${line}”.`; break; }
     }
     if (err) return put(out, errorBox(err));
+    if (!rows.length) return put(out, h("p", { class: "small muted" }, "Bir katman ekleyin."));
     const big = rows.reduce((a, r) => (r[4] > a[4] ? r : a), rows[0]);
-    put(out, table(["Katman", "Girdi", "Çıktı", "Parametre formülü", "Parametre", "Pay"], rows.map((r) => ({ cls: r === big && total ? "hl" : "", row: [r[0], r[1], r[2], r[3], { v: r[4].toLocaleString("en-US"), cls: "num" }, { html: `<span class="bar" style="width:${total ? Math.round((80 * r[4]) / total) : 0}px"></span> ${total ? Math.round((100 * r[4]) / total) : 0}%` }] })),
-      { cls: "compact", foot: ["Toplam", "", "", "", { v: total.toLocaleString("en-US"), cls: "num" }, ""] }),
-      h("p", { class: "small" }, `En çok parametre “${big[0]}” katmanında. Evrişim katmanlarının parametresi yalnız filtre boyutuna ve kanal sayılarına bağlıdır; tam bağlı katmanınki girdisinin tamamına bağlı olduğu için genellikle en büyüğüdür.`));
+    put(out, cnnDiagram(shapes),
+      table(["Katman", "Girdi", "Çıktı", "Parametre formülü", "Parametre", "Pay"], rows.map((r) => ({ cls: r === big && total ? "hl" : "", row: [r[0], r[1], r[2], r[3], { v: r[4].toLocaleString("en-US"), cls: "num" }, { html: `<span class="bar" style="width:${total ? Math.round((80 * r[4]) / total) : 0}px"></span> ${total ? Math.round((100 * r[4]) / total) : 0}%` }] })),
+        { cls: "compact", foot: ["Toplam", "", "", "", { v: total.toLocaleString("en-US"), cls: "num" }, ""] }),
+      h("p", { class: "small" }, `En çok parametre “${big[0]}” katmanında. Çizimde bloklar derinleştikçe (kanal arttıkça) kısalıyor (uzamsal boyut küçülüyor): CNN'lerin ortak kalıbı. Evrişimin parametresi yalnız filtreye bağlıdır; tam bağlı katmanınki girdisinin tamamına bağlı olduğu için genellikle en büyüğüdür. “havuzlamasız” ön ayarını deneyip farkı görün.`));
   });
+  return el;
+};
+
+/** Clickable grid editor: values cycle through `cycle` on click. */
+function clickGrid(M, cycle, onchange, cs = 34) {
+  const wrap = h("div", { class: "click-grid", style: `--cols:${M[0].length}` });
+  const paint = () => wrap.replaceChildren(...M.flatMap((r, i) => r.map((v, j) => h("button", { type: "button", class: `cg-cell ${v > 0 ? "cg-pos" : v < 0 ? "cg-neg" : "cg-zero"}`, style: `width:${cs}px;height:${cs}px`, "aria-label": `satır ${i + 1} sütun ${j + 1}: ${v}`,
+    onclick: () => { M[i][j] = cycle[(cycle.indexOf(v) + 1) % cycle.length]; paint(); onchange(); } }, v > 0 ? `+${v}` : String(v).replace("-", "−")))));
+  paint();
+  return { el: wrap, repaint: paint };
+}
+const heatCls = (v, mx) => (v > 0 ? `fill:var(--pos);fill-opacity:${(0.15 + 0.85 * v / mx).toFixed(2)}` : v < 0 ? `fill:var(--neg);fill-opacity:${(0.15 + 0.85 * -v / mx).toFixed(2)}` : "fill:var(--surface-2)");
+
+W.template = () => {
+  const { el, body } = frame("Neden evrişim? Kendi görüntünü ve filtreni çiz, haritayı izle");
+  const LET = {
+    "X": [[1, -1, -1, 1], [-1, 1, 1, -1], [-1, 1, 1, -1], [1, -1, -1, 1]].map((r) => r.slice()),
+    "O": [[-1, 1, 1, -1], [1, -1, -1, 1], [1, -1, -1, 1], [-1, 1, 1, -1]],
+    "\\": [[1, -1, -1, -1], [-1, 1, -1, -1], [-1, -1, 1, -1], [-1, -1, -1, 1]],
+    "/": [[-1, -1, -1, 1], [-1, -1, 1, -1], [-1, 1, -1, -1], [1, -1, -1, -1]],
+    "dikey çizgi": [[-1, 1, -1, -1], [-1, 1, -1, -1], [-1, 1, -1, -1], [-1, 1, -1, -1]],
+    "yatay çizgi": [[-1, -1, -1, -1], [1, 1, 1, 1], [-1, -1, -1, -1], [-1, -1, -1, -1]],
+  };
+  const FIL = { "“\\” köşegen": [[1, -1], [-1, 1]], "“/” köşegen": [[-1, 1], [1, -1]], "dikey kenar 3×3": [[1, 0, -1], [1, 0, -1], [1, 0, -1]], "yatay kenar 3×3": [[1, 1, 1], [0, 0, 0], [-1, -1, -1]], "dikey çizgi 3×1": [[1], [1], [1]] };
+  let N = 6, I = Array.from({ length: N }, () => Array(N).fill(-1)), K = FIL["“\\” köşegen"].map((r) => r.slice());
+  const put4 = (P) => { I = Array.from({ length: N }, () => Array(N).fill(-1)); P.forEach((r, i) => r.forEach((v, j) => { if (i + 1 < N && j + 1 < N) I[i + 1][j + 1] = v; })); };
+  put4(LET["X"]);
+  const imgBox = h("div"), kerBox = h("div"), pic = h("div"), info = h("div");
+  const shift = (di, dj) => { I = I.map((r, i) => r.map((_, j) => (I[i - di] && I[i - di][j - dj] !== undefined ? I[i - di][j - dj] : -1))); draw(true); };
+  const letters = h("span", { class: "btn-group" }, Object.keys(LET).map((k) => button(k, () => { put4(LET[k]); draw(true); })), button("temizle", () => { I = I.map((r) => r.map(() => -1)); draw(true); }));
+  const filters = h("span", { class: "btn-group" }, Object.keys(FIL).map((k) => button(k, () => { K = FIL[k].map((r) => r.slice()); draw(true); })));
+  const kh = h("input", { type: "text", value: "2 2", style: { width: "4rem" } });
+  body.append(h("p", { class: "small" }, "Görüntünün piksellerine tıklayın (+1 koyu, −1 açık) ya da bir ön ayar seçin. Filtrenin hücrelerine tıklayınca +1, 0, −1 arasında döner; boyutunu da değiştirebilirsiniz. Harita, filtrenin her konumdaki iç çarpımıdır: koyu mavi “desen burada güçlü”, koyu kırmızı “tersi burada”."),
+    h("div", { class: "controls" }, h("span", { class: "field-hint" }, "görüntü ön ayarları: "), letters),
+    h("div", { class: "controls" }, h("span", { class: "field-hint" }, "filtre ön ayarları: "), filters, h("label", {}, "filtre boyu (satır sütun) ", kh)),
+    h("div", { class: "controls" }, button("◀ kaydır", () => shift(0, -1)), button("kaydır ▶", () => shift(0, 1)), button("▲", () => shift(-1, 0)), button("▼", () => shift(1, 0))),
+    h("div", { class: "tmpl-row" }, h("div", {}, h("p", { class: "field-hint" }, `görüntü (${N}×${N})`), imgBox), h("div", {}, h("p", { class: "field-hint" }, "filtre"), kerBox), h("div", {}, h("p", { class: "field-hint" }, "öznitelik haritası"), pic)), info);
+  kh.addEventListener("change", () => { const [a, b] = parseNums(kh.value); const r = Math.max(1, Math.min(4, a || 2)), c = Math.max(1, Math.min(4, b || a || 2)); K = Array.from({ length: r }, (_, i) => Array.from({ length: c }, (_, j) => (K[i] && K[i][j] !== undefined ? K[i][j] : 0))); draw(true); });
+  let gI, gK;
+  const draw = (rebuild) => {
+    if (rebuild || !gI) { gI = clickGrid(I, [-1, 1], () => draw()); gK = clickGrid(K, [1, 0, -1], () => draw()); imgBox.replaceChildren(gI.el); kerBox.replaceChildren(gK.el); kh.value = `${K.length} ${K[0].length}`; }
+    const oh = N - K.length + 1, ow = N - K[0].length + 1;
+    const M = Array.from({ length: oh }, (_, i) => Array.from({ length: ow }, (_, j) => ml.sum(K.flatMap((r, a) => r.map((w, b) => w * I[i + a][j + b])))));
+    const best = K.flat().reduce((s, w) => s + Math.abs(w), 0) || 1, cs = 30;
+    let sv = "";
+    M.forEach((r, i) => r.forEach((v, j) => { sv += `<rect x="${j * cs}" y="${i * cs}" width="${cs}" height="${cs}" style="${heatCls(v, best)}" class="hm"/><text x="${j * cs + cs / 2}" y="${i * cs + cs / 2 + 5}" text-anchor="middle" class="lab">${f(v)}</text>`; }));
+    put(pic, svgBox(ow * cs, oh * cs, sv, ow * cs * 1.15));
+    const hits = []; M.forEach((r, i) => r.forEach((v, j) => v === best && hits.push(`(${i + 1}, ${j + 1})`)));
+    put(info, steps([
+      { what: `Harita ${oh}×${ow}: filtre ${K.length}×${K[0].length} olduğu için ${N} − ${K.length} + 1 = ${oh} satır ve ${N} − ${K[0].length} + 1 = ${ow} sütun konumu var. Her hücre, filtre ile altındaki pencerenin iç çarpımıdır.`, formula: "(I ∗ K)[i, j] = Σₐ Σ_b I[i + a, j + b]·K[a, b]" },
+      { what: hits.length ? `Filtre deseni ${hits.join(", ")} konumlarında tam eşleşiyor (en büyük değer ${best}: filtredeki her +1 bir +1 piksele, her −1 bir −1 piksele denk geldi).` : `Hiçbir konumda tam eşleşme yok; en büyük değer ${f(Math.max(...M.flat()))} (tam eşleşme ${best} olurdu).`,
+        note: `Bu filtrenin ${K.flat().filter((w) => w).length} ağırlığı görüntünün bütün konumlarında aynen kullanıldı. Aynı işi tam bağlı bir katmanla yapmak her çıktı hücresi için ${N * N} ağırlık, yani ${oh * ow * N * N} ağırlık isterdi. Görüntüyü kaydırın: harita da aynı yöne kayar, filtre değişmez.` },
+    ]));
+  };
+  queueMicrotask(() => draw(true));
   return el;
 };
 

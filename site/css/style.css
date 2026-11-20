@@ -541,3 +541,15 @@ td.hlc { background: var(--accent-wash); font-weight: 600; }
 .essence li { margin: 0.25rem 0; }
 .btn-group { display: inline-flex; gap: 0.3rem; flex-wrap: wrap; }
 .bar { display: inline-block; height: 0.6em; background: var(--accent); border-radius: 2px; vertical-align: middle; }
+
+.click-grid { display: inline-grid; grid-template-columns: repeat(var(--cols), auto); gap: 2px; }
+.cg-cell { border: 1px solid var(--border); border-radius: 4px; font: inherit; font-size: 0.8rem; cursor: pointer; padding: 0; color: var(--text); }
+.cg-pos { background: color-mix(in srgb, var(--pos) 55%, var(--surface)); }
+.cg-neg { background: var(--surface-2); }
+.cg-zero { background: var(--surface); color: var(--muted); }
+.tmpl-row { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-start; margin: 0.6rem 0; }
+.scroll-x { overflow-x: auto; max-width: 100%; }
+.plot .hm { stroke: var(--border); }
+.bridge { margin: 0.6rem 0 1rem; padding: 0.6rem 1rem; border-radius: var(--radius); border: 1px dashed var(--border); background: var(--surface); }
+.bridge-title { font-weight: 700; margin-bottom: 0.2rem; }
+.bridge p { margin: 0.3rem 0; }
