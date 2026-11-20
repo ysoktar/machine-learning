@@ -37,7 +37,7 @@ export const NAV = [
     { id: "w10-seq", week: 10, scope: "final", title: "Diziler, dikkat, Transformer", desc: "RNN, LSTM ve GRU, elle dikkat hesabı, Transformer, gömmeler ve kosinüs, Word2Vec, LLM." },
     { id: "w11-unsup", week: 11, scope: "final", title: "Gözetimsiz öğrenme, Naive Bayes", desc: "k-ortalamalar elle, dendrogram, siluet, DBSCAN, GMM/EM, otokodlayıcı, Naive Bayes, anomali tespiti." },
     { id: "w12-rl", week: 12, scope: "final", title: "Pekiştirmeli öğrenme", desc: "MDP, değer yinelemesi, Q-öğrenme, ε-greedy, TD ve Monte Carlo, DQN; adillik ve MLOps." },
-    { id: "exam-final", scope: "final", title: "Final rehberi", desc: "Kapsam, 10–12. hafta konuları ve geçmiş final alıştırma soruları." },
+    { id: "exam-final", scope: "final", title: "Final rehberi", desc: "Kapsam, soru kalıpları, geçmiş final soruları ve adım adım çözümlü deneme soruları." },
   ] },
 ];
 const ALL = NAV.flatMap((p) => p.items.map((it) => ({ ...it, part: p.part, scope: it.scope ?? (it.week ? "midterm" : "none") })));
