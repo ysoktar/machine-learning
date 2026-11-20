@@ -20,6 +20,51 @@ const DEFS = `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" marker
 const range = (a, b, n) => Array.from({ length: n + 1 }, (_, i) => a + ((b - a) * i) / n);
 
 export const FIG = {
+  // ---------------------------------------------------------------- week 9 (hand convolution pictures)
+  conv1d: () => {
+    const f = [4, 3, 2, "−5", 3, 5, 2, 5, 5, 6], o = ["3", "0", "0", "1", "10/3", "4", "4", "16/3"];
+    const cw = 40, x0 = 70, cell = (x, y, t, cls) => `<rect x="${x}" y="${y}" width="${cw}" height="30" class="${cls}"/>${T(x + cw / 2, y + 20, t, { anchor: "middle" })}`;
+    let s = DEFS;
+    s += T(4, 26, "f (sinyal)", { cls: "fig-sub" }) + T(4, 76, "g (filtre)", { cls: "fig-sub" }) + T(4, 126, "f ∗ g", { cls: "fig-sub" });
+    f.forEach((v, i) => { s += cell(x0 + i * cw, 6, String(v), i < 3 ? "fig-hl" : "fig-box2"); });
+    for (let i = 0; i < 3; i++) s += cell(x0 + i * cw, 56, "⅓", "fig-box3");
+    o.forEach((v, i) => { s += cell(x0 + (i + 1) * cw, 106, v, i === 0 ? "fig-hl" : "fig-box"); });
+    s += arrow(x0 + 1.5 * cw, 88, x0 + 1.5 * cw, 104);
+    s += T(x0 + 3 * cw + 8, 76, "(4 + 3 + 2)/3 = 3; filtre birer adım sağa kayar", { cls: "fig-sub" });
+    return svg(x0 + 10 * cw + 6, 142, s, "1B evrişim");
+  },
+
+  conv2d: () => {
+    const I = [[1, 2, 0, 1], [0, 1, 3, 1], [2, 1, 0, 0], [1, 0, 1, 2]], K = [[1, 0, "−1"], [1, 0, "−1"], [1, 0, "−1"]], O = [[0, 2], ["−1", "−1"]];
+    const c = 32;
+    const grid = (M, x, y, hl) => M.map((r, i) => r.map((v, j) => `<rect x="${x + j * c}" y="${y + i * c}" width="${c}" height="${c}" class="${hl(i, j)}"/>${T(x + j * c + c / 2, y + i * c + c / 2 + 5, String(v), { anchor: "middle" })}`).join("")).join("");
+    let s = DEFS;
+    s += grid(I, 6, 10, (i, j) => (i < 3 && j < 3 ? "fig-hl" : "fig-box2"));
+    s += T(150, 82, "∗", { anchor: "middle", size: 22 });
+    s += grid(K, 170, 26, () => "fig-box3");
+    s += T(286, 82, "=", { anchor: "middle", size: 22 });
+    s += grid(O, 306, 42, (i, j) => (i === 0 && j === 0 ? "fig-hl" : "fig-box"));
+    s += T(70, 152, "I (4×4)", { anchor: "middle", cls: "fig-sub" }) + T(218, 152, "K (3×3, dikey kenar)", { anchor: "middle", cls: "fig-sub" }) + T(338, 152, "çıktı (2×2)", { anchor: "middle", cls: "fig-sub" });
+    s += T(382, 50, "sol üst hücre:", { cls: "fig-sub" }) + T(382, 68, "(1 + 0 + 2)", { cls: "fig-sub" }) + T(382, 86, "− (0 + 3 + 0)", { cls: "fig-sub" }) + T(382, 104, "= 0", { cls: "fig-sub" });
+    return svg(470, 162, s, "2B evrişim");
+  },
+
+  lrsched: () => lines({ series: [
+    { pts: range(0, 40, 80).map((t) => [t, 0.1 * 0.5 ** Math.floor(t / 10)]), cls: "curve2", name: "basamak (her 10 epoch'ta yarıya)", color: "neg" },
+    { pts: range(0, 40, 80).map((t) => [t, 0.1 * 0.93 ** t]), cls: "curve1", name: "üstel: 0.1·0.93ᵗ", color: "pos" },
+    { pts: range(0, 40, 80).map((t) => [t, 0.05 * (1 + Math.cos((Math.PI * t) / 40))]), cls: "curve3", name: "kosinüs", color: "s3" },
+  ], xlim: [0, 40], ylim: [0, 0.11], ystep: 0.02, xlabel: "epoch t", ylabel: "öğrenme oranı η", aria: "Öğrenme oranı çizelgeleri" }),
+
+  resblock: () => {
+    let s = DEFS;
+    s += box(6, 60, 50, 34, "x", "fig-box2") + arrow(58, 77, 96, 77);
+    s += box(98, 60, 196, 34, "Conv · BN · ReLU · Conv · BN", "fig-box") + T(196, 112, "F(x)", { anchor: "middle", cls: "fig-sub" });
+    s += arrow(296, 77, 326, 77) + `<circle cx="342" cy="77" r="15" class="fig-box3"/>${T(342, 83, "+", { anchor: "middle", size: 17 })}`;
+    s += arrow(358, 77, 384, 77) + box(386, 60, 92, 34, "y = F(x) + x", "fig-box2");
+    s += `<path d="M31,58 V18 H342 V60" class="fig-arrow" fill="none" marker-end="url(#ah)"/>` + T(186, 12, "kısayol (özdeşlik): x olduğu gibi eklenir", { anchor: "middle", cls: "fig-sub" });
+    return svg(482, 122, s, "Artık blok");
+  },
+
   // ---------------------------------------------------------------- week 10
   rnnunroll: () => {
     let s = DEFS;

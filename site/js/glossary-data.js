@@ -44,6 +44,14 @@ export const TERMS = [
 "en": "empirical risk"
 },
 {
+"term": "Artık bağlantı",
+"def": "Bir bloğun çıktısına girdisini doğrudan eklemek (ResNet). Gradyan kısayoldan bozulmadan geri akar. (y = F(x) + x)",
+"id": "t-artik-baglanti",
+"match": "artık bağlantı",
+"week": 9,
+"en": "residual (skip) connection"
+},
+{
 "term": "Aşırı uyum",
 "def": "Modelin eğitim verisini, gürültüsüyle birlikte ezberlemesi: eğitim hatası çok düşük, yeni verideki hata yüksek. Sınavı ezberleyip konuyu anlamamış öğrenci gibi. (eğitim ≪ doğrulama hatası)",
 "id": "t-asiri-uyum",
@@ -194,6 +202,14 @@ export const TERMS = [
 "match": "doğrulama kümesi|doğrulama(?! eğrisi)",
 "week": 2,
 "en": "validation set"
+},
+{
+"term": "Dolgu",
+"def": "Evrişimden önce görüntünün ya da sinyalin kenarlarına sıfır (ya da kenar değeri) eklemek; “same” dolgu çıktıyı girdiyle aynı boyda tutar. (p = (k − 1)/2 (adım 1 iken same))",
+"id": "t-dolgu",
+"match": "dolgu",
+"week": 9,
+"en": "padding"
 },
 {
 "term": "Dropout",
@@ -375,9 +391,17 @@ export const TERMS = [
 "term": "GRU",
 "def": "LSTM'nin sade hâli: ayrı bellek yok, iki kapı (sıfırlama ve güncelleme). Yaklaşık %25 daha az parametre. (hₜ = (1 − zₜ)⊙hₜ₋₁ + zₜ⊙h′ₜ)",
 "id": "t-gru",
-"match": "GRU",
+"match": "GRU(?![a-zçğıöşüA-ZÇĞİÖŞÜ])",
 "week": 10,
 "en": "gated recurrent unit"
+},
+{
+"term": "Havuzlama",
+"def": "Görüntüyü küçük bloklara bölüp her bloktan tek değer (en büyük ya da ortalama) bırakmak. Boyutu küçültür, parametresi yoktur.",
+"id": "t-havuzlama",
+"match": "havuzlama",
+"week": 9,
+"en": "pooling"
 },
 {
 "term": "Hiperparametre",
@@ -588,7 +612,7 @@ export const TERMS = [
 "term": "LSTM",
 "def": "Ayrı bir hücre durumu (bellek) ve üç kapısı (unutma, girdi, çıktı) olan RNN hücresi. Belleği toplamayla güncellediği için uzun bağımlılıkları öğrenebilir. (cₜ = fₜ⊙cₜ₋₁ + iₜ⊙gₜ, hₜ = oₜ⊙tanh(cₜ))",
 "id": "t-lstm",
-"match": "LSTM",
+"match": "LSTM(?![a-zçğıöşüA-ZÇĞİÖŞÜ])",
 "week": 10,
 "en": "long short-term memory"
 },
@@ -736,7 +760,7 @@ export const TERMS = [
 "term": "RAG",
 "def": "Erişimle zenginleştirilmiş üretim: soruyla ilgili belgeleri gömme benzerliğiyle bulup isteme ekleyerek dil modeline cevap ürettirmek.",
 "id": "t-rag",
-"match": "RAG",
+"match": "RAG(?![a-zçğıöşüA-ZÇĞİÖŞÜ])",
 "week": 10,
 "en": "retrieval-augmented generation"
 },
@@ -862,6 +886,14 @@ export const TERMS = [
 "en": "token"
 },
 {
+"term": "Toplu normalleştirme",
+"def": "Bir katmanın değerlerini her mini yığın içinde ortalaması 0, varyansı 1 olacak biçimde ölçekleyip öğrenilen γ ve β ile yeniden ölçeklemek. Eğitimi hızlandırır ve kararlı kılar. (x̂ = (x − μ_B)/√(σ²_B + ε), y = γx̂ + β)",
+"id": "t-toplu-normallestirme-bn",
+"match": "toplu normalleştirme",
+"week": 9,
+"en": "batch normalization"
+},
+{
 "term": "Transformer",
 "def": "Özyineleme kullanmayan, yalnız dikkat katmanları, ileri beslemeli ağlar, artık bağlantılar ve konum kodlamasıyla kurulan ağ (2017). BERT ve GPT bu mimaridir.",
 "id": "t-transformer",
@@ -888,6 +920,14 @@ export const TERMS = [
 "w2-data",
 "on-bilgi"
 ]
+},
+{
+"term": "Veri çoğaltma",
+"def": "Eğitim örneklerinden etiketi değiştirmeyen dönüşümlerle (kırpma, çevirme, döndürme) yeni örnekler üretmek. Yalnız eğitim kümesine uygulanır.",
+"id": "t-veri-cogaltma",
+"match": "veri çoğaltma",
+"week": 9,
+"en": "data augmentation"
 },
 {
 "term": "Veri sızıntısı",
