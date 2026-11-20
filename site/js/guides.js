@@ -1,6 +1,31 @@
 // "How to use this tool" boxes shown at the top of each widget: what it shows, what to try, what you should notice.
 // The point is that a tool supports the explanation around it instead of being thrown at the reader.
 export const GUIDE = {
+  kmeans: {
+    what: "Verdiğiniz noktalar ve başlangıç merkezleriyle k-ortalamaları yineleme yineleme yürütür: her yinelemede uzaklık kareleri tablosu, atama, yeni merkezler ve SSE.",
+    tryit: ["Varsayılan veri sayfadaki örnektir: 2. yinelemede B'nin birinci kümeye geçtiğini görün.", "Merkezleri “1 1” ve “5 5” yapın: tek yinelemede doğru kümeler bulunur.", "Tek boyutlu Problem 1'i deneyin: noktalar 1 2 3 4 6 12 (her biri ayrı satırda), merkezler 2, 3, 4."],
+    see: "SSE her yinelemede azalır ya da aynı kalır; atamalar değişmeyince algoritma durur. Kötü başlangıç daha çok yineleme gerektirir.",
+  },
+  linkage: {
+    what: "Bir uzaklık matrisinden birleştirici hiyerarşik kümeleme yapar; her birleşmeyi ve güncellenen uzaklıkları yazar, dendrogramı çizer.",
+    tryit: ["Varsayılan matriste tam bağlantının son birleşmesinin 10'da olduğunu görün.", "Bağlantıyı “tek” yapın: son birleşme 5'e iner.", "Problem 2'nin matrisini yazın (P Q R S)."],
+    see: "Tam bağlantı en uzak çifte, tek bağlantı en yakın çifte bakar; bu yüzden tek bağlantı kümeleri daha alçakta birleştirir.",
+  },
+  nbayes: {
+    what: "Etiketli metinlerden önsel ve Laplace düzeltmeli kelime olasılıklarını çıkarıp yeni bir metnin sınıf olasılıklarını adım adım hesaplar.",
+    tryit: ["Varsayılan örnekte sonucun spam (0.6) çıktığını görün.", "Yeni metni “toplantı yarın” yapın.", "Problem 3'ün verisini yazın: olumlu: harika ürün, olumlu: harika hızlı kargo, olumsuz: kötü ürün, olumsuz: kötü kargo yavaş, olumsuz: yavaş."],
+    see: "Önsel olasılık ve tek bir güçlü kelime kararı değiştirebilir; Laplace düzeltmesi görülmemiş kelimelerin çarpımı sıfırlamasını önler.",
+  },
+  qlearn: {
+    what: "Tek bir Q-öğrenme güncellemesini dört adımda hesaplar: en iyi sonraki değer, hedef, fark ve yeni Q.",
+    tryit: ["Varsayılan değerlerde sonucun 3.3 olduğunu görün.", "“s′ son durum” kutusunu işaretleyin: hedef yalnız ödül olur.", "α'yı 1 yapın: yeni değer doğrudan hedefe eşit olur."],
+    see: "α, eski tahminin hedefe ne kadar yaklaştırılacağını belirler; γ, gelecekteki değerin ne kadar önemsendiğini.",
+  },
+  valueiter: {
+    what: "Düz bir koridorda değer yinelemesini çalıştırır: her yinelemede her karenin değeri, en iyi eylemin ödülü artı varılan karenin indirimli değeridir.",
+    tryit: ["Varsayılan ayarlarla değerlerin (6.2, 8, 10) olduğunu görün.", "γ'yı 0.5 yapın: uzaktaki kareler hedefi çok daha az önemser.", "Adım ödülünü 0 yapın: değerler yalnız γ ile küçülür."],
+    see: "Hedefin değeri her yinelemede bir kare geriye yayılır; değerler değişmeyi bırakınca en iyi politika okunur.",
+  },
   attention: {
     what: "Q, K ve V matrislerinden dikkat ağırlıklarını ve çıktıları hesaplar; seçtiğiniz satır için skor, ölçekleme, softmax ve ağırlıklı toplamı adım adım yazar.",
     tryit: ["Varsayılan değerler sayfadaki elle örnektir: 3. satırın ağırlıklarının 0.248, 0.248, 0.503 çıktığını görün.", "Q'nun ilk satırını 2 0 yapın: ağırlıklar nasıl keskinleşiyor?", "Nedensel maskeyi açın ve 2. satıra bakın: üçüncü kelimenin ağırlığı 0 oluyor."],

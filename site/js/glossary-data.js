@@ -17,6 +17,14 @@ export const TERMS = [
 "en": "adaptive boosting"
 },
 {
+"term": "Adillik",
+"def": "Modelin farklı gruplara sistematik olarak farklı davranmaması; demografik eşitlik, fırsat eşitliği gibi ölçütlerle ölçülür.",
+"id": "t-adillik",
+"match": "adillik",
+"week": 12,
+"en": "fairness"
+},
+{
 "term": "Ağırlık",
 "def": "Modelin öğrendiği sayılardan biri: bir özniteliğin karara ne kadar ve hangi yönde katkı yaptığı. w = (2, −1) ise x₁ artınca skor artar, x₂ artınca azalır. (ŷ = w·x + b)",
 "id": "t-agirlik",
@@ -42,6 +50,14 @@ export const TERMS = [
 "match": "ampirik risk",
 "week": 3,
 "en": "empirical risk"
+},
+{
+"term": "Anomali tespiti",
+"def": "Verinin büyük çoğunluğundan belirgin biçimde farklı örnekleri bulmak (sahtekârlık, arıza); genellikle gözetimsiz yapılır.",
+"id": "t-anomali-tespiti",
+"match": "anomali",
+"week": 11,
+"en": "anomaly detection"
 },
 {
 "term": "Artık bağlantı",
@@ -180,6 +196,30 @@ export const TERMS = [
 "en": "branch"
 },
 {
+"term": "DBSCAN",
+"def": "Kümeleri yoğun bölgeler olarak bulan algoritma (ε yarıçapı, minPts); her biçimdeki kümeyi bulur, gürültüyü ayrıca işaretler.",
+"id": "t-dbscan",
+"match": "DBSCAN",
+"week": 11,
+"en": "density-based clustering"
+},
+{
+"term": "Değer fonksiyonu",
+"def": "Bir durumun (V) ya da durum-eylem çiftinin (Q) gelecekte getireceği beklenen indirimli toplam ödül. (V(s), Q(s, a))",
+"id": "t-deger-fonksiyonu",
+"match": "değer fonksiyonu|değer yinelemesi",
+"week": 12,
+"en": "value function"
+},
+{
+"term": "Dendrogram",
+"def": "Hiyerarşik kümelemede birleşmelerin sırasını ve uzaklığını gösteren ağaç; yatay bir kesim küme sayısını belirler.",
+"id": "t-dendrogram",
+"match": "dendrogram",
+"week": 11,
+"en": "dendrogram"
+},
+{
 "term": "Destek vektörü",
 "def": "SVM'de karar sınırına en yakın, “sokağın” kenarına değen noktalar. Çözüm yalnız onlara bağlıdır; diğer noktaları silmek sınırı değiştirmez. (y·(w·x + b) = 1)",
 "id": "t-destek-vektoru",
@@ -196,6 +236,14 @@ export const TERMS = [
 "en": "attention mechanism"
 },
 {
+"term": "Dirsek yöntemi",
+"def": "k-ortalamalarda farklı k değerleri için küme içi kare toplamını çizip eğrinin büküldüğü (düzleştiği) k'yı seçmek.",
+"id": "t-dirsek-yontemi",
+"match": "dirsek yöntemi",
+"week": 11,
+"en": "elbow method"
+},
+{
 "term": "Doğrulama kümesi",
 "def": "Hiperparametre seçmek ve modelleri karşılaştırmak için ayrılan veri. Test kümesi en sona saklanır.",
 "id": "t-dogrulama-kumesi",
@@ -210,6 +258,14 @@ export const TERMS = [
 "match": "dolgu",
 "week": 9,
 "en": "padding"
+},
+{
+"term": "DQN",
+"def": "Q tablosu yerine durumdan Q değerlerini tahmin eden sinir ağı; deneyim tekrarı ve hedef ağla eğitilir.",
+"id": "t-dqn-derin-q-agi",
+"match": "DQN",
+"week": 12,
+"en": "deep Q-network"
 },
 {
 "term": "Dropout",
@@ -348,12 +404,28 @@ export const TERMS = [
 "en": "hidden state"
 },
 {
+"term": "GMM ve EM",
+"def": "Veriyi Gauss dağılımlarının karışımıyla modelleyen yumuşak kümeleme; parametreler E (sorumluluklar) ve M (güncelleme) adımlarıyla bulunur.",
+"id": "t-gmm-ve-em",
+"match": "GMM|Gauss karışım|EM algoritma",
+"week": 11,
+"en": "Gaussian mixture model / expectation–maximization"
+},
+{
 "term": "Gömme vektörü",
 "def": "Bir kelimeyi (ya da görüntüyü, cümleyi) kısa ve yoğun bir sayı vektörüyle temsil etmek; anlamca benzer olanlar uzayda birbirine yakın düşer.",
 "id": "t-gomme-vektoru",
 "match": "gömme(?!li)",
 "week": 10,
 "en": "embedding"
+},
+{
+"term": "Gözetimsiz öğrenme",
+"def": "Etiket olmadan verinin içindeki yapıyı bulmak: kümeleme, boyut indirgeme, yoğunluk kestirimi, anomali tespiti.",
+"id": "t-gozetimsiz-ogrenme",
+"match": "gözetimsiz",
+"week": 11,
+"en": "unsupervised learning"
 },
 {
 "term": "Gradyan",
@@ -460,6 +532,22 @@ export const TERMS = [
 "en": "fine-tuning"
 },
 {
+"term": "İndirim çarpanı",
+"def": "Gelecekteki ödülleri küçülten 0 ile 1 arası sayı; uzak ödüller γ'nın kuvvetleriyle çarpılır. (G = r₁ + γr₂ + γ²r₃ + …)",
+"id": "t-i-ndirim-carpani",
+"match": "indirim çarpanı|indirimli",
+"week": 12,
+"en": "discount factor (γ)"
+},
+{
+"term": "k-ortalamalar",
+"def": "Her noktayı en yakın merkeze atayıp merkezleri kümelerin ortalaması yaparak, atamalar değişmeyene kadar tekrarlayan kümeleme algoritması. (SSE = Σⱼ Σ ‖x − mⱼ‖²)",
+"id": "t-k-ortalamalar-k-means",
+"match": "k-ortalamalar|k-means",
+"week": 11,
+"en": "k-means"
+},
+{
 "term": "Kalıntı",
 "def": "Gerçek değer ile tahmin arasındaki fark: y − ŷ.",
 "id": "t-kalinti-artik",
@@ -533,6 +621,14 @@ export const TERMS = [
 "en": "gain ratio"
 },
 {
+"term": "Keşif ve sömürü",
+"def": "Yeni eylemleri denemek (keşif) ile bilinen en iyi eylemi kullanmak (sömürü) arasındaki denge.",
+"id": "t-kesif-ve-somuru",
+"match": "keşif|sömürü",
+"week": 12,
+"en": "exploration vs exploitation"
+},
+{
 "term": "kNN",
 "def": "Yeni örneği, eğitim verisindeki en yakın k komşusunun çoğunluk oyuyla sınıflamak. Eğitimde hiçbir şey öğrenmez, yalnız veriyi saklar.",
 "id": "t-knn",
@@ -575,6 +671,22 @@ export const TERMS = [
 "on-bilgi",
 "w2-data"
 ]
+},
+{
+"term": "Kümeleme",
+"def": "Benzer örnekleri aynı gruba, farklı olanları ayrı gruplara koymak; etiket kullanılmaz.",
+"id": "t-kumeleme",
+"match": "kümeleme|kümelem",
+"week": 11,
+"en": "clustering"
+},
+{
+"term": "Laplace düzeltmesi",
+"def": "Sayımlara 1 ekleyerek eğitimde görülmemiş bir değerin olasılığının 0 çıkmasını önlemek. ((sayı + 1)/(toplam + |V|))",
+"id": "t-laplace-duzeltmesi",
+"match": "Laplace",
+"week": 11,
+"en": "Laplace (add-one) smoothing"
 },
 {
 "term": "Lasso",
@@ -625,6 +737,14 @@ export const TERMS = [
 "en": "margin"
 },
 {
+"term": "MDP",
+"def": "Durumlar, eylemler, geçiş olasılıkları, ödüller ve indirim çarpanıyla tanımlanan karar problemi; gelecek yalnız şimdiki duruma bağlıdır. ((S, A, T, R, γ))",
+"id": "t-mdp-markov-karar-sureci",
+"match": "MDP|Markov karar",
+"week": 12,
+"en": "Markov decision process"
+},
+{
 "term": "Menteşe kaybı",
 "def": "SVM'nin kaybı: nokta doğru tarafta ve marjın dışındaysa 0, değilse marja ne kadar girdiyse o kadar. (max(0, 1 − y·f(x)))",
 "id": "t-mentese-kaybi",
@@ -639,6 +759,14 @@ export const TERMS = [
 "match": "min-max",
 "week": 2,
 "en": "min-max scaling"
+},
+{
+"term": "MLOps ve veri kayması",
+"def": "Modelleri üretimde izlemek, sürümlemek ve yeniden eğitmek; veri kayması, girdi dağılımının zamanla değişip başarıyı düşürmesidir.",
+"id": "t-mlops-ve-veri-kaymasi",
+"match": "MLOps|veri kayması",
+"week": 12,
+"en": "MLOps / data drift"
 },
 {
 "term": "MLP",
@@ -663,6 +791,14 @@ export const TERMS = [
 "match": "MSE|MAE|RMSE",
 "week": 2,
 "en": "mean squared / absolute error"
+},
+{
+"term": "Naive Bayes",
+"def": "Sınıf bilindiğinde özniteliklerin bağımsız olduğunu varsayan olasılıksal sınıflandırıcı; önsel ile her özniteliğin olasılığı çarpılır. (P(C | x) ∝ P(C)·Π P(xᵢ | C))",
+"id": "t-naive-bayes",
+"match": "Naive Bayes",
+"week": 11,
+"en": "naive Bayes"
 },
 {
 "term": "Normalleştirme",
@@ -690,6 +826,14 @@ export const TERMS = [
 "match": "OOB|torba dışı",
 "week": 6,
 "en": "out-of-bag error"
+},
+{
+"term": "Otokodlayıcı",
+"def": "Girdisini dar bir orta katmandan geçirip yeniden üretmeyi öğrenen ağ; orta katman sıkıştırılmış temsildir. Gürültü giderme ve anomali tespitinde de kullanılır. (kayıp = ‖x − x̂‖²)",
+"id": "t-otokodlayici",
+"match": "otokodlayıcı",
+"week": 11,
+"en": "autoencoder"
 },
 {
 "term": "Öğrenme oranı",
@@ -741,6 +885,14 @@ export const TERMS = [
 "en": "principal component analysis"
 },
 {
+"term": "Pekiştirmeli öğrenme",
+"def": "Bir ajanın çevreyle etkileşerek, doğru eylem söylenmeden yalnız ödül sinyaliyle toplam ödülü en büyük yapan davranışı öğrenmesi.",
+"id": "t-pekistirmeli-ogrenme",
+"match": "pekiştirmeli",
+"week": 12,
+"en": "reinforcement learning"
+},
+{
 "term": "Perceptron",
 "def": "En basit doğrusal sınıflandırıcı: skor ≥ 0 ise +1. Yalnız yanlış sınıfladığı örnekte ağırlıklarını o örneğe doğru çeker. (hatada w ← w + η·y·x)",
 "id": "t-perceptron-algilayici",
@@ -749,12 +901,28 @@ export const TERMS = [
 "en": "perceptron"
 },
 {
+"term": "Politika",
+"def": "Ajanın her durumda hangi eylemi seçeceğini belirleyen kural: π(s). (π(s))",
+"id": "t-politika",
+"match": "politika",
+"week": 12,
+"en": "policy"
+},
+{
 "term": "Precision",
 "def": "“Pozitif dediklerimin kaçı gerçekten pozitif?” Yanlış alarm (FP) pahalıysa önemli (spam filtresi). (TP/(TP + FP))",
 "id": "t-precision-kesinlik",
 "match": "precision|kesinlik",
 "week": 2,
 "en": "precision"
+},
+{
+"term": "Q-öğrenme",
+"def": "Durum-eylem değerlerini deneyimden öğrenen modelsiz yöntem; hedefte varılan durumdaki en iyi Q kullanılır. (Q ← Q + α[r + γ max Q(s′, ·) − Q])",
+"id": "t-q-ogrenme",
+"match": "Q-öğrenme",
+"week": 12,
+"en": "Q-learning"
 },
 {
 "term": "RAG",
@@ -821,6 +989,14 @@ export const TERMS = [
 "en": "sigmoid / logistic function"
 },
 {
+"term": "Siluet katsayısı",
+"def": "Bir noktanın kendi kümesine ne kadar iyi oturduğunu komşu kümeyle karşılaştırarak ölçen −1 ile 1 arası değer. (s = (b − a)/max(a, b))",
+"id": "t-siluet-katsayisi",
+"match": "siluet",
+"week": 11,
+"en": "silhouette coefficient"
+},
+{
 "term": "Sınıf",
 "def": "Sınıflandırmada etiketin alabileceği kategorilerden biri: Evet/Hayır, +/−, spam/değil.",
 "id": "t-sinif",
@@ -861,6 +1037,14 @@ export const TERMS = [
 "en": "support vector machine"
 },
 {
+"term": "t-SNE ve UMAP",
+"def": "Yüksek boyutlu veriyi görselleştirmek için iki boyuta indiren, yerel komşuluğu koruyan yöntemler; kümeler arası uzaklıklar yorumlanmaz.",
+"id": "t-t-sne-ve-umap",
+"match": "t-SNE|UMAP",
+"week": 11,
+"en": "t-SNE / UMAP"
+},
+{
 "term": "Tahmin",
 "def": "Modelin bir örnek için verdiği cevap; ŷ (y şapka) ile gösterilir. (ŷ)",
 "id": "t-tahmin",
@@ -868,6 +1052,22 @@ export const TERMS = [
 "week": 1,
 "en": "prediction",
 "lower": true
+},
+{
+"term": "TD öğrenme",
+"def": "Her geçişten sonra değeri, ödül artı sonraki durumun tahminine doğru biraz kaydırarak öğrenmek; bölümün bitmesini beklemez. (V(s) ← V(s) + α[r + γV(s′) − V(s)])",
+"id": "t-td-ogrenme",
+"match": "zamansal fark|TD öğren|TD hata",
+"week": 12,
+"en": "temporal difference learning"
+},
+{
+"term": "Tek / tam bağlantı",
+"def": "Hiyerarşik kümelemede iki küme arasındaki uzaklık: tek bağlantıda en yakın, tam bağlantıda en uzak nokta çiftinin uzaklığı. (min d(a, b) / max d(a, b))",
+"id": "t-tek-tam-baglanti",
+"match": "tek bağlantı|tam bağlantı",
+"week": 11,
+"en": "single / complete linkage"
 },
 {
 "term": "Test kümesi",
@@ -918,7 +1118,8 @@ export const TERMS = [
 "en": "variance",
 "skip": [
 "w2-data",
-"on-bilgi"
+"on-bilgi",
+"w11-unsup"
 ]
 },
 {
@@ -995,5 +1196,13 @@ export const TERMS = [
 "match": "z-score|z-skoru",
 "week": 2,
 "en": "standardization"
+},
+{
+"term": "ε-greedy",
+"def": "Olasılık ε ile rastgele, 1 − ε ile en iyi bilinen eylemi seçerek keşif ile sömürüyü dengeleme. (P(en iyi) = 1 − ε + ε/|A|)",
+"id": "t-greedy",
+"match": "ε-greedy",
+"week": 12,
+"en": "epsilon-greedy"
 }
 ];

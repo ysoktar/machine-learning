@@ -530,3 +530,7 @@ ol.walk.parts { list-style: none; padding-left: 0; }
 @media (max-width: 700px) { .three-col { grid-template-columns: 1fr; } }
 label.block { display: block; margin: 0.3rem 0; }
 label.block input { display: block; max-width: 100%; box-sizing: border-box; }
+
+.plot .kc0 { fill: var(--pos); } .plot .kc1 { fill: var(--neg); } .plot .kc2 { fill: var(--s3); } .plot .kc3 { fill: var(--s4); }
+.plot .kring { fill: none; stroke-width: 2.5; } .plot .kring.kc0 { stroke: var(--pos); } .plot .kring.kc1 { stroke: var(--neg); } .plot .kring.kc2 { stroke: var(--s3); } .plot .kring.kc3 { stroke: var(--s4); }
+td.hlc { background: var(--accent-wash); font-weight: 600; }

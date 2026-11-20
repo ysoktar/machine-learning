@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pekiştirmeli öğrenme · Yapay Öğrenme</title>
+<meta name="description" content="MDP, değer yinelemesi, Monte Carlo ve TD, Q-öğrenme, ε-greedy, DQN; adillik, yorumlanabilirlik ve MLOps.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w12-rl">
+<main><div class="content">
+
+<h1>Pekiştirmeli öğrenme ve güvenilir makine öğrenmesi</h1>
+<p class="lead">Bu hafta doğru cevabın hiç söylenmediği, yalnız yapılan işin sonunda bir ödül ya da ceza alındığı öğrenmeyi görüyoruz. Bir ajanın çevreyle etkileşerek toplam ödülünü en büyük yapan davranışı nasıl öğrendiğini Markov karar süreci (MDP), değer yinelemesi ve Q-öğrenme üzerinden elle hesaplıyoruz. Haftanın ikinci yarısında modellerin adil, açıklanabilir ve üretimde güvenilir olması için gerekenlere kısaca bakıyoruz. Finalde bu haftadan özellikle <strong>Q-öğrenme güncellemesi, ε-greedy, keşif ve sömürü dengesi, TD ile Monte Carlo farkı, DQN</strong> ve gözetimli öğrenmeyle farklar soruluyor.</p>
+<div class="callout news"><div class="callout-title">Bu sayfa nereden derlendi?</div><p>Bu dönemin 12. hafta slaytları henüz yayımlanmadı. Sayfa, izlencedeki konu listesine (“Markov karar süreçleri, değer ve politika yinelemesi, Q-öğrenme; adillik, yorumlanabilirlik, veri sızıntısı, MLOps”) ve önceki dönemin pekiştirmeli öğrenme ders notlarıyla final alıştırma sorularına dayanıyor. Slaytlar yayımlanınca gösterim onlara göre güncellenebilir.</p></div>
+<div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
+<tr><td>Q güncellemesi</td><td>Bir geçiş (s, a, r, s′), eski Q değerleri, α ve γ verilir; yeni Q(s, a) istenir.</td><td>Hedefi (r + γ·max Q(s′, ·)), farkı ve güncellenmiş değeri ayrı ayrı yazmak.</td></tr>
+<tr><td>Değer yinelemesi / getiri</td><td>Küçük bir ızgara ya da zincir dünyası verilir; birkaç yinelemede durum değerleri ya da indirimli getiri istenir.</td><td>Bellman güncellemesini her durum için yazmak ve en iyi eylemi göstermek.</td></tr>
+<tr><td>Kavram</td><td>Gözetimli ve pekiştirmeli öğrenme farkı, TD ile Monte Carlo, aktif ve pasif öğrenme, Q-öğrenme, keşif ve sömürü, ε-greedy, DQN.</td><td>Her yöntemin ne yaptığını ve neden gerektiğini birlikte yazmak.</td></tr>
+<tr><td>Hiperparametre tablosu</td><td>Durum sayısı, az keşif ve aşırı sömürü arttıkça yanlılık, varyans ve aşırı uyuma ne olur?</td><td>Yönü doğru seçip bir cümleyle gerekçelendirmek.</td></tr>
+</tbody></table></div><p class="small">Ara sınavda yok; finalde.</p></div>
+<div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-pekistirmeli-ogrenme">Pekiştirmeli öğrenme</a> · <a href="sozluk.html#t-mdp-markov-karar-sureci">MDP</a> · <a href="sozluk.html#t-politika">Politika</a> · <a href="sozluk.html#t-deger-fonksiyonu">Değer fonksiyonu</a> · <a href="sozluk.html#t-q-ogrenme">Q-öğrenme</a> · <a href="sozluk.html#t-greedy">ε-greedy</a> · <a href="sozluk.html#t-td-ogrenme">TD öğrenme</a> · <a href="sozluk.html#t-adillik">Adillik</a></div>
+
+<h2>Pekiştirmeli öğrenme nedir? Ajan, çevre, ödül</h2><p class="h-en" lang="en">What is reinforcement learning? Agent, environment, reward</p>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Bisiklete binmeyi öğrenmek</div><p>Bisiklete binmeyi öğrenen bir çocuğa kimse her an hangi kası ne kadar kasacağını söylemez. Çocuk bir şeyler dener; düşerse (ceza) o davranıştan kaçınmayı, dengede kalırsa (ödül) onu sürdürmeyi öğrenir. Bazen hemen kötü görünen bir hareket (hızlanmak) birkaç saniye sonra dengeyi sağlar: ödül gecikmeli gelir. Pekiştirmeli öğrenme budur.</p></div>
+<p>Pekiştirmeli öğrenmede bir <strong>ajan</strong> bir <strong>çevrede</strong> adım adım hareket eder. Her adımda çevrenin <strong>durumunu</strong> (s) gözler, bir <strong>eylem</strong> (a) seçer, çevreden bir <strong>ödül</strong> (r, tek bir sayı) alır ve yeni bir duruma (s′) geçer. Ajanın amacı tek bir adımın ödülünü değil, gelecekteki <strong>toplam ödülü</strong> en büyük yapmaktır; bunun için bazen o anki ödülden vazgeçmek gerekir.</p>
+<div data-widget="fig" data-fig="rlloop" data-caption="Pekiştirmeli öğrenme döngüsü: ajan durumu görüp bir eylem seçer; çevre yeni durumu ve bir ödülü döndürür. Ajan bu deneyimlerden davranışını iyileştirir."></div>
+<p><strong>Gözetimli öğrenmeden farkları.</strong> (1) Öğretmen yoktur, yalnız bir ödül sinyali vardır: ajana doğru eylem söylenmez, yalnız seçtiği eylemin ne kadar iyi olduğu (çoğu zaman gecikmeli) bildirilir. (2) Veri bağımsız değildir: ajanın eylemleri bir sonraki gördüğü veriyi değiştirir. (3) Zaman önemlidir; karar ardışıktır ve bir eylemin sonucu çok sonra ortaya çıkabilir. <strong>Gözetimli öğrenme mümkün olsa bile</strong> pekiştirmeli öğrenme şu durumlarda tercih edilir: doğru eylemleri etiketlemek çok pahalı ya da imkânsızsa (her satranç hamlesi için “en iyi hamle”yi kim yazacak?), uzmanlardan daha iyi bir davranış isteniyorsa (gözetimli model en fazla öğretmeni taklit eder), ve amaç tek tek kararlar değil uzun vadeli toplam sonuçsa (robot kontrolü, öneri sistemleri, oyunlar).</p>
+<h3>Markov karar süreci (MDP)</h3>
+<p>Problem bir MDP olarak yazılır: durumlar kümesi S, eylemler kümesi A, geçiş modeli T(s, a, s′) (s'de a yapılınca s′'ne geçme olasılığı), ödül fonksiyonu R(s, a, s′) ve indirim çarpanı γ. “Markov” sözcüğü geleceğin yalnız şimdiki duruma bağlı olduğunu, geçmişin bilinmesinin ek bilgi vermediğini söyler. Çevre tamamen gözlenebiliyorsa ajan durumu doğrudan görür; kısmen gözlenebiliyorsa (kamerası olan bir robot konumunu tam bilmez, poker oyuncusu rakibin kartlarını görmez) yalnız dolaylı gözlemler alır.</p>
+<div class="formula" style="font-size:1.2rem">Gₜ = rₜ₊₁ + γ·rₜ₊₂ + γ²·rₜ₊₃ + …</div>
+<p class="formula-legend"><b>Burada:</b> Gₜ, t anından sonra toplanan indirimli getiridir. rₜ₊₁, rₜ₊₂, … sonraki adımlarda alınan ödüllerdir. γ (gama) 0 ile 1 arasında bir indirim çarpanıdır: uzak gelecekteki ödüller γ'nın kuvvetleriyle küçültülür. γ = 0 ise ajan yalnız hemen alacağı ödülü önemser; γ 1'e yaklaştıkça uzun vadeyi daha çok önemser.</p>
+<p><strong>Örnek.</strong> Ajan üç adımda −1, −1 ve +10 ödül alıyor, γ = 0.9: G = −1 + 0.9·(−1) + 0.81·10 = −1 − 0.9 + 8.1 = <strong>6.2</strong>.</p>
+<p>Bir pekiştirmeli öğrenme ajanının üç bileşeni olabilir: <strong>politika</strong> π(s) (her durumda hangi eylemin seçileceği; belirlenimci ya da olasılıksal), <strong>değer fonksiyonu</strong> (bir durumun ya da durum-eylem çiftinin gelecekte ne kadar ödül getireceğinin tahmini) ve <strong>model</strong> (çevrenin bir sonraki adımda ne yapacağının tahmini: geçişler ve ödüller).</p>
+
+<h2>Değerler ve Bellman denklemi: değer yinelemesi</h2><p class="h-en" lang="en">Values and the Bellman equation: value iteration</p>
+<p>V(s), s durumundan başlayıp en iyi davranıldığında beklenen getiridir. Q(s, a) ise s'de önce a eylemini yapıp sonra en iyi davranıldığında beklenen getiridir. İkisi Bellman denklemiyle birbirine bağlıdır: bir durumun değeri, en iyi eylemin hemen getirdiği ödül artı varılan durumun indirimli değeridir.</p>
+<div class="formula" style="font-size:1.15rem">V*(s) = maxₐ Σ_(s′) T(s, a, s′)·[R(s, a, s′) + γ·V*(s′)]<br>Q*(s, a) = Σ_(s′) T(s, a, s′)·[R(s, a, s′) + γ·maxₐ′ Q*(s′, a′)]</div>
+<p class="formula-legend"><b>Burada:</b> V*(s) en iyi davranışla s'nin değeri, Q*(s, a) s'de a yapılınca elde edilecek en iyi değerdir. T(s, a, s′) geçiş olasılığı, R(s, a, s′) bu geçişin ödülü, γ indirim çarpanıdır. maxₐ bütün eylemler içinde en iyisini seçer; Σ_(s′) bütün olası sonraki durumlar üzerinden olasılıkla ağırlıklı ortalama alır. Geçişler belirlenimciyse toplam tek bir terime iner.</p>
+<p><strong>Değer yinelemesi</strong> bu denklemi çözmek için bütün değerleri 0 ile başlatır ve her yinelemede her durumun değerini sağ taraftaki formülle, bir önceki yinelemenin değerlerini kullanarak yeniden hesaplar. Değerler değişmeyi bırakınca en iyi politika her durumda formüldeki max'ı veren eylemdir. <strong>Politika yinelemesi</strong> ise iki adımı sırayla yapar: mevcut politikanın değerlerini hesapla (politika değerlendirme), sonra her durumda bu değerlere göre en iyi eylemi seç (politika iyileştirme); politika değişmeyince durur. İkisi de T ve R'nin bilinmesini gerektirir; buna planlama denir.</p>
+<h3>Elle örnek: dört kareli bir koridor</h3>
+<p>Koridor A, B, C ve hedef G'den oluşur. Her durumda iki eylem vardır: sağa ya da sola gitmek (A'da sola gitmek ajanı A'da bırakır). G'ye girmek +10 ödül verir ve oyun biter; öteki her hareket −1 ödüldür. Geçişler belirlenimci, γ = 0.9. Başlangıçta bütün değerler 0.</p>
+<div data-widget="fig" data-fig="corridor" data-caption="Dört kareli koridor. Her kutunun altındaki sayı değer yinelemesinin sonunda bulunan durum değeridir; oklar en iyi politikayı (her yerde sağa) gösterir."></div>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Her yinelemede her durum için yapılan</div><ol>
+<li>Her eylem için: ödül + γ·(varılan durumun önceki yinelemedeki değeri).</li>
+<li>Yeni değer = bu eylem değerlerinin en büyüğü. (G bittiği için değeri hep 0.)</li>
+</ol></div>
+<ol class="walk">
+<li><strong>1. yineleme.</strong> C: sağa 10 + 0.9·0 = 10, sola −1 + 0.9·0 = −1; V₁(C) = <strong>10</strong>. B: sağa −1 + 0.9·0 = −1, sola −1; V₁(B) = <strong>−1</strong>. A: iki eylem de −1; V₁(A) = <strong>−1</strong>.</li>
+<li><strong>2. yineleme.</strong> C: yine 10. B: sağa −1 + 0.9·V₁(C) = −1 + 9 = 8, sola −1 + 0.9·(−1) = −1.9; V₂(B) = <strong>8</strong>. A: sağa −1 + 0.9·V₁(B) = −1.9, sola −1 + 0.9·V₁(A) = −1.9; V₂(A) = <strong>−1.9</strong>.</li>
+<li><strong>3. yineleme.</strong> C: 10. B: −1 + 0.9·10 = 8. A: sağa −1 + 0.9·V₂(B) = −1 + 7.2 = <strong>6.2</strong>, sola −1 + 0.9·(−1.9) = −2.71; V₃(A) = 6.2.</li>
+<li><strong>4. yineleme.</strong> Hiçbir değer değişmez: V = (6.2, 8, 10). En iyi politika her durumda sağa gitmektir. V(A) = 6.2, A'dan başlayan indirimli getiriyle (−1, −1, +10) aynıdır.</li>
+</ol>
+<div data-widget="valueiter"></div>
+
+<h2>Modeli bilmeden öğrenmek: Monte Carlo ve TD</h2><p class="h-en" lang="en">Learning without a model: Monte Carlo and TD</p>
+<p>Gerçek problemlerde geçiş olasılıklarını ve ödülleri genellikle bilmeyiz; ajan çevrede gerçekten eylem yaparak öğrenmek zorundadır. İki yol vardır. <strong>Model tabanlı</strong> öğrenmede ajan önce deneyimlerinden T ve R'yi sayarak kestirir (her (s, a) için hangi s′'ne kaç kez gidildiği), sonra bu öğrenilmiş modelle değer yinelemesi yapar. <strong>Modelsiz</strong> öğrenmede değerler doğrudan deneyimlerden öğrenilir.</p>
+<p><strong>Pasif ve aktif öğrenme.</strong> Pasif pekiştirmeli öğrenmede politika sabittir; ajan yalnız onu uygular ve bu politikanın durum değerlerini öğrenir (politika değerlendirme). Aktif pekiştirmeli öğrenmede ajan eylemlerini kendisi seçer ve amacı en iyi politikayı öğrenmektir; bu yüzden keşif ile sömürü arasında denge kurması gerekir. Gerçek bir ajanın davranışını iyileştirmesi istendiğinde aktif öğrenme gerekir.</p>
+<p><strong>Monte Carlo (MC)</strong> bir durumu her ziyaret ettiğinde, oyun bitene kadar toplanan gerçek getiriyi yazar ve değeri bu getirilerin ortalaması olarak kestirir. Anlaşılması kolaydır ve T ile R'yi bilmeyi gerektirmez. Ama her bölümün sonunu beklemesi gerekir, sonu olmayan problemlerde kullanılamaz, durumlar arasındaki bağlantıyı kullanmadığı için her durumu ayrı öğrenir ve yavaş, gürültülü (varyansı yüksek) kestirimler verir.</p>
+<p><strong>Zamansal fark (TD) öğrenmesi</strong> her geçişten hemen sonra günceller. Gerçek getiri yerine “şimdiki ödül + sonraki durumun şimdiki tahmini” kullanılır ve değer bu hedefe doğru biraz kaydırılır:</p>
+<div class="formula" style="font-size:1.2rem">V(s) ← V(s) + α·[r + γ·V(s′) − V(s)]</div>
+<p class="formula-legend"><b>Burada:</b> V(s) s durumunun şimdiki değer tahmini, r geçişte alınan ödül, s′ varılan durum, γ indirim çarpanıdır. Köşeli parantezin içi TD hatasıdır: yeni örnekten gelen hedef (r + γ·V(s′)) ile eski tahmin arasındaki fark. α öğrenme oranıdır (0 ile 1 arası): tahmin bu farkın α katı kadar hedefe yaklaştırılır. Bu, son örneklere daha çok ağırlık veren yürüyen bir ortalamadır.</p>
+<p>TD'nin avantajları: bölüm bitmeden öğrenir (sonu olmayan problemlerde de çalışır), sonraki durumun tahminini kullanarak durumlar arasındaki bağlantıdan yararlanır, daha az gürültülüdür ve genellikle daha hızlı öğrenir. Bedeli, kendi tahminine dayandığı için başta yanlı olmasıdır. Bu yüzden uygulamada TD, MC'den daha yaygındır.</p>
+
+<h2>Q-öğrenme: eylem değerlerini deneyimden öğrenmek</h2><p class="h-en" lang="en">Q-learning: learning action values from experience</p>
+<p>TD ile durum değerleri öğrenilebilir ama V'den bir politika çıkarmak için hangi eylemin hangi duruma götürdüğünü (modeli) bilmek gerekir. Q-öğrenme bunun yerine her durum-eylem çiftinin değerini Q(s, a) öğrenir; politika doğrudan “Q'su en büyük eylemi seç” olur, model gerekmez. Q değerleri bir tabloda tutulur ve her geçişten sonra şöyle güncellenir:</p>
+<div class="formula" style="font-size:1.25rem">Q(s, a) ← Q(s, a) + α·[r + γ·maxₐ′ Q(s′, a′) − Q(s, a)]</div>
+<p class="formula-legend"><b>Burada:</b> s şimdiki durum, a yapılan eylem, r alınan ödül, s′ varılan durumdur. maxₐ′ Q(s′, a′), varılan durumdaki en iyi eylemin şimdiki Q değeridir. r + γ·maxₐ′ Q(s′, a′) yeni örnekten gelen hedeftir; köşeli parantezin içi hedef ile eski değer arasındaki farktır (TD hatası). α öğrenme oranı, γ indirim çarpanıdır. Varılan durum son durumsa max terimi 0 alınır.</p>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Bir Q güncellemesi: 4 adım</div><ol>
+<li><strong>En iyi sonraki değer:</strong> s′'ndeki bütün eylemlerin Q'larının en büyüğü.</li>
+<li><strong>Hedef:</strong> r + γ·(bu en büyük değer).</li>
+<li><strong>Fark:</strong> hedef − eski Q(s, a).</li>
+<li><strong>Güncelle:</strong> yeni Q(s, a) = eski Q(s, a) + α·fark.</li>
+</ol></div>
+<p><strong>Örnek.</strong> Q(s, a) = 2, ödül r = 1, s′'ndeki Q değerleri 4 ve 3, α = 0.5, γ = 0.9.</p>
+<ol class="walk">
+<li><strong>En iyi sonraki değer.</strong> max(4, 3) = 4.</li>
+<li><strong>Hedef.</strong> 1 + 0.9·4 = 4.6.</li>
+<li><strong>Fark.</strong> 4.6 − 2 = 2.6.</li>
+<li><strong>Güncelle.</strong> Q(s, a) = 2 + 0.5·2.6 = <strong>3.3</strong>. Değer hedefe doğru yarı yol kadar yaklaştı.</li>
+</ol>
+<div data-widget="qlearn"></div>
+<h3>Koridorda iki bölüm Q-öğrenme</h3>
+<p>Aynı koridorda bütün Q değerleri 0 ile başlasın; α = 0.5, γ = 0.9. Ajan her bölümde A'dan başlayıp hep sağa gidiyor.</p>
+<ol class="walk">
+<li><strong>1. bölüm, A'dan B'ye.</strong> Q(A, sağ) = 0 + 0.5·(−1 + 0.9·0 − 0) = <strong>−0.5</strong>. B'den C'ye geçişte de aynı biçimde Q(B, sağ) = −0.5.</li>
+<li><strong>1. bölüm, C'den G'ye.</strong> G son durum olduğu için max terimi 0: Q(C, sağ) = 0 + 0.5·(10 − 0) = <strong>5</strong>.</li>
+<li><strong>2. bölüm, A'dan B'ye.</strong> B'deki Q değerleri sağ için −0.5, henüz denenmemiş sol için 0; en büyüğü 0. Q(A, sağ) = −0.5 + 0.5·(−1 + 0.9·0 + 0.5) = <strong>−0.75</strong>. Denenmemiş eylemin 0 değeri burada yanıltıcı oldu.</li>
+<li><strong>2. bölüm, B'den C'ye.</strong> C'deki en büyük Q artık 5: Q(B, sağ) = −0.5 + 0.5·(−1 + 0.9·5 + 0.5) = −0.5 + 0.5·4 = <strong>1.5</strong>. Hedefteki ödül bir adım geriye taşındı.</li>
+<li><strong>2. bölüm, C'den G'ye.</strong> Q(C, sağ) = 5 + 0.5·(10 − 5) = <strong>7.5</strong>. Bölümler tekrarlandıkça Q(C, sağ) 10'a, Q(B, sağ) 8'e, Q(A, sağ) 6.2'ye yaklaşır: değer yinelemesinin bulduğu değerler.</li>
+</ol>
+<p>Q-öğrenmenin dikkat çekici bir özelliği, ajan en iyi olmayan eylemler yapsa bile (yeterince keşif yapıldığı ve α uygun biçimde küçültüldüğü sürece) en iyi Q değerlerine yakınsamasıdır. Çünkü hedefte ajanın gerçekte seçeceği eylem değil, en iyi eylemin değeri (max) kullanılır. Buna <strong>politika dışı</strong> (off-policy) öğrenme denir.</p>
+
+<h2>Keşif ile sömürü dengesi ve ε-greedy</h2><p class="h-en" lang="en">The exploration–exploitation trade-off and ε-greedy</p>
+<p>Ajan her zaman bildiği en iyi eylemi seçerse (<strong>sömürü</strong>) daha iyi olabilecek eylemleri hiç denemez ve yetersiz bir politikada takılır; yukarıdaki örnekte hiç denenmemiş sol eylemin değeri hep yanlış kalır. Hep rastgele davranırsa (<strong>keşif</strong>) öğrendiğini kullanmaz ve az ödül toplar. İyi bir ajan ikisini dengeler: başta çok keşfeder, öğrendikçe sömürüye ağırlık verir.</p>
+<div class="formula">ε-greedy: olasılık ε ile rastgele bir eylem, olasılık 1 − ε ile argmaxₐ Q(s, a)</div>
+<p class="formula-legend"><b>Burada:</b> ε (epsilon) 0 ile 1 arasında küçük bir sayıdır (örneğin 0.1). argmaxₐ Q(s, a), Q değeri en büyük eylemdir. Rastgele seçimde en iyi eylem de çıkabileceği için en iyi eylemin toplam seçilme olasılığı 1 − ε + ε/|A|'dır; |A| eylem sayısıdır.</p>
+<p><strong>Örnek.</strong> Dört eylem ve ε = 0.1: en iyi eylem 0.9 + 0.1/4 = <strong>0.925</strong>, her biri 0.1/4 = <strong>0.025</strong> olasılıkla seçilir. Uygulamada ε eğitim boyunca azaltılır (örneğin 1'den 0.05'e). Öteki stratejiler: denenme sayısı az olan eylemlere bonus vermek (keşif fonksiyonu, UCB), eylemleri Q değerlerinin softmax'ıyla olasılıksal seçmek ve Q değerlerini iyimser (büyük) başlatmak.</p>
+<h3>Derin Q ağı (DQN)</h3>
+<p>Tablo tabanlı Q-öğrenme her durum-eylem çifti için ayrı bir sayı tutar. Durum sayısı çok büyükse (bir oyunun ekran görüntüsü, robotun sürekli konumu) tablo belleğe sığmaz ve her durumu ayrı ayrı ziyaret edip öğrenmek imkânsızdır; benzer durumlar arasında genelleme de yapılamaz. <strong>DQN</strong>, Q tablosunun yerine durumu girdi olarak alıp her eylemin Q değerini çıktı veren bir sinir ağı (görüntüde CNN) kullanır ve ağı, Q-öğrenmenin hedefi r + γ·max Q(s′, a′) ile tahmini arasındaki kare hatayı küçültecek biçimde eğitir. Eğitimi kararlı kılmak için iki hile kullanılır: <strong>deneyim tekrarı</strong> (geçişler bir bellekte saklanır ve rastgele mini yığınlarla eğitilir, böylece ardışık örneklerin bağımlılığı kırılır) ve <strong>hedef ağ</strong> (hedefler ayrı, yavaş güncellenen bir ağ kopyasıyla hesaplanır, böylece hedef her adımda kaymaz). Avantajı, çok büyük ve sürekli durum uzaylarında çalışması ve görülmemiş durumlara genelleme yapabilmesidir (Atari oyunlarını ekran görüntüsünden öğrenmek gibi).</p>
+
+<h2>Güvenilir makine öğrenmesi: adillik, yorumlanabilirlik, sızıntı ve MLOps</h2><p class="h-en" lang="en">Trustworthy machine learning: fairness, interpretability, leakage and MLOps</p>
+<p><strong>Adillik.</strong> Bir model doğruluğu yüksek olsa da bazı gruplara (cinsiyet, yaş, bölge) sistematik olarak farklı davranabilir; verideki tarihsel önyargılar modele taşınır (<a href="w10-seq.html">10. haftadaki gömme örneği</a>). Ölçmek için grup bazında ölçütler karşılaştırılır: <strong>demografik eşitlik</strong> (gruplarda pozitif tahmin oranı aynı mı?), <strong>fırsat eşitliği</strong> (gruplarda recall, yani gerçek pozitiflerin yakalanma oranı aynı mı?). Bu ölçütlerin hepsi aynı anda sağlanamayabilir; hangisinin önemli olduğu uygulamaya bağlıdır. Hassas özniteliği modelden çıkarmak yetmez, çünkü posta kodu gibi öznitelikler onu dolaylı olarak taşıyabilir.</p>
+<p><strong>Yorumlanabilirlik.</strong> Bir modelin neden o kararı verdiğini açıklayabilmek, hataları bulmak, güven kazanmak ve yasal gereklilikler için önemlidir. Doğrusal modeller ve küçük ağaçlar kendiliğinden yorumlanabilir. Karmaşık modeller için öznitelik önemi (<a href="w6-ensembles.html">6. hafta</a>), permütasyon önemi (bir özniteliği karıştırınca başarı ne kadar düşüyor?) ve tek bir tahmini açıklayan SHAP ve LIME gibi yöntemler kullanılır. Dikkat haritaları da bir fikir verir ama tek başına güvenilir açıklama sayılmaz.</p>
+<p><strong>Veri sızıntısı</strong> (<a href="w3-knn.html">3. hafta</a>): test bilgisinin eğitime karışması (ölçeklemeyi bütün veriyle yapmak, aynı hastanın görüntülerini hem eğitime hem teste koymak, gelecekte bilinecek bir özniteliği kullanmak) skorları iyimser yapar ve model üretimde başarısız olur. Dil modellerinde test verisinin ön eğitim verisinde bulunması da bir sızıntıdır.</p>
+<p><strong>Üretimde makine öğrenmesi (MLOps).</strong> Model eğitildikten sonra iş bitmez. Verinin dağılımı zamanla değişebilir (<strong>veri kayması</strong>: yeni müşteri profilleri, mevsim) ve başarı sessizce düşer; bu yüzden girdiler ve tahminler izlenir, başarı düşünce model yeniden eğitilir. Veri, kod ve model sürümlenir; deneyler kaydedilir; sonuçların yeniden üretilebilmesi için tohum (seed) sabitlenir. Gecikme ve maliyet de ölçülür.</p>
+
+<h2>Sınav tipi problemler ve adım adım çözümleri</h2><p class="h-en" lang="en">Exam-style problems with step-by-step solutions</p>
+<h3>Problem 1: Q güncellemesi</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>Bir ajan s durumunda a eylemini yapıyor, r = −2 ödül alıp s′ durumuna geçiyor. Q(s, a) = 5; s′'ndeki Q değerleri 6, 8 ve 3. α = 0.1, γ = 0.9. Yeni Q(s, a) nedir? s′ son durum olsaydı ne olurdu?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Kullanılan formül</div><ol>
+<li>Q(s, a) ← Q(s, a) + α·[r + γ·maxₐ′ Q(s′, a′) − Q(s, a)]</li>
+</ol></div>
+<ol class="walk">
+<li><strong>En iyi sonraki değer.</strong> max(6, 8, 3) = 8.</li>
+<li><strong>Hedef.</strong> −2 + 0.9·8 = −2 + 7.2 = 5.2.</li>
+<li><strong>Fark.</strong> 5.2 − 5 = 0.2.</li>
+<li><strong>Güncelle.</strong> Q(s, a) = 5 + 0.1·0.2 = <strong>5.02</strong>.</li>
+<li><strong>s′ son durum olsaydı.</strong> Sonraki değer 0 alınır: hedef −2, fark −2 − 5 = −7, yeni Q = 5 + 0.1·(−7) = <strong>4.3</strong>.</li>
+</ol></div></details>
+<h3>Problem 2: İndirimli getiri ve γ'nın etkisi</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>Bir bölümde ödüller sırasıyla 0, 0, 0, +100. (a) γ = 0.9 ve (b) γ = 0.5 için başlangıçtaki getiriyi bulun. (c) Her adım −1 olsaydı ve aynı +100 en sonda gelseydi γ = 0.9 ile getiri ne olurdu?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Kullanılan formül</div><ol><li>G = r₁ + γ·r₂ + γ²·r₃ + γ³·r₄</li></ol></div>
+<ol class="walk parts">
+<li><strong>(a)</strong> G = 0 + 0 + 0 + 0.9³·100 = 0.729·100 = <strong>72.9</strong>.</li>
+<li><strong>(b)</strong> G = 0.5³·100 = 0.125·100 = <strong>12.5</strong>. Küçük γ uzaktaki ödülü çok daha az önemser.</li>
+<li><strong>(c)</strong> G = −1 + 0.9·(−1) + 0.81·(−1) + 0.729·100 = −2.71 + 72.9 = <strong>70.19</strong>. Adım başına ceza, ajanı hedefe kısa yoldan gitmeye iter.</li>
+</ol></div></details>
+<h3>Problem 3: ε-greedy olasılıkları</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>Bir durumda üç eylemin Q değerleri 2, 5 ve 1. ε = 0.3 ile ε-greedy uygulanıyor. Her eylemin seçilme olasılığı nedir?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<ol class="walk">
+<li><strong>En iyi eylem.</strong> Q değeri en büyük olan ikinci eylemdir (5).</li>
+<li><strong>Rastgele kısım.</strong> Olasılık ε = 0.3 ile üç eylemden biri eşit olasılıkla seçilir: her birine 0.3/3 = 0.1.</li>
+<li><strong>Açgözlü kısım.</strong> Olasılık 1 − ε = 0.7 ile en iyi eylem seçilir.</li>
+<li><strong>Sonuç.</strong> İkinci eylem 0.7 + 0.1 = <strong>0.8</strong>, birinci ve üçüncü eylem <strong>0.1</strong>'er. Toplam 1.</li>
+</ol></div></details>
+<h3>Problem 4: Kavram soruları (geçmiş final listesi)</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>(a) TD öğrenmesi Monte Carlo'dan nasıl ayrılır, avantajları nelerdir? (b) Q-öğrenme nedir, neden kullanılır? (c) Keşif ve sömürü dengesi öğrenmeyi nasıl etkiler? (d) DQN'in Q-öğrenmeden farkı ve avantajı nedir?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<ol class="walk parts">
+<li><strong>(a)</strong> Monte Carlo bölüm bitince gerçek getiriyi hesaplayıp ortalamaya ekler; TD her geçişten sonra, ödül ile sonraki durumun şimdiki tahminini kullanarak hemen günceller. TD bölüm bitmeden öğrenir (sonu olmayan görevlerde de çalışır), durumlar arasındaki bağlantıdan yararlanır, daha az gürültülüdür ve genellikle daha hızlı öğrenir.</li>
+<li><strong>(b)</strong> Her durum-eylem çiftinin değerini Q(s, a) ← Q(s, a) + α·[r + γ·max Q(s′, a′) − Q(s, a)] güncellemesiyle deneyimden öğrenen modelsiz bir yöntemdir. Politika doğrudan en büyük Q'lu eylem olduğu için çevrenin modelini bilmeye gerek kalmaz ve ajan keşif yaparken bile en iyi politikayı öğrenir (politika dışı).</li>
+<li><strong>(c)</strong> Yalnız sömüren ajan denemediği eylemlerin değerini hiç öğrenemez ve yetersiz bir politikada takılır; yalnız keşfeden ajan öğrendiğini kullanmaz ve az ödül toplar. Denge ε-greedy (ε zamanla azaltılarak), keşif bonusları ya da softmax seçimle kurulur.</li>
+<li><strong>(d)</strong> DQN, Q tablosunun yerine durumdan Q değerlerini tahmin eden bir sinir ağı kullanır; deneyim tekrarı ve hedef ağ ile eğitilir. Çok büyük ya da sürekli durum uzaylarında (görüntü girdisi) çalışabilir ve benzer durumlar arasında genelleme yapar; tablo tabanlı Q-öğrenme bunu yapamaz.</li>
+</ol></div></details>
+
+<h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
+<ul class="mistakes">
+<li><strong>Q hedefinde max yerine yapılan eylemin değerini almak.</strong> Q-öğrenmede hedef, varılan durumdaki en büyük Q değeriyle hesaplanır; ajanın orada sonra ne yaptığı önemli değildir.</li>
+<li><strong>Son durumda max terimini eklemek.</strong> Bölüm bittiyse sonraki değer 0'dır; hedef yalnız ödüldür.</li>
+<li><strong>Güncellemede α'yı unutmak.</strong> Yeni değer hedefin kendisi değildir; eski değer farkın α katı kadar hedefe yaklaştırılır.</li>
+<li><strong>γ'nın kuvvetlerini yanlış saymak.</strong> İlk ödül indirimsizdir (γ⁰ = 1); ikinci ödül γ, üçüncü γ² ile çarpılır.</li>
+<li><strong>ε-greedy'de en iyi eylemin olasılığını 1 − ε yazmak.</strong> Rastgele seçimde de çıkabildiği için olasılığı 1 − ε + ε/|A|'dır.</li>
+<li><strong>Değer yinelemesinde aynı yinelemenin yeni değerlerini kullanmak.</strong> Klasik değer yinelemesinde her yineleme bir önceki yinelemenin değerleriyle hesaplanır.</li>
+</ul>
+
+<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
+<tbody>
+<tr><td>Durum sayısı (daha ince durum gösterimi)</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>her durum daha az ziyaret edilir, kestirimler gürültülenir</td></tr>
+<tr><td>Az keşif (yetersiz keşif)</td><td class="up">artar</td><td class="up">artar</td><td class="up">artar</td><td>az denenmiş eylemlerin değerleri yanlış kalır; ajan gördüğü az deneyime fazla uyar</td></tr>
+<tr><td>Aşırı sömürü</td><td class="up">artar</td><td class="up">artar</td><td class="up">artar</td><td>daha iyi eylemler keşfedilmez; politika dar deneyime göre ezberlenir</td></tr>
+<tr><td>İndirim çarpanı γ</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>uzak ödüller önem kazanır, getiri kestirimleri gürültülenir</td></tr>
+<tr><td>Öğrenme oranı α</td><td>değişmez</td><td class="up">artar</td><td>değişmez</td><td>büyük α son örneklere aşırı tepki verir; küçük α yavaş öğrenir</td></tr>
+</tbody></table></div>
+<p class="small">“Az keşif” ve “aşırı sömürü” satırları geçmiş final listesindeki tablodan gelir; bu satırlarda uygulamaya göre farklı gerekçelendirmeler de kabul edilebilir. Cevabınızı bir cümleyle açıklayın.</p>
+
+<h2>Kendini sına: kısa sorular</h2><p class="h-en" lang="en">Self-check: short questions</p>
+<div class="quiz" data-answer="2"><p>Pekiştirmeli öğrenmeyi gözetimli öğrenmeden ayıran temel özellik?</p><ol>
+<li data-why="İkisi de sinir ağı kullanabilir.">Sinir ağı kullanması</li>
+<li data-why="">Doğru eylemin söylenmemesi; yalnız (çoğu zaman gecikmeli) bir ödül sinyali olması</li>
+<li data-why="Pekiştirmeli öğrenmede veri ajanın eylemlerine bağlıdır.">Verinin önceden toplanmış ve bağımsız olması</li>
+<li data-why="Ödül sayısal bir sinyaldir; etiket değildir.">Her örneğin bir etiketi olması</li></ol><div class="explain">Ajana doğru cevap söylenmez; yalnız yaptığı eylemin ne kadar iyi olduğunu gösteren bir ödül gelir. Ayrıca eylemler sonraki veriyi değiştirir ve sonuçlar gecikebilir.</div></div>
+<div class="quiz" data-answer="4"><p>Q(s, a) = 1, r = 0, s′'ndeki Q'lar 2 ve 4, α = 0.5, γ = 0.5. Yeni Q(s, a)?</p><ol>
+<li data-why="Bu hedeftir, güncellenmiş değer değil.">2</li>
+<li data-why="max yerine ilk değeri aldınız.">1</li>
+<li data-why="α'yı unuttunuz: 1 + 1 = 2 olurdu.">3</li>
+<li data-why="">1.5</li></ol><div class="explain">Hedef 0 + 0.5·max(2, 4) = 2, fark 2 − 1 = 1, yeni değer 1 + 0.5·1 = 1.5.</div></div>
+<div class="quiz" data-answer="1"><p>TD öğrenmesinin Monte Carlo'ya göre bir avantajı?</p><ol>
+<li data-why="">Bölüm bitmeden, her geçişten sonra öğrenebilmesi</li>
+<li data-why="TD kendi tahminine dayandığı için başta yanlıdır; MC yansızdır.">Kestirimlerinin her zaman yansız olması</li>
+<li data-why="İkisi de modelsizdir.">Geçiş modelini bilmeyi gerektirmesi</li>
+<li data-why="TD de bir öğrenme oranı kullanır.">Öğrenme oranı gerektirmemesi</li></ol><div class="explain">TD, ödül ile sonraki durumun tahminini kullanarak her adımda günceller; bu yüzden sonu olmayan görevlerde de çalışır ve genellikle daha hızlı öğrenir.</div></div>
+<div class="quiz" data-answer="3"><p>Beş eylem ve ε = 0.2 ile ε-greedy'de en iyi eylemin seçilme olasılığı?</p><ol>
+<li data-why="Rastgele seçimde de çıkabilir.">0.8</li>
+<li data-why="Bu rastgele kısımda her eylemin payıdır.">0.04</li>
+<li data-why="">0.84</li>
+<li data-why="ε her eyleme değil, rastgele seçime aittir.">0.2</li></ol><div class="explain">0.8 olasılıkla en iyi eylem seçilir; 0.2 olasılıkla beş eylemden biri rastgele seçilir ve en iyi eylem bunlardan biridir: 0.8 + 0.2/5 = 0.84.</div></div>
+<div class="quiz" data-answer="2"><p>DQN neden deneyim tekrarı kullanır?</p><ol>
+<li data-why="Keşfi ε-greedy sağlar.">Keşfi artırmak için</li>
+<li data-why="">Ardışık örneklerin birbirine bağımlılığını kırıp eğitimi kararlı kılmak için</li>
+<li data-why="Ödülleri değiştirmez.">Ödülleri büyütmek için</li>
+<li data-why="Bunu hedef ağ yapar ama asıl amaç farklıdır.">Ağın parametre sayısını azaltmak için</li></ol><div class="explain">Ardışık geçişler birbirine çok benzer; bunlarla sırayla eğitmek ağı kararsızlaştırır. Geçişler bir bellekte saklanıp rastgele mini yığınlarla eğitilince örnekler daha bağımsız olur.</div></div>
+<div class="quiz" data-answer="4"><p>Bir modelin üretimde başarısı aylar içinde sessizce düştü; kod değişmedi. En olası neden?</p><ol>
+<li data-why="Kod değişmediyse tohum sonucu değiştirmez.">Tohumun (seed) sabitlenmemesi</li>
+<li data-why="Eğitimde sızıntı varsa başarı en baştan düşük çıkardı.">Eğitimde veri sızıntısı</li>
+<li data-why="Model eğitim sonrası değişmez.">Ağırlıkların zamanla bozulması</li>
+<li data-why="">Veri kayması: girdi dağılımı değişti</li></ol><div class="explain">Dünya değişir: yeni müşteri profilleri, mevsim, yeni ürünler. Modelin gördüğü dağılım eğitim dağılımından uzaklaşınca başarı düşer; bu yüzden girdiler ve tahminler izlenir, gerekince yeniden eğitilir.</div></div>
+
+</div></main>
+</body>
+</html>

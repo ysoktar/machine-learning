@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gözetimsiz ve olasılıksal öğrenme · Yapay Öğrenme</title>
+<meta name="description" content="k-ortalamalar elle, dirsek ve siluet, hiyerarşik kümeleme ve dendrogram, DBSCAN, GMM ve EM, otokodlayıcı, Naive Bayes ve anomali tespiti.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w11-unsup">
+<main><div class="content">
+
+<h1>Gözetimsiz ve olasılıksal öğrenme</h1>
+<p class="lead">Bu hafta etiketi olmayan veriden öğrenmeyi görüyoruz: benzer örnekleri gruplamak (kümeleme), veriyi az sayıda boyutla özetlemek (boyut indirgeme) ve olağan dışı örnekleri bulmak (anomali tespiti). İkinci yarıda olasılıkla karar vermeyi (Bayesçi karar kuramı) ve metin sınıflandırmanın klasik yöntemi Naive Bayes'i elle hesaplıyoruz. Finalde bu haftadan en çok <strong>k-ortalamaları elle 2–3 adım yürütmek, uzaklık matrisinden dendrogram çizmek, Naive Bayes olasılıklarını hesaplamak</strong> ve k-ortalamaların zayıflıkları gibi kavram soruları bekleniyor.</p>
+<div class="callout news"><div class="callout-title">Bu sayfa nereden derlendi?</div><p>Bu dönemin 11. hafta slaytları henüz yayımlanmadı. Sayfa, izlencedeki konu listesine, 10. haftanın sonundaki duyuruya (“k-means elde 2 yineleme, hiyerarşik kümeleme ve dendrogram, DBSCAN, GMM/EM, PCA/AE, t-SNE/UMAP, kümeleme değerlendirme; Bayesçi karar kuramı, Naive Bayes elde metin örneği, anomali tespiti”) ve önceki dönemin ders notlarıyla final alıştırma sorularına dayanıyor. Slaytlar yayımlanınca sayılar ve gösterim onlara göre güncellenebilir.</p></div>
+<div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
+<tr><td>k-ortalamalar</td><td>Birkaç nokta ve başlangıç merkezleri verilir; algoritmanın 2–3 adımı ve son kümeler istenir.</td><td>Her adımda her noktanın merkezlere uzaklığını yazmak, atamayı göstermek ve yeni merkezleri ortalama olarak hesaplamak.</td></tr>
+<tr><td>Dendrogram</td><td>4–5 gözlemin uzaklık matrisi verilir; tam ya da tek bağlantıyla birleştirme sırası ve dendrogram istenir.</td><td>Her birleştirmeden sonra matrisi güncellemek (tam bağlantıda en büyük, tek bağlantıda en küçük uzaklık) ve birleşme yüksekliklerini doğru yazmak.</td></tr>
+<tr><td>Naive Bayes</td><td>Küçük bir etiketli metin kümesi ve yeni bir metin verilir; sınıf olasılıkları istenir.</td><td>Önsel olasılığı ve kelime olasılıklarını Laplace düzeltmesiyle yazıp çarpmak, iki sınıfı karşılaştırmak.</td></tr>
+<tr><td>Kavram</td><td>İki gözetimsiz öğrenme türü, dirsek ve siluet yöntemleri, başlangıç merkezlerinin ve aykırı değerlerin etkisi, tek ve tam bağlantının sakıncaları, otokodlayıcı, kümelemeyle anomali tespiti.</td><td>Yöntemin nasıl çalıştığını ve hangi sorunu çözdüğünü ya da hangi durumda başarısız olduğunu birlikte yazmak.</td></tr>
+</tbody></table></div><p class="small">Ara sınavda yok; finalde.</p></div>
+<div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-gozetimsiz-ogrenme">Gözetimsiz öğrenme</a> · <a href="sozluk.html#t-kumeleme">Kümeleme</a> · <a href="sozluk.html#t-k-ortalamalar-k-means">k-ortalamalar</a> · <a href="sozluk.html#t-siluet-katsayisi">Siluet katsayısı</a> · <a href="sozluk.html#t-dendrogram">Dendrogram</a> · <a href="sozluk.html#t-otokodlayici">Otokodlayıcı</a> · <a href="sozluk.html#t-naive-bayes">Naive Bayes</a> · <a href="sozluk.html#t-anomali-tespiti">Anomali tespiti</a></div>
+
+<h2>Etiketsiz veriden ne öğrenilir? Gözetimsiz öğrenmenin türleri</h2><p class="h-en" lang="en">What can be learned from unlabelled data? Types of unsupervised learning</p>
+<p>Gözetimli öğrenmede her örneğin doğru cevabı (etiketi) vardı ve model bu cevapları tahmin etmeyi öğreniyordu. <strong>Gözetimsiz öğrenmede</strong> etiket yoktur; elimizde yalnız örnekler vardır ve amaç verinin içindeki yapıyı bulmaktır. Öğretmen olmadığı için “doğru cevap” da yoktur; bu yüzden sonuçları değerlendirmek gözetimli öğrenmeden daha zordur.</p>
+<p>Derste iki ana tür görülür:</p>
+<ul>
+<li><strong>Kümeleme:</strong> birbirine benzeyen örnekleri aynı gruba, farklı olanları ayrı gruplara koymak. Örnek problem: müşterileri alışveriş alışkanlıklarına göre segmentlere ayırmak; benzer haberleri gruplamak.</li>
+<li><strong>Boyut indirgeme:</strong> çok sayıda özniteliği, bilginin çoğunu koruyan az sayıda yeni özniteliğe sıkıştırmak. Örnek problem: yüzlerce sensörden gelen ölçümü görselleştirmek için iki boyuta indirmek; bir modelin girdisini küçültmek.</li>
+</ul>
+<p>Bunların yanında veri dağılımını kestirmek (yoğunluk kestirimi) ve olağan dışı örnekleri bulmak (anomali tespiti) da gözetimsiz görevlerdir.</p>
+<p><strong>Gözetimsiz ve gözetimli öğrenme birlikte nasıl kullanılır?</strong> Üç tipik durum vardır:</p>
+<ol>
+<li><strong>Ön işleme olarak boyut indirgeme:</strong> PCA ile öznitelik sayısını azaltıp sınıflandırıcıyı bu bileşenlerle eğitmek. Gürültü ve boyut laneti azalır, eğitim hızlanır.</li>
+<li><strong>Kümeleri öznitelik ya da etiketleme yardımı olarak kullanmak:</strong> her örneğin küme numarasını ya da merkezlere uzaklıklarını yeni öznitelik olarak eklemek; ya da az sayıda etiketli örnek varken her kümeden birkaç örnek etiketleyip etiketi kümenin geri kalanına yaymak (yarı gözetimli öğrenme). Etiketleme maliyeti düşer.</li>
+<li><strong>Etiketsiz veriyle ön eğitim:</strong> bir otokodlayıcıyı (ya da Word2Vec, BERT gibi modelleri) çok miktarda etiketsiz veriyle eğitip öğrendiği gömmeleri küçük etiketli veride sınıflandırıcıya girdi yapmak. Az etiketle daha iyi genelleme elde edilir.</li>
+</ol>
+
+<h2>k-ortalamalar: her noktayı en yakın merkeze atamak</h2><p class="h-en" lang="en">k-means: assigning every point to the nearest centre</p>
+<p>k-ortalamalar (k-means) en çok kullanılan kümeleme algoritmasıdır. Küme sayısı k önceden seçilir. Her küme bir <strong>merkezle</strong> (o kümedeki noktaların ortalamasıyla) temsil edilir ve algoritma, noktaların kendi merkezlerine olan uzaklıklarının karelerinin toplamını küçültmeye çalışır.</p>
+<div class="formula" style="font-size:1.2rem">SSE = Σⱼ Σ_(x ∈ Cⱼ) ‖x − mⱼ‖²</div>
+<p class="formula-legend"><b>Burada:</b> SSE (sum of squared errors) kare hataların toplamıdır ve küme içi sıkılığı ölçer; küçük olması iyidir. Cⱼ j'inci küme, mⱼ onun merkezidir (kümedeki noktaların ortalama vektörü). ‖x − mⱼ‖² bir noktanın merkezine Öklid uzaklığının karesidir. İçteki toplam bir kümedeki noktalar, dıştaki toplam bütün kümeler üzerinden alınır.</p>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>k-ortalamalar algoritması</div><ol>
+<li><strong>Başlat:</strong> k tane başlangıç merkezi seç (sınavda verilir).</li>
+<li><strong>Ata:</strong> her noktayı kendisine en yakın merkezin kümesine koy.</li>
+<li><strong>Güncelle:</strong> her merkezi, kümesindeki noktaların ortalaması yap.</li>
+<li><strong>Tekrarla:</strong> 2. ve 3. adımları atamalar değişmeyene (ya da merkezler kıpırdamayana, SSE neredeyse azalmayana, en çok yineleme sayısına ulaşılana) kadar sürdür.</li>
+</ol></div>
+<p>En yakın merkezi bulmak için uzaklığın karekökünü almak gerekmez: hangi merkez daha yakınsa onun uzaklığının karesi de daha küçüktür. Elle hesapta <strong>uzaklık karelerini</strong> karşılaştırmak işi çok kolaylaştırır.</p>
+<h3>Elle örnek: 7 nokta, k = 2, üç yineleme</h3>
+<p>Noktalar A(1, 1), B(2, 1), C(1, 2), D(3, 3), E(5, 4), F(4, 5), G(5, 5). Başlangıç merkezleri kötü seçilmiş olsun: m₁ = A = (1, 1) ve m₂ = B = (2, 1).</p>
+<div data-widget="fig" data-fig="kmeansit" data-caption="k-ortalamaların üç yinelemesi. Halkalar merkezler, renkler atanan kümelerdir. İlk yinelemede merkezler kötü başladığı için noktaların çoğu ikinci kümeye düşer; merkezler ortalamaya kayınca kümeler düzelir ve üçüncü yinelemede hiçbir şey değişmez."></div>
+<ol class="walk">
+<li><strong>1. yineleme, atama.</strong> Her noktanın m₁ = (1, 1) ve m₂ = (2, 1) merkezlerine uzaklık kareleri: A 0 ve 1 (küme 1), B 1 ve 0 (küme 2), C 1 ve 2 (küme 1), D 8 ve 5 (küme 2), E 25 ve 18 (küme 2), F 25 ve 20 (küme 2), G 32 ve 25 (küme 2). Kümeler {A, C} ve {B, D, E, F, G}.</li>
+<li><strong>1. yineleme, güncelleme.</strong> m₁ = ((1 + 1)/2, (1 + 2)/2) = (1, 1.5). m₂ = ((2 + 3 + 5 + 4 + 5)/5, (1 + 3 + 4 + 5 + 5)/5) = (3.8, 3.6). SSE = 18.5.</li>
+<li><strong>2. yineleme, atama.</strong> Yeni merkezlere uzaklık kareleri: A 0.25 ve 14.6, B 1.25 ve 10.0, C 0.25 ve 10.4 (üçü de küme 1); D 6.25 ve 1.0, E 22.25 ve 1.6, F 21.25 ve 2.0, G 28.25 ve 3.4 (hepsi küme 2). B birinci kümeye geçti: kümeler {A, B, C} ve {D, E, F, G}.</li>
+<li><strong>2. yineleme, güncelleme.</strong> m₁ = ((1 + 2 + 1)/3, (1 + 1 + 2)/3) = (1.33, 1.33). m₂ = ((3 + 5 + 4 + 5)/4, (3 + 4 + 5 + 5)/4) = (4.25, 4.25). SSE 18.5'ten 6.83'e düştü.</li>
+<li><strong>3. yineleme.</strong> Uzaklık kareleri: A 0.22 ve 21.1, B 0.56 ve 15.6, C 0.56 ve 15.6, D 5.56 ve 3.13, E 20.6 ve 0.63, F 20.6 ve 0.63, G 26.9 ve 1.13. Atamalar değişmedi, merkezler de değişmez: algoritma yakınsadı. Son kümeler <strong>{A, B, C}</strong> ve <strong>{D, E, F, G}</strong>.</li>
+</ol>
+<div data-widget="kmeans"></div>
+<h3>k'yı seçmek: dirsek yöntemi ve siluet katsayısı</h3>
+<p><strong>Dirsek yöntemi.</strong> k-ortalamalar k = 1, 2, 3, … için ayrı ayrı çalıştırılır ve her k için küme içi kare toplamı (WCSS, yukarıdaki SSE) çizilir. k arttıkça WCSS hep azalır (k = n olunca 0 olur), bu yüzden en küçük WCSS'yi seçmek anlamsızdır. Bunun yerine eğrinin keskin biçimde düzleştiği, dirsek gibi büküldüğü nokta seçilir: o noktadan sonra yeni bir küme eklemek hatayı pek azaltmaz.</p>
+<div data-widget="fig" data-fig="elbow" data-caption="Dirsek yöntemi: k = 3'ten sonra WCSS'deki düşüş belirgin biçimde yavaşlar; dirsek k = 3'tedir."></div>
+<p><strong>Siluet katsayısı.</strong> Her nokta için, kendi kümesine ne kadar iyi oturduğu komşu kümeyle karşılaştırılır:</p>
+<div class="formula" style="font-size:1.2rem">s(i) = (b(i) − a(i)) / max(a(i), b(i))</div>
+<p class="formula-legend"><b>Burada:</b> a(i), i'inci noktanın kendi kümesindeki öteki noktalara ortalama uzaklığıdır (küçük olması iyi). b(i), noktanın en yakın komşu kümedeki noktalara ortalama uzaklığıdır (büyük olması iyi). s(i) −1 ile 1 arasındadır: 1'e yakınsa nokta kendi kümesine iyi oturmuş ve komşu kümeden uzaktır; 0'a yakınsa iki kümenin sınırındadır; negatifse büyük olasılıkla yanlış kümededir.</p>
+<p>Bütün noktaların siluet değerlerinin ortalaması kümelemenin kalitesini verir; farklı k değerleri denenir ve ortalama siluet değerini en büyük yapan k seçilir. Dirsek yöntemi yalnız küme içi sıkılığa bakarken siluet hem sıkılığı hem de kümelerin birbirinden ayrıklığını ölçer.</p>
+<p><strong>Örnek.</strong> Tek boyutlu noktalar, küme 1 = {1, 2}, küme 2 = {6, 7, 9}. 2 noktası için a = |2 − 1| = 1, b = (|2 − 6| + |2 − 7| + |2 − 9|)/3 = (4 + 5 + 7)/3 = 5.33. s = (5.33 − 1)/5.33 = <strong>0.81</strong>: nokta kendi kümesine çok iyi oturmuş.</p>
+<h3>k-ortalamaların zayıflıkları ve çareleri</h3>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Zayıflık</th><th>Neden olur?</th><th>Çare</th></tr></thead><tbody>
+<tr><td>k önceden seçilmeli</td><td>Algoritma küme sayısını kendisi bulmaz.</td><td>Dirsek yöntemi, siluet katsayısı.</td></tr>
+<tr><td>Başlangıç merkezlerine duyarlı</td><td>Yerel bir en iyiye yakınsar; kötü başlangıç kötü kümeler ya da yavaş yakınsama verir.</td><td>Birçok farklı başlangıçla çalıştırıp en küçük SSE'yi seçmek; k-means++ (her yeni merkezi mevcut merkezlere uzak noktalardan, uzaklığın karesiyle orantılı olasılıkla seçmek); başka bir kümeleme yönteminin sonucuyla başlatmak.</td></tr>
+<tr><td>Aykırı değerlere duyarlı</td><td>Merkez bir ortalamadır; çok uzaktaki tek bir nokta merkezi kendine çeker.</td><td>Merkezlerden çok uzak kalan noktaları birkaç yineleme izleyip çıkarmak; rastgele bir alt örneklemle kümelemek (aykırı değer seçme olasılığı küçüktür); ortalama yerine ortanca kullanan k-medoids.</td></tr>
+<tr><td>Yalnız küresel kümeler</td><td>Her nokta en yakın merkeze atandığı için kümeler dışbükey ve yaklaşık küresel olur; halka ya da hilal biçimli kümeleri bulamaz.</td><td>DBSCAN, hiyerarşik kümeleme, çekirdekli yöntemler.</td></tr>
+<tr><td>Farklı boyut ve yoğunluktaki kümeler</td><td>Büyük ya da seyrek bir kümeyi bölüp küçük kümelerle birleştirebilir.</td><td>GMM (her kümeye ayrı yayılım), DBSCAN.</td></tr>
+<tr><td>Ortalama tanımlı olmalı</td><td>Kategorik veride ortalama alınamaz.</td><td>k-modes (merkez olarak en sık değerler).</td></tr>
+</tbody></table></div>
+<p>Bütün bu zayıflıklara rağmen k-ortalamalar basit, hızlı (her yineleme O(k·n)) ve çoğu durumda yeterli olduğu için en popüler kümeleme yöntemidir. Kümeleri iyi ayrılmış, yaklaşık küresel ve benzer büyüklükte olan verilerde çok başarılıdır.</p>
+<p><strong>Yumuşak k-ortalamalar.</strong> Klasik k-ortalamalar her noktayı kesin olarak tek bir kümeye atar (sert atama). Yumuşak k-ortalamalarda her nokta her kümeye bir <strong>üyelik derecesiyle</strong> aittir; derece merkeze uzaklık arttıkça azalır (örneğin e^(−β·uzaklık²) ile orantılı, toplamları 1). Merkezler bu derecelerle ağırlıklı ortalama olarak güncellenir. Avantajı, iki kümenin arasındaki noktaların belirsizliğini ifade edebilmesi ve sonuçların başlangıca daha az duyarlı olmasıdır. Aşağıdaki Gauss karışım modeli bu fikrin olasılıksal biçimidir.</p>
+
+<h2>Hiyerarşik kümeleme ve dendrogram</h2><p class="h-en" lang="en">Hierarchical clustering and the dendrogram</p>
+<p>Hiyerarşik (birleştirici) kümelemede başta her nokta kendi başına bir kümedir. Her adımda birbirine en yakın iki küme birleştirilir; bütün noktalar tek kümede toplanana kadar devam edilir. Birleşmelerin sırası ve yüksekliği bir ağaçla, <strong>dendrogramla</strong>, gösterilir. Dendrogram istenen bir yükseklikten yatay olarak kesilince küme sayısı seçilmiş olur; k'yı önceden seçmek gerekmez.</p>
+<p>İki küme arasındaki uzaklık farklı biçimlerde tanımlanabilir:</p>
+<div class="formula">tek bağlantı: d(A, B) = min d(a, b)   tam bağlantı: d(A, B) = max d(a, b)</div>
+<p class="formula-legend"><b>Burada:</b> A ve B iki küme, a ∈ A ve b ∈ B bu kümelerin noktalarıdır; d(a, b) iki nokta arasındaki uzaklıktır. Tek bağlantıda iki kümenin en yakın iki noktası, tam bağlantıda en uzak iki noktası esas alınır. Ortalama bağlantıda bütün nokta çiftlerinin ortalaması kullanılır.</p>
+<ul>
+<li><strong>Tek bağlantının sakıncası:</strong> zincirleme etkisi. Arada birkaç ara nokta varsa birbirinden çok uzak iki grup tek bir uzun, ince kümede birleşebilir; gürültüye duyarlıdır.</li>
+<li><strong>Tam bağlantının sakıncası:</strong> aykırı değerlere duyarlıdır (tek bir uzak nokta küme uzaklığını büyütür) ve büyük kümeleri bölüp kompakt ama yapay kümeler üretmeye eğilimlidir.</li>
+</ul>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Uzaklık matrisinden dendrogram</div><ol>
+<li>Matristeki en küçük uzaklığı bul; bu iki kümeyi birleştir ve birleşme yüksekliği olarak bu uzaklığı yaz.</li>
+<li>Matrisi güncelle: yeni kümenin öteki her kümeye uzaklığı, tam bağlantıda eski iki uzaklığın büyüğü, tek bağlantıda küçüğüdür.</li>
+<li>Tek küme kalana kadar tekrarla; birleşmeleri yükseklikleriyle ağaç olarak çiz.</li>
+</ol></div>
+<h3>Elle örnek: 5 gözlem</h3>
+<p class="mat-eq">D = <span class="mat" style="--cols:6"><span></span><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>A</span><span>0</span><span>2</span><span>6</span><span>10</span><span>9</span><span>B</span><span>2</span><span>0</span><span>5</span><span>9</span><span>8</span><span>C</span><span>6</span><span>5</span><span>0</span><span>4</span><span>5</span><span>D</span><span>10</span><span>9</span><span>4</span><span>0</span><span>3</span><span>E</span><span>9</span><span>8</span><span>5</span><span>3</span><span>0</span></span></p>
+<ol class="walk">
+<li><strong>Tam bağlantı, 1. birleşme.</strong> En küçük uzaklık d(A, B) = 2: {A, B} yükseklik 2'de birleşir. Yeni uzaklıklar en büyükle: d(AB, C) = max(6, 5) = 6, d(AB, D) = max(10, 9) = 10, d(AB, E) = max(9, 8) = 9.</li>
+<li><strong>2. birleşme.</strong> Kalan en küçük uzaklık d(D, E) = 3: {D, E} yükseklik 3'te birleşir. d(AB, DE) = max(10, 9) = 10, d(C, DE) = max(4, 5) = 5.</li>
+<li><strong>3. birleşme.</strong> Kalan uzaklıklar d(AB, C) = 6, d(AB, DE) = 10, d(C, DE) = 5. En küçüğü 5: {C, D, E} yükseklik 5'te birleşir. d(AB, CDE) = max(6, 10) = 10.</li>
+<li><strong>4. birleşme.</strong> {A, B} ile {C, D, E} yükseklik <strong>10</strong>'da birleşir.</li>
+<li><strong>Tek bağlantıyla karşılaştırma.</strong> İlk iki birleşme aynıdır (2 ve 3). Sonra d(C, DE) = min(4, 5) = 4 ve d(AB, C) = min(6, 5) = 5 olur: {C, D, E} yükseklik 4'te, son birleşme yükseklik <strong>5</strong>'te olur. Tek bağlantı kümeleri daha alçakta birleştirir.</li>
+</ol>
+<div data-widget="fig" data-fig="dendro" data-caption="Örneğin tam bağlantılı dendrogramı. Dikey çizgilerin yüksekliği birleşme uzaklığıdır. Kesikli çizgi yükseklik 7'de kesilirse iki küme çıkar: {A, B} ve {C, D, E}."></div>
+<div data-widget="linkage"></div>
+<p><strong>Hiyerarşik kümeleme mi, k-ortalamalar mı?</strong> Hiyerarşik kümelemenin avantajları: k önceden seçilmez, dendrogram veriyi farklı ölçeklerde gösterir, herhangi bir uzaklık ölçüsüyle çalışır ve sonuç başlangıca bağlı değildir (deterministiktir). Dezavantajları: n² boyutlu uzaklık matrisi ve en az O(n²) zaman gerektirdiği için büyük veride yavaştır; bir kez yapılan birleştirme geri alınamaz; gürültüye ve aykırı değerlere duyarlı olabilir. k-ortalamalar ise hızlıdır ama k'yı ve başlangıcı ister.</p>
+<p><strong>Kosinüs mü, Öklid mi?</strong> Kümelemede hangi uzaklığın kullanılacağı sonucu belirler. Öklid uzaklığı vektörlerin hem yönünü hem uzunluğunu ölçer; kosinüs benzerliği yalnız yönü ölçer. Metinlerde belgenin uzunluğu konusunu değiştirmez, bu yüzden belge kümelemede kosinüs tercih edilir (<a href="w10-seq.html">10. hafta</a>).</p>
+
+<h2>Yoğunluğa dayalı kümeleme (DBSCAN) ve Gauss karışım modeli (GMM)</h2><p class="h-en" lang="en">Density-based clustering (DBSCAN) and the Gaussian mixture model (GMM)</p>
+<p><strong>DBSCAN</strong> kümeleri yoğun bölgeler olarak tanımlar. İki ayarı vardır: komşuluk yarıçapı ε ve en az nokta sayısı minPts. ε yarıçapında en az minPts komşusu olan nokta bir <strong>çekirdek noktadır</strong>; çekirdek noktaların komşuluğunda kalan ama kendisi çekirdek olmayan nokta <strong>sınır noktasıdır</strong>; ikisi de olmayan nokta <strong>gürültüdür</strong> (anomali). Birbirine ε'dan yakın çekirdek noktalar zincirleme aynı kümeye girer. DBSCAN k'yı önceden istemez, halka ya da hilal gibi her biçimdeki kümeleri bulur ve aykırı değerleri ayrıca işaretler. Zayıflığı, yoğunluğu çok farklı kümelerde tek bir ε'nun yetmemesi ve yüksek boyutta uzaklıkların anlamını yitirmesidir.</p>
+<div data-widget="fig" data-fig="dbscan" data-caption="DBSCAN: dolu noktalar çekirdek, halkalı noktalar sınır, çarpılar gürültüdür. Daire bir çekirdek noktanın ε komşuluğunu gösterir. Hilal biçimli iki küme k-ortalamalarla ayrılamaz ama yoğunlukla ayrılır."></div>
+<p><strong>Gauss karışım modeli (GMM)</strong> verinin k tane Gauss (normal) dağılımın karışımından geldiğini varsayar. Her bileşenin bir karışım ağırlığı πⱼ, bir ortalaması μⱼ ve bir kovaryansı Σⱼ vardır. Her noktanın her bileşene ait olma olasılığı hesaplandığı için GMM yumuşak bir kümelemedir ve her kümenin kendi biçimi ve yayılımı olabilir (elips biçimli kümeler). Parametreler <strong>EM algoritmasıyla</strong> bulunur:</p>
+<div class="formula">E adımı: γᵢⱼ = πⱼ·N(xᵢ | μⱼ, Σⱼ) / Σₗ πₗ·N(xᵢ | μₗ, Σₗ)<br>M adımı: Nⱼ = Σᵢ γᵢⱼ,   πⱼ = Nⱼ / n,   μⱼ = (1/Nⱼ)·Σᵢ γᵢⱼ·xᵢ</div>
+<p class="formula-legend"><b>Burada:</b> γᵢⱼ, i'inci noktanın j'inci bileşene ait olma olasılığıdır (sorumluluk). N(x | μ, Σ) ortalaması μ, kovaryansı Σ olan normal dağılımın x'teki yoğunluğudur. πⱼ bileşenin karışım ağırlığı, Nⱼ ona düşen “etkin” nokta sayısı, n toplam nokta sayısıdır. M adımında kovaryans da γ ağırlıklı olarak yeniden hesaplanır.</p>
+<p>EM, k-ortalamalarla aynı iki adımlı yapıdadır: E adımı “atama”nın yumuşak hâli, M adımı “merkezi güncelleme”nin ağırlıklı hâlidir. Bütün kovaryanslar eşit ve çok küçük alınırsa GMM, k-ortalamalara iner.</p>
+
+<h2>Boyut indirgeme: PCA, otokodlayıcı, t-SNE ve UMAP</h2><p class="h-en" lang="en">Dimensionality reduction: PCA, autoencoders, t-SNE and UMAP</p>
+<p><strong>Boyut laneti.</strong> Öznitelik sayısı arttıkça uzay o kadar hızlı büyür ki veri seyrekleşir; model gürültüye uymaya daha yatkın olur ve noktalar arasındaki uzaklıklar birbirine benzemeye başlar, “en yakın” kavramı anlamını yitirir. Bu, kNN ve kümeleme gibi uzaklığa dayalı yöntemleri en çok etkiler. Çareler: boyut indirgeme (PCA, otokodlayıcı), öznitelik seçimi ve yüksek boyutta daha anlamlı olan kosinüs gibi ölçüler.</p>
+<p><strong>PCA</strong> (<a href="w2-data.html">2. hafta</a>) veriyi en çok varyansın olduğu dik yönlere izdüşürür. Varyans bilgi demektir: bütün noktaların aynı değeri aldığı bir yön noktaları birbirinden ayırmaya yaramaz; noktaların en çok yayıldığı yön onları en iyi ayırır ve izdüşürünce en az bilgi (yeniden kurma hatası) kaybedilir. Adımlar: (1) her öznitelikten ortalamasını çıkar, (2) kovaryans matrisini hesapla, (3) özdeğerleri ve özvektörleri bul, (4) özdeğeri en büyük olan özvektörler bileşenlerdir; veriyi ilk m bileşene izdüşür. Gözetimli bir modelle birlikte kullanılırken bileşen sayısı m ya açıklanan varyans oranına göre (örneğin toplam varyansın %90–95'i) ya da en iyisi, farklı m değerleri çapraz doğrulamayla denenip modelin doğrulama başarısına göre seçilir.</p>
+<p><strong>Otokodlayıcı</strong> (autoencoder, AE) girdisini kendisi olarak yeniden üretmeyi öğrenen bir sinir ağıdır. Kodlayıcı girdiyi dar bir orta katmana (darboğaz, kod) sıkıştırır, kod çözücü bu koddan girdiyi yeniden kurar; kayıp girdi ile yeniden kurulan arasındaki farktır. Etiket gerekmez. Orta katman verinin sıkıştırılmış bir temsilidir ve PCA'nın doğrusal olmayan bir genellemesi gibi çalışır. Kullanım alanları: boyut indirgeme ve öznitelik çıkarma, veri sıkıştırma, anomali tespiti (normal veride eğitilen AE, anormal örneği kötü kurar ve yeniden kurma hatası büyük çıkar) ve gürültü giderme.</p>
+<p><strong>Evrişimli otokodlayıcı</strong> (CAE) aynı fikri görüntü için evrişim katmanlarıyla kurar: kodlayıcı evrişim ve havuzlamayla görüntüyü küçültür, kod çözücü ters evrişim (ya da büyütme) katmanlarıyla görüntüyü yeniden boyutlandırır. <strong>Gürültü gidermede</strong> CAE'nin girdisine gürültülü görüntü verilir ama kayıp, çıktının <strong>temiz</strong> görüntüyle farkı olarak hesaplanır. Ağ, gürültüyü koda taşımamayı ve görüntünün asıl yapısını kurmayı öğrenir; eğitimden sonra yeni gürültülü görüntüleri temizler.</p>
+<div data-widget="fig" data-fig="autoenc" data-caption="Otokodlayıcı: kodlayıcı girdiyi dar bir koda sıkıştırır, kod çözücü koddan girdiyi yeniden kurar. Gürültü giderme için girdi gürültülü, hedef temiz görüntüdür."></div>
+<p><strong>t-SNE ve UMAP</strong> yüksek boyutlu veriyi görselleştirmek için iki boyuta indirir. Birbirine yakın noktaları iki boyutta da yakın tutmaya çalışırlar (yerel komşuluğu korurlar). Yalnız görselleştirme içindir: eksenlerin anlamı yoktur, kümeler arasındaki uzaklıklar ve küme büyüklükleri yorumlanmamalıdır, sonuç ayarlara (perplexity, komşu sayısı) ve rastgele başlangıca bağlıdır. UMAP daha hızlıdır ve genel yapıyı biraz daha iyi korur.</p>
+
+<h2>Bayesçi karar kuramı ve Naive Bayes</h2><p class="h-en" lang="en">Bayesian decision theory and naive Bayes</p>
+<p>Olasılıksal bir sınıflandırıcı her sınıf için bir olasılık verir. Bayes kuralı, gözlemi gördükten sonraki (sonsal) olasılığı, gözlemden önceki (önsel) olasılık ve olabilirlikten hesaplar:</p>
+<div class="formula" style="font-size:1.2rem">P(C | x) = P(x | C)·P(C) / P(x)</div>
+<p class="formula-legend"><b>Burada:</b> C bir sınıf, x gözlenen öznitelikler. P(C) önsel olasılıktır (veride o sınıfın oranı). P(x | C) olabilirliktir (o sınıftan bir örneğin x gibi görünme olasılığı). P(x) bütün sınıflar için aynı olan bir normalleştirme terimidir. P(C | x) sonsal olasılıktır.</p>
+<p><strong>Bayesçi karar kuralı:</strong> hataların maliyeti eşitse sonsal olasılığı en büyük sınıf seçilir. Maliyetler farklıysa beklenen maliyeti (riski) en küçük karar seçilir. Örneğin bir hastanın hasta olma olasılığı P(hasta | x) = 0.3 olsun; hasta birine “sağlıklı” demenin maliyeti 10, sağlıklı birine “hasta” demenin maliyeti 1. “Sağlıklı” demenin riski 0.3·10 = 3, “hasta” demenin riski 0.7·1 = 0.7'dir. Olasılık küçük olsa da “hasta” demek daha az risklidir: eşik maliyetlere göre kayar.</p>
+<p><strong>Naive Bayes</strong>, P(x | C)'yi hesaplamak için “saf” (naive) bir varsayım yapar: sınıf bilindiğinde öznitelikler birbirinden bağımsızdır. Bu varsayım gerçekte çoğu zaman doğru değildir (bir metinde “ücretsiz” ve “kazan” birlikte geçmeye eğilimlidir) ama hesap çok kolaylaşır ve sınıflandırma başarısı şaşırtıcı derecede iyidir.</p>
+<div class="formula" style="font-size:1.15rem">P(C | x₁, …, xₙ) ∝ P(C)·P(x₁ | C)·P(x₂ | C)·…·P(xₙ | C)<br>P(w | C) = (sayı(w, C) + 1) / (toplam kelime(C) + |V|)</div>
+<p class="formula-legend"><b>Burada:</b> ∝ “orantılıdır” demektir; P(x) her sınıf için aynı olduğu için atlanır ve sınıflar yalnız bu çarpımla karşılaştırılır. Metin sınıflandırmada xᵢ'ler metindeki kelimelerdir. sayı(w, C), w kelimesinin C sınıfının eğitim metinlerinde kaç kez geçtiği; toplam kelime(C), o sınıftaki bütün kelimelerin sayısı; |V| sözlükteki farklı kelime sayısıdır. Paya 1, paydaya |V| eklemeye <strong>Laplace düzeltmesi</strong> denir: eğitimde bir sınıfta hiç görülmemiş tek bir kelime olasılığı 0 yapıp bütün çarpımı sıfırlamasın diye.</p>
+<h3>Elle örnek: spam mı, değil mi?</h3>
+<p>Eğitim verisi: spam metinler “ücretsiz kazan” ve “ücretsiz para kazan”; normal metinler “toplantı yarın” ve “proje toplantı kazan”. Yeni metin: “ücretsiz kazan toplantı”.</p>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Naive Bayes'te yapılan</div><ol>
+<li><strong>Önsel:</strong> her sınıfın eğitimdeki oranı.</li>
+<li><strong>Sayım:</strong> her sınıftaki kelime sayıları ve toplamı; sözlük boyutu |V|.</li>
+<li><strong>Kelime olasılıkları:</strong> Laplace düzeltmesiyle (sayı + 1)/(toplam + |V|).</li>
+<li><strong>Çarp ve karşılaştır:</strong> önsel × yeni metindeki kelimelerin olasılıkları; istenirse toplamlarına bölerek sonsal olasılığa çevir.</li>
+</ol></div>
+<ol class="walk">
+<li><strong>Önsel.</strong> İki spam, iki normal metin var: P(spam) = P(normal) = 1/2.</li>
+<li><strong>Sayım.</strong> Spam metinlerde ücretsiz 2, kazan 2, para 1 kez geçiyor: toplam 5 kelime. Normal metinlerde toplantı 2, yarın 1, proje 1, kazan 1: toplam 5. Sözlük {ücretsiz, kazan, para, toplantı, yarın, proje}, |V| = 6. Payda her iki sınıfta 5 + 6 = 11.</li>
+<li><strong>Kelime olasılıkları.</strong> Spam: P(ücretsiz) = 3/11, P(kazan) = 3/11, P(toplantı) = (0 + 1)/11 = 1/11. Normal: P(ücretsiz) = 1/11, P(kazan) = 2/11, P(toplantı) = 3/11.</li>
+<li><strong>Çarpım.</strong> Spam: (1/2)·(3/11)·(3/11)·(1/11) = (1/2)·9/1331. Normal: (1/2)·(1/11)·(2/11)·(3/11) = (1/2)·6/1331.</li>
+<li><strong>Karar.</strong> 9 > 6 olduğu için metin <strong>spam</strong>. Sonsal olasılık P(spam | metin) = 9/(9 + 6) = <strong>0.6</strong>.</li>
+<li><strong>Laplace olmasaydı.</strong> “ücretsiz” normal metinlerde hiç geçmediği için P(ücretsiz | normal) = 0 olur ve normal sınıfın çarpımı, öteki kelimeler ne derse desin 0 çıkardı. Düzeltme bu aşırı kesinliği önler.</li>
+</ol>
+<div data-widget="nbayes"></div>
+
+<h2>Anomali tespiti: olağan dışı örnekleri bulmak</h2><p class="h-en" lang="en">Anomaly detection: finding unusual examples</p>
+<p>Anomali tespitinde amaç, verinin büyük çoğunluğundan belirgin biçimde farklı örnekleri bulmaktır: sahte kredi kartı işlemleri, arızalanmak üzere olan makineler, ağdaki saldırılar, bot hesapları. Anomaliler çok seyrek ve çoğu zaman etiketsizdir; yeni tür anomaliler de ortaya çıkabilir. Bu yüzden genellikle gözetimsiz çalışılır: “normal” veri modellenir ve bu modele uymayan örnekler işaretlenir.</p>
+<ul>
+<li><strong>Olasılıkla:</strong> normal veriye bir dağılım (örneğin her öznitelik için bir Gauss ya da GMM) uydurulur; yoğunluğu bir eşiğin altında kalan örnek anomalidir. Tek boyutta bu, z-skorunun mutlak değerinin örneğin 3'ü aşması gibidir.</li>
+<li><strong>Kümelemeyle:</strong> veri kümelenir; hiçbir kümeye ait olmayan (DBSCAN'de gürültü), çok küçük bir kümede kalan ya da kendi merkezine uzaklığı alışılmadık derecede büyük olan nokta anomali sayılır.</li>
+<li><strong>Yeniden kurma hatasıyla:</strong> normal veride eğitilmiş bir otokodlayıcının kuramadığı örnekler anomalidir.</li>
+</ul>
+<p><strong>Kümelemeyle anomali tespitinin başlıca zorluğu</strong> “normal”in ve eşiğin tanımıdır: kaç küme seçileceği, uzaklık ölçüsü ve hangi uzaklığın “fazla” sayılacağı sonuçları büyük ölçüde değiştirir. Anomaliler çok seyrek olduğu için etiketli doğrulama verisi azdır; aykırı değerler kümelemeyi de bozabilir (k-ortalamalarda merkezi kendine çeker) ve normal ama seyrek bir davranış yanlışlıkla anomali sayılabilir. Değerlendirmede accuracy yanıltıcıdır; precision, recall ve PR eğrisi kullanılmalıdır (<a href="w2-data.html">2. hafta</a>).</p>
+
+<h2>Sınav tipi problemler ve adım adım çözümleri</h2><p class="h-en" lang="en">Exam-style problems with step-by-step solutions</p>
+<h3>Problem 1: k-ortalamalarda üç yineleme</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(geçmiş final listesi kalıbı)</span></div><p>Tek boyutlu noktalar 1, 2, 3, 4, 6, 12. Başlangıç merkezleri m₁ = 2, m₂ = 3, m₃ = 4. k-ortalamaları üç yineleme uygulayın ve son kümeleri yazın.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Her yinelemede yapılan</div><ol>
+<li><strong>Ata:</strong> her noktayı en yakın merkeze ver (tek boyutta uzaklık |x − m|).</li>
+<li><strong>Güncelle:</strong> her merkez = kümesindeki noktaların ortalaması.</li>
+</ol></div>
+<ol class="walk">
+<li><strong>1. yineleme, atama.</strong> Uzaklıklar (m₁, m₂, m₃ sırasıyla): 1 için 1, 2, 3; 2 için 0, 1, 2; 3 için 1, 0, 1; 4 için 2, 1, 0; 6 için 4, 3, 2; 12 için 10, 9, 8. Kümeler {1, 2}, {3}, {4, 6, 12}.</li>
+<li><strong>1. yineleme, güncelleme.</strong> m₁ = (1 + 2)/2 = 1.5, m₂ = 3, m₃ = (4 + 6 + 12)/3 = 7.33. Uzaktaki 12, üçüncü merkezi kendine doğru çekti.</li>
+<li><strong>2. yineleme.</strong> 3 için 1.5, 0, 4.33 (küme 2); 4 için 2.5, 1, 3.33 (küme 2'ye geçti); 6 için 4.5, 3, 1.33 (küme 3); 1 ve 2 küme 1'de, 12 küme 3'te kalır. Kümeler {1, 2}, {3, 4}, {6, 12}; merkezler 1.5, 3.5, 9.</li>
+<li><strong>3. yineleme.</strong> 6 için uzaklıklar 4.5, 2.5, 3: artık ikinci merkez daha yakın. 3 ve 4 de ikinci kümede, 12 üçüncü kümede kalır. Kümeler {1, 2}, {3, 4, 6}, {12}; merkezler 1.5, 4.33, 12.</li>
+<li><strong>Sonuç.</strong> Üç yinelemeden sonra kümeler <strong>{1, 2}, {3, 4, 6}, {12}</strong>. Bir yineleme daha yapılsa hiçbir atama değişmez (6 için 4.5, 1.67, 6). Aykırı değer 12 sonunda tek başına bir küme oldu: k-ortalamaların aykırı değerlere duyarlılığının küçük bir örneği.</li>
+</ol></div></details>
+<h3>Problem 2: Tam bağlantılı dendrogram</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(geçmiş final listesi kalıbı)</span></div><p>Dört gözlemin uzaklık matrisi aşağıda. Tam bağlantıyla birleştirici kümeleme uygulayıp dendrogramı çizin. Tek bağlantıyla sonuç nasıl değişirdi? <span class="mat" style="--cols:5"><span></span><span>P</span><span>Q</span><span>R</span><span>S</span><span>P</span><span>0</span><span>3</span><span>7</span><span>8</span><span>Q</span><span>3</span><span>0</span><span>4</span><span>6</span><span>R</span><span>7</span><span>4</span><span>0</span><span>2</span><span>S</span><span>8</span><span>6</span><span>2</span><span>0</span></span></p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Kullanılan kural</div><ol>
+<li><strong>Birleştir:</strong> en küçük uzaklıktaki iki kümeyi, o uzaklık yüksekliğinde.</li>
+<li><strong>Güncelle:</strong> tam bağlantıda yeni uzaklık = eski iki uzaklığın büyüğü.</li>
+</ol></div>
+<ol class="walk">
+<li><strong>1. birleşme.</strong> En küçük d(R, S) = 2: {R, S} yükseklik 2. Yeni uzaklıklar: d(P, RS) = max(7, 8) = 8, d(Q, RS) = max(4, 6) = 6.</li>
+<li><strong>2. birleşme.</strong> Kalanlar d(P, Q) = 3, d(P, RS) = 8, d(Q, RS) = 6. En küçüğü 3: {P, Q} yükseklik 3. d(PQ, RS) = max(8, 6) = 8.</li>
+<li><strong>3. birleşme.</strong> {P, Q} ile {R, S} yükseklik <strong>8</strong>'de birleşir. Dendrogramda önce R ile S (2), sonra P ile Q (3), en üstte iki grup (8) birleşir.</li>
+<li><strong>Tek bağlantı.</strong> İlk birleşme yine {R, S} (2). d(Q, RS) = min(4, 6) = 4, d(P, RS) = min(7, 8) = 7. Sonra d(P, Q) = 3 en küçük: {P, Q} yükseklik 3. Son birleşme d(PQ, RS) = min(7, 4) = <strong>4</strong> yüksekliğinde. Kümeler aynı, yalnız son birleşme çok daha alçakta.</li>
+</ol></div></details>
+<h3>Problem 3: Naive Bayes ile duygu sınıflandırma</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>Olumlu yorumlar: “harika ürün”, “harika hızlı kargo”. Olumsuz yorumlar: “kötü ürün”, “kötü kargo yavaş”, “yavaş”. Laplace düzeltmesiyle “harika kargo yavaş” yorumunun sınıfını ve sonsal olasılığını bulun.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Kullanılan formüller</div><ol>
+<li><strong>Önsel:</strong> P(C) = sınıftaki yorum sayısı / toplam yorum sayısı</li>
+<li><strong>Kelime:</strong> P(w | C) = (sayı(w, C) + 1) / (toplam kelime(C) + |V|)</li>
+<li><strong>Karar:</strong> P(C)·Π P(w | C) büyük olan sınıf</li>
+</ol></div>
+<ol class="walk">
+<li><strong>Önsel.</strong> 2 olumlu, 3 olumsuz yorum: P(olumlu) = 2/5, P(olumsuz) = 3/5.</li>
+<li><strong>Sayım.</strong> Olumlu: harika 2, ürün 1, hızlı 1, kargo 1; toplam 5. Olumsuz: kötü 2, ürün 1, kargo 1, yavaş 2; toplam 6. Sözlük {harika, ürün, hızlı, kargo, kötü, yavaş}, |V| = 6. Paydalar 5 + 6 = 11 ve 6 + 6 = 12.</li>
+<li><strong>Kelime olasılıkları.</strong> Olumlu: harika 3/11, kargo 2/11, yavaş 1/11. Olumsuz: harika 1/12, kargo 2/12, yavaş 3/12.</li>
+<li><strong>Çarpımlar.</strong> Olumlu: (2/5)·(3·2·1)/11³ = 0.4·6/1331 ≈ 0.4·0.004508 ≈ 0.001803. Olumsuz: (3/5)·(1·2·3)/12³ = 0.6·6/1728 ≈ 0.6·0.003472 ≈ 0.002083.</li>
+<li><strong>Karar.</strong> Olumsuz çarpım daha büyük: yorum <strong>olumsuz</strong>. P(olumsuz | yorum) = 0.002083/(0.002083 + 0.001803) ≈ <strong>0.54</strong>. “Harika” olumlu bir işaret olsa da “yavaş” ve olumsuz sınıfın daha büyük önseli kararı çevirdi.</li>
+</ol></div></details>
+<h3>Problem 4: Kavram soruları (geçmiş final listesi)</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>(a) Başlangıç merkezlerinin seçimi k-ortalamaları nasıl etkiler, ne yapılabilir? (b) Aykırı değerler k-ortalamaları nasıl etkiler? (c) Dirsek yöntemi k'yı nasıl seçer? (d) Otokodlayıcı nedir, hangi problemlerde kullanılır? (e) PCA'da neden en büyük varyans önceliklidir?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<ol class="walk parts">
+<li><strong>(a)</strong> k-ortalamalar yalnız yerel bir en iyiye yakınsar; farklı başlangıçlar farklı kümeler ve farklı SSE değerleri verir, kötü bir başlangıç yavaş yakınsar ya da iki kümeyi birleştirip birini ikiye böler. Çareler: birçok rastgele başlangıçla çalıştırıp en küçük SSE'yi seçmek, k-means++ ile birbirinden uzak merkezlerle başlamak, ya da başka bir yöntemin (örneğin hiyerarşik kümeleme) sonucuyla başlatmak.</li>
+<li><strong>(b)</strong> Merkez kümedeki noktaların ortalaması olduğu için uzaktaki tek bir nokta merkezi kendine doğru çeker, hatta tek başına bir küme olabilir; böylece öteki kümeler bozulur. Çareler: merkezlerden çok uzak noktaları izleyip çıkarmak, rastgele alt örneklemle kümelemek, ortanca temelli k-medoids kullanmak.</li>
+<li><strong>(c)</strong> k = 1, 2, 3, … için küme içi kare toplamı (WCSS) çizilir. WCSS k arttıkça hep düşer; düşüşün belirgin biçimde yavaşladığı “dirsek” noktasındaki k seçilir, çünkü ondan sonra yeni küme eklemek hatayı pek azaltmaz.</li>
+<li><strong>(d)</strong> Girdisini dar bir orta katmandan geçirip yeniden üretmeyi öğrenen, etiket gerektirmeyen bir sinir ağıdır. Orta katman verinin sıkıştırılmış temsilidir. Boyut indirgeme ve öznitelik çıkarma, sıkıştırma, gürültü giderme ve (yeniden kurma hatasıyla) anomali tespitinde kullanılır.</li>
+<li><strong>(e)</strong> Varyans, noktaların o yönde ne kadar farklılaştığını, yani o yönün taşıdığı bilgiyi gösterir. En büyük varyanslı yönlere izdüşürmek noktaları birbirinden en iyi ayıran özeti verir ve yeniden kurma hatasını en küçük yapar; küçük varyanslı yönler çoğunlukla gürültüdür ve atılabilir.</li>
+</ol></div></details>
+
+<h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
+<ul class="mistakes">
+<li><strong>Merkezi güncellemeyi unutmak ya da eski merkezlerle ikinci atamayı yapmak.</strong> Her yinelemede önce bütün noktalar atanır, sonra bütün merkezler yeniden hesaplanır; bir sonraki atama yeni merkezlerle yapılır.</li>
+<li><strong>Merkezi kümenin bir noktası sanmak.</strong> Merkez kümedeki noktaların ortalamasıdır; çoğu zaman verideki hiçbir noktaya denk gelmez.</li>
+<li><strong>Tam ve tek bağlantıyı karıştırmak.</strong> Tam bağlantıda kümeler arası uzaklık en uzak çiftin, tek bağlantıda en yakın çiftin uzaklığıdır. Matrisi güncellerken bunu her adımda uygulayın.</li>
+<li><strong>Dendrogramda yükseklikleri yanlış yazmak.</strong> Her birleşmenin yüksekliği, o anki matristeki birleşme uzaklığıdır; adım numarası değildir.</li>
+<li><strong>Naive Bayes'te önseli unutmak.</strong> Sınıf oranları eşit değilse P(C) çarpımı kararı değiştirebilir.</li>
+<li><strong>Laplace düzeltmesinde paydaya |V| eklemeyi unutmak.</strong> Paya 1 eklendiyse paydaya sözlükteki farklı kelime sayısı eklenmelidir; yoksa olasılıkların toplamı 1 olmaz.</li>
+<li><strong>t-SNE grafiğindeki uzaklıkları yorumlamak.</strong> t-SNE ve UMAP yalnız yerel komşuluğu korur; kümeler arası uzaklık ve küme büyüklüğü anlam taşımaz.</li>
+</ul>
+
+<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Ne olur?</th><th>Not</th></tr></thead>
+<tbody>
+<tr><td>k-ortalamalarda k</td><td>WCSS hep düşer; kümeler küçülür ve gürültüye uymaya başlar (varyans artar)</td><td>k = n iken her nokta kendi kümesidir; dirsek ve siluetle seçin</td></tr>
+<tr><td>PCA bileşen sayısı</td><td>daha çok bilgi korunur ama gürültü de kalır (yanlılık azalır, varyans artar)</td><td>çapraz doğrulamayla ya da %90–95 açıklanan varyansla seçin</td></tr>
+<tr><td>DBSCAN ε</td><td>komşuluklar büyür, kümeler birleşir, gürültü azalır</td><td>çok büyükse her şey tek küme</td></tr>
+<tr><td>DBSCAN minPts</td><td>çekirdek olmak zorlaşır, daha çok nokta gürültü sayılır</td><td>tipik olarak boyut sayısının iki katı civarı</td></tr>
+<tr><td>GMM bileşen sayısı</td><td>model esnekleşir, olabilirlik artar (varyans artar)</td><td>BIC/AIC gibi ölçütlerle seçilir</td></tr>
+<tr><td>Otokodlayıcı kod boyutu</td><td>yeniden kurma iyileşir ama sıkıştırma ve gürültü giderme zayıflar</td><td>kod girdiye eşitse ağ kopyalamayı öğrenir</td></tr>
+<tr><td>Laplace düzeltmesinin büyüklüğü (+1 yerine +α)</td><td>olasılıklar düzleşir (yanlılık artar, varyans azalır)</td><td>α = 0 görülmemiş kelimede sıfır olasılık verir</td></tr>
+</tbody></table></div>
+
+<h2>Kendini sına: kısa sorular</h2><p class="h-en" lang="en">Self-check: short questions</p>
+<div class="quiz" data-answer="3"><p>k-ortalamalarda bir yinelemenin doğru sırası?</p><ol>
+<li data-why="Merkezler atamadan sonra güncellenir.">Merkezleri güncelle, sonra rastgele yeni merkezler seç</li>
+<li data-why="Uzaklıklar her yinelemede yeni merkezlerle hesaplanır.">Bütün uzaklıkları bir kez hesapla, sonra durmadan ata</li>
+<li data-why="">Her noktayı en yakın merkeze ata, sonra her merkezi kümesinin ortalaması yap</li>
+<li data-why="Bu hiyerarşik kümelemedir.">En yakın iki kümeyi birleştir</li></ol><div class="explain">Bir yineleme iki adımdır: atama (her nokta en yakın merkeze) ve güncelleme (her merkez kümesindeki noktaların ortalaması). Atamalar değişmeyene kadar tekrarlanır.</div></div>
+<div class="quiz" data-answer="2"><p>Tam bağlantıda iki kümenin uzaklığı nedir?</p><ol>
+<li data-why="Bu tek bağlantıdır.">En yakın iki noktanın uzaklığı</li>
+<li data-why="">En uzak iki noktanın uzaklığı</li>
+<li data-why="Bu ortalama bağlantıdır.">Bütün nokta çiftlerinin ortalama uzaklığı</li>
+<li data-why="Bu merkez (centroid) bağlantısıdır.">İki kümenin merkezleri arasındaki uzaklık</li></ol><div class="explain">Tam bağlantı iki kümenin en uzak noktalarına bakar; bu yüzden kompakt kümeler üretir ama aykırı değerlere duyarlıdır.</div></div>
+<div class="quiz" data-answer="4"><p>Bir noktanın siluet değeri −0.4 çıktı. Bu ne demek?</p><ol>
+<li data-why="Bu 1'e yakın değerler için geçerlidir.">Kendi kümesine çok iyi oturmuş</li>
+<li data-why="Bu 0'a yakın değerler için geçerlidir.">Tam iki kümenin sınırında</li>
+<li data-why="Siluet uzaklık değildir.">Merkezine uzaklığı 0.4'tür</li>
+<li data-why="">Komşu kümeye kendi kümesinden daha yakın; büyük olasılıkla yanlış kümede</li></ol><div class="explain">s = (b − a)/max(a, b) negatifse a > b'dir: noktanın kendi kümesine ortalama uzaklığı, en yakın komşu kümeye ortalama uzaklığından büyüktür.</div></div>
+<div class="quiz" data-answer="1"><p>Halka biçimli iki iç içe kümeyi hangisi en iyi ayırır?</p><ol>
+<li data-why="">DBSCAN</li>
+<li data-why="k-ortalamalar küresel kümeler varsayar.">k-ortalamalar</li>
+<li data-why="Merkezler aynı yerde olduğu için iki halkayı ayıramaz.">İki merkezli yumuşak k-ortalamalar</li>
+<li data-why="PCA kümeleme yapmaz.">PCA</li></ol><div class="explain">DBSCAN kümeleri yoğun bölgelerin zincirleme bağlantısı olarak tanımladığı için her biçimdeki kümeyi bulabilir. Merkez temelli yöntemler iç içe iki halkanın merkezini aynı yerde görür.</div></div>
+<div class="quiz" data-answer="3"><p>Naive Bayes'te Laplace düzeltmesi neden yapılır?</p><ol>
+<li data-why="Önseli değiştirmez.">Sınıf oranlarını eşitlemek için</li>
+<li data-why="Kelimeleri bağımsız yapmaz; bu ayrı bir varsayımdır.">Kelimeleri birbirinden bağımsız yapmak için</li>
+<li data-why="">Eğitimde bir sınıfta görülmemiş bir kelime bütün çarpımı sıfırlamasın diye</li>
+<li data-why="Uzun metinlerde log almak işe yarar; düzeltme bunun için değildir.">Uzun metinlerde sayıların çok küçülmesini önlemek için</li></ol><div class="explain">Bir kelime bir sınıfın eğitim metinlerinde hiç geçmemişse olasılığı 0 olur ve çarpım tamamen sıfırlanır. Paya 1, paydaya sözlük boyutunu eklemek her kelimeye küçük ama sıfır olmayan bir olasılık verir.</div></div>
+<div class="quiz" data-answer="2"><p>Gürültü gideren evrişimli otokodlayıcı nasıl eğitilir?</p><ol>
+<li data-why="Hedef temiz görüntü olmalı; yoksa gürültüyü de kopyalamayı öğrenir.">Girdi gürültülü, hedef aynı gürültülü görüntü</li>
+<li data-why="">Girdi gürültülü, hedef temiz görüntü</li>
+<li data-why="Otokodlayıcı etiket kullanmaz.">Girdi görüntü, hedef sınıf etiketi</li>
+<li data-why="Bu sıradan otokodlayıcıdır; gürültü gidermeyi öğretmez.">Girdi temiz, hedef temiz görüntü</li></ol><div class="explain">Ağa gürültülü görüntü verilir ama kayıp çıktının temiz görüntüyle farkıdır. Ağ gürültüyü koda taşımamayı ve görüntünün yapısını kurmayı öğrenir.</div></div>
+<div class="quiz" data-answer="4"><p>t-SNE ile çizilen bir grafikte hangisi güvenle yorumlanabilir?</p><ol>
+<li data-why="Eksenlerin anlamı yoktur.">Yatay eksenin anlamı</li>
+<li data-why="Küme büyüklükleri korunmaz.">Kümelerin büyüklükleri</li>
+<li data-why="Kümeler arası uzaklık korunmaz.">İki kümenin birbirine uzaklığı</li>
+<li data-why="">Birbirine yakın noktaların özgün uzayda da benzer olduğu</li></ol><div class="explain">t-SNE yerel komşuluğu korumak için tasarlanmıştır: yakın noktalar özgün uzayda da yakındır. Eksenler, kümeler arası uzaklıklar ve küme büyüklükleri ise yorumlanmamalıdır.</div></div>
+
+</div></main>
+</body>
+</html>

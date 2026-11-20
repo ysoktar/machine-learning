@@ -1077,6 +1077,16 @@ export const HYPER = [
   { m: "MLP", hp: "Erken durdurma sabrı (patience)", b: "↓", v: "↑", r: "↑", why: "Daha büyük sabır daha uzun eğitir." },
   { m: "CNN", hp: "Evrişim katmanı / filtre sayısı", b: "↓", v: "↑", r: "↑", why: "Kapasite artar." },
   { m: "CNN", hp: "Havuzlama katmanı sayısı", b: "↑", v: "↓", r: "↓", why: "Uzamsal ayrıntı atılır, parametre azalır." },
+  { m: "RNN / Transformer", hp: "Gizli boyut / katman sayısı", b: "↓", v: "↑", r: "↑", why: "Kapasite artar; az veride seyreltme gerekir." },
+  { m: "RNN / Transformer", hp: "Gömme boyutu d", b: "↓", v: "↑", r: "↑", why: "Her kelime daha çok sayıyla temsil edilir; kapasite artar." },
+  { m: "RNN / Transformer", hp: "Bağlam penceresi / dizi uzunluğu", b: "↓", v: "↑", r: "↑", why: "Daha çok bağlam görülür; dikkatin maliyeti n² ile büyür." },
+  { m: "RNN / Transformer", hp: "Dikkat başı sayısı h (d sabit)", b: "=", v: "=", r: "=", why: "Her baş d/h boyutludur; toplam kapasite aynı kalır." },
+  { m: "RNN / Transformer", hp: "İnce ayar epoch sayısı", b: "↓", v: "↑", r: "↑", why: "Küçük etiketli veriye giderek daha çok uyar; erken durdurmayla izlenir." },
+  { m: "RNN / Transformer", hp: "İnce ayar öğrenme oranı", b: "=", v: "↑", r: "↑", why: "Büyük oran ön eğitimde öğrenilen bilgiyi siler." },
+  { m: "k-ortalamalar", hp: "Küme sayısı k", b: "↓", v: "↑", r: "↑", why: "WCSS hep düşer; k = n iken her nokta kendi kümesidir." },
+  { m: "Pekiştirmeli öğrenme", hp: "Durum sayısı", b: "↓", v: "↑", r: "↑", why: "Daha ince gösterim; ama her durum daha az ziyaret edilir ve kestirimler gürültülenir." },
+  { m: "Pekiştirmeli öğrenme", hp: "Az keşif (yetersiz keşif)", b: "↑", v: "↑", r: "↑", why: "Ajan az sayıdaki deneyimine uyar; denenmemiş eylemlerin değerleri yanlış kalır ve yetersiz bir politikada takılır." },
+  { m: "Pekiştirmeli öğrenme", hp: "Aşırı sömürü", b: "↑", v: "↑", r: "↑", why: "Hep bilinen en iyi eylem seçilir; daha iyi eylemler keşfedilmez ve politika gördüğü dar deneyime göre ezberlenir." },
 ];
 W.hyper = (ds) => {
   const { el, body } = frame("“X artarsa?” alıştırması", "Alıştırma");
@@ -1435,6 +1445,182 @@ W.lstmstep = () => {
       { what: "İkisini toplayınca yeni bellek çıkar (toplamalı yol).", formula: "cₜ = fₜ·cₜ₋₁ + iₜ·gₜ", calc: `${f(F * C)} ${pm(I * G)}`, result: f(c) },
       { what: "Çıktı kapısı belleğin tanh'ının ne kadarının dışarı verileceğini seçer.", formula: "hₜ = oₜ·tanh(cₜ)", calc: `${f(O)}·tanh(${f(c)}) = ${f(O)}·${f(Math.tanh(c))}`, result: f(hh), note: bad },
     ]), h("p", { class: "small muted" }, "Unutma kapısını 0 yapın: eski bellek tamamen silinir. Girdi kapısını 0 yapın: hiçbir şey yazılmaz ve bellek yalnız unutma kapısı kadar korunur."));
+  });
+  return el;
+};
+
+// ======================================================================= week 11: clustering, Naive Bayes
+const SVGNS = "http://www.w3.org/2000/svg";
+const svgEl = (w, hh, inner, label) => { const e = document.createElementNS(SVGNS, "svg"); e.setAttribute("viewBox", `0 0 ${w} ${hh}`); e.setAttribute("class", "plot fig-svg"); e.setAttribute("role", "img"); e.setAttribute("aria-label", label); e.innerHTML = inner; return e; };
+const d2 = (p, q) => p.reduce((s, x, i) => s + (x - (q[i] ?? 0)) ** 2, 0);
+const ptTxt = (p) => (p.length === 1 ? f(p[0]) : vec(p));
+
+/** Scatter of 1D/2D points coloured by cluster, centres drawn as rings. */
+function clusterPic(P, assign, C) {
+  const two = P[0].length > 1, xs = P.map((p) => p[0]).concat(C.map((c) => c[0])), ys = two ? P.map((p) => p[1]).concat(C.map((c) => c[1])) : [0];
+  const x0 = Math.min(...xs) - 1, x1 = Math.max(...xs) + 1, y0 = Math.min(...ys) - 1, y1 = Math.max(...ys) + 1;
+  const W = 360, H = two ? 260 : 90, m = 22, X = (v) => m + ((v - x0) / (x1 - x0)) * (W - 2 * m), Y = (v) => (two ? H - m - ((v - y0) / (y1 - y0)) * (H - 2 * m) : H / 2);
+  let s = `<line x1="${m}" y1="${two ? H - m : H / 2}" x2="${W - m}" y2="${two ? H - m : H / 2}" class="fig-grid"/>`;
+  P.forEach((p, i) => { s += `<circle cx="${X(p[0])}" cy="${Y(p[1] ?? 0)}" r="6" class="kc${assign[i] % 4}"/>`; });
+  C.forEach((c, j) => { s += `<circle cx="${X(c[0])}" cy="${Y(c[1] ?? 0)}" r="11" class="kring kc${j % 4}"/><text x="${X(c[0]) + 13}" y="${Y(c[1] ?? 0) - 9}" class="lab">m${"₁₂₃₄₅₆₇₈₉"[j] || j + 1}</text>`; });
+  const e = svgEl(W, H, s, "Kümeler ve merkezler"); e.style.maxWidth = "380px"; e.style.display = "block"; e.style.margin = "0.5rem auto"; return e;
+}
+
+W.kmeans = () => {
+  const { el, body } = frame("k-ortalamalar adım adım");
+  const pts = area("1 1\n2 1\n1 2\n3 3\n5 4\n4 5\n5 5", 5), cen = area("1 1\n2 1", 3);
+  const its = h("input", { type: "text", value: "3", style: { width: "3rem" } });
+  const out = outBox();
+  body.append(h("div", { class: "two-col" }, h("div", {}, h("p", { class: "field-hint" }, "Noktalar (her satır bir nokta; tek ya da iki sayı)"), pts), h("div", {}, h("p", { class: "field-hint" }, "Başlangıç merkezleri (k satır)"), cen)),
+    h("div", { class: "controls" }, h("label", {}, "yineleme sayısı ", its)), out);
+  live(body, () => {
+    const P = matRows(pts.value), C0 = matRows(cen.value);
+    if (P.length < 2 || !C0.length) return put(out, errorBox("Noktaları ve en az bir merkezi yazın."));
+    const dim = P[0].length;
+    if (P.some((p) => p.length !== dim) || C0.some((c) => c.length !== dim)) return put(out, errorBox("Bütün noktalar ve merkezler aynı boyutta olmalı."));
+    const n = Math.min(10, Math.max(1, Math.round(readNumber(its.value)) || 1));
+    let C = C0.map((c) => c.slice()), prev = null;
+    const blocks = [];
+    let assign = [];
+    for (let t = 1; t <= n; t++) {
+      const D = P.map((p) => C.map((c) => d2(p, c)));
+      assign = D.map((r) => r.indexOf(Math.min(...r)));
+      const NC = C.map((c, j) => { const mem = P.filter((_, i) => assign[i] === j); return mem.length ? c.map((_, d) => ml.sum(mem.map((p) => p[d])) / mem.length) : c; });
+      const sse = ml.sum(P.map((p, i) => d2(p, NC[assign[i]])));
+      const groups = C.map((_, j) => P.map((p, i) => [p, i]).filter(([, i]) => assign[i] === j).map(([p]) => ptTxt(p)));
+      const same = prev && prev.every((a, i) => a === assign[i]);
+      blocks.push(h("h4", {}, `${t}. yineleme`),
+        table(["Nokta", ...C.map((c, j) => `m${sub(j + 1)} = ${ptTxt(c)} uzaklık²`), "küme"], P.map((p, i) => [ptTxt(p), ...D[i].map((v, j) => ({ v: f(v), cls: j === assign[i] ? "num hlc" : "num" })), `küme ${assign[i] + 1}`]), { cls: "center compact" }),
+        steps([
+          { what: "Her nokta, uzaklık karesi en küçük olan merkezin kümesine atanır.", calc: groups.map((g, j) => `küme ${j + 1}: {${g.join(", ")}}`).join(";  ") },
+          { what: "Her merkez, kümesindeki noktaların ortalaması olur.", formula: "mⱼ = (1/|Cⱼ|)·Σ x", calc: NC.map((c, j) => `m${sub(j + 1)} = ${ptTxt(c)}`).join(";  ") },
+          { what: "Kare hataların toplamı (küçük olması iyi).", formula: "SSE = Σ ‖x − m‖²", calc: "SSE", result: f(sse), note: same ? "Atamalar bir önceki yinelemeyle aynı: algoritma yakınsadı." : null },
+        ]));
+      prev = assign; C = NC;
+    }
+    put(out, clusterPic(P, assign, C), ...blocks);
+  });
+  return el;
+};
+
+W.linkage = () => {
+  const { el, body } = frame("Hiyerarşik kümeleme: uzaklık matrisinden dendrogram");
+  const src = area("A B C D E\n0 2 6 10 9\n2 0 5 9 8\n6 5 0 4 5\n10 9 4 0 3\n9 8 5 3 0", 6);
+  const meth = select("bağlantı ", [["complete", "tam (en büyük)"], ["single", "tek (en küçük)"], ["average", "ortalama"]], "complete");
+  const out = outBox();
+  body.append(h("p", { class: "field-hint" }, "İlk satır adlar, sonraki satırlar simetrik uzaklık matrisi."), src, h("div", { class: "controls" }, meth.label), out);
+  live(body, () => {
+    const rows = src.value.trim().split("\n").map((l) => l.trim().split(/[\s,;]+/).filter(Boolean));
+    if (rows.length < 3) return put(out, errorBox("Adları ve matrisi yazın."));
+    const names = rows[0], M = rows.slice(1).map((r) => r.map((t) => Number(t.replace(",", "."))));
+    const n = names.length;
+    if (M.length !== n || M.some((r) => r.length !== n || r.some((v) => !Number.isFinite(v)))) return put(out, errorBox(`${n} ad için ${n}×${n} sayı gerekir.`));
+    let cl = names.map((nm, i) => ({ name: nm, items: [i], x: i, hgt: 0 }));
+    const dist = (a, b) => { const v = a.items.flatMap((i) => b.items.map((j) => M[i][j])); return meth.get() === "single" ? Math.min(...v) : meth.get() === "complete" ? Math.max(...v) : ml.sum(v) / v.length; };
+    const st = [], merges = [];
+    while (cl.length > 1) {
+      let best = null;
+      for (let a = 0; a < cl.length; a++) for (let b = a + 1; b < cl.length; b++) { const d = dist(cl[a], cl[b]); if (!best || d < best.d - 1e-12) best = { a, b, d }; }
+      const A = cl[best.a], B = cl[best.b], N = { name: A.name + B.name, items: A.items.concat(B.items), hgt: best.d, kids: [A, B] };
+      merges.push(N);
+      const rest = cl.filter((_, i) => i !== best.a && i !== best.b);
+      st.push({ what: `En yakın iki küme {${A.name}} ve {${B.name}}; yükseklik ${f(best.d)}'de birleşir.`, calc: rest.length ? `Yeni uzaklıklar (${meth.get() === "single" ? "en küçük" : meth.get() === "complete" ? "en büyük" : "ortalama"}): ` + rest.map((r) => `d(${N.name}, ${r.name}) = ${f(dist(N, r))}`).join(";  ") : "Tek küme kaldı." });
+      cl = rest.concat([N]);
+    }
+    // dendrogram: leaves in merge order so branches never cross
+    const order = []; const walk = (c) => (c.kids ? (walk(c.kids[0]), walk(c.kids[1])) : order.push(c.items[0])); walk(cl[0]);
+    const W = 360, H = 220, m = 30, top = cl[0].hgt || 1, X = (i) => m + (order.indexOf(i) + 0.5) * ((W - 2 * m) / n), Y = (v) => H - m - (v / top) * (H - 2 * m);
+    let s = `<line x1="${m - 6}" y1="${H - m}" x2="${m - 6}" y2="${m}" class="fig-grid"/>` + [0, top / 2, top].map((v) => `<text x="${m - 10}" y="${Y(v) + 4}" text-anchor="end" class="fig-sub">${f(v)}</text>`).join("");
+    const pos = (c) => (c.kids ? c.px : X(c.items[0]));
+    for (const N of merges) {
+      const [a, b] = N.kids, xa = pos(a), xb = pos(b), ya = Y(a.hgt), yb = Y(b.hgt), y = Y(N.hgt);
+      s += `<path d="M${xa},${ya} V${y} H${xb} V${yb}" class="fig-arrow" fill="none"/>`;
+      N.px = (xa + xb) / 2;
+    }
+    names.forEach((nm, i) => { s += `<text x="${X(i)}" y="${H - m + 16}" text-anchor="middle" class="lab">${nm}</text>`; });
+    const dg = svgEl(W, H, s, "Dendrogram"); dg.style.maxWidth = "420px"; dg.style.display = "block"; dg.style.margin = "0.5rem auto";
+    put(out, dg, steps(st));
+  });
+  return el;
+};
+
+W.nbayes = () => {
+  const { el, body } = frame("Naive Bayes ile metin sınıflandırma (Laplace düzeltmeli)");
+  const src = area("spam: ücretsiz kazan\nspam: ücretsiz para kazan\nnormal: toplantı yarın\nnormal: proje toplantı kazan", 5);
+  const q = h("input", { type: "text", value: "ücretsiz kazan toplantı", style: { width: "100%" } });
+  const out = outBox();
+  body.append(h("p", { class: "field-hint" }, "Her satır: sınıf: metin"), src, h("label", { class: "block" }, "yeni metin ", q), out);
+  live(body, () => {
+    const docs = src.value.split("\n").map((l) => l.match(/^\s*([^:]+):(.*)$/)).filter(Boolean).map((m) => ({ c: m[1].trim(), w: m[2].trim().toLocaleLowerCase("tr").split(/\s+/).filter(Boolean) }));
+    if (!docs.length) return put(out, errorBox("“sınıf: metin” biçiminde en az bir satır yazın."));
+    const classes = ml.uniq(docs.map((d) => d.c)), V = ml.uniq(docs.flatMap((d) => d.w)), words = q.value.trim().toLocaleLowerCase("tr").split(/\s+/).filter(Boolean);
+    const info = classes.map((c) => {
+      const ds = docs.filter((d) => d.c === c), all = ds.flatMap((d) => d.w), tot = all.length, den = tot + V.length;
+      const probs = words.map((w) => ({ w, k: all.filter((x) => x === w).length }));
+      const prior = ds.length / docs.length, score = prior * probs.reduce((s, p) => s * ((p.k + 1) / den), 1);
+      return { c, n: ds.length, tot, den, probs, prior, score };
+    });
+    const Z = ml.sum(info.map((i) => i.score)), best = info.reduce((a, b) => (b.score > a.score ? b : a));
+    put(out, steps([
+      { what: "Önsel olasılıklar: her sınıfın eğitim metinleri içindeki oranı.", formula: "P(C) = sınıftaki metin / toplam metin", calc: info.map((i) => `P(${i.c}) = ${i.n}/${docs.length}`).join(";  ") },
+      { what: `Sözlükte ${V.length} farklı kelime var. Her sınıfın kelime sayısına |V| eklenerek payda bulunur.`, formula: "payda = toplam kelime(C) + |V|", calc: info.map((i) => `${i.c}: ${i.tot} + ${V.length} = ${i.den}`).join(";  ") },
+      ...info.map((i) => ({ what: `${i.c} sınıfında yeni metnin kelimelerinin olasılıkları (sayı + 1)/payda:`, formula: "P(w | C) = (sayı + 1)/payda",
+        calc: i.probs.map((p) => `P(${p.w}) = (${p.k} + 1)/${i.den}`).join(";  ") + `;  çarpım × önsel = ${f(i.score, 6)}` })),
+      { what: "Çarpımlar karşılaştırılır; toplamlarına bölününce sonsal olasılıklar çıkar.", formula: "P(C | metin) = skor(C) / Σ skor", calc: info.map((i) => `P(${i.c} | metin) = ${f(i.score / Z)}`).join(";  "), result: `${best.c}` },
+    ]), words.some((w) => !V.includes(w)) ? h("p", { class: "small muted" }, "Sözlükte olmayan kelimeler her sınıfta aynı (1/payda) olasılığı alır.") : null);
+  });
+  return el;
+};
+
+// ======================================================================= week 12: reinforcement learning
+W.qlearn = () => {
+  const { el, body } = frame("Bir Q-öğrenme güncellemesi");
+  const mk = (lab, val, w = "4rem") => { const i = h("input", { type: "text", value: val, style: { width: w } }); return { i, label: h("label", {}, lab, i) }; };
+  const q = mk("eski Q(s, a) ", "2"), r = mk("ödül r ", "1"), nx = mk("sonraki durumdaki Q değerleri ", "4 3", "6rem"), al = mk("α ", "0.5"), ga = mk("γ ", "0.9");
+  const term = checkbox(" s′ son durum (bölüm bitti)", false);
+  const out = outBox();
+  body.append(h("div", { class: "controls" }, q.label, r.label, nx.label, al.label, ga.label, term.label), out);
+  live(body, () => {
+    const Q = readNumber(q.i.value), R = readNumber(r.i.value), A = readNumber(al.i.value), G = readNumber(ga.i.value), N = parseNums(nx.i.value);
+    if ([Q, R, A, G].some((x) => !Number.isFinite(x))) return put(out, errorBox("Sayıları kontrol edin."));
+    const mx = term.get() || !N.length ? 0 : Math.max(...N), tgt = R + G * mx, diff = tgt - Q, nq = Q + A * diff;
+    put(out, steps([
+      { what: term.get() ? "Bölüm bittiği için sonraki durumun değeri 0 alınır." : "Varılan durumdaki en iyi eylemin Q değerini buluruz.", formula: "max Q(s′, a′)", calc: term.get() ? "son durum" : `max(${N.map((x) => f(x)).join(", ")})`, result: f(mx) },
+      { what: "Yeni örnekten gelen hedef: ödül artı indirimli en iyi sonraki değer.", formula: "hedef = r + γ·max Q(s′, a′)", calc: `${f(R)} + ${f(G)}·${par(mx)}`, result: f(tgt) },
+      { what: "Hedef ile eski tahmin arasındaki fark (TD hatası).", formula: "fark = hedef − Q(s, a)", calc: `${f(tgt)} − ${par(Q)}`, result: f(diff) },
+      { what: "Eski değeri farkın α katı kadar hedefe yaklaştırırız.", formula: "Q(s, a) ← Q(s, a) + α·fark", calc: `${f(Q)} + ${f(A)}·${par(diff)}`, result: f(nq) },
+    ]));
+  });
+  return el;
+};
+
+W.valueiter = () => {
+  const { el, body } = frame("Değer yinelemesi: koridor dünyası");
+  const n = h("input", { type: "text", value: "3", style: { width: "3rem" } }), goal = h("input", { type: "text", value: "10", style: { width: "4rem" } }), step = h("input", { type: "text", value: "-1", style: { width: "4rem" } }), ga = h("input", { type: "text", value: "0.9", style: { width: "4rem" } });
+  const out = outBox();
+  body.append(h("div", { class: "controls" }, h("label", {}, "kare sayısı (hedef hariç) ", n), h("label", {}, "hedef ödülü ", goal), h("label", {}, "adım ödülü ", step), h("label", {}, "γ ", ga)), out);
+  live(body, () => {
+    const N = Math.min(8, Math.max(1, Math.round(readNumber(n.value)) || 3)), Rg = readNumber(goal.value), Rs = readNumber(step.value), G = readNumber(ga.value);
+    if ([Rg, Rs, G].some((x) => !Number.isFinite(x))) return put(out, errorBox("Sayıları kontrol edin."));
+    const names = Array.from({ length: N }, (_, i) => String.fromCharCode(65 + i));
+    let V = Array(N).fill(0);
+    const rows = [["0", ...V.map((v) => ({ v: f(v), cls: "num" }))]];
+    const val = (Vp, i, dir) => { const j = i + dir; if (j >= N) return Rg; return Rs + G * Vp[Math.max(0, j)]; };
+    let it = 0, done = false;
+    while (it < 30 && !done) {
+      it++;
+      const NV = V.map((_, i) => Math.max(val(V, i, 1), val(V, i, -1)));
+      done = NV.every((v, i) => Math.abs(v - V[i]) < 1e-9);
+      V = NV; rows.push([String(it), ...V.map((v) => ({ v: f(v), cls: "num" }))]);
+    }
+    const pol = V.map((_, i) => (val(V, i, 1) >= val(V, i, -1) ? "sağ" : "sol"));
+    const last = N - 1;
+    put(out, table(["Yineleme", ...names], rows, { cls: "center compact" }),
+      steps([
+        { what: `Hedefin hemen solundaki ${names[last]} karesinde sağa gitmek hedef ödülünü verir (G'nin değeri 0).`, formula: "V(s) = max(sağ, sol)", calc: `sağ = ${f(Rg)}, sol = ${f(Rs)} + ${f(G)}·V(${names[Math.max(0, last - 1)]})`, result: f(V[last]) },
+        N > 1 ? { what: `Öteki karelerde sağa gitmek: adım ödülü + γ·(sağdaki karenin değeri).`, formula: "sağ = r + γ·V(s′)", calc: names.slice(0, last).map((nm, i) => `V(${nm}) = ${f(Rs)} + ${f(G)}·${f(V[i + 1])} = ${f(V[i])}`).join(";  ") } : null,
+        { what: done ? `${it - 1}. yinelemeden sonra değerler değişmedi; en iyi politika her karede max'ı veren eylemdir.` : "30 yinelemede tam yakınsamadı; son değerler gösteriliyor.", calc: names.map((nm, i) => `${nm}: ${pol[i]}`).join(", ") },
+      ]));
   });
   return el;
 };

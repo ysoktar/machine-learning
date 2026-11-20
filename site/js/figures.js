@@ -20,6 +20,89 @@ const DEFS = `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" marker
 const range = (a, b, n) => Array.from({ length: n + 1 }, (_, i) => a + ((b - a) * i) / n);
 
 export const FIG = {
+  // ---------------------------------------------------------------- week 11
+  kmeansit: () => {
+    const P = [[1, 1], [2, 1], [1, 2], [3, 3], [5, 4], [4, 5], [5, 5]], L = "ABCDEFG";
+    const stages = [
+      { t: "1. yineleme", c: [[1, 1], [2, 1]], a: [0, 1, 0, 1, 1, 1, 1] },
+      { t: "2. yineleme", c: [[1, 1.5], [3.8, 3.6]], a: [0, 0, 0, 1, 1, 1, 1] },
+      { t: "3. yineleme (değişiklik yok)", c: [[1.33, 1.33], [4.25, 4.25]], a: [0, 0, 0, 1, 1, 1, 1] },
+    ];
+    const S = 26, pw = 160;
+    let s = "";
+    stages.forEach((st, k) => {
+      const ox = 10 + k * (pw + 10), X = (v) => ox + 10 + (v - 0.5) * S, Y = (v) => 168 - (v - 0.5) * S;
+      s += `<rect x="${ox}" y="20" width="${pw}" height="160" rx="8" class="fig-box2"/>` + T(ox + pw / 2, 14, st.t, { anchor: "middle", cls: "fig-sub" });
+      P.forEach((p, i) => { s += `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="6" class="kc${st.a[i]}"/>` + T(X(p[0]) + 7, Y(p[1]) - 6, L[i], { cls: "fig-sub", size: 10 }); });
+      st.c.forEach((c, j) => { s += `<circle cx="${X(c[0])}" cy="${Y(c[1])}" r="11" class="kring kc${j}"/>`; });
+    });
+    return svg(10 + 3 * (pw + 10), 190, s, "k-ortalamaların üç yinelemesi");
+  },
+
+  elbow: () => lines({ series: [
+    { pts: [[1, 100], [2, 55], [3, 22], [4, 18], [5, 15.5], [6, 13.5], [7, 12], [8, 11]], cls: "curve1", dots: true, name: "WCSS", color: "pos" },
+    { pts: [[3, 0], [3, 22]], cls: "curve2", name: "dirsek: k = 3", color: "neg" },
+  ], xlim: [1, 8], ylim: [0, 105], xstep: 1, ystep: 20, xlabel: "küme sayısı k", ylabel: "küme içi kare toplamı (WCSS)", aria: "Dirsek yöntemi" }),
+
+  dendro: () => {
+    // complete linkage of A..E: AB at 2, DE at 3, C+DE at 5, all at 10
+    const X = { A: 60, B: 120, C: 190, D: 250, E: 310 }, Y = (v) => 190 - v * 16;
+    let s = `<line x1="34" y1="${Y(0)}" x2="34" y2="${Y(10)}" class="fig-grid"/>` + [0, 2, 3, 5, 10].map((v) => T(28, Y(v) + 4, String(v), { anchor: "end", cls: "fig-sub" })).join("");
+    const link = (x1, y1, x2, y2, y) => `<path d="M${x1},${y1} V${y} H${x2} V${y2}" class="fig-arrow" fill="none"/>`;
+    s += link(X.A, Y(0), X.B, Y(0), Y(2)) + link(X.D, Y(0), X.E, Y(0), Y(3));
+    const de = (X.D + X.E) / 2, ab = (X.A + X.B) / 2;
+    s += link(X.C, Y(0), de, Y(3), Y(5));
+    const cde = (X.C + de) / 2;
+    s += link(ab, Y(2), cde, Y(5), Y(10));
+    s += `<line x1="40" y1="${Y(7)}" x2="336" y2="${Y(7)}" class="line dash"/>` + T(340, Y(7) + 4, "kesim: 2 küme", { cls: "fig-sub" });
+    for (const [k, x] of Object.entries(X)) s += T(x, Y(0) + 16, k, { anchor: "middle" });
+    return svg(430, 214, s, "Tam bağlantılı dendrogram");
+  },
+
+  dbscan: () => {
+    const moon = (cx, cy, r, a0, a1, n) => Array.from({ length: n }, (_, i) => { const a = a0 + ((a1 - a0) * i) / (n - 1); return [cx + r * Math.cos(a), cy - r * Math.sin(a)]; });
+    const A = moon(120, 120, 70, 0.1, Math.PI - 0.1, 11), B = moon(190, 150, 70, Math.PI + 0.1, 2 * Math.PI - 0.1, 11);
+    let s = "";
+    A.forEach(([x, y], i) => { s += i === 0 || i === 10 ? `<circle cx="${x}" cy="${y}" r="5.5" class="kring kc0"/>` : `<circle cx="${x}" cy="${y}" r="5.5" class="kc0"/>`; });
+    B.forEach(([x, y], i) => { s += i === 0 || i === 10 ? `<circle cx="${x}" cy="${y}" r="5.5" class="kring kc1"/>` : `<circle cx="${x}" cy="${y}" r="5.5" class="kc1"/>`; });
+    for (const [x, y] of [[40, 210], [300, 40], [330, 200]]) s += `<path d="M${x - 5},${y - 5} L${x + 5},${y + 5} M${x - 5},${y + 5} L${x + 5},${y - 5}" class="fig-arrow"/>`;
+    const [cx, cy] = A[5];
+    s += `<circle cx="${cx}" cy="${cy}" r="26" class="line dash" fill="none"/>` + T(cx + 30, cy - 18, "ε", { cls: "fig-sub", size: 14 });
+    s += T(14, 236, "dolu: çekirdek nokta · halkalı: sınır noktası · çarpı: gürültü", { cls: "fig-sub" });
+    return svg(360, 246, s, "DBSCAN");
+  },
+
+  autoenc: () => {
+    let s = DEFS;
+    const layer = (x, n, cls) => { let o = ""; const h0 = 120 - (n - 1) * 13; for (let i = 0; i < n; i++) o += `<circle cx="${x}" cy="${h0 + i * 26}" r="9" class="${cls}"/>`; return o; };
+    s += layer(40, 7, "fig-box2") + layer(120, 5, "fig-box") + layer(200, 2, "fig-box3") + layer(280, 5, "fig-box") + layer(360, 7, "fig-box2");
+    s += arrow(56, 120, 104, 120) + arrow(136, 120, 184, 120) + arrow(216, 120, 264, 120) + arrow(296, 120, 344, 120);
+    s += T(40, 226, "girdi x", { anchor: "middle", cls: "fig-sub" }) + T(120, 226, "kodlayıcı", { anchor: "middle", cls: "fig-sub" }) + T(200, 226, "kod (darboğaz)", { anchor: "middle", cls: "fig-sub" }) + T(280, 226, "kod çözücü", { anchor: "middle", cls: "fig-sub" }) + T(360, 226, "x̂ ≈ x", { anchor: "middle", cls: "fig-sub" });
+    s += T(200, 16, "kayıp = ‖x − x̂‖²   (gürültü giderme: girdi gürültülü, hedef temiz)", { anchor: "middle", cls: "fig-sub" });
+    return svg(400, 236, s, "Otokodlayıcı");
+  },
+
+  // ---------------------------------------------------------------- week 12
+  rlloop: () => {
+    let s = DEFS;
+    s += box(180, 10, 130, 40, "Ajan", "fig-box3") + box(180, 120, 130, 40, "Çevre", "fig-box2");
+    s += `<path d="M312,30 H390 V140 H314" class="fig-arrow" fill="none" marker-end="url(#ah)"/>` + T(396, 90, "eylem aₜ", { cls: "fig-sub" });
+    s += `<path d="M178,132 H110 V30 H176" class="fig-arrow" fill="none" marker-end="url(#ah)"/>` + `<path d="M178,150 H80 V42 H176" class="fig-arrow" fill="none" marker-end="url(#ah)"/>`;
+    s += T(116, 92, "durum sₜ₊₁", { cls: "fig-sub" }) + T(4, 110, "ödül rₜ₊₁", { cls: "fig-sub" });
+    return svg(480, 170, s, "Ajan ve çevre döngüsü");
+  },
+
+  corridor: () => {
+    let s = DEFS;
+    const nm = ["A", "B", "C", "G"], v = ["6.2", "8", "10", "son"];
+    nm.forEach((t, i) => {
+      const x = 10 + i * 110;
+      s += box(x, 20, 80, 44, t, i === 3 ? "fig-box3" : "fig-box2") + T(x + 40, 84, i === 3 ? "+10 ile biter" : `V = ${v[i]}`, { anchor: "middle", cls: "fig-sub" });
+      if (i < 3) s += arrow(x + 82, 42, x + 108, 42) + T(x + 95, 34, i === 2 ? "+10" : "−1", { anchor: "middle", cls: "fig-sub" });
+    });
+    return svg(440, 96, s, "Koridor dünyası");
+  },
+
   // ---------------------------------------------------------------- week 9 (hand convolution pictures)
   conv1d: () => {
     const f = [4, 3, 2, "−5", 3, 5, 2, 5, 5, 6], o = ["3", "0", "0", "1", "10/3", "4", "4", "16/3"];
