@@ -525,3 +525,8 @@ details.aside .m { white-space: normal; overflow-wrap: anywhere; }
 ol.walk { padding-left: 1.4rem; }
 ol.walk > li { margin: 0.35rem 0; padding: 0.35rem 0.6rem; background: var(--surface-2); border-radius: 8px; list-style-position: outside; }
 ol.walk.parts { list-style: none; padding-left: 0; }
+
+.three-col { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; }
+@media (max-width: 700px) { .three-col { grid-template-columns: 1fr; } }
+label.block { display: block; margin: 0.3rem 0; }
+label.block input { display: block; max-width: 100%; box-sizing: border-box; }

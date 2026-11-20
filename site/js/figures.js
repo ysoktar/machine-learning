@@ -20,6 +20,101 @@ const DEFS = `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" marker
 const range = (a, b, n) => Array.from({ length: n + 1 }, (_, i) => a + ((b - a) * i) / n);
 
 export const FIG = {
+  // ---------------------------------------------------------------- week 10
+  rnnunroll: () => {
+    let s = DEFS;
+    const xs = [20, 135, 250, 365], bw = 76, bh = 34;
+    xs.forEach((x, i) => {
+      const n = "₁₂₃₄"[i];
+      s += box(x, 8, bw, bh, `ŷ${n}`, "fig-box3") + box(x, 88, bw, bh, `h${n}`, "fig-box") + box(x, 168, bw, bh, `x${n}`, "fig-box2");
+      s += arrow(x + bw / 2, 166, x + bw / 2, 124) + arrow(x + bw / 2, 86, x + bw / 2, 44);
+      s += T(x + bw / 2 + 6, 150, "W", { cls: "fig-sub" }) + T(x + bw / 2 + 6, 70, "V", { cls: "fig-sub" });
+      if (i < 3) s += arrow(x + bw + 2, 105, xs[i + 1] - 2, 105) + T(x + bw + 19, 96, "U", { anchor: "middle", cls: "fig-sub" });
+    });
+    return svg(460, 210, s, "Zamanda açılmış RNN");
+  },
+
+  gradpow: () => lines({ series: [
+    { pts: range(1, 15, 14).map((t) => [t, 0.75 ** t]), cls: "curve2", name: "|J| = 0.75: söner", color: "neg" },
+    { pts: range(1, 15, 14).map((t) => [t, 1]), cls: "curve3", name: "|J| = 1: korunur", color: "s3" },
+    { pts: range(1, 15, 14).map((t) => [t, 1.15 ** t]), cls: "curve1", name: "|J| = 1.15: patlar", color: "pos" },
+  ], xlim: [1, 15], ylim: [0, 9], ystep: 1, xlabel: "geriye taşınan adım sayısı t", ylabel: "gradyanın büyüklüğü", aria: "Gradyan büyüklüğü adım sayısıyla" }),
+
+  lstmcell: () => {
+    let s = DEFS;
+    const y = 50, odot = (cx, cy) => `<circle cx="${cx}" cy="${cy}" r="14" class="fig-box2"/>${T(cx, cy + 5, "⊙", { anchor: "middle", size: 15 })}`;
+    s += box(10, 32, 64, 36, "cₜ₋₁", "fig-box2") + odot(120, y) + `<circle cx="200" cy="${y}" r="14" class="fig-box3"/>${T(200, y + 5, "+", { anchor: "middle", size: 16 })}`;
+    s += box(240, 32, 56, 36, "cₜ", "fig-box") + box(320, 34, 60, 32, "tanh", "fig-box2") + odot(420, y) + box(460, 32, 64, 36, "hₜ", "fig-box3");
+    s += arrow(76, y, 104, y) + arrow(136, y, 184, y) + arrow(216, y, 238, y) + arrow(298, y, 318, y) + arrow(382, y, 404, y) + arrow(436, y, 458, y);
+    // forget gate from above
+    s += T(120, 14, "fₜ = σ(W_f·[xₜ; hₜ₋₁] + b_f)", { anchor: "middle", cls: "fig-sub" }) + arrow(120, 20, 120, 34);
+    // input gate and candidate below the +
+    s += odot(200, 150) + arrow(200, 135, 200, 66) + box(40, 135, 122, 30, "gₜ = tanh(…)", "fig-box2") + arrow(163, 150, 184, 150);
+    s += T(222, 166, "iₜ = σ(W_i·[xₜ; hₜ₋₁] + b_i)", { cls: "fig-sub" });
+    // output gate below the last ⊙
+    s += arrow(420, 118, 420, 66) + T(420, 132, "oₜ = σ(W_o·[xₜ; hₜ₋₁] + b_o)", { anchor: "middle", cls: "fig-sub" });
+    // inputs
+    s += box(10, 200, 60, 28, "xₜ", "fig-box2") + box(10, 236, 60, 28, "hₜ₋₁", "fig-box2") + arrow(72, 212, 96, 168) + arrow(72, 246, 104, 168);
+    return svg(540, 272, s, "LSTM hücresi");
+  },
+
+  attnflow: () => {
+    let s = DEFS;
+    const ys = [14, 92, 170], ks = ["k₁ = (1, 0)", "k₂ = (0, 1)", "k₃ = (1, 1)"], vs = ["v₁ = (1, 2)", "v₂ = (3, 0)", "v₃ = (0, 1)"];
+    const sc = ["0.707", "0.707", "1.414"], a = [0.248, 0.248, 0.503];
+    s += box(6, 92, 96, 36, "q₃ = (1, 1)", "fig-box3");
+    ys.forEach((y, i) => {
+      s += box(128, y, 92, 36, ks[i], "fig-box2") + arrow(104, 110, 126, y + 18);
+      s += T(228, y + 14, `skor ${sc[i]}`, { cls: "fig-sub" }) + T(228, y + 30, `a = ${a[i]}`, { cls: "fig-sub" });
+      s += box(306, y, 92, 36, vs[i], "fig-box2");
+      s += `<line x1="400" y1="${y + 18}" x2="420" y2="110" class="fig-arrow" style="stroke-width:${1 + 7 * a[i]}px"/>`;
+    });
+    s += box(424, 88, 90, 44, "z₃", "fig-box", "(0.99, 1.00)");
+    s += T(6, 222, "skor = q·k / √2,   a = softmax(skorlar),   z = Σ a·v", { cls: "fig-sub" });
+    return svg(520, 232, s, "Bir kelimenin dikkat hesabı");
+  },
+
+  transformer: () => {
+    let s = DEFS;
+    const bw = 190, bh = 28, row = (k) => 26 + 40 * k;
+    const dec = [[0, "Doğrusal + softmax", "fig-box"], [1, "Ekle ve normalleştir", "fig-box2"], [2, "İleri beslemeli ağ (FFN)", "fig-box"], [3, "Ekle ve normalleştir", "fig-box2"], [4, "Çapraz dikkat", "fig-box3"], [5, "Ekle ve normalleştir", "fig-box2"], [6, "Maskeli öz-dikkat", "fig-box3"], [7, "Çıktı gömmesi + konum", "fig-box2"]];
+    const ex = 14, dx = 270;
+    const encRows = [[3, "Ekle ve normalleştir", "fig-box2"], [4, "İleri beslemeli ağ (FFN)", "fig-box"], [5, "Ekle ve normalleştir", "fig-box2"], [6, "Çok başlı öz-dikkat", "fig-box3"], [7, "Girdi gömmesi + konum", "fig-box2"]];
+    for (const [k, t, c] of encRows) s += box(ex, row(k), bw, bh, t, c);
+    for (const [k, t, c] of dec) s += box(dx, row(k), bw, bh, t, c);
+    for (let k = 3; k < 7; k++) s += arrow(ex + bw / 2, row(k + 1) - 1, ex + bw / 2, row(k) + bh + 1);
+    for (let k = 0; k < 7; k++) s += arrow(dx + bw / 2, row(k + 1) - 1, dx + bw / 2, row(k) + bh + 1);
+    // encoder output feeds the decoder's cross-attention
+    s += `<path d="M${ex + bw / 2},${row(3) - 1} V${row(2) + 6} H${dx - 24} V${row(4) + bh / 2} H${dx - 3}" class="fig-arrow" fill="none" marker-end="url(#ah)"/>`;
+    s += T(ex + bw / 2, row(8) + 4, "Kodlayıcı (N blok)", { anchor: "middle", cls: "fig-sub" }) + T(dx + bw / 2, row(8) + 4, "Kod çözücü (N blok)", { anchor: "middle", cls: "fig-sub" });
+    return svg(474, row(8) + 14, s, "Transformer kodlayıcı ve kod çözücü");
+  },
+
+  w2vwin: () => {
+    const w = ["öğrenci", "sınav", "öncesi", "evde", "ders", "çalışmayı", "sever"];
+    const bw = 68, gap = 6;
+    let s = DEFS;
+    w.forEach((t, i) => {
+      const x = 4 + i * (bw + gap), cls = i === 2 ? "fig-box3" : Math.abs(i - 2) <= 2 ? "fig-box2" : "fig-box fig-gray";
+      s += box(x, 50, bw, 32, t, cls);
+      if (i !== 2 && Math.abs(i - 2) <= 2) { const cx = x + bw / 2, c0 = 4 + 2 * (bw + gap) + bw / 2; s += `<path d="M${c0},48 Q${(c0 + cx) / 2},${8 + 6 * Math.abs(i - 2)} ${cx},47" class="fig-arrow" fill="none" marker-end="url(#ah)"/>`; }
+    });
+    s += T(4, 106, "merkez kelime: öncesi (mavi); pencere = 2 içindeki komşular (yeşil); gri kelimeler pencere dışında", { cls: "fig-sub" });
+    s += T(4, 126, "skip-gram çiftleri: (öncesi, öğrenci), (öncesi, sınav), (öncesi, evde), (öncesi, ders)", { cls: "fig-sub" });
+    return svg(520, 136, s, "Word2Vec penceresi");
+  },
+
+  cosangle: () => {
+    const S = 52, ox = 34, oy = 196, X = (v) => ox + v * S, Y = (v) => oy - v * S;
+    let s = DEFS + `<line x1="${X(0)}" y1="${Y(0)}" x2="${X(5.2)}" y2="${Y(0)}" class="fig-grid"/><line x1="${X(0)}" y1="${Y(0)}" x2="${X(0)}" y2="${Y(3.4)}" class="fig-grid"/>`;
+    const vecs = [[2, 1, "a = (2, 1)", "fig-arrow"], [4, 2, "2a = (4, 2)", "fig-arrow"], [1, 2.2, "b = (1, 2.2)", "fig-arrow"]];
+    for (const [a, b, l, c] of vecs) s += `<line x1="${X(0)}" y1="${Y(0)}" x2="${X(a)}" y2="${Y(b)}" class="${c}" marker-end="url(#ah)"/>`;
+    s += T(X(2) + 4, Y(1) + 16, "a = (2, 1)", { cls: "fig-sub" }) + T(X(4) - 30, Y(2) - 8, "2a = (4, 2)", { cls: "fig-sub" }) + T(X(1) + 6, Y(2.2) - 4, "b = (1, 2.2)", { cls: "fig-sub" });
+    s += `<path d="M${X(1.2)},${Y(0.6)} A ${1.34 * S} ${1.34 * S} 0 0 0 ${X(0.55)},${Y(1.21)}" class="fig-arrow" fill="none"/>` + T(X(1.05), Y(1.12), "θ", { cls: "fig-sub" });
+    s += T(X(0.2), Y(3.1), "cos(a, 2a) = 1,   Öklid(a, 2a) = 2.24", { cls: "fig-sub" }) + T(X(0.2), Y(2.75), "cos(a, b) = 0.78,   Öklid(a, b) = 1.56", { cls: "fig-sub" });
+    return svg(330, 210, s, "Kosinüs ve açı");
+  },
+
   entropy: () => lines({ series: [
     { pts: range(0.001, 0.999, 120).map((p) => [p, ml.entropy([p, 1 - p])]), cls: "curve1", name: "entropi H(p)", color: "pos" },
     { pts: range(0, 1, 120).map((p) => [p, ml.gini([p, 1 - p])]), cls: "curve2", name: "Gini 1 − p² − (1−p)²", color: "neg" },

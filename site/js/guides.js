@@ -1,6 +1,31 @@
 // "How to use this tool" boxes shown at the top of each widget: what it shows, what to try, what you should notice.
 // The point is that a tool supports the explanation around it instead of being thrown at the reader.
 export const GUIDE = {
+  attention: {
+    what: "Q, K ve V matrislerinden dikkat ağırlıklarını ve çıktıları hesaplar; seçtiğiniz satır için skor, ölçekleme, softmax ve ağırlıklı toplamı adım adım yazar.",
+    tryit: ["Varsayılan değerler sayfadaki elle örnektir: 3. satırın ağırlıklarının 0.248, 0.248, 0.503 çıktığını görün.", "Q'nun ilk satırını 2 0 yapın: ağırlıklar nasıl keskinleşiyor?", "Nedensel maskeyi açın ve 2. satıra bakın: üçüncü kelimenin ağırlığı 0 oluyor."],
+    see: "Her satırın ağırlıkları toplamı 1'dir ve çıktı, değer vektörlerinin bu ağırlıklarla karışımıdır. Sorgu büyüdükçe dağılım tek bir kelimeye yığılır.",
+  },
+  cosine: {
+    what: "Yazdığınız vektörlerin her çifti için iç çarpımı, uzunlukları, kosinüs benzerliğini ve Öklid uzaklığını hesaplar; en benzer çiftin hesabını adım adım gösterir.",
+    tryit: ["Varsayılan kedi, köpek, borsa örneğinde en benzer çiftin kedi ve köpek olduğunu görün.", "Yeni bir satır ekleyin: “kedi2: 4 2 0”. Kedi ile kosinüsü 1, Öklid uzaklığı ise büyük çıkar."],
+    see: "Kosinüs yalnız yöne bakar, Öklid uzaklığı uzunluk farkını da sayar; metin karşılaştırmada kosinüsün tercih edilmesinin nedeni budur.",
+  },
+  rnnparams: {
+    what: "Girdi ve gizli boyuttan yalın RNN, LSTM ve GRU katmanlarının parametre sayısını formülle adım adım hesaplar.",
+    tryit: ["Varsayılan d = 4, h = 3 için 24, 96 ve 72 sonuçlarını okuyun.", "d = 128, h = 256 yazın: sayfadaki Problem 4'ün cevabı (394,240 ve 295,680)."],
+    see: "Her kapı d + h uzunluğunda bir vektöre bakar; LSTM dört, GRU üç grup taşıdığı için GRU her zaman %25 daha küçüktür.",
+  },
+  w2v: {
+    what: "Bir cümle ve pencere boyu için bütün skip-gram çiftlerini ve CBOW örneklerini listeler, toplam çift sayısını bulur.",
+    tryit: ["Pencereyi 1 yapın: 7 kelimeden 12 çift çıkar (geçmiş finaldeki “2-gram” sorusu).", "Kendi 6 kelimelik cümlenizi yazın ve çiftleri önce kâğıtta sayın."],
+    see: "Cümlenin uçlarındaki kelimelerin daha az komşusu vardır; toplam, her kelimenin komşu sayılarının toplamıdır.",
+  },
+  lstmstep: {
+    what: "Kapı değerleri verilmiş bir LSTM hücresinde yeni belleği (cₜ) ve yeni gizli durumu (hₜ) adım adım hesaplar.",
+    tryit: ["Unutma kapısını 0 yapın: eski bellek tamamen silinir.", "Girdi kapısını 0 yapın: belleğe hiçbir şey yazılmaz.", "Çıktı kapısını 0 yapın: bellek korunur ama dışarıya hiçbir şey verilmez."],
+    see: "Bellek çarpılarak değil toplanarak güncellenir; kapılar yalnız ne kadarının kalacağını ve ne kadarının ekleneceğini ayarlar.",
+  },
   hypspace: {
     what: "Her özniteliğin kaç değer alabildiğini yazınca kaç farklı örnek (gün), kaç farklı hipotez ve kaç olası kavram olduğunu hesaplar.",
     tryit: ["Varsayılan EnjoySport değerlerini (3 2 2 2 2 2) okuyun: 96 gün, 973 hipotez.", "Sona bir “2” daha ekleyin (yeni öznitelik): sayılar nasıl büyüyor?"],

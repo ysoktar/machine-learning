@@ -76,6 +76,14 @@ export const TERMS = [
 "en": "batch / stochastic gradient descent"
 },
 {
+"term": "BERT ve GPT",
+"def": "Transformer'ın iki ailesi. BERT yalnız kodlayıcıdır, iki yöne bakar ve maskelenmiş kelimeyi tahmin eder; GPT yalnız kod çözücüdür, yalnız geçmişi görür ve sonraki kelimeyi tahmin eder.",
+"id": "t-bert-ve-gpt",
+"match": "BERT|GPT",
+"week": 10,
+"en": "BERT / GPT"
+},
+{
 "term": "Bias",
 "def": "Doğrusal modeldeki sabit sayı: karar sınırını orijinden kaydırır. “Yanlılık-varyans”taki yanlılıkla aynı kelime ama farklı kavram. (ŷ = w·x + b)",
 "id": "t-bias-yanlilik-terimi-b",
@@ -114,6 +122,14 @@ export const TERMS = [
 "match": "boyut laneti",
 "week": 3,
 "en": "curse of dimensionality"
+},
+{
+"term": "BPTT",
+"def": "RNN'yi zamanda açıp derin bir ağ gibi geri yayılım yapmak. Bütün adımlar aynı ağırlıkları paylaştığı için adımların gradyanları toplanır.",
+"id": "t-bptt-zamanda-geri-yayilim",
+"match": "BPTT|zamanda geri yayılım",
+"week": 10,
+"en": "backpropagation through time"
 },
 {
 "term": "Budama",
@@ -162,6 +178,14 @@ export const TERMS = [
 "match": "destek vektör",
 "week": 7,
 "en": "support vector"
+},
+{
+"term": "Dikkat mekanizması",
+"def": "Her kelimenin bütün kelimelere bakıp hangisinin ne kadar önemli olduğuna karar vermesi: sorgu ile anahtarların benzerlikleri softmax ile ağırlığa çevrilir, değerler bu ağırlıklarla toplanır. (softmax(Q·Kᵀ/√dₖ)·V)",
+"id": "t-dikkat-mekanizmasi",
+"match": "dikkat mekanizması|öz-dikkat|çok başlı dikkat|maskeli dikkat|çapraz dikkat",
+"week": 10,
+"en": "attention mechanism"
 },
 {
 "term": "Doğrulama kümesi",
@@ -300,6 +324,22 @@ export const TERMS = [
 "en": "Gini impurity"
 },
 {
+"term": "Gizli durum",
+"def": "RNN'nin o ana kadar okuduklarının özetini taşıyan vektör. Her adımda yeni girdiyle güncellenir.",
+"id": "t-gizli-durum",
+"match": "gizli durum",
+"week": 10,
+"en": "hidden state"
+},
+{
+"term": "Gömme vektörü",
+"def": "Bir kelimeyi (ya da görüntüyü, cümleyi) kısa ve yoğun bir sayı vektörüyle temsil etmek; anlamca benzer olanlar uzayda birbirine yakın düşer.",
+"id": "t-gomme-vektoru",
+"match": "gömme(?!li)",
+"week": 10,
+"en": "embedding"
+},
+{
 "term": "Gradyan",
 "def": "Kaybın her parametreye göre türevlerinden oluşan vektör; kaybın en hızlı arttığı yön. Ters yöne gidilir. (∇L)",
 "id": "t-gradyan",
@@ -322,6 +362,22 @@ export const TERMS = [
 "match": "gradyan inişi",
 "week": 4,
 "en": "gradient descent"
+},
+{
+"term": "Gradyan kırpma",
+"def": "Gradyanın uzunluğu bir eşiği aşınca onu, yönünü koruyarak eşik uzunluğuna küçültmek. Patlayan gradyanı önler, kaybolanı çözmez. (‖g‖ > c ise g ← c·g/‖g‖)",
+"id": "t-gradyan-kirpma",
+"match": "gradyan kırpma",
+"week": 10,
+"en": "gradient clipping"
+},
+{
+"term": "GRU",
+"def": "LSTM'nin sade hâli: ayrı bellek yok, iki kapı (sıfırlama ve güncelleme). Yaklaşık %25 daha az parametre. (hₜ = (1 − zₜ)⊙hₜ₋₁ + zₜ⊙h′ₜ)",
+"id": "t-gru",
+"match": "GRU",
+"week": 10,
+"en": "gated recurrent unit"
 },
 {
 "term": "Hiperparametre",
@@ -370,6 +426,14 @@ export const TERMS = [
 "match": "ileri yayılım",
 "week": 8,
 "en": "forward pass"
+},
+{
+"term": "İnce ayar",
+"def": "Önceden eğitilmiş bir modeli kendi küçük etiketli verinizde düşük öğrenme oranıyla biraz daha eğitmek.",
+"id": "t-i-nce-ayar",
+"match": "ince ayar",
+"week": 9,
+"en": "fine-tuning"
 },
 {
 "term": "Kalıntı",
@@ -421,6 +485,14 @@ export const TERMS = [
 "auto": false
 },
 {
+"term": "Kaybolan / patlayan gradyan",
+"def": "Geri yayılımda gradyan birçok çarpandan geçer; çarpanlar 1'den küçükse sıfıra yaklaşır (ilk katmanlar ya da ilk adımlar öğrenemez), büyükse patlar (kayıp NaN olur). (|J|ᵗ)",
+"id": "t-kaybolan-patlayan-gradyan",
+"match": "kaybolan gradyan|patlayan gradyan|kaybolan ve patlayan gradyan",
+"week": 9,
+"en": "vanishing / exploding gradient"
+},
+{
 "term": "Kayıp",
 "def": "Tek bir tahminin ne kadar kötü olduğunu ölçen sayı. Eğitim, ortalama kaybı küçültmektir. (kare: (y − ŷ)², log-loss, menteşe)",
 "id": "t-kayip-fonksiyonu",
@@ -443,6 +515,22 @@ export const TERMS = [
 "match": "kNN",
 "week": 3,
 "en": "k-nearest neighbours"
+},
+{
+"term": "Konum kodlaması",
+"def": "Dikkat sırayı bilmediği için her konuma özgü bir vektörü kelimenin gömmesine eklemek. (PE(p, 2i) = sin(p/10000^(2i/d)))",
+"id": "t-konum-kodlamasi",
+"match": "konum kodlaması",
+"week": 10,
+"en": "positional encoding"
+},
+{
+"term": "Kosinüs benzerliği",
+"def": "İki vektör arasındaki açının kosinüsü: yalnız yöne bakar, uzunluğu görmezden gelir. 1 aynı yön, 0 ilgisiz, −1 zıt yön. (cos(u, v) = u·v / (‖u‖·‖v‖))",
+"id": "t-kosinus-benzerligi",
+"match": "kosinüs benzerliği",
+"week": 10,
+"en": "cosine similarity"
 },
 {
 "term": "Kovaryans",
@@ -473,6 +561,14 @@ export const TERMS = [
 "en": "lasso (L1)"
 },
 {
+"term": "LLM",
+"def": "Çok büyük metin derleminde sonraki kelime tahminiyle eğitilmiş, sonra yönerge ayarı ve insan geri bildirimiyle iyileştirilmiş Transformer.",
+"id": "t-llm-buyuk-dil-modeli",
+"match": "LLM|büyük dil model",
+"week": 10,
+"en": "large language model"
+},
+{
 "term": "Log-loss",
 "def": "Olasılık tahminlerinin kaybı: doğru sınıfa verilen olasılığın negatif logaritması. Emin olup yanılmayı çok ağır cezalandırır. (−[y ln p + (1 − y) ln(1 − p)])",
 "id": "t-log-loss-capraz-entropi",
@@ -487,6 +583,14 @@ export const TERMS = [
 "match": "lojistik regresyon",
 "week": 4,
 "en": "logistic regression"
+},
+{
+"term": "LSTM",
+"def": "Ayrı bir hücre durumu (bellek) ve üç kapısı (unutma, girdi, çıktı) olan RNN hücresi. Belleği toplamayla güncellediği için uzun bağımlılıkları öğrenebilir. (cₜ = fₜ⊙cₜ₋₁ + iₜ⊙gₜ, hₜ = oₜ⊙tanh(cₜ))",
+"id": "t-lstm",
+"match": "LSTM",
+"week": 10,
+"en": "long short-term memory"
 },
 {
 "term": "Marj",
@@ -629,6 +733,14 @@ export const TERMS = [
 "en": "precision"
 },
 {
+"term": "RAG",
+"def": "Erişimle zenginleştirilmiş üretim: soruyla ilgili belgeleri gömme benzerliğiyle bulup isteme ekleyerek dil modeline cevap ürettirmek.",
+"id": "t-rag",
+"match": "RAG",
+"week": 10,
+"en": "retrieval-augmented generation"
+},
+{
 "term": "Rastgele orman",
 "def": "Bootstrap örneklemleri + her bölmede rastgele öznitelik alt kümesiyle eğitilmiş birçok ağacın oyu. (m ≈ √p)",
 "id": "t-rastgele-orman",
@@ -651,6 +763,14 @@ export const TERMS = [
 "match": "ridge",
 "week": 4,
 "en": "ridge (L2)"
+},
+{
+"term": "RNN",
+"def": "Diziyi elemanlarını teker teker okuyarak işleyen ağ. Her adımda yeni girdiyi bir önceki gizli durumla birleştirir; aynı ağırlıklar her adımda kullanılır. (hₜ = tanh(W·xₜ + U·hₜ₋₁ + b))",
+"id": "t-rnn-ozyinelemeli-sinir-agi",
+"match": "RNN|özyinelemeli",
+"week": 10,
+"en": "recurrent neural network"
 },
 {
 "term": "ROC eğrisi",
@@ -734,6 +854,22 @@ export const TERMS = [
 "en": "test set"
 },
 {
+"term": "Token",
+"def": "Dil modelinin işlediği en küçük metin parçası: bir kelime ya da kelime parçası.",
+"id": "t-token",
+"match": "token",
+"week": 10,
+"en": "token"
+},
+{
+"term": "Transformer",
+"def": "Özyineleme kullanmayan, yalnız dikkat katmanları, ileri beslemeli ağlar, artık bağlantılar ve konum kodlamasıyla kurulan ağ (2017). BERT ve GPT bu mimaridir.",
+"id": "t-transformer",
+"match": "Transformer",
+"week": 10,
+"en": "Transformer"
+},
+{
 "term": "Tümevarımsal yanlılık",
 "def": "Bir öğrenme algoritmasının veriyle eşit uyumlu hipotezler arasından birini seçmesini sağlayan varsayımları (doğrusal, basit, pürüzsüz…). Hiç varsayımı olmayan bir öğrenme algoritması genelleyemez.",
 "id": "t-tumevarimsal-yanlilik",
@@ -760,6 +896,14 @@ export const TERMS = [
 "match": "veri sızıntısı",
 "week": 3,
 "en": "data leakage"
+},
+{
+"term": "Word2Vec",
+"def": "Kelime gömmelerini, her kelimenin penceredeki komşularını tahmin eden sığ bir ağla öğrenmek. Skip-gram merkezden komşuyu, CBOW komşulardan merkezi tahmin eder.",
+"id": "t-word2vec",
+"match": "Word2Vec|skip-gram|CBOW",
+"week": 10,
+"en": "Word2Vec"
 },
 {
 "term": "Yanlılık",

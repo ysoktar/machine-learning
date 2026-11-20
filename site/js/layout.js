@@ -34,6 +34,7 @@ export const NAV = [
   { part: "Final", short: "H8+", items: [
     { id: "w8-nn", week: 8, scope: "final", title: "Yapay sinir ağları", desc: "XOR, etkinleştirmeler, MLP tasarımı (Boole, bölge), ileri/geri yayılım, Adam." },
     { id: "w9-cnn", week: 9, scope: "final", title: "Derin öğrenme ve CNN", desc: "Eğitim püf noktaları, evrişim hesabı, çıktı boyutu ve parametre sayısı." },
+    { id: "w10-seq", week: 10, scope: "final", title: "Diziler, dikkat, Transformer", desc: "RNN, LSTM ve GRU, elle dikkat hesabı, Transformer, gömmeler ve kosinüs, Word2Vec, LLM." },
     { id: "exam-final", scope: "final", title: "Final rehberi", desc: "Kapsam, 10–12. hafta konuları ve geçmiş final alıştırma soruları." },
   ] },
 ];

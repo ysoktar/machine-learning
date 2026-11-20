@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diziler, dikkat ve Transformer · Yapay Öğrenme</title>
+<meta name="description" content="RNN, LSTM ve GRU, elle dikkat hesabı, Transformer, kelime gömmeleri, kosinüs benzerliği, Word2Vec ve büyük dil modelleri.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme-init.js"></script>
+<script type="module" src="js/layout.js"></script>
+</head>
+<body data-page="w10-seq">
+<main><div class="content">
+
+<h1>Diziler, dikkat ve Transformer</h1>
+<p class="lead">Bu hafta sırası önemli olan verilerle (cümle, ses, zaman serisi) çalışan modelleri öğreniyoruz. Önce geçmişi bir “gizli durum” içinde taşıyan özyinelemeli ağları (RNN) ve onların uzun bağımlılık sorununu çözen LSTM ile GRU'yu kuruyoruz. Sonra bugünkü dil modellerinin temeli olan dikkat mekanizmasını elle hesaplıyor, Transformer'ı, kelime gömmelerini ve büyük dil modellerini (LLM) tanıyoruz. Finalde bu haftadan en çok <strong>elle dikkat hesabı, kosinüs benzerliği, Word2Vec eğitim çiftleri, LSTM/GRU parametre sayısı ve kapıların görevleri</strong> soruluyor.</p>
+<div class="callout exam"><div class="callout-title"><span class="ic ic-target" aria-hidden="true"></span>Sınavda bu haftadan ne çıkar?</div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Soru tipi</th><th>Nasıl sorulur?</th><th>Puanı getiren</th></tr></thead><tbody>
+<tr><td>Dikkat hesabı</td><td>Üç kelimenin sorgu, anahtar ve değer vektörleri ile bir eˣ tablosu verilir; bir kelimenin dikkat ağırlıkları ve çıktısı istenir. Maskeli (GPT tarzı) sürümü de sorulabilir.</td><td>Skorları yazmak, √dₖ ile bölmek, softmax'ı satır satır uygulamak ve değerlerin ağırlıklı toplamını almak.</td></tr>
+<tr><td>Kosinüs benzerliği</td><td>Birkaç kelime ya da cümle vektörü verilir; hangisinin hangisine en yakın olduğu sorulur.</td><td>İç çarpımı ve iki uzunluğu ayrı ayrı yazmak; kosinüsün yönü, Öklid uzaklığının ise uzunluğu da ölçtüğünü söylemek.</td></tr>
+<tr><td>Word2Vec</td><td>Bir cümle ve pencere boyu verilir; skip-gram ya da CBOW eğitim çiftleri (girdi ve etiket) istenir.</td><td>Her merkez kelime için penceredeki komşuları eksiksiz yazmak ve toplam çift sayısını bulmak.</td></tr>
+<tr><td>Parametre sayısı</td><td>Girdi ve gizli boyut verilir; RNN, LSTM ya da GRU katmanının parametre sayısı istenir.</td><td>Bir kapının parametresini (h·(d + h) + h) bulup kapı sayısıyla (LSTM'de 4, GRU'da 3) çarpmak.</td></tr>
+<tr><td>Kavram</td><td>RNN neden MLP'den iyidir, BPTT nedir, LSTM kapıları ne yapar, GRU farkı, dikkat neden gerekir, gömmeler one-hot'tan neden iyidir, BERT ile GPT farkı.</td><td>Her mekanizmanın ne yaptığını ve hangi sorunu çözdüğünü birlikte yazmak.</td></tr>
+</tbody></table></div><p class="small">Ara sınavda yok; finalde.</p></div>
+<div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-rnn-ozyinelemeli-sinir-agi">RNN</a> · <a href="sozluk.html#t-gizli-durum">Gizli durum</a> · <a href="sozluk.html#t-bptt-zamanda-geri-yayilim">BPTT</a> · <a href="sozluk.html#t-lstm">LSTM</a> · <a href="sozluk.html#t-gru">GRU</a> · <a href="sozluk.html#t-dikkat-mekanizmasi">Dikkat mekanizması</a> · <a href="sozluk.html#t-transformer">Transformer</a> · <a href="sozluk.html#t-gomme-vektoru">Gömme vektörü</a> · <a href="sozluk.html#t-kosinus-benzerligi">Kosinüs benzerliği</a> · <a href="sozluk.html#t-word2vec">Word2Vec</a></div>
+
+<h2>Dizi verisi: sıra neden önemli ve neden ayrı bir model gerekir?</h2><p class="h-en" lang="en">Sequence data: why order matters and why it needs its own model</p>
+<p>Şimdiye kadarki modellerin hepsi sabit uzunlukta bir öznitelik vektörü alıyordu: bir müşterinin yaşı, geliri, şehri. Oysa bir cümle 3 kelime de olabilir 30 kelime de, ve kelimelerin <strong>sırası</strong> anlamı değiştirir. “Köpek adamı ısırdı” ile “adam köpeği ısırdı” aynı kelimelerden oluşur ama anlamları çok farklıdır. Kelimeleri sırasız bir torbaya atan klasik yöntem (kelime torbası ve üstüne lojistik regresyon) bu farkı göremez.</p>
+<p>Dizi modelleme için bir modelin dört şeyi yapabilmesi gerekir: değişken uzunluktaki girdiyi işlemek, sıradaki konumu bilmek, uzak geçmişteki bilgiyi hatırlamak ve dizinin her konumunda aynı parametreleri kullanmak. Görevler girdinin ve çıktının dizi olup olmamasına göre beş gruba ayrılır:</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Senaryo</th><th>Girdi</th><th>Çıktı</th><th>Örnek görev</th><th>Tipik model</th></tr></thead><tbody>
+<tr><td>Bire bir</td><td>sabit vektör</td><td>sabit</td><td>Görüntü sınıflandırma</td><td>MLP, CNN (8–9. hafta)</td></tr>
+<tr><td>Çoktan bire</td><td>dizi</td><td>tek değer</td><td>Duygu analizi, spam, zaman serisi tahmini</td><td>RNN, kodlayıcı Transformer</td></tr>
+<tr><td>Birden çoğa</td><td>tek öğe</td><td>dizi</td><td>Görüntü altyazılama, müzik üretimi</td><td>CNN ve ardından RNN kod çözücü</td></tr>
+<tr><td>Çoktan çoğa (gecikmeli)</td><td>dizi</td><td>dizi (sonradan)</td><td>Çeviri, özetleme: önce okur, sonra üretir</td><td>seq2seq, Transformer</td></tr>
+<tr><td>Çoktan çoğa (eşzamanlı)</td><td>dizi</td><td>dizi (her adımda)</td><td>Video karelerini etiketleme, sözcük türü etiketleme</td><td>RNN, kodlayıcı Transformer</td></tr>
+</tbody></table></div>
+<p>Bu alanda üç kuşak model vardır: özyinelemeli ağlar (RNN, 1990'lar; çeviride 2014), dikkat mekanizması (2015) ve Transformer (2017). Sayfa bu sırayı izliyor.</p>
+
+<h2>Özyinelemeli sinir ağı (RNN): geçmişi bir gizli durumda taşımak</h2><p class="h-en" lang="en">Recurrent neural network (RNN): carrying the past in a hidden state</p>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Kitap okurken akılda tutulan özet</div><p>Bir romanı okurken her yeni cümleyi, o ana kadar okuduklarınızdan aklınızda kalan bir özetle birlikte yorumlarsınız. Cümleyi okuduktan sonra özetinizi günceller ve bir sonraki cümleye geçersiniz. RNN tam olarak böyle çalışır: aklındaki özete <strong>gizli durum</strong> (h) denir ve her adımda yeni kelimeyle birlikte güncellenir.</p></div>
+<p>RNN dizinin elemanlarını teker teker okur. t'inci adımda iki şey alır: o adımın girdisi xₜ (örneğin bir kelimenin vektörü) ve bir önceki adımdan kalan gizli durum hₜ₋₁. Bu ikisini birleştirip yeni gizli durumu hesaplar. Gerekiyorsa her adımda gizli durumdan bir çıktı da üretir.</p>
+<div class="formula">hₜ = tanh(W·xₜ + U·hₜ₋₁ + b)<br>ŷₜ = softmax(V·hₜ)</div>
+<p class="formula-legend"><b>Burada:</b> xₜ t'inci adımın girdisi, hₜ₋₁ bir önceki adımın gizli durumu, hₜ yeni gizli durumdur. W girdiyi, U önceki gizli durumu gizli duruma taşıyan ağırlık matrisleridir; b sabit terimdir (bias). tanh, sonucu −1 ile 1 arasına sıkıştıran etkinleştirme işlevidir. V gizli durumdan çıktıya giden ağırlık matrisidir ve softmax çıktıları olasılığa çevirir. İlk adımda h₀ genellikle sıfır vektörüdür.</p>
+<div data-widget="fig" data-fig="rnnunroll" data-caption="RNN'nin zamanda açılmış hâli. Her kutu aynı hücredir; kırmızı oklar gizli durumu bir sonraki adıma taşır. Bütün adımlarda aynı W, U ve V kullanılır."></div>
+<p>Şekildeki gibi zamanda “açılmış” bir RNN, her katmanı bir zaman adımı olan derin bir ağa benzer. Önemli fark şudur: bütün adımlarda <strong>aynı</strong> W, U ve V ağırlıkları kullanılır. Bu yüzden parametre sayısı dizinin uzunluğuna bağlı değildir ve model 5 kelimelik bir cümleyi de 50 kelimelik bir cümleyi de aynı ağırlıklarla işler. CNN'de bir filtrenin görüntünün her yerinde kullanılması gibi, burada da bir hücre zamanın her adımında kullanılır.</p>
+<p><strong>RNN neden MLP'den iyidir?</strong> MLP sabit sayıda girdi ister ve girdinin sırasını bilmez; her konum için ayrı ağırlık öğrenmesi gerekir. RNN ise değişken uzunluktaki diziyi okuyabilir, sırayı gizli durumda tutar ve aynı ağırlıkları her konumda kullandığı için daha az parametreyle daha iyi genelleme yapar.</p>
+<h3>Küçük bir örnek: üç adımda gizli durum</h3>
+<p>Her şeyin tek sayı olduğu bir RNN düşünelim: w = 1, u = 0.5, b = 0, başlangıç h₀ = 0. Girdi dizisi x = (1, 0, −1). Sınavda tanh değerleri soruda verilir.</p>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Her adımda yapılan</div><ol>
+<li><strong>Toplam:</strong> zₜ = w·xₜ + u·hₜ₋₁ + b</li>
+<li><strong>Yeni durum:</strong> hₜ = tanh(zₜ)</li>
+</ol></div>
+<ol class="walk">
+<li><strong>1. adım.</strong> z₁ = 1·1 + 0.5·0 = 1, h₁ = tanh(1) = <strong>0.762</strong>.</li>
+<li><strong>2. adım.</strong> Girdi 0 olsa da önceki durum katkı yapar: z₂ = 1·0 + 0.5·0.762 = 0.381, h₂ = tanh(0.381) = <strong>0.363</strong>.</li>
+<li><strong>3. adım.</strong> z₃ = 1·(−1) + 0.5·0.363 = −0.818, h₃ = tanh(−0.818) = <strong>−0.674</strong>.</li>
+</ol>
+<p>İkinci adımda girdi sıfır olduğu hâlde gizli durum sıfır olmadı: ilk kelimenin bilgisi u ağırlığı üzerinden taşındı. Bu taşınan bilgi her adımda u ile çarpılarak küçülür; aşağıda bunun neden sorun olduğunu göreceğiz.</p>
+<h3>Çift yönlü RNN</h3>
+<p>Bir cümlede bir kelimenin anlamı yalnız öncesine değil sonrasına da bağlı olabilir: “Yüz” kelimesinin sayı mı, surat mı, yüzmek mi olduğunu çoğu zaman sonraki kelimeler belli eder. <strong>Çift yönlü RNN</strong> diziyi iki ayrı RNN ile okur: biri baştan sona, öteki sondan başa. Her konumda iki gizli durum yan yana konur, böylece her kelimenin temsili hem sol hem sağ bağlamı içerir. Konuşma tanıma ve etiketleme görevlerinde çok kullanılır. Bedeli şudur: dizinin tamamını görmeden çıktı üretemez, bu yüzden metin üretmek ya da gerçek zamanlı tahmin için uygun değildir.</p>
+
+<h2>Zamanda geri yayılım (BPTT) ve kaybolan gradyan</h2><p class="h-en" lang="en">Backpropagation through time (BPTT) and the vanishing gradient</p>
+<p>RNN'yi eğitmek için önce açılmış ağı derin bir ileri beslemeli ağ gibi düşünürüz. Dizinin tamamı ileri doğru işlenir, her adımın kaybı hesaplanır ve toplam kayıp bütün adımların kayıplarının toplamıdır. Sonra gradyanlar sondan başa doğru, zaman adımları boyunca geri yayılır. Buna <strong>zamanda geri yayılım</strong> (BPTT, backpropagation through time) denir.</p>
+<p>BPTT'nin sıradan geri yayılımdan iki farkı vardır. Birincisi, gradyan katmanlar yerine zaman adımları boyunca akar. İkincisi, bütün adımlar aynı ağırlıkları paylaştığı için her adımda ayrı ayrı hesaplanan gradyanlar <strong>toplanır</strong> ve ortak ağırlık bu toplamla bir kez güncellenir.</p>
+<div class="formula">∂L/∂h₁ = ∂L/∂hₜ · (∂hₜ/∂hₜ₋₁) · … · (∂h₂/∂h₁)</div>
+<p class="formula-legend"><b>Burada:</b> L toplam kayıp, hₜ son adımın, h₁ ilk adımın gizli durumudur. Her (∂hₖ/∂hₖ₋₁) çarpanı, bir adımdaki gizli durumun bir öncekine göre ne kadar değiştiğini gösterir. İlk adıma ulaşan gradyan, t − 1 tane böyle çarpanın çarpımıdır.</p>
+<p>Bu çarpanların büyüklüğü (aşağıdaki şekilde |J|) 1'den küçükse çarpım hızla sıfıra yaklaşır: 0.75'in 15. kuvveti 0.013'tür. Buna <strong>kaybolan gradyan</strong> denir ve sonuç olarak yalın bir RNN 10–20 adımdan uzaktaki bağımlılıkları öğrenemez. Çarpanlar 1'den büyükse tersi olur: 1.15'in 15. kuvveti 8.1'dir, gradyan <strong>patlar</strong> ve kayıp NaN olur.</p>
+<div data-widget="fig" data-fig="gradpow" data-formula="çarpım = |J|ᵗ" data-legend="|J| her adımdaki çarpanın büyüklüğüdür, t ise gradyanın geriye doğru kaç adım taşındığıdır." data-caption="Gradyanın t adım geriye taşındıktan sonraki büyüklüğü. Çarpan 0.75 ise söner, 1.15 ise patlar; yalnız tam 1 iken korunur."></div>
+<p>Patlayan gradyana karşı <strong>gradyan kırpma</strong> kullanılır: gradyanın uzunluğu (normu) önceden seçilen bir eşiği aşarsa gradyan, yönü korunarak eşik uzunluğuna küçültülür.</p>
+<div class="formula">‖g‖ > c ise g ← c · g / ‖g‖</div>
+<p class="formula-legend"><b>Burada:</b> g bütün parametrelerin gradyanlarından oluşan vektör, ‖g‖ onun uzunluğu, c seçilen kırpma eşiğidir. g/‖g‖ uzunluğu 1 olan yön vektörüdür; c ile çarpınca uzunluk tam c olur.</p>
+<p>Gradyan kırpma yalnız patlamayı önler, kaybolmayı çözmez. Kaybolan gradyanın çaresi hücrenin yapısını değiştirmektir: LSTM ve GRU bunu yapar.</p>
+
+<h2>LSTM: kapılarla neyin hatırlanacağına karar veren hücre</h2><p class="h-en" lang="en">LSTM: a cell that decides with gates what to remember</p>
+<p>LSTM'yi (Long Short-Term Memory, uzun kısa süreli bellek) üç adımda, her adımda bir eksiği gidererek kuracağız. LSTM'nin yalın RNN'den farkı, gizli durumun yanında ayrı bir <strong>hücre durumu</strong> (c, bellek) taşımasıdır.</p>
+<h3>1. adım: toplamalı bir yol</h3>
+<p>Yalın RNN'de yeni durum, eski durumun bir matrisle çarpılıp tanh'tan geçirilmesiyle bulunuyordu; her adımda bir çarpma olduğu için gradyan sönüyordu. LSTM'nin temel fikri, belleği çarparak değil <strong>toplayarak</strong> güncellemektir: cₜ = cₜ₋₁ + gₜ. Burada gₜ, bu adımda belleğe yazılmak istenen yeni bilgidir (aday). Bu durumda ∂cₜ/∂cₜ₋₁ = 1 olur ve gradyan bellekte hiç çarpılmadan geriye akar. Hochreiter (1997) buna “sabit hata karuseli” adını vermiştir. Sorun şudur: her adımda belleğe bir şey eklenir ama hiçbir şey silinmez, bu yüzden bellek büyür ve taşar.</p>
+<h3>2. adım: girdi ve çıktı kapıları</h3>
+<p>Belleğe ne kadar yazılacağını ve bellekten ne kadarının dışarı verileceğini ayarlamak için iki “musluk” ekleriz. Her musluk 0 ile 1 arasında bir sayıdır ve <strong>kapı</strong> adını alır. Girdi kapısı iₜ adayın ne kadarının yazılacağını, çıktı kapısı oₜ belleğin ne kadarının gizli duruma (dışarıya) verileceğini belirler. Her kapı, girdiye ve önceki gizli duruma bakan küçük bir sigmoid nörondur; ağırlıkları eğitimle öğrenilir.</p>
+<h3>3. adım: unutma kapısı ve tam hücre</h3>
+<p>Son eksik belleği silebilmektir. Unutma kapısı fₜ eski belleğin ne kadarının kalacağını seçer: fₜ = 1 ise hepsi kalır, fₜ = 0 ise hepsi silinir (Gers ve ark., 2000). Bugün “LSTM” denince bu üç kapılı hücre kastedilir:</p>
+<div class="formula" style="font-size:1.15rem">fₜ = σ(W_f·[xₜ; hₜ₋₁] + b_f)   iₜ = σ(W_i·[xₜ; hₜ₋₁] + b_i)   oₜ = σ(W_o·[xₜ; hₜ₋₁] + b_o)<br>gₜ = tanh(W_g·[xₜ; hₜ₋₁] + b_g)<br>cₜ = fₜ ⊙ cₜ₋₁ + iₜ ⊙ gₜ<br>hₜ = oₜ ⊙ tanh(cₜ)</div>
+<p class="formula-legend"><b>Burada:</b> [xₜ; hₜ₋₁] girdi ile önceki gizli durumun alt alta birleştirilmiş vektörüdür. σ sigmoid işlevidir ve her kapıyı 0 ile 1 arasına sıkıştırır. fₜ unutma, iₜ girdi, oₜ çıktı kapısıdır; gₜ belleğe yazılmak istenen adaydır (−1 ile 1 arası). cₜ₋₁ eski, cₜ yeni hücre durumudur (bellek); hₜ yeni gizli durumdur (dışarı verilen çıktı). ⊙ eleman eleman çarpımdır. Her kapının kendi ağırlık matrisi W ve sabit terimi b vardır.</p>
+<div data-widget="fig" data-fig="lstmcell" data-caption="LSTM hücresi. Üstteki yatay yol hücre durumudur (bellek): unutma kapısıyla çarpılır, girdi kapısından geçen aday eklenir. Çıktı kapısı, belleğin tanh'ından ne kadarının gizli duruma verileceğini seçer."></div>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Kapı</th><th>Sorduğu soru</th><th>Denklemdeki yeri</th></tr></thead><tbody>
+<tr><td>Unutma fₜ</td><td>Eski belleğin ne kadarı kalsın?</td><td>fₜ ⊙ cₜ₋₁</td></tr>
+<tr><td>Girdi iₜ</td><td>Yeni bilginin ne kadarı yazılsın?</td><td>iₜ ⊙ gₜ</td></tr>
+<tr><td>Çıktı oₜ</td><td>Belleğin ne kadarı dışarı verilsin?</td><td>oₜ ⊙ tanh(cₜ)</td></tr>
+</tbody></table></div>
+<p><strong>Bir kapı bilgiyi nasıl tutar ya da atar?</strong> Kapı, sigmoid çıktısı olduğu için 0 ile 1 arasında bir sayıdır ve bilgiyle eleman eleman çarpılır. 1'e yakın bir kapı bilgiyi olduğu gibi geçirir, 0'a yakın bir kapı siler, arada bir değer kısmen geçirir. Kapının değeri o anki girdiye ve önceki gizli duruma bağlı olduğu için ağ, örneğin cümlede yeni bir özne görünce eski özneyi unutmayı öğrenebilir.</p>
+<p><strong>LSTM kaybolan gradyanı nasıl çözer?</strong> Bellek cₜ = fₜ ⊙ cₜ₋₁ + iₜ ⊙ gₜ biçiminde toplamayla güncellenir. Gradyan bu yoldan geriye giderken her adımda yalnız fₜ ile çarpılır; ağ uzun süre hatırlaması gereken bilgi için fₜ'yi 1'e yakın tutarak gradyanın sönmesini engelleyebilir. Bu, sorunu tamamen ortadan kaldırmaz ama uzun bağımlılıkları öğrenmeyi çok kolaylaştırır. Patlayan gradyan için yine gradyan kırpma kullanılır.</p>
+<h3>Bir LSTM adımını elle hesaplamak</h3>
+<p>Tek boyutlu bir hücrede kapıların değerleri hesaplanmış olsun: fₜ = 0.9, iₜ = 0.5, oₜ = 0.8, aday gₜ = 0.6 ve eski bellek cₜ₋₁ = 1.0. Soruda tanh(1.2) ≈ 0.834 verilmiş olsun.</p>
+<ol class="walk">
+<li><strong>Yeni bellek.</strong> Eski belleğin %90'ı kalır, adayın yarısı eklenir: cₜ = 0.9·1.0 + 0.5·0.6 = 0.9 + 0.3 = <strong>1.2</strong>.</li>
+<li><strong>Yeni gizli durum.</strong> Belleğin tanh'ının %80'i dışarı verilir: hₜ = 0.8·tanh(1.2) = 0.8·0.834 = <strong>0.667</strong>.</li>
+<li><strong>Kapıların etkisini yorumla.</strong> Unutma kapısı 0 olsaydı eski bellek tamamen silinir ve cₜ = 0.3 olurdu. Girdi kapısı 0 olsaydı hiçbir şey yazılmaz ve cₜ = 0.9 olurdu.</li>
+</ol>
+<div data-widget="lstmstep"></div>
+
+<h2>GRU: aynı fikir, iki kapı</h2><p class="h-en" lang="en">GRU: the same idea with two gates</p>
+<p>GRU (Gated Recurrent Unit, kapılı özyinelemeli birim) LSTM'nin sadeleştirilmiş hâlidir. Ayrı bir hücre durumu yoktur; gizli durum hₜ hem bellek hem çıktıdır. Unutma ve girdi kapıları tek bir <strong>güncelleme kapısında</strong> (zₜ) birleşir; ayrıca bir <strong>sıfırlama kapısı</strong> (rₜ) geçmişin ne kadarının yeni adaya gireceğini seçer.</p>
+<div class="formula" style="font-size:1.15rem">rₜ = σ(W_r·[xₜ; hₜ₋₁] + b_r)   zₜ = σ(W_z·[xₜ; hₜ₋₁] + b_z)<br>h′ₜ = tanh(W·[xₜ; rₜ ⊙ hₜ₋₁] + b)<br>hₜ = (1 − zₜ) ⊙ hₜ₋₁ + zₜ ⊙ h′ₜ</div>
+<p class="formula-legend"><b>Burada:</b> rₜ sıfırlama kapısıdır; 0'a yakınsa aday h′ₜ geçmişi görmez, yani “yeni bir cümleye başla” denir. zₜ güncelleme kapısıdır ve eski durum ile yeni aday arasında karışım oranını verir: zₜ = 0 ise eski durum aynen korunur, zₜ = 1 ise yerini tamamen aday alır. h′ₜ aday gizli durumdur, ⊙ eleman eleman çarpımdır.</p>
+<p><strong>Örnek.</strong> zₜ = 0.2, hₜ₋₁ = 1 ve aday h′ₜ = −0.5 ise hₜ = 0.8·1 + 0.2·(−0.5) = 0.8 − 0.1 = <strong>0.7</strong> olur: güncelleme kapısı küçük olduğu için eski bilginin çoğu korundu.</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th></th><th>LSTM</th><th>GRU</th></tr></thead><tbody>
+<tr><td>Kapı sayısı</td><td>3 (unutma, girdi, çıktı)</td><td>2 (sıfırlama, güncelleme)</td></tr>
+<tr><td>Durum</td><td>hücre durumu cₜ ve gizli durum hₜ ayrı</td><td>yalnız hₜ</td></tr>
+<tr><td>Parametre</td><td>4 grup ağırlık matrisi</td><td>3 grup (yaklaşık %25 daha az)</td></tr>
+<tr><td>Avantajı</td><td>Uzun dizilerde ve bol veride biraz daha güçlü</td><td>Daha hızlı eğitilir, az veride aşırı uyuma daha az eğilimli</td></tr>
+<tr><td>Dezavantajı</td><td>Daha çok parametre, daha yavaş</td><td>Belleği ayrı kontrol edemediği için çok uzun bağımlılıklarda biraz geride kalabilir</td></tr>
+</tbody></table></div>
+<p>Uygulamada ikisinin hiçbiri her görevde öbüründen açıkça iyi değildir; genellikle ikisi de denenir.</p>
+
+<h2>RNN, LSTM ve GRU katmanının parametre sayısı</h2><p class="h-en" lang="en">Number of parameters of an RNN, LSTM and GRU layer</p>
+<p>Her kapı (ve aday), girdi ile önceki gizli durumun birleşimine bakan sıradan bir katmandır. Birleşik vektörün uzunluğu d + h'dir ve katmanın h tane çıktısı vardır. Bu yüzden bir kapının h·(d + h) ağırlığı ve h sabit terimi olur. Sonra bu sayı kapı sayısıyla çarpılır.</p>
+<div class="formula" style="font-size:1.2rem">bir grup = h·(d + h) + h<br>RNN = 1 grup   LSTM = 4 grup   GRU = 3 grup</div>
+<p class="formula-legend"><b>Burada:</b> d girdi vektörünün boyutu, h gizli durumun boyutudur. h·(d + h) bir grubun ağırlık sayısıdır, sondaki + h her çıktı nöronunun sabit terimidir. LSTM'deki 4 grup unutma, girdi, çıktı kapıları ve adaydır; GRU'daki 3 grup sıfırlama, güncelleme kapıları ve adaydır.</p>
+<details class="aside"><summary>PyTorch neden biraz farklı sayı verir? (sınavda istenmez)</summary><p>PyTorch'un nn.LSTM ve nn.GRU katmanları her grup için iki ayrı sabit terim vektörü tutar (biri girdi, biri gizli durum tarafında). Bu yüzden kodda görülen sayı grup başına h kadar fazladır: LSTM için 4·(h·(d + h) + 2h). Sınavda derste verilen tek sabit terimli formülü kullanın.</p></details>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Örnek: girdi d = 4, gizli h = 3</div><ol>
+<li><strong>Bir grup:</strong> 3·(4 + 3) + 3 = 21 + 3 = 24.</li>
+<li><strong>Yalın RNN:</strong> 1·24 = 24.</li>
+<li><strong>LSTM:</strong> 4·24 = 96.</li>
+<li><strong>GRU:</strong> 3·24 = 72.</li>
+</ol></div>
+<div data-widget="rnnparams"></div>
+
+<h2>Dikkat mekanizması: her kelime hangi kelimelere bakmalı?</h2><p class="h-en" lang="en">Attention mechanism: which words should each word look at?</p>
+<p>RNN tabanlı çeviride kodlayıcı bütün cümleyi tek bir gizli duruma sıkıştırıyordu; uzun cümlelerde bu tek vektör yetmiyordu. <strong>Dikkat mekanizması</strong> bu darboğazı kaldırır: model her adımda bütün kelimelere bakar ve o an için hangisinin ne kadar önemli olduğuna kendisi karar verir. Uzak bir kelimeye ulaşmak için bilginin adım adım taşınması gerekmediği için kaybolan gradyan sorunu da büyük ölçüde ortadan kalkar.</p>
+<div class="intuition"><div class="intuition-title"><span class="ic ic-idea" aria-hidden="true"></span>Kütüphane benzetmesi</div><p>Kütüphanede bir konu arıyorsunuz. Aklınızdaki konu <strong>sorgudur</strong> (q). Her kitabın sırtındaki etiket bir <strong>anahtardır</strong> (k), kitabın içeriği ise <strong>değerdir</strong> (v). Sorgunuzu her etiketle karşılaştırıp ne kadar benzediğine bakarsınız. Tek bir kitap seçmek yerine bütün kitaplardan, benzerlikleri oranında birer parça alıp karıştırırsınız. Dikkat tam olarak budur: benzerlikler ağırlığa, ağırlıklar da değerlerin karışımına dönüşür.</p></div>
+<div class="formula" style="font-size:1.25rem">Attention(Q, K, V) = softmax(Q·Kᵀ / √dₖ) · V</div>
+<p class="formula-legend"><b>Burada:</b> Q sorgu matrisidir; her satırı bir kelimenin “ne arıyorum?” vektörü qᵢ'dir. K anahtar matrisidir; her satırı bir kelimenin “kendimi nasıl tanıtırım?” vektörü kⱼ'dir. V değer matrisidir; her satırı bir kelimenin taşıdığı bilgi vⱼ'dir. Kᵀ, K'nın devriğidir; Q·Kᵀ bütün qᵢ·kⱼ iç çarpımlarını (skorları) bir tabloda verir. dₖ anahtar vektörlerinin boyutudur; √dₖ'ye bölmek skorların boyutla büyüyüp softmax'ı tek bir kelimeye kilitlemesini önler. softmax her satıra ayrı uygulanır ve skorları toplamı 1 olan ağırlıklara çevirir.</p>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Dikkati elle hesaplamak: 4 adım</div><ol>
+<li><strong>Skorlar:</strong> her sorgu ile her anahtarın iç çarpımı, sᵢⱼ = qᵢ·kⱼ.</li>
+<li><strong>Ölçekle:</strong> her skoru √dₖ'ye böl.</li>
+<li><strong>Softmax (satır satır):</strong> her değerin eˣ'ini al, satır toplamına böl: aᵢⱼ = e^(sᵢⱼ/√dₖ) / Σⱼ e^(sᵢⱼ/√dₖ).</li>
+<li><strong>Ağırlıklı toplam:</strong> zᵢ = Σⱼ aᵢⱼ·vⱼ. Bu, i'inci kelimenin bağlama göre yeni vektörüdür.</li>
+</ol></div>
+<h3>Elle örnek: üç kelime, dₖ = 2</h3>
+<p>Kelimeler t₁ = “kedi”, t₂ = “hasır”, t₃ = “üstünde”. Öz-dikkatte sorgu ve anahtar aynı kelimelerden gelir; bu örnekte Q ile K aynı, V farklıdır:</p>
+<p class="mat-eq">Q = K = <span class="mat" style="--cols:2"><span>1</span><span>0</span><span>0</span><span>1</span><span>1</span><span>1</span></span>   V = <span class="mat" style="--cols:2"><span>1</span><span>2</span><span>3</span><span>0</span><span>0</span><span>1</span></span></p>
+<p>Yani q₁ = k₁ = (1, 0), q₂ = k₂ = (0, 1), q₃ = k₃ = (1, 1); değerler v₁ = (1, 2), v₂ = (3, 0), v₃ = (0, 1). Soruda verilen eˣ tablosu: e⁰ = 1, e^0.707 ≈ 2.028, e^1.414 ≈ 4.113.</p>
+<ol class="walk">
+<li><strong>Skor tablosu.</strong> Her satır bir sorgu, her sütun bir anahtardır. Örneğin s₁₂ = q₁·k₂ = 1·0 + 0·1 = 0 ve s₃₃ = q₃·k₃ = 1·1 + 1·1 = 2. Bütün tablo: Q·Kᵀ = <span class="mat" style="--cols:3"><span>1</span><span>0</span><span>1</span><span>0</span><span>1</span><span>1</span><span>1</span><span>1</span><span>2</span></span>.</li>
+<li><strong>Ölçekleme.</strong> √2 ≈ 1.414 olduğu için 1'ler 0.707'ye, 2 ise 1.414'e dönüşür: <span class="mat" style="--cols:3"><span>0.707</span><span>0</span><span>0.707</span><span>0</span><span>0.707</span><span>0.707</span><span>0.707</span><span>0.707</span><span>1.414</span></span>.</li>
+<li><strong>Softmax, 1. satır (kedi).</strong> eˣ değerleri 2.028, 1, 2.028; toplam 5.056. Her birini toplama bölünce ağırlıklar <strong>0.401, 0.198, 0.401</strong>.</li>
+<li><strong>Softmax, 2. ve 3. satır.</strong> 2. satırda eˣ değerleri 1, 2.028, 2.028 (toplam 5.056), ağırlıklar <strong>0.198, 0.401, 0.401</strong>. 3. satırda 2.028, 2.028, 4.113 (toplam 8.169), ağırlıklar <strong>0.248, 0.248, 0.503</strong> (slaytta yuvarlama farkıyla 0.504 yazıyor).</li>
+<li><strong>Çıktılar.</strong> Her kelimenin çıktısı değerlerin ağırlıklı toplamıdır. z₁ = 0.401·(1, 2) + 0.198·(3, 0) + 0.401·(0, 1) = (0.401 + 0.594, 0.802 + 0.401) = <strong>(0.99, 1.20)</strong>. Aynı biçimde z₂ = <strong>(1.40, 0.80)</strong> ve z₃ = 0.248·(1, 2) + 0.248·(3, 0) + 0.503·(0, 1) = <strong>(0.99, 1.00)</strong>.</li>
+</ol>
+<p><strong>Yorum.</strong> “Üstünde” kelimesi en çok kendisine bakıyor (0.503) ve öteki iki kelimeye eşit ağırlık veriyor; çıktısı üç değerin karışımı. Aynı kelime farklı bir cümlede farklı ağırlıklar alacağı için farklı bir vektöre dönüşür: dikkatin özü, bir kelimenin temsilini bağlama göre değiştirmesidir.</p>
+<div data-widget="fig" data-fig="attnflow" data-caption="Üçüncü kelimenin (üstünde) dikkat hesabı: sorgusu üç anahtarla karşılaştırılır, skorlar softmax ile ağırlığa çevrilir ve değerler bu ağırlıklarla toplanır. Okların kalınlığı ağırlığı gösterir."></div>
+<div data-widget="attention"></div>
+<h3>Maskeli (nedensel) dikkat</h3>
+<p>Metin üreten bir modelde (GPT gibi) bir kelime, henüz üretilmemiş gelecek kelimelere bakamamalıdır. Bunun için skor tablosunda her satırın sağındaki (gelecekteki) skorlar −∞ yapılır. e^(−∞) = 0 olduğu için softmax'tan sonra bu ağırlıklar sıfır olur ve her kelime yalnız kendisine ve öncesine bakar.</p>
+<p><strong>Örnek.</strong> Yukarıdaki veriyle q₂ (hasır) yalnız k₁ ve k₂'yi görebilir. Ölçekli skorlar 0 ve 0.707, eˣ değerleri 1 ve 2.028, toplam 3.028; ağırlıklar (0.330, 0.670, 0) olur. Çıktı z₂ = 0.330·(1, 2) + 0.670·(3, 0) = <strong>(2.34, 0.66)</strong>. İlk kelime yalnız kendisini görür, bu yüzden z₁ = v₁ = (1, 2) olur. Son kelime zaten hepsini görebildiği için çıktısı değişmez.</p>
+<h3>RNN ile dizi sınıflandırmada dikkat</h3>
+<p>Bir yorumu olumlu ya da olumsuz diye sınıflandıran bir RNN, normalde yalnız son gizli durumu kullanır; uzun bir yorumda baştaki önemli kelimeler bu son duruma zayıf ulaşır. Dikkat eklenince her adımın gizli durumu hₜ için bir skor hesaplanır, skorlar softmax ile ağırlığa çevrilir ve sınıflandırıcıya bütün gizli durumların ağırlıklı toplamı verilir. Böylece model “harika” ya da “berbat” gibi belirleyici kelimelerin olduğu adımlara daha çok ağırlık verir, ve ağırlıklara bakarak modelin nereye odaklandığı da kabaca görülebilir.</p>
+
+<h2>Transformer: yalnız dikkatten kurulan ağ</h2><p class="h-en" lang="en">Transformer: a network built from attention alone</p>
+<p>Transformer (Vaswani ve ark., 2017, “Attention Is All You Need”) özyinelemeyi tamamen bırakır ve diziyi dikkat katmanlarıyla işler.</p>
+<ul>
+<li><strong>Öz-dikkat:</strong> Q, K ve V aynı diziden üç ayrı öğrenilmiş matrisle üretilir: Q = X·W_Q, K = X·W_K, V = X·W_V. Her kelime tek adımda bütün öteki kelimelere bakar; RNN'de n adım süren yol burada tek adımdır. Bütün kelimeler aynı anda işlenebildiği için eğitim GPU'da çok hızlıdır. Bedeli n×n boyutlu skor tablosudur: dizi uzadıkça maliyet n² ile büyür.</li>
+<li><strong>Çok başlı dikkat:</strong> h tane ayrı (W_Q, W_K, W_V) üçlüsü paralel çalışır. Her baş farklı bir ilişki öğrenebilir (örneğin biri özne ile fiili, öteki zamiri gösterdiği isimle eşler); başların çıktıları yan yana birleştirilip W_O matrisiyle karıştırılır. Her başın boyutu d/h olduğu için toplam kapasite değişmez.</li>
+<li><strong>Konum kodlaması:</strong> dikkat tek başına sırayı bilmez; kelimelerin yerini değiştirmek yalnız çıktıların yerini değiştirir. Bu yüzden her konum p için bir vektör üretilip kelimenin gömmesine eklenir: x′ₚ = xₚ + PEₚ.</li>
+<li><strong>Artık bağlantı ve katman normalleştirme:</strong> her alt katmanın çıktısına girdisi eklenir (ResNet'teki gibi) ve sonuç LayerNorm ile normalleştirilir. Her kelimeye ayrıca ayrı ayrı uygulanan küçük bir ileri beslemeli ağ (FFN) vardır.</li>
+</ul>
+<div class="formula">PE(p, 2i) = sin(p / 10000^(2i/d))   PE(p, 2i + 1) = cos(p / 10000^(2i/d))</div>
+<p class="formula-legend"><b>Burada:</b> p kelimenin cümledeki konumu (0, 1, 2, …), d gömme vektörünün boyutu, i ise boyut çiftinin sırasıdır: çift numaralı boyutlar sinüs, tek numaralılar kosinüs alır. Düşük boyutlar hızlı, yüksek boyutlar yavaş salınır; saatin saniye, dakika ve akrep ibreleri gibi, bütün boyutlar birlikte her konuma farklı bir “parmak izi” verir. Örneğin p = 1 ve i = 0 için ilk iki boyut sin(1) ≈ 0.841 ve cos(1) ≈ 0.540'tır.</p>
+<div data-widget="fig" data-fig="transformer" data-caption="Transformer. Solda kodlayıcı bloğu: öz-dikkat ve ileri beslemeli ağ, her birinin ardından ekle-ve-normalleştir. Sağda kod çözücü: maskeli öz-dikkat, kodlayıcıya bakan çapraz dikkat ve ileri beslemeli ağ. Bloklar N kez üst üste konur."></div>
+<p>Kod çözücüdeki <strong>çapraz dikkatte</strong> sorgular kod çözücüden, anahtarlar ve değerler kodlayıcıdan gelir: çeviri yaparken üretilen her kelime kaynak cümlenin hangi kelimelerine bakacağını böyle seçer.</p>
+<h3>BERT ve GPT: Transformer'ın iki ailesi</h3>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th></th><th>BERT (2018)</th><th>GPT (2018 ve sonrası)</th><th>T5 / BART</th></tr></thead><tbody>
+<tr><td>Mimari</td><td>Yalnız kodlayıcı</td><td>Yalnız kod çözücü</td><td>Kodlayıcı ve kod çözücü</td></tr>
+<tr><td>Dikkat</td><td>Çift yönlü: her kelime bütün cümleyi görür</td><td>Nedensel: her kelime yalnız geçmişi görür</td><td>Kodlayıcıda çift yönlü, kod çözücüde nedensel</td></tr>
+<tr><td>Ön eğitim görevi</td><td>Maskelenmiş kelimeyi tahmin etmek</td><td>Sonraki kelimeyi (token'ı) tahmin etmek</td><td>Bozulmuş metni onarmak</td></tr>
+<tr><td>Güçlü olduğu yer</td><td>Sınıflandırma, varlık tanıma, gömme çıkarma</td><td>Metin üretme, sohbet, az örnekle öğrenme</td><td>Çeviri, özetleme</td></tr>
+<tr><td>Nasıl kullanılır</td><td>İnce ayar</td><td>İstem (prompt), istenirse ince ayar</td><td>İnce ayar</td></tr>
+</tbody></table></div>
+
+<h2>Kelime gömmeleri: kelimeleri anlamlı sayılara çevirmek</h2><p class="h-en" lang="en">Word embeddings: turning words into meaningful numbers</p>
+<p>Bir kelimeyi modele vermenin en basit yolu <strong>one-hot</strong> kodlamadır: sözlükte 50,000 kelime varsa her kelime 50,000 uzunluğunda, yalnız kendi yerinde 1 olan bir vektördür. Bunun iki sorunu vardır. Birincisi vektörler çok uzun ve neredeyse tamamen sıfırdır. İkincisi her iki kelime arasındaki uzaklık aynıdır: “kedi” ile “köpek” birbirine “kedi” ile “borsa” kadar uzaktır, yani vektörler hiçbir anlam taşımaz.</p>
+<p>Bir <strong>gömme vektörü</strong> her kelimeyi 100 ile 1000 arası boyutlu, değerleri dolu (yoğun) bir vektörle temsil eder. Bu vektörler, benzer bağlamlarda geçen kelimeler birbirine yakın düşecek biçimde öğrenilir. Böylece hem boyut küçülür hem de anlam benzerliği geometrik yakınlığa dönüşür; modelin “kedi” için öğrendiği bir şey “köpek”e de kısmen aktarılır.</p>
+<h3>Word2Vec: bir kelimeyi komşularından tanımak</h3>
+<p>Word2Vec, “bir kelimeyi birlikte gezdiği kelimelerden tanırsınız” fikrine dayanır. Metindeki her kelime için çevresindeki pencere içinde kalan komşulardan eğitim çiftleri üretilir ve bu çiftleri tahmin eden sığ bir ağ eğitilir. Etiketleri kimse yazmaz, metnin kendisinden çıkar: bu bir <strong>öz-gözetimli</strong> öğrenmedir.</p>
+<ul>
+<li><strong>Skip-gram:</strong> girdi merkez kelime, etiket penceredeki bir komşu. Her (merkez, komşu) ikilisi ayrı bir eğitim örneğidir.</li>
+<li><strong>CBOW:</strong> girdi penceredeki komşuların hepsi, etiket ortadaki kelime.</li>
+</ul>
+<p>Ağın yapısı çok basittir: girdi one-hot bir kelimedir, V×d boyutlu bir tablodan (W) d boyutlu gizli katmana gidilir, oradan d×V boyutlu bir matrisle bütün sözlük üzerinde softmax alınır. Eğitim bitince W'nin her satırı bir kelimenin gömme vektörüdür.</p>
+<div data-widget="fig" data-fig="w2vwin" data-caption="Pencere = 2 ile skip-gram çiftleri. Merkez kelime “öncesi” iken her yönde iki komşu alınır ve dört eğitim çifti çıkar."></div>
+<div data-widget="w2v"></div>
+<p><strong>Vektör aritmetiği.</strong> İyi öğrenilmiş gömmelerde “kral − erkek + kadın” vektörüne en yakın kelime “kraliçe” çıkar. Bu, uzayda anlamlı <strong>yönler</strong> oluştuğunu gösterir: “erkekten kadına” giden fark vektörü, “kraldan kraliçeye” giden fark vektörüyle hemen hemen aynıdır. Yani cinsiyet, çoğul olma ya da başkent-ülke gibi ilişkiler gömme uzayında yaklaşık olarak sabit yönlerle ifade edilir.</p>
+<p><strong>Cümle gömmeleri</strong> kelime vektörlerinin ortalaması alınarak ya da SentenceBERT gibi bu iş için eğitilmiş modellerle elde edilir. Gömmeler benzer metin arama, kümeleme (11. hafta), RAG ve sınıflandırma için öznitelik olarak kullanılır. Ön eğitilmiş bir görüntü ya da metin modelinin son katmandan önceki çıktısı da aynı biçimde bir gömme olarak alınıp başka bir modele girdi yapılabilir.</p>
+<h3>Kosinüs benzerliği: iki vektörün yönü ne kadar aynı?</h3>
+<div class="formula" style="font-size:1.25rem">cos(u, v) = (u·v) / (‖u‖ · ‖v‖)</div>
+<p class="formula-legend"><b>Burada:</b> u ve v karşılaştırılan iki vektördür. u·v iç çarpımdır, yani karşılıklı bileşenlerin çarpımlarının toplamı. ‖u‖ = √(u₁² + u₂² + …) vektörün uzunluğudur. Sonuç −1 ile 1 arasındadır: 1 aynı yön, 0 dik (ilgisiz), −1 zıt yön demektir.</p>
+<p><strong>Örnek.</strong> Üç kelimenin 3 boyutlu gömmeleri kedi = (2, 1, 0), köpek = (1, 2, 0), borsa = (0, 1, 3) olsun.</p>
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Her çift için yapılan</div><ol>
+<li><strong>İç çarpım:</strong> karşılıklı bileşenleri çarp ve topla.</li>
+<li><strong>Uzunluklar:</strong> her vektör için bileşenlerin karelerinin toplamının karekökü.</li>
+<li><strong>Böl:</strong> iç çarpımı iki uzunluğun çarpımına böl.</li>
+</ol></div>
+<ol class="walk">
+<li><strong>Uzunluklar.</strong> ‖kedi‖ = √(4 + 1) = √5 ≈ 2.236, ‖köpek‖ = √5 ≈ 2.236, ‖borsa‖ = √(1 + 9) = √10 ≈ 3.162.</li>
+<li><strong>Kedi ve köpek.</strong> İç çarpım 2·1 + 1·2 + 0 = 4. Kosinüs 4/(2.236·2.236) = 4/5 = <strong>0.80</strong>.</li>
+<li><strong>Kedi ve borsa.</strong> İç çarpım 0 + 1 + 0 = 1. Kosinüs 1/(2.236·3.162) = 1/7.071 = <strong>0.14</strong>.</li>
+<li><strong>Köpek ve borsa.</strong> İç çarpım 0 + 2 + 0 = 2. Kosinüs 2/7.071 = <strong>0.28</strong>.</li>
+</ol>
+<p>Kedi ile köpek en benzer çifttir. Kosinüs vektörlerin <strong>uzunluğunu değil yönünü</strong> ölçer: (2, 1, 0) ile (4, 2, 0) arasındaki kosinüs 1'dir. Sık geçen kelimelerin ve uzun belgelerin vektörleri daha uzun olur; Öklid uzaklığı bu uzunluk farkını da ceza olarak sayarken kosinüs saymaz. Metinleri ve belgeleri karşılaştırırken kosinüsün tercih edilmesinin nedeni budur.</p>
+<div data-widget="fig" data-fig="cosangle" data-caption="Kosinüs benzerliği vektörler arasındaki açıya bakar. a ile 2a aynı yöndedir (kosinüs 1) ama Öklid uzaklıkları büyüktür; b ise a'ya daha yakındır ama farklı yöndedir."></div>
+<div data-widget="cosine"></div>
+<h3>Gömmeler ne öğrenir? <span class="no-gl">Toplumsal önyargı</span></h3>
+<p class="no-gl">Gömmeler anlamı kullanımdan öğrenir; eğitim metinleri (haber, forum, web) toplumdaki kalıpları da taşır ve model bu kalıpları öğrenir, hatta keskinleştirebilir. Örneğin meslek kelimeleri “she − he” yönüne izdüşürülünce bir uçta hemşire ve kütüphaneci, öteki uçta kaptan ve filozof çıkar (Bolukbasi, 2016). Türkçede “o” cinsiyetsizdir, ama çeviri modelleri “o bir hemşire” cümlesini “she”, “o bir mühendis” cümlesini “he” ile çevirebilir. Çareler arasında önyargı yönünü izdüşümle silmek (kısmen işe yarar), eğitim verisini denetlemek ve model kartında raporlamak vardır. Derste gömmeleri öznitelik olarak kullanan projelerin bir adillik ölçümü raporlaması istenir.</p>
+<h3>Ön eğitilmiş modeller ve ince ayar</h3>
+<p>Büyük bir model bir kez, çok büyük etiketsiz bir metin derleminde (maskeli ya da sonraki kelime tahminiyle) önceden eğitilir; bu pahalıdır. Sonra küçük, etiketli bir veri kümesinde üstüne bir sınıflandırma katmanı eklenip düşük bir öğrenme oranıyla (1e-5 ile 5e-5 arası) 2–5 epoch <strong>ince ayar</strong> yapılır. Öğrenme oranı büyük seçilirse ön eğitimde öğrenilen bilgi silinir. Daha ucuz seçenekler de vardır: modeli dondurup yalnız gömmelerini çıkarmak ve üstüne lojistik regresyon eğitmek, ya da LoRA ile yalnız küçük ek matrisleri eğitmek. Her durumda sonuç, TF-IDF ve lojistik regresyon gibi basit bir taban çizgisiyle karşılaştırılmalıdır.</p>
+
+<h2>Büyük dil modelleri (LLM) ve makine öğrenmesi iş akışında kullanımı</h2><p class="h-en" lang="en">Large language models (LLMs) and their use in the machine learning workflow</p>
+<p>Bir LLM üç aşamada eğitilir:</p>
+<ol>
+<li><strong>Ön eğitim:</strong> trilyonlarca token üzerinde sonraki token tahmini. Sonuç, metni tamamlayabilen ama yönergeye uymayan bir “temel model”dir.</li>
+<li><strong>Yönerge ayarı (SFT):</strong> on binlerce (yönerge, iyi cevap) çifti üzerinde gözetimli ince ayar. Model soruya cevap vermeyi öğrenir.</li>
+<li><strong>İnsan geri bildirimiyle pekiştirmeli öğrenme (RLHF):</strong> insanlar iki cevaptan iyisini seçer, bu tercihlerle bir ödül modeli eğitilir ve dil modeli bu ödülü artıracak biçimde pekiştirmeli öğrenmeyle (12. hafta) iyileştirilir.</li>
+</ol>
+<p>Parametre, veri ve hesap birlikte büyüdükçe kayıp düzenli olarak düşer (ölçekleme yasaları). Büyük modeller istemdeki birkaç örnekten, hiçbir ağırlık değişmeden görevi kavrayabilir; buna <strong>bağlam içi öğrenme</strong> denir.</p>
+<div class="table-wrap"><table class="simple compact"><thead><tr><th>Kullanım</th><th>Nasıl?</th><th>Dikkat edilecek</th></tr></thead><tbody>
+<tr><td>Öznitelik çıkarma</td><td>Metni gömme vektörüne çevirip klasik bir modele vermek (yorum, 768 boyutlu vektör, lojistik regresyon).</td><td>Ucuz, hızlı ve yorumlanabilir.</td></tr>
+<tr><td>Etiketleme</td><td>Sıfır ya da az örnekli istemle ön etiket üretip insana denetletmek.</td><td>LLM etiketleri gürültülüdür; doğrulama kümesini insan etiketlemelidir.</td></tr>
+<tr><td>RAG (erişimle zenginleştirilmiş üretim)</td><td>Soruyu gömmeyle aramak, bulunan belgeleri isteme ekleyip cevabı ürettirmek.</td><td>Modelde olmayan ya da güncel bilgi için; kaynak gösterebilir.</td></tr>
+</tbody></table></div>
+<p>Seçim kuralı: bol etiketli veri varsa küçük bir model eğitin; az veri varsa gömme ve basit bir model kullanın; hiç etiket yoksa LLM istemiyle başlayın. Her durumda LLM çıktısını kendi test kümenizde ölçün. Başlıca riskler şunlardır: akıcı ama yanlış içerik üretmek (uydurma), test verisinin ön eğitim verisinde bulunması (bulaşma), gizli verinin dış bir hizmete gönderilmesi (KVKK), maliyet ve gecikme, model sürümü değiştikçe sonuçların yeniden üretilememesi ve Türkçe gibi dillerde başarımın düşük olabilmesi.</p>
+
+<h2>Sınav tipi problemler ve adım adım çözümleri</h2><p class="h-en" lang="en">Exam-style problems with step-by-step solutions</p>
+<h3>Problem 1: Yeni bir sorgunun dikkat ağırlıkları</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(10. hafta derste)</span></div><p>Anahtarlar k₁ = (1, 0), k₂ = (0, 1), k₃ = (1, 1); değerler v₁ = (1, 2), v₂ = (3, 0), v₃ = (0, 1); dₖ = 2. Yeni sorgu q = (2, 0) için dikkat ağırlıklarını ve çıktıyı bulun. q = (1, 0) iken ağırlıklar (0.40, 0.20, 0.40) idi; ne değişti? (e^1.414 ≈ 4.113)</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Kullanılan formüller</div><ol>
+<li><strong>Skor:</strong> sⱼ = q·kⱼ / √dₖ</li>
+<li><strong>Ağırlık:</strong> aⱼ = e^(sⱼ) / Σ e^(sⱼ)</li>
+<li><strong>Çıktı:</strong> z = Σ aⱼ·vⱼ</li>
+</ol></div>
+<ol class="walk">
+<li><strong>İç çarpımlar.</strong> q·k₁ = 2·1 + 0·0 = 2, q·k₂ = 0, q·k₃ = 2·1 + 0·1 = 2.</li>
+<li><strong>Ölçekleme.</strong> √2'ye bölünce 1.414, 0, 1.414.</li>
+<li><strong>Softmax.</strong> eˣ değerleri 4.113, 1, 4.113; toplam 9.226. Ağırlıklar 4.113/9.226 = <strong>0.446</strong>, 1/9.226 = <strong>0.108</strong> ve yine <strong>0.446</strong>.</li>
+<li><strong>Çıktı.</strong> z = 0.446·(1, 2) + 0.108·(3, 0) + 0.446·(0, 1) = (0.446 + 0.324, 0.892 + 0.446) = <strong>(0.77, 1.34)</strong>.</li>
+<li><strong>Yorum.</strong> Sorgu iki katına çıkınca skorlar da iki katına çıktı ve ağırlıklar (0.40, 0.20, 0.40)'tan (0.45, 0.11, 0.45)'e keskinleşti. Skorlar büyüdükçe softmax tek bir seçeneğe kilitlenmeye başlar; √dₖ'ye bölmek, boyut büyüdükçe skorların büyümesini dengelemek içindir.</li>
+</ol></div></details>
+<h3>Problem 2: En yakın cümleyi kosinüsle bulmak</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(10. hafta derste)</span></div><p>Kelime torbası vektörleri dört boyutludur (fiyat, kargo, hızlı, sorun). Sorgu s₀ = “kargo hızlı” = (0, 1, 1, 0). Adaylar s₁ = “fiyat kargo” = (1, 1, 0, 0), s₂ = “fiyat hızlı” = (1, 0, 1, 0), s₃ = “kargo hızlı sorun” = (0, 1, 1, 1). Sorguya en yakın cümle hangisi? Öklid uzaklığı aynı sıralamayı verir mi?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Kullanılan formüller</div><ol>
+<li><strong>Kosinüs:</strong> cos(u, v) = u·v / (‖u‖·‖v‖)</li>
+<li><strong>Öklid uzaklığı:</strong> √(Σ (uᵢ − vᵢ)²)</li>
+</ol></div>
+<ol class="walk">
+<li><strong>Uzunluklar.</strong> ‖s₀‖ = ‖s₁‖ = ‖s₂‖ = √2 ≈ 1.414 ve ‖s₃‖ = √3 ≈ 1.732.</li>
+<li><strong>s₁.</strong> İç çarpım 0·1 + 1·1 + 1·0 + 0·0 = 1; kosinüs 1/(1.414·1.414) = 1/2 = <strong>0.50</strong>.</li>
+<li><strong>s₂.</strong> İç çarpım 1; kosinüs yine <strong>0.50</strong>.</li>
+<li><strong>s₃.</strong> İç çarpım 0 + 1 + 1 + 0 = 2; kosinüs 2/(1.414·1.732) = 2/2.449 = <strong>0.82</strong>. En yakın cümle s₃'tür.</li>
+<li><strong>Öklid ile denetim.</strong> s₀ − s₁ = (−1, 0, 1, 0), uzaklık √2 ≈ 1.41; s₂ için de 1.41; s₀ − s₃ = (0, 0, 0, −1), uzaklık 1. Burada iki ölçüt aynı sıralamayı veriyor. Uzun belgelerde ise Öklid uzaklığı uzunluğu cezalandırır, kosinüs cezalandırmaz; bu yüzden sıralamalar ayrışabilir.</li>
+</ol></div></details>
+<h3>Problem 3: Word2Vec eğitim çiftleri</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(10. hafta derste; geçmiş final listesinde de var)</span></div><p>Cümle: “öğrenci sınav öncesi evde ders çalışmayı sever” (7 kelime), pencere = 2. (a) Skip-gram çiftlerini yazın ve sayın. (b) “öncesi” için CBOW örneği nedir? (c) Pencere 5 olunca ne değişir? (d) Etiketleri kim yazdı?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Her kelimede yapılan</div><ol>
+<li>Kelimeyi merkez seç; solundan ve sağından en çok 2'şer komşu al (cümlenin ucunda daha az kalır).</li>
+<li><strong>Skip-gram:</strong> her komşu için ayrı bir (merkez, komşu) çifti yaz.</li>
+<li><strong>CBOW:</strong> komşuların hepsi girdi, merkez etiket.</li>
+</ol></div>
+<ol class="walk parts">
+<li><strong>(a)</strong> öğrenci: (öğrenci, sınav), (öğrenci, öncesi). sınav: (sınav, öğrenci), (sınav, öncesi), (sınav, evde). öncesi: (öncesi, öğrenci), (öncesi, sınav), (öncesi, evde), (öncesi, ders). evde: (evde, sınav), (evde, öncesi), (evde, ders), (evde, çalışmayı). ders: (ders, öncesi), (ders, evde), (ders, çalışmayı), (ders, sever). çalışmayı: (çalışmayı, evde), (çalışmayı, ders), (çalışmayı, sever). sever: (sever, ders), (sever, çalışmayı). Komşu sayıları 2 + 3 + 4 + 4 + 4 + 3 + 2 = <strong>22 çift</strong>.</li>
+<li><strong>(b)</strong> Girdi (öğrenci, sınav, evde, ders), etiket <strong>öncesi</strong>.</li>
+<li><strong>(c)</strong> Her kelime daha çok komşu alır, çift sayısı artar ve bağlam gevşer; gömmeler kelimelerin aynı konuda geçmesini (konusal benzerlik) daha çok yansıtır. Küçük pencere ise sözdizimsel benzerliği öne çıkarır.</li>
+<li><strong>(d)</strong> Kimse: etiketler metnin kendisinden çıktı. Bu öz-gözetimli öğrenmedir. GPT'nin sonraki kelime tahmini de aynı fikrin yalnız sol bağlamı kullanan biçimidir.</li>
+</ol>
+<p class="small">Geçmiş final listesindeki “2-gram komşuluk” ifadesi, her yönde 1 komşu (pencere = 1) anlamına gelir. 7 kelimelik bir cümlede bu durumda 2·(7 − 1) = 12 skip-gram çifti çıkar.</p></div></details>
+<h3>Problem 4: LSTM ve GRU katmanının parametre sayısı</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(10. hafta derste)</span></div><p>Girdi boyutu 128, gizli boyut 256 olan bir katman için yalın RNN, LSTM ve GRU'nun parametre sayılarını bulun.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Kullanılan formül</div><ol>
+<li><strong>Bir grup:</strong> h·(d + h) + h; RNN 1, LSTM 4, GRU 3 grup.</li>
+</ol></div>
+<ol class="walk">
+<li><strong>Birleşik girdi.</strong> d + h = 128 + 256 = 384.</li>
+<li><strong>Bir grup.</strong> 256·384 + 256 = 98,304 + 256 = 98,560.</li>
+<li><strong>Yalın RNN.</strong> 1·98,560 = <strong>98,560</strong>.</li>
+<li><strong>LSTM.</strong> 4·98,560 = <strong>394,240</strong>.</li>
+<li><strong>GRU.</strong> 3·98,560 = <strong>295,680</strong>; LSTM'den %25 az.</li>
+</ol></div></details>
+<h3>Problem 5: Maskeli dikkat</h3>
+<div class="problem"><div class="ptitle">Soru <span class="muted small">(10. hafta derste)</span></div><p>Elle örnekteki q, k, v ile (kedi, hasır, üstünde) GPT tarzı nedensel maske uygulanıyor. Her kelimenin ağırlıklarını ve çıktısını bulun.</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<div class="recipe"><div class="recipe-title"><span class="ic ic-recipe" aria-hidden="true"></span>Her satırda yapılan</div><ol>
+<li>Gelecekteki (sağdaki) skorları −∞ yap; bunların ağırlığı 0 olur.</li>
+<li>Kalan skorlara softmax uygula ve değerlerin ağırlıklı toplamını al.</li>
+</ol></div>
+<ol class="walk">
+<li><strong>Kedi.</strong> Yalnız kendisini görür: ağırlıklar (1, 0, 0), çıktı z₁ = v₁ = <strong>(1, 2)</strong>.</li>
+<li><strong>Hasır.</strong> k₁ ve k₂'yi görür. Ölçekli skorlar 0 ve 0.707, eˣ değerleri 1 ve 2.028, toplam 3.028. Ağırlıklar (0.330, 0.670, 0). Çıktı z₂ = 0.330·(1, 2) + 0.670·(3, 0) = (0.330 + 2.010, 0.660) = <strong>(2.34, 0.66)</strong>.</li>
+<li><strong>Üstünde.</strong> Zaten hepsini görebildiği için maske bir şey değiştirmez: ağırlıklar (0.248, 0.248, 0.503), çıktı <strong>(0.99, 1.00)</strong>.</li>
+</ol></div></details>
+<h3>Problem 6: Kavram soruları (geçmiş final listesi)</h3>
+<div class="problem"><div class="ptitle">Soru</div><p>(a) Gizli durum geçmiş bilgiyi nasıl taşır? (b) BPTT sıradan geri yayılımdan nasıl ayrılır? (c) LSTM'nin kapılarını ve görevlerini yazın. (d) GRU'nun LSTM'ye göre bir avantajı ve bir dezavantajı nedir? (e) Gömmeler one-hot kodlamanın hangi sınırlarını aşar?</p></div>
+<details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
+<ol class="walk parts">
+<li><strong>(a)</strong> Her adımda yeni gizli durum, o adımın girdisi ile bir önceki gizli durumdan hesaplanır: hₜ = tanh(W·xₜ + U·hₜ₋₁ + b). Böylece hₜ, o ana kadarki bütün girdilerin sıkıştırılmış bir özetini taşır.</li>
+<li><strong>(b)</strong> Ağ zamanda açılır ve gradyan zaman adımları boyunca geri yayılır. Bütün adımlar aynı ağırlıkları paylaştığı için her adımın gradyanı toplanıp ortak ağırlık bir kez güncellenir. Uzun dizilerde gradyan çok sayıda çarpandan geçtiği için kaybolabilir ya da patlayabilir.</li>
+<li><strong>(c)</strong> Unutma kapısı eski belleğin ne kadarının kalacağını, girdi kapısı yeni adayın ne kadarının belleğe yazılacağını, çıktı kapısı belleğin ne kadarının gizli duruma verileceğini belirler. Hepsi 0 ile 1 arasında sigmoid çıktılarıdır ve bilgiyle eleman eleman çarpılır.</li>
+<li><strong>(d)</strong> Avantaj: daha az parametre (3 grup yerine 4), daha hızlı eğitim ve az veride daha iyi genelleme. Dezavantaj: ayrı bir hücre durumu olmadığı için belleği LSTM kadar ince kontrol edemez; çok uzun bağımlılıklarda biraz geride kalabilir.</li>
+<li><strong>(e)</strong> One-hot vektörler sözlük boyutunda uzun ve seyrektir, ve her iki kelime arasındaki uzaklık aynıdır. Gömmeler kısa ve yoğundur, ve anlamca benzer kelimeleri birbirine yakın yerleştirdiği için benzerlik ve ilişkiler (kral − erkek + kadın ≈ kraliçe) geometrik olarak ifade edilir.</li>
+</ol></div></details>
+
+<h2>Sınavda sık yapılan hatalar</h2><p class="h-en" lang="en">Common mistakes in the exam</p>
+<ul class="mistakes">
+<li><strong>Softmax'ı sütun sütun uygulamak.</strong> Dikkatte softmax her satıra (her sorguya) ayrı uygulanır; her satırın ağırlıkları toplamı 1 olmalıdır.</li>
+<li><strong>√dₖ'ye bölmeyi unutmak.</strong> Skorları ölçeklemeden softmax alırsanız ağırlıklar yanlış çıkar. dₖ anahtar vektörlerinin boyutudur, kelime sayısı değildir.</li>
+<li><strong>Çıktıda anahtarları toplamak.</strong> Ağırlıklı toplam değer vektörleriyle (v) yapılır, anahtarlarla (k) değil.</li>
+<li><strong>Kosinüste uzunlukları unutmak.</strong> İç çarpım tek başına benzerlik değildir; iki uzunluğun çarpımına bölmek gerekir.</li>
+<li><strong>LSTM parametresinde gizli durumu unutmak.</strong> Kapılar yalnız girdiye değil önceki gizli duruma da bakar; bu yüzden d değil d + h kullanılır. Kapı sayısı da LSTM'de 4 (üç kapı ve aday), GRU'da 3'tür.</li>
+<li><strong>Word2Vec'te cümle uçlarını yanlış saymak.</strong> Baştaki ve sondaki kelimelerin bir yanda komşusu yoktur; her merkez kelimenin komşu sayısını ayrı ayrı sayın.</li>
+<li><strong>Gradyan kırpmanın kaybolan gradyanı çözdüğünü yazmak.</strong> Kırpma yalnız patlamayı önler; kaybolmanın çaresi LSTM ve GRU gibi toplamalı yolları olan hücreler ya da dikkattir.</li>
+</ul>
+
+<h2>Ayarlar değişince ne olur? (hiperparametre tablosu)</h2><p class="h-en" lang="en">What happens when a setting changes? (hyperparameter table)</p>
+<div class="table-wrap"><table class="simple">
+<thead><tr><th>Arttıkça</th><th>Yanlılık</th><th>Varyans</th><th>Aşırı uyum</th><th>Not</th></tr></thead>
+<tbody>
+<tr><td>Gizli boyut / katman sayısı (RNN, Transformer)</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>kapasite artar; az veride seyreltme şart</td></tr>
+<tr><td>Gömme boyutu d</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>100–1000 tipiktir</td></tr>
+<tr><td>Bağlam penceresi / dizi uzunluğu</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>dikkatin maliyeti n² ile büyür</td></tr>
+<tr><td>Dikkat başı sayısı h (d sabit)</td><td>değişmez</td><td>değişmez</td><td>değişmez</td><td>her baş d/h boyutlu; kapasite aynı</td></tr>
+<tr><td>Seyreltme oranı</td><td class="up">artar</td><td class="down">azalır</td><td class="down">azalır</td><td>0.1–0.3 tipik; çok büyükse yetersiz uyum</td></tr>
+<tr><td>İnce ayar epoch sayısı</td><td class="down">azalır</td><td class="up">artar</td><td class="up">artar</td><td>doğrulama kaybını erken durdurmayla izleyin</td></tr>
+<tr><td>İnce ayar öğrenme oranı</td><td>değişmez</td><td class="up">artar</td><td class="up">artar</td><td>büyükse ön eğitim bilgisi silinir</td></tr>
+<tr><td>Gradyan kırpma eşiği</td><td>değişmez</td><td>küçük eşikte azalır</td><td>değişmez</td><td>patlamayı önler, kaybolmayı çözmez</td></tr>
+</tbody></table></div>
+
+<h2>Kendini sına: kısa sorular</h2><p class="h-en" lang="en">Self-check: short questions</p>
+<div class="quiz" data-answer="2"><p>Yalın RNN'de bütün zaman adımlarının ağırlıkları için hangisi doğrudur?</p><ol>
+<li data-why="Öyle olsaydı parametre sayısı dizi uzunluğuyla büyürdü.">Her adımın kendi ağırlıkları vardır</li>
+<li data-why="">Bütün adımlar aynı W, U ve V'yi paylaşır</li>
+<li data-why="Bütün adımlar eğitilir; gradyanlar toplanır.">Yalnız son adımın ağırlıkları eğitilir</li>
+<li data-why="Paylaşım dizi uzunluğundan bağımsızdır.">Ağırlıklar yalnız kısa dizilerde paylaşılır</li></ol><div class="explain">RNN aynı hücreyi her adımda yeniden kullanır; bu yüzden parametre sayısı dizinin uzunluğuna bağlı değildir. BPTT'de her adımın gradyanı hesaplanır ve ortak ağırlık bu gradyanların toplamıyla güncellenir.</div></div>
+<div class="quiz" data-answer="3"><p>LSTM kaybolan gradyanı esas olarak nasıl hafifletir?</p><ol>
+<li data-why="Kırpma patlamaya karşıdır.">Gradyan kırpma ile</li>
+<li data-why="Sigmoid kapılarda kullanılır ama asıl neden bu değil.">Bütün etkinleştirmeleri sigmoid yaparak</li>
+<li data-why="">Belleği toplamayla güncelleyen bir yol sayesinde (cₜ = fₜ ⊙ cₜ₋₁ + iₜ ⊙ gₜ)</li>
+<li data-why="Gizli boyut sorunu çözmez.">Gizli boyutu büyüterek</li></ol><div class="explain">Hücre durumu her adımda bir matrisle çarpılmak yerine eski değerin fₜ katına yeni bilgi eklenerek güncellenir. Gradyan bu yoldan geri giderken yalnız fₜ ile çarpılır; ağ fₜ'yi 1'e yakın tutarak bilgiyi ve gradyanı uzun süre koruyabilir.</div></div>
+<div class="quiz" data-answer="1"><p>LSTM'de “eski belleğin ne kadarı kalsın?” sorusunu hangi kapı cevaplar?</p><ol>
+<li data-why="">Unutma kapısı fₜ</li>
+<li data-why="Girdi kapısı yeni bilginin yazılmasını ayarlar.">Girdi kapısı iₜ</li>
+<li data-why="Çıktı kapısı belleğin dışarı verilmesini ayarlar.">Çıktı kapısı oₜ</li>
+<li data-why="Sıfırlama kapısı GRU'dadır.">Sıfırlama kapısı rₜ</li></ol><div class="explain">Unutma kapısı fₜ eski bellek cₜ₋₁ ile eleman eleman çarpılır: 1 ise bellek aynen kalır, 0 ise silinir.</div></div>
+<div class="quiz" data-answer="4"><p>Girdi boyutu 10, gizli boyut 20 olan bir GRU katmanının parametre sayısı?</p><ol>
+<li data-why="Bu yalın RNN'nin sayısıdır.">620</li>
+<li data-why="Bu LSTM'nin sayısıdır.">2,480</li>
+<li data-why="Gizli durumu unuttunuz: d + h kullanılmalı.">3·(20·10 + 20) = 660</li>
+<li data-why="">3·(20·30 + 20) = 1,860</li></ol><div class="explain">Bir grup h·(d + h) + h = 20·30 + 20 = 620 parametredir. GRU'da üç grup (sıfırlama, güncelleme, aday) olduğu için toplam 3·620 = 1,860'tır.</div></div>
+<div class="quiz" data-answer="2"><p>Dikkatte skorlar neden √dₖ'ye bölünür?</p><ol>
+<li data-why="Toplam 1'i softmax sağlar.">Ağırlıkların toplamını 1 yapmak için</li>
+<li data-why="">Boyut büyüdükçe iç çarpımlar büyüyüp softmax'ı tek bir kelimeye kilitlemesin diye</li>
+<li data-why="Negatif skorlar softmax'ta sorun değildir.">Negatif skorlardan kurtulmak için</li>
+<li data-why="Maliyeti değiştirmez.">Hesap maliyetini azaltmak için</li></ol><div class="explain">dₖ boyutlu iki vektörün iç çarpımı boyut arttıkça büyür. Büyük skorlarda softmax neredeyse bütün ağırlığı en büyük skora verir ve gradyanlar küçülür. √dₖ'ye bölmek skorları makul bir aralıkta tutar.</div></div>
+<div class="quiz" data-answer="3"><p>u = (1, 0) ve v = (3, 0) vektörleri için hangisi doğrudur?</p><ol>
+<li data-why="Kosinüs yöne bakar, uzunluğa değil.">Kosinüs benzerliği 1/3'tür</li>
+<li data-why="Öklid uzaklığı 2'dir.">Öklid uzaklığı 0'dır</li>
+<li data-why="">Kosinüs benzerliği 1, Öklid uzaklığı 2'dir</li>
+<li data-why="Aynı yöndeler.">Kosinüs benzerliği 0'dır</li></ol><div class="explain">İki vektör aynı yönü gösterir: iç çarpım 3, uzunluklar 1 ve 3, kosinüs 3/3 = 1. Öklid uzaklığı ise √((3 − 1)² + 0²) = 2'dir. Kosinüs uzunluk farkını görmezden gelir.</div></div>
+<div class="quiz" data-answer="1"><p>BERT ile GPT arasındaki temel fark?</p><ol>
+<li data-why="">BERT yalnız kodlayıcıdır ve çift yönlü bakar; GPT yalnız kod çözücüdür ve yalnız geçmişi görür</li>
+<li data-why="İkisi de Transformer'dır.">BERT bir RNN, GPT bir Transformer'dır</li>
+<li data-why="Tersine: BERT maskeli kelime, GPT sonraki kelime tahmin eder.">BERT sonraki kelimeyi, GPT maskeli kelimeyi tahmin eder</li>
+<li data-why="İkisinde de dikkat vardır.">Yalnız GPT dikkat kullanır</li></ol><div class="explain">BERT cümlenin tamamını görerek maskelenmiş kelimeleri tahmin etmeyi öğrenir; bu yüzden sınıflandırma ve gömme çıkarmada güçlüdür. GPT her kelimede yalnız öncekileri görerek sonraki kelimeyi tahmin eder; bu yüzden metin üretmeye uygundur.</div></div>
+<div class="quiz" data-answer="4"><p>Transformer'a konum kodlaması neden eklenir?</p><ol>
+<li data-why="Parametreyi azaltmaz.">Parametre sayısını azaltmak için</li>
+<li data-why="Maske bunu yapar.">Gelecekteki kelimeleri gizlemek için</li>
+<li data-why="Normalleştirme LayerNorm'un işidir.">Gömmeleri normalleştirmek için</li>
+<li data-why="">Dikkat tek başına kelimelerin sırasını bilmediği için</li></ol><div class="explain">Dikkat bir kümeye bakar gibi çalışır: kelimelerin yerini değiştirmek yalnız çıktıların yerini değiştirir. Her konuma özgü bir vektör gömmeye eklenince model sırayı ayırt edebilir.</div></div>
+<div class="quiz" data-answer="2"><p>Pencere = 1 ile 5 kelimelik bir cümleden kaç skip-gram çifti çıkar?</p><ol>
+<li data-why="Uç kelimelerin tek komşusu vardır ama her kelime sayılmalı.">5</li>
+<li data-why="">8</li>
+<li data-why="Bu pencere = 2 için olurdu (2 + 3 + 4 + 3 + 2 = 14).">14</li>
+<li data-why="Her kelime en çok 2 komşu alır.">10</li></ol><div class="explain">Uçtaki iki kelimenin birer, ortadaki üç kelimenin ikişer komşusu vardır: 1 + 2 + 2 + 2 + 1 = 8. Genel olarak pencere 1 iken n kelimeden 2·(n − 1) çift çıkar.</div></div>
+<div class="quiz" data-answer="3"><p>Gradyan kırpma hangi sorunu çözer?</p><ol>
+<li data-why="Kırpma küçük gradyanları büyütmez.">Kaybolan gradyanı</li>
+<li data-why="Aşırı uyumla doğrudan ilgisi yoktur.">Aşırı uyumu</li>
+<li data-why="">Patlayan gradyanı</li>
+<li data-why="Sıra bilgisi konum kodlamasının işidir.">Sıra bilgisinin kaybını</li></ol><div class="explain">Gradyanın uzunluğu bir eşiği aşınca gradyan, yönü korunarak eşik uzunluğuna küçültülür. Böylece tek bir büyük adım ağırlıkları bozamaz. Küçük gradyanlara dokunmadığı için kaybolan gradyanı çözmez.</div></div>
+
+</div></main>
+</body>
+</html>

@@ -1299,6 +1299,146 @@ W.countdown = () => {
 };
 
 // ======================================================================= interactive versions (drag, step, explore)
+// ======================================================================= week 10: sequences, attention, embeddings
+/** A bracketed matrix (same look as the .mat matrices in the text). */
+const matEl = (rows, d = 3) => h("span", { class: "mat", style: `--cols:${rows[0]?.length || 1}` }, rows.flat().map((v) => h("span", {}, typeof v === "string" ? v : f(v, d))));
+const matRows = (txt) => parseRows(txt).map((r) => r.map((t) => Number(t.replace(",", "."))).filter(Number.isFinite)).filter((r) => r.length);
+const dot = (a, b) => a.reduce((s, x, i) => s + x * (b[i] ?? 0), 0);
+const norm = (a) => Math.sqrt(dot(a, a));
+const dotTxt = (a, b) => a.map((x, i) => `${par(x)}·${par(b[i] ?? 0)}`).join(" + ");
+
+W.attention = () => {
+  const { el, body } = frame("Dikkat hesabı: softmax(Q·Kᵀ/√dₖ)·V adım adım");
+  const q = area("1 0\n0 1\n1 1", 3), k = area("1 0\n0 1\n1 1", 3), v = area("1 2\n3 0\n0 1", 3);
+  const mask = checkbox(" nedensel maske (her kelime yalnız kendisine ve öncesine bakar)", false);
+  const row = h("input", { type: "text", value: "3", style: { width: "3rem" } });
+  const out = outBox();
+  body.append(h("div", { class: "three-col" },
+    h("div", {}, h("p", { class: "field-hint" }, "Q (her satır bir sorgu qᵢ)"), q),
+    h("div", {}, h("p", { class: "field-hint" }, "K (her satır bir anahtar kⱼ)"), k),
+    h("div", {}, h("p", { class: "field-hint" }, "V (her satır bir değer vⱼ)"), v)),
+    h("div", { class: "controls" }, mask.label, h("label", {}, "ayrıntısı gösterilecek satır ", row)), out);
+  live(body, () => {
+    const Q = matRows(q.value), K = matRows(k.value), V = matRows(v.value);
+    if (!Q.length || !K.length || !V.length) return put(out, errorBox("Üç matrisi de doldurun."));
+    if (K.length !== V.length) return put(out, errorBox("K ile V'nin satır sayısı (kelime sayısı) aynı olmalı."));
+    const dk = K[0].length, sq = Math.sqrt(dk);
+    if (Q.some((r) => r.length !== dk) || K.some((r) => r.length !== dk)) return put(out, errorBox("Sorgu ve anahtar vektörlerinin boyutu aynı olmalı."));
+    const S = Q.map((qi) => K.map((kj) => dot(qi, kj)));
+    const Ss = S.map((r, i) => r.map((s, j) => (mask.get() && j > i ? -Infinity : s / sq)));
+    const E = Ss.map((r) => r.map((s) => Math.exp(s)));
+    const A = E.map((r) => { const t = ml.sum(r); return r.map((e) => e / t); });
+    const Z = A.map((a) => V[0].map((_, c) => ml.sum(a.map((w, j) => w * V[j][c]))));
+    const i = Math.min(Q.length, Math.max(1, Math.round(readNumber(row.value)) || 1)) - 1;
+    const allowed = K.map((_, j) => !(mask.get() && j > i));
+    const idx = K.map((_, j) => j).filter((j) => allowed[j]);
+    put(out,
+      h("div", { class: "mat-eq" }, "Q·Kᵀ =", matEl(S), " ölçekli (÷√", String(dk), " = ", f(sq), ") =", matEl(Ss.map((r) => r.map((x) => (x === -Infinity ? "−∞" : f(x)))))),
+      h("div", { class: "mat-eq" }, "ağırlıklar A =", matEl(A), "  çıktılar Z = A·V =", matEl(Z)),
+      h("p", {}, h("b", {}, `${i + 1}. satırın (q${sub(i + 1)}) hesabı`)),
+      steps([
+        { what: `Sorguyu her anahtarla iç çarpıp skorları buluruz.${mask.get() && idx.length < K.length ? " Maske açık olduğu için sonraki kelimelerin skorları −∞ yapılır." : ""}`, formula: "sⱼ = qᵢ·kⱼ",
+          calc: K.map((kj, j) => (allowed[j] ? `s${sub(j + 1)} = ${dotTxt(Q[i], kj)} = ${f(S[i][j])}` : `s${sub(j + 1)} = −∞`)).join(";  ") },
+        { what: "Skorları anahtar boyutunun kareköküne böleriz.", formula: `sⱼ / √dₖ, √${dk} = ${f(sq)}`, calc: idx.map((j) => f(Ss[i][j])).join(", ") },
+        { what: "Her skorun üstelini alıp hepsinin toplamını buluruz.", formula: "eˢ ve toplam Σ eˢ", calc: `${idx.map((j) => f(E[i][j])).join(" + ")}`, result: f(ml.sum(E[i])) },
+        { what: "Her üsteli toplama bölerek ağırlıkları buluruz (softmax); toplamları 1'dir.", formula: "aⱼ = eˢʲ / Σ eˢ", calc: idx.map((j) => `a${sub(j + 1)} = ${f(E[i][j])}/${f(ml.sum(E[i]))} = ${f(A[i][j])}`).join(";  ") },
+        { what: "Değer vektörlerini bu ağırlıklarla toplarız: kelimenin bağlama göre yeni vektörü.", formula: "zᵢ = Σ aⱼ·vⱼ", calc: idx.map((j) => `${f(A[i][j])}·${vec(V[j])}`).join(" + "), result: vec(Z[i]) },
+      ]),
+      table(["Kelime", ...K.map((_, j) => `a·${j + 1}`), "çıktı z"], A.map((r, ii) => ({ row: [String(ii + 1), ...r.map((w) => ({ v: f(w), cls: "num" })), vec(Z[ii])] })), { cls: "center compact" }));
+  });
+  return el;
+};
+
+W.cosine = () => {
+  const { el, body } = frame("Kosinüs benzerliği ve Öklid uzaklığı");
+  const src = area("kedi: 2 1 0\nköpek: 1 2 0\nborsa: 0 1 3", 4);
+  const out = outBox();
+  body.append(h("p", { class: "field-hint" }, "Her satıra bir ad ve vektör yazın (ad: sayılar)."), src, out);
+  live(body, () => {
+    const items = src.value.split("\n").map((l) => l.trim()).filter(Boolean).map((l, n) => {
+      const m = l.match(/^([^:]+):(.*)$/);
+      return m ? { name: m[1].trim(), v: parseNums(m[2]) } : { name: `v${n + 1}`, v: parseNums(l) };
+    }).filter((it) => it.v.length);
+    if (items.length < 2) return put(out, errorBox("En az iki vektör yazın."));
+    const pairs = [];
+    for (let a = 0; a < items.length; a++) for (let b = a + 1; b < items.length; b++) {
+      const u = items[a].v, w = items[b].v, d = dot(u, w), nu = norm(u), nw = norm(w);
+      pairs.push({ a: items[a].name, b: items[b].name, u, w, d, nu, nw, cos: d / (nu * nw), eu: Math.sqrt(ml.sum(u.map((x, i) => (x - (w[i] ?? 0)) ** 2))) });
+    }
+    const best = pairs.reduce((m, p) => (p.cos > m.cos ? p : m));
+    put(out,
+      table(["Çift", "u·v", "‖u‖", "‖v‖", "kosinüs", "Öklid"], pairs.map((p) => ({ cls: p === best ? "hl" : "", row: [`${p.a}, ${p.b}`, { v: f(p.d), cls: "num" }, { v: f(p.nu), cls: "num" }, { v: f(p.nw), cls: "num" }, { v: f(p.cos), cls: "num" }, { v: f(p.eu), cls: "num" }] })), { cls: "center compact" }),
+      h("p", {}, h("b", {}, `En benzer çift: ${best.a} ve ${best.b}. Hesabı:`)),
+      steps([
+        { what: "İç çarpım: karşılıklı bileşenlerin çarpımlarını toplarız.", formula: "u·v = Σ uᵢvᵢ", calc: dotTxt(best.u, best.w), result: f(best.d) },
+        { what: "İki vektörün uzunluklarını buluruz.", formula: "‖u‖ = √(Σ uᵢ²)", calc: `‖${best.a}‖ = √(${best.u.map((x) => `${par(x)}²`).join(" + ")}) = ${f(best.nu)};  ‖${best.b}‖ = √(${best.w.map((x) => `${par(x)}²`).join(" + ")})`, result: f(best.nw) },
+        { what: "İç çarpımı uzunlukların çarpımına böleriz.", formula: "cos = u·v / (‖u‖·‖v‖)", calc: `${f(best.d)} / (${f(best.nu)}·${f(best.nw)})`, result: f(best.cos),
+          note: "Kosinüs yalnız yöne bakar: bir vektörü 2 ile çarpmak kosinüsü değiştirmez ama Öklid uzaklığını değiştirir." },
+      ]));
+  });
+  return el;
+};
+
+W.rnnparams = () => {
+  const { el, body } = frame("RNN, LSTM ve GRU katmanının parametre sayısı");
+  const d = h("input", { type: "text", value: "4", style: { width: "4rem" } }), hh = h("input", { type: "text", value: "3", style: { width: "4rem" } });
+  const out = outBox();
+  body.append(h("div", { class: "controls" }, h("label", {}, "girdi boyutu d ", d), h("label", {}, "gizli boyut h ", hh)), out);
+  live(body, () => {
+    const D = Math.round(readNumber(d.value)), H = Math.round(readNumber(hh.value));
+    if (!(D > 0 && H > 0)) return put(out, errorBox("d ve h pozitif tam sayı olmalı."));
+    const g = H * (D + H) + H, n = (x) => x.toLocaleString("en-US");
+    put(out, steps([
+      { what: "Her kapı girdi ile önceki gizli durumun birleşimine bakar; birleşik vektörün uzunluğu d + h'dir.", formula: "d + h", calc: `${D} + ${H}`, result: String(D + H) },
+      { what: "Bir grubun (bir kapının ya da adayın) h çıktısı vardır: h·(d + h) ağırlık ve h sabit terim.", formula: "h·(d + h) + h", calc: `${H}·${D + H} + ${H}`, result: n(g) },
+      { what: "Yalın RNN tek gruptur.", formula: "1 · grup", calc: `1·${n(g)}`, result: n(g) },
+      { what: "LSTM'de dört grup vardır: unutma, girdi, çıktı kapıları ve aday.", formula: "4 · grup", calc: `4·${n(g)}`, result: n(4 * g) },
+      { what: "GRU'da üç grup vardır: sıfırlama, güncelleme kapıları ve aday.", formula: "3 · grup", calc: `3·${n(g)}`, result: n(3 * g), note: "GRU, LSTM'den her zaman tam %25 daha az parametre taşır." },
+    ]));
+  });
+  return el;
+};
+
+W.w2v = () => {
+  const { el, body } = frame("Word2Vec eğitim çiftleri: skip-gram ve CBOW");
+  const sent = h("input", { type: "text", value: "öğrenci sınav öncesi evde ders çalışmayı sever", style: { width: "100%" } });
+  const win = h("input", { type: "text", value: "2", style: { width: "3rem" } });
+  const out = outBox();
+  body.append(h("label", { class: "block" }, "cümle ", sent), h("div", { class: "controls" }, h("label", {}, "pencere (her yönde komşu) ", win)), out);
+  live(body, () => {
+    const w = sent.value.trim().split(/\s+/).filter(Boolean), m = Math.max(1, Math.round(readNumber(win.value)) || 1);
+    if (w.length < 2) return put(out, errorBox("En az iki kelime yazın."));
+    const rows = w.map((c, i) => { const nb = []; for (let j = Math.max(0, i - m); j <= Math.min(w.length - 1, i + m); j++) if (j !== i) nb.push(w[j]); return { c, nb }; });
+    const total = ml.sum(rows.map((r) => r.nb.length));
+    put(out, table(["Merkez", "Skip-gram çiftleri (merkez, komşu)", "CBOW girdisi (etiketi merkez kelime)", "Sayı"],
+      rows.map((r) => [r.c, r.nb.map((x) => `(${r.c}, ${x})`).join(", "), `(${r.nb.join(", ")})`, { v: String(r.nb.length), cls: "num" }]),
+      { cls: "compact", foot: [{ v: "Toplam", span: 3 }, { v: String(total), cls: "num" }] }),
+    h("p", { class: "small" }, `Skip-gram çifti sayısı, her kelimenin komşu sayılarının toplamıdır: ${rows.map((r) => r.nb.length).join(" + ")} = ${total}. Etiketler metnin kendisinden çıktığı için bu öz-gözetimli öğrenmedir.`));
+  });
+  return el;
+};
+
+W.lstmstep = () => {
+  const { el, body } = frame("Bir LSTM adımı: kapılar belleği nasıl değiştirir?");
+  const mk = (lab, val) => { const i = h("input", { type: "text", value: val, style: { width: "4rem" } }); return { i, label: h("label", {}, lab, i) }; };
+  const c0 = mk("eski bellek cₜ₋₁ ", "1"), fg = mk("unutma fₜ ", "0.9"), ig = mk("girdi iₜ ", "0.5"), gg = mk("aday gₜ ", "0.6"), og = mk("çıktı oₜ ", "0.8");
+  const out = outBox();
+  body.append(h("div", { class: "controls" }, c0.label, fg.label, ig.label, gg.label, og.label), out);
+  live(body, () => {
+    const [C, F, I, G, O] = [c0, fg, ig, gg, og].map((x) => readNumber(x.i.value));
+    if ([C, F, I, G, O].some((x) => !Number.isFinite(x))) return put(out, errorBox("Beş değeri de sayı olarak yazın."));
+    const c = F * C + I * G, hh = O * Math.tanh(c);
+    const bad = [F, I, O].some((x) => x < 0 || x > 1) ? "Not: kapılar sigmoid çıktısıdır, 0 ile 1 arasında olmalı." : null;
+    put(out, steps([
+      { what: "Unutma kapısı eski belleğin ne kadarının kalacağını seçer.", formula: "fₜ·cₜ₋₁", calc: `${f(F)}·${par(C)}`, result: f(F * C) },
+      { what: "Girdi kapısı adayın ne kadarının yazılacağını seçer.", formula: "iₜ·gₜ", calc: `${f(I)}·${par(G)}`, result: f(I * G) },
+      { what: "İkisini toplayınca yeni bellek çıkar (toplamalı yol).", formula: "cₜ = fₜ·cₜ₋₁ + iₜ·gₜ", calc: `${f(F * C)} ${pm(I * G)}`, result: f(c) },
+      { what: "Çıktı kapısı belleğin tanh'ının ne kadarının dışarı verileceğini seçer.", formula: "hₜ = oₜ·tanh(cₜ)", calc: `${f(O)}·tanh(${f(c)}) = ${f(O)}·${f(Math.tanh(c))}`, result: f(hh), note: bad },
+    ]), h("p", { class: "small muted" }, "Unutma kapısını 0 yapın: eski bellek tamamen silinir. Girdi kapısını 0 yapın: hiçbir şey yazılmaz ve bellek yalnız unutma kapısı kadar korunur."));
+  });
+  return el;
+};
+
 W.knn = I.knn;
 W.hardsvm = I.hardsvm;
 W.perceptron = I.perceptron;
