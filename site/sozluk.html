@@ -18,7 +18,7 @@
 
 <h2>Terimler ve anlamları</h2><p class="h-en" lang="en">Terms and their meanings</p>
 <p><input type="search" class="glossary-filter" id="gfilter" placeholder="Ara: örn. marj, recall, entropi" aria-label="Sözlükte ara"></p>
-<nav class="letter-nav" aria-label="Harfler"><a href="#t-accuracy-dogruluk">A</a><a href="#t-bagging-torbalama">B</a><a href="#t-capraz-dogrulama">Ç</a><a href="#t-dal">D</a><a href="#t-egitim">E</a><a href="#t-f1">F</a><a href="#t-genelleme">G</a><a href="#t-havuzlama">H</a><a href="#t-i-i-d">I</a><a href="#t-i-c-carpim">İ</a><a href="#t-k-ortalamalar-k-means">K</a><a href="#t-laplace-duzeltmesi">L</a><a href="#t-marj">M</a><a href="#t-naive-bayes">N</a><a href="#t-one-hot-kodlama">O</a><a href="#t-ogrenme-orani">Ö</a><a href="#t-parametre">P</a><a href="#t-q-ogrenme">Q</a><a href="#t-rag">R</a><a href="#t-sigmoid">S</a><a href="#t-t-sne-ve-umap">T</a><a href="#t-varyans-model">V</a><a href="#t-word2vec">W</a><a href="#t-yanlilik-model">Y</a><a href="#t-z-score">Z</a><a href="#t-greedy">Ε</a></nav>
+<nav class="letter-nav" aria-label="Harfler"><a href="#t-accuracy-dogruluk">A</a><a href="#t-bagging-torbalama">B</a><a href="#t-capraz-dogrulama">Ç</a><a href="#t-dal">D</a><a href="#t-egitim">E</a><a href="#t-f1">F</a><a href="#t-genelleme">G</a><a href="#t-havuzlama">H</a><a href="#t-i-i-d">I</a><a href="#t-i-c-carpim">İ</a><a href="#t-k-ortalamalar-k-means">K</a><a href="#t-laplace-duzeltmesi">L</a><a href="#t-marj">M</a><a href="#t-naive-bayes">N</a><a href="#t-one-hot-kodlama">O</a><a href="#t-ogrenme-orani">Ö</a><a href="#t-parametre">P</a><a href="#t-q-ogrenme">Q</a><a href="#t-rag">R</a><a href="#t-sigmoid">S</a><a href="#t-t-sne-ve-umap">T</a><a href="#t-varyans-model">V</a><a href="#t-word2vec">W</a><a href="#t-xor-problemi">X</a><a href="#t-yanlilik-model">Y</a><a href="#t-z-score">Z</a><a href="#t-greedy">Ε</a></nav>
 <dl class="glossary" id="glossary">
 <dt id="t-accuracy-dogruluk" data-letter="A">Accuracy (doğruluk)<span class="en">accuracy</span></dt>
 <dd>Bütün tahminlerin yüzde kaçı doğru? En sezgisel ölçüt ama sınıflar dengesizse yanıltır: 1000 işlemin 20'si sahteyse “hepsi normal” diyen model %98 alır. <span class="m">(TP + TN) / n</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
@@ -94,6 +94,8 @@
 <dd>Kayba “karmaşıklık cezası” ekleyerek modeli basit kalmaya zorlamak (ridge, lasso, budama, dropout). Aşırı uyumu azaltır, biraz yanlılık ekler. <span class="m">min kayıp + λ·ceza</span> <a class="see" href="w3-knn.html">→ sayfa</a></dd>
 <dt id="t-egitim" data-letter="E">Eğitim<span class="en">training</span></dt>
 <dd>Modelin parametrelerini eğitim verisine bakarak ayarlama süreci; genelde kaybı küçültmek demektir. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
+<dt id="t-en-kucuk-kareler">En küçük kareler<span class="en">least squares</span></dt>
+<dd>Tahminlerle gerçek değerler arasındaki farkların karelerinin toplamını en küçük yapan doğruyu bulmak. <span class="m">w₁ = Σ(x − x̄)(y − ȳ)/Σ(x − x̄)², w₀ = ȳ − w₁x̄</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
 <dt id="t-entropi">Entropi<span class="en">entropy</span></dt>
 <dd>Bir kümenin ne kadar “karışık” olduğu. Hepsi aynı sınıfsa 0, iki sınıf yarı yarıyaysa 1 bit. “Bu örneğin sınıfını öğrenmek için ortalama kaç evet/hayır sorusu gerekir?” <span class="m">H = −Σ pᵢ log₂ pᵢ</span> <a class="see" href="w5-trees.html">→ sayfa</a></dd>
 <dt id="t-epoch">Epoch<span class="en">epoch</span></dt>
@@ -110,6 +112,8 @@
 <dd>Küçük bir filtreyi görüntü (ya da sinyal) üzerinde kaydırıp her konumda çarpımların toplamını almak. Aynı filtre her yerde kullanıldığı için parametre azdır. <span class="m">çıktı = ⌊(n + 2p − k)/s⌋ + 1</span> <a class="see" href="w9-cnn.html">→ sayfa</a></dd>
 <dt id="t-f1" data-letter="F">F1<span class="en">F1 score</span></dt>
 <dd>Precision ve recall'un harmonik ortalaması: ikisi de yüksekse yüksek. Dengesiz veride accuracy'den çok daha bilgilendirici. <span class="m">2·Precision·Recall / (Precision + Recall) = 2TP / (2TP + FP + FN)</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-find-s">Find-S<span class="en">Find-S</span></dt>
+<dd>En özel hipotezden başlayıp her pozitif örnekte uymayan kısıtı genelleyen (“?” yapan) kavram öğrenme algoritması. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
 <dt id="t-genelleme" data-letter="G">Genelleme<span class="en">generalization</span></dt>
 <dd>Modelin görmediği yeni veride de iyi çalışması. Makine öğrenmesinin asıl amacı. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
 <dt id="t-geri-yayilim">Geri yayılım<span class="en">backpropagation</span></dt>
@@ -120,10 +124,14 @@
 <dd>Entropiye benzer karışıklık ölçüsü (CART kullanır): rastgele iki örnek çekince farklı sınıftan olma olasılığı. <span class="m">1 − Σ pᵢ²</span> <a class="see" href="w5-trees.html">→ sayfa</a></dd>
 <dt id="t-gizli-durum">Gizli durum<span class="en">hidden state</span></dt>
 <dd>RNN'nin o ana kadar okuduklarının özetini taşıyan vektör. Her adımda yeni girdiyle güncellenir. <a class="see" href="w10-seq.html">→ sayfa</a></dd>
+<dt id="t-gizli-katman">Gizli katman<span class="en">hidden layer</span></dt>
+<dd>Girdi ile çıktı arasındaki nöron katmanı; her nöronu bir doğru ya da bir öznitelik gibi çalışır. <span class="m">h = g(Wx + b)</span> <a class="see" href="w8-nn.html">→ sayfa</a></dd>
 <dt id="t-gmm-ve-em">GMM ve EM<span class="en">Gaussian mixture model / expectation–maximization</span></dt>
 <dd>Veriyi Gauss dağılımlarının karışımıyla modelleyen yumuşak kümeleme; parametreler E (sorumluluklar) ve M (güncelleme) adımlarıyla bulunur. <a class="see" href="w11-unsup.html">→ sayfa</a></dd>
 <dt id="t-gomme-vektoru">Gömme vektörü<span class="en">embedding</span></dt>
 <dd>Bir kelimeyi (ya da görüntüyü, cümleyi) kısa ve yoğun bir sayı vektörüyle temsil etmek; anlamca benzer olanlar uzayda birbirine yakın düşer. <a class="see" href="w10-seq.html">→ sayfa</a></dd>
+<dt id="t-gozetimli-ogrenme">Gözetimli öğrenme<span class="en">supervised learning</span></dt>
+<dd>Her örneğin doğru cevabının (etiketinin) verildiği öğrenme; model girdiden etikete giden kuralı öğrenir. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
 <dt id="t-gozetimsiz-ogrenme">Gözetimsiz öğrenme<span class="en">unsupervised learning</span></dt>
 <dd>Etiket olmadan verinin içindeki yapıyı bulmak: kümeleme, boyut indirgeme, yoğunluk kestirimi, anomali tespiti. <a class="see" href="w11-unsup.html">→ sayfa</a></dd>
 <dt id="t-gradyan">Gradyan<span class="en">gradient</span></dt>
@@ -214,6 +222,8 @@
 <dd>Nöronların katmanlar hâlinde bağlandığı sinir ağı; gizli katmanlar sayesinde XOR gibi doğrusal olmayan problemleri çözer. <a class="see" href="w8-nn.html">→ sayfa</a></dd>
 <dt id="t-model">Model<span class="en">model</span></dt>
 <dd>Veriden öğrenilmiş, girdiyi alıp tahmin üreten kural ya da fonksiyon (bir doğru, bir ağaç, bir sinir ağı). <a class="see" href="w1-intro.html">→ sayfa</a></dd>
+<dt id="t-momentum-ve-adam">Momentum ve Adam<span class="en">momentum / Adam optimizer</span></dt>
+<dd>Gradyan inişinin hızlandırılmış biçimleri: momentum geçmiş gradyanların yürüyen ortalamasıyla ilerler; Adam bunu her parametre için ayrı ölçekleme ile birleştirir. <span class="m">m ← βm + g, θ ← θ − ηm</span> <a class="see" href="w8-nn.html">→ sayfa</a></dd>
 <dt id="t-mse-mae-rmse">MSE, MAE, RMSE<span class="en">mean squared / absolute error</span></dt>
 <dd>Regresyon hata ölçütleri: hataların karelerinin ortalaması, mutlak değerlerinin ortalaması, MSE'nin karekökü. <a class="see" href="w2-data.html">→ sayfa</a></dd>
 <dt id="t-naive-bayes" data-letter="N">Naive Bayes<span class="en">naive Bayes</span></dt>
@@ -232,6 +242,8 @@
 <dd>Veri tablosundaki bir satır: bir müşteri, bir e-posta, bir gün. Model her örnek için bir tahmin yapar. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
 <dt id="t-oznitelik">Öznitelik<span class="en">feature</span></dt>
 <dd>Bir örneği anlatan ölçülebilir özellik: yaş, gelir, piksel değeri. Tablodaki bir sütun. <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-oznitelik-onemi">Öznitelik önemi<span class="en">feature importance</span></dt>
+<dd>Bir özniteliğin modelin kararlarına ne kadar katkı yaptığının ölçüsü; ağaçlarda safsızlık azalmalarının toplamı ya da permütasyonla ölçülür. <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
 <dt id="t-oznitelik-secimi-cikarimi">Öznitelik seçimi / çıkarımı<span class="en">feature selection / extraction</span></dt>
 <dd>Seçim: var olan sütunlardan bir alt küme tutmak (yorumlanabilir). Çıkarım: eskilerden yeni sütunlar türetmek (PCA). <a class="see" href="w2-data.html">→ sayfa</a></dd>
 <dt id="t-parametre" data-letter="P">Parametre<span class="en">parameter</span></dt>
@@ -252,8 +264,16 @@
 <dd>Erişimle zenginleştirilmiş üretim: soruyla ilgili belgeleri gömme benzerliğiyle bulup isteme ekleyerek dil modeline cevap ürettirmek. <a class="see" href="w10-seq.html">→ sayfa</a></dd>
 <dt id="t-rastgele-orman">Rastgele orman<span class="en">random forest</span></dt>
 <dd>Bootstrap örneklemleri + her bölmede rastgele öznitelik alt kümesiyle eğitilmiş birçok ağacın oyu. <span class="m">m ≈ √p</span> <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
+<dt id="t-rbf-cekirdegi">RBF çekirdeği<span class="en">RBF (Gaussian) kernel</span></dt>
+<dd>İki noktanın benzerliğini uzaklıklarıyla azalan bir çan eğrisiyle ölçen çekirdek; γ büyüdükçe tümsekler daralır. <span class="m">K(x, z) = exp(−γ‖x − z‖²)</span> <a class="see" href="w7-svm.html">→ sayfa</a></dd>
 <dt id="t-recall-duyarlilik-tpr">Recall (duyarlılık, TPR)<span class="en">recall / sensitivity</span></dt>
 <dd>“Gerçek pozitiflerin kaçını yakaladım?” Kaçırmak (FN) pahalıysa önemli (kanser taraması). <span class="m">TP/(TP + FN)</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-regresyon">Regresyon<span class="en">regression</span></dt>
+<dd>Tahmin edilen şeyin bir sayı olduğu gözetimli görev: fiyat, sıcaklık, süre. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
+<dt id="t-regresyon-agaci-cart">Regresyon ağacı (CART)<span class="en">regression tree / CART</span></dt>
+<dd>Yapraklarında sayı tahmin eden karar ağacı; bölme, dallardaki kare hatayı (varyansı) en çok azaltan eşikle seçilir. <a class="see" href="w5-trees.html">→ sayfa</a></dd>
+<dt id="t-relu">ReLU<span class="en">rectified linear unit</span></dt>
+<dd>Negatifleri 0 yapan, pozitifleri olduğu gibi geçiren etkinleştirme; pozitif bölgede türevi 1 olduğu için gradyan sönmez. <span class="m">max(0, z)</span> <a class="see" href="w8-nn.html">→ sayfa</a></dd>
 <dt id="t-ridge">Ridge<span class="en">ridge (L2)</span></dt>
 <dd>Ağırlıkların kareleri toplamını cezalandıran düzenlileştirme; ağırlıkları küçültür ama sıfırlamaz. <span class="m">L + λΣwⱼ²</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
 <dt id="t-rnn-ozyinelemeli-sinir-agi">RNN (özyinelemeli sinir ağı)<span class="en">recurrent neural network</span></dt>
@@ -268,18 +288,24 @@
 <dd>Bir noktanın kendi kümesine ne kadar iyi oturduğunu komşu kümeyle karşılaştırarak ölçen −1 ile 1 arası değer. <span class="m">s = (b − a)/max(a, b)</span> <a class="see" href="w11-unsup.html">→ sayfa</a></dd>
 <dt id="t-sinif">Sınıf<span class="en">class</span></dt>
 <dd>Sınıflandırmada etiketin alabileceği kategorilerden biri: Evet/Hayır, +/−, spam/değil. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
+<dt id="t-siniflandirma">Sınıflandırma<span class="en">classification</span></dt>
+<dd>Tahmin edilen şeyin bir kategori olduğu gözetimli görev: spam mı değil mi, hangi rakam. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
 <dt id="t-skor">Skor<span class="en">score</span></dt>
 <dd>Modelin bir örnek için ürettiği ham sayı (örneğin z = w·x + b); eşikle karşılaştırılarak sınıfa çevrilir. <a class="see" href="w2-data.html">→ sayfa</a></dd>
 <dt id="t-softmax">Softmax<span class="en">softmax</span></dt>
 <dd>Birden çok sınıfın skorlarını toplamı 1 olan olasılıklara çevirir. <span class="m">e^{zₖ}/Σe^{zⱼ}</span> <a class="see" href="w4-linear.html">→ sayfa</a></dd>
 <dt id="t-specificity-ozgulluk">Specificity (özgüllük)<span class="en">specificity / TNR</span></dt>
 <dd>“Gerçek negatiflerin kaçını doğru bıraktım?” <span class="m">TN/(TN + FP)</span> <a class="see" href="w2-data.html">→ sayfa</a></dd>
+<dt id="t-stacking-yiginlama">Stacking (yığınlama)<span class="en">stacking</span></dt>
+<dd>Farklı modellerin tahminlerini girdi olarak alan ikinci bir modelle (meta model) bunları birleştirmek. <a class="see" href="w6-ensembles.html">→ sayfa</a></dd>
 <dt id="t-svm">SVM<span class="en">support vector machine</span></dt>
 <dd>Sınıfları en geniş “sokakla” ayıran doğrusal sınıflandırıcı; çekirdeklerle doğrusal olmayan sınırlar da çizer. <span class="m">min ½‖w‖²</span> <a class="see" href="w7-svm.html">→ sayfa</a></dd>
 <dt id="t-t-sne-ve-umap" data-letter="T">t-SNE ve UMAP<span class="en">t-SNE / UMAP</span></dt>
 <dd>Yüksek boyutlu veriyi görselleştirmek için iki boyuta indiren, yerel komşuluğu koruyan yöntemler; kümeler arası uzaklıklar yorumlanmaz. <a class="see" href="w11-unsup.html">→ sayfa</a></dd>
 <dt id="t-tahmin">Tahmin<span class="en">prediction</span></dt>
 <dd>Modelin bir örnek için verdiği cevap; ŷ (y şapka) ile gösterilir. <span class="m">ŷ</span> <a class="see" href="w1-intro.html">→ sayfa</a></dd>
+<dt id="t-tanh">tanh<span class="en">hyperbolic tangent</span></dt>
+<dd>Çıktısı −1 ile 1 arasında, sıfır merkezli, türevlenebilir etkinleştirme; sign fonksiyonunun yumuşak hâli. <span class="m">tanh′(z) = 1 − tanh²(z)</span> <a class="see" href="w8-nn.html">→ sayfa</a></dd>
 <dt id="t-td-ogrenme">TD öğrenme<span class="en">temporal difference learning</span></dt>
 <dd>Her geçişten sonra değeri, ödül artı sonraki durumun tahminine doğru biraz kaydırarak öğrenmek; bölümün bitmesini beklemez. <span class="m">V(s) ← V(s) + α[r + γV(s′) − V(s)]</span> <a class="see" href="w12-rl.html">→ sayfa</a></dd>
 <dt id="t-tek-tam-baglanti">Tek / tam bağlantı<span class="en">single / complete linkage</span></dt>
@@ -296,12 +322,16 @@
 <dd>Bir öğrenme algoritmasının veriyle eşit uyumlu hipotezler arasından birini seçmesini sağlayan varsayımları (doğrusal, basit, pürüzsüz…). Hiç varsayımı olmayan bir öğrenme algoritması genelleyemez. <a class="see" href="w1-intro.html">→ sayfa</a></dd>
 <dt id="t-varyans-model" data-letter="V">Varyans (model)<span class="en">variance</span></dt>
 <dd>Eğitim verisi biraz değişince modelin ne kadar değiştiği. Karmaşık modellerde yüksektir. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
+<dt id="t-vc-boyutu">VC boyutu<span class="en">VC dimension</span></dt>
+<dd>Bir model ailesinin her türlü etiketlemesini ayırabildiği en büyük nokta sayısı; kapasitenin ölçüsü. Düzlemdeki doğrular için 3. <a class="see" href="w7-svm.html">→ sayfa</a></dd>
 <dt id="t-veri-cogaltma">Veri çoğaltma<span class="en">data augmentation</span></dt>
 <dd>Eğitim örneklerinden etiketi değiştirmeyen dönüşümlerle (kırpma, çevirme, döndürme) yeni örnekler üretmek. Yalnız eğitim kümesine uygulanır. <a class="see" href="w9-cnn.html">→ sayfa</a></dd>
 <dt id="t-veri-sizintisi">Veri sızıntısı<span class="en">data leakage</span></dt>
 <dd>Test (ya da gelecek) bilgisinin eğitime karışması: ölçekleyiciyi bütün veride fit etmek, etiketi ele veren öznitelik kullanmak. Skor gerçek olamayacak kadar iyi çıkar. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
 <dt id="t-word2vec" data-letter="W">Word2Vec<span class="en">Word2Vec</span></dt>
 <dd>Kelime gömmelerini, her kelimenin penceredeki komşularını tahmin eden sığ bir ağla öğrenmek. Skip-gram merkezden komşuyu, CBOW komşulardan merkezi tahmin eder. <a class="see" href="w10-seq.html">→ sayfa</a></dd>
+<dt id="t-xor-problemi" data-letter="X">XOR problemi<span class="en">XOR problem</span></dt>
+<dd>Girdilerden yalnız biri 1 iken 1 veren fonksiyon; tek bir doğruyla ayrılamaz, bu yüzden gizli katman gerektirir. <a class="see" href="w8-nn.html">→ sayfa</a></dd>
 <dt id="t-yanlilik-model" data-letter="Y">Yanlılık (model)<span class="en">bias</span></dt>
 <dd>Modelin basitliğinden gelen sistematik hata: sinüs eğrisine doğru uydurmak. Daha çok veri bunu düzeltmez. <a class="see" href="w3-knn.html">→ sayfa</a></dd>
 <dt id="t-yanlilik-varyans-ayrisimi">Yanlılık-varyans ayrışımı<span class="en">bias-variance decomposition</span></dt>

@@ -569,3 +569,8 @@ details.page-toc > summary { cursor: pointer; list-style: revert; }
 .guide-lite > p .ic { color: var(--s7); }
 .guide-lite > .guide { margin: 0; padding: 0.3rem 0.7rem; }
 .guide-lite > .guide > summary { font-size: 0.88rem; }
+.words-list { display: flex; flex-wrap: wrap; gap: 0.3rem 0.4rem; margin-top: 0.35rem; }
+.word-chip { display: inline-flex; align-items: baseline; gap: 0.3rem; padding: 0.1rem 0.55rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); font-size: 0.86rem; text-decoration: none; color: var(--text); }
+.word-chip:hover { border-color: var(--accent); color: var(--accent); }
+.word-chip .en-tag { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+.words-hint { font-weight: 400; color: var(--muted); text-transform: none; letter-spacing: 0; }

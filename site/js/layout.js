@@ -381,6 +381,19 @@ function compactIntro(content, howto) {
   row.addEventListener("toggle", () => row.classList.toggle("has-open", !![...row.children].some((d) => d.open)), true);
 }
 
+/** "Words you will learn here": every glossary term taught this week, generated so no week falls behind. */
+async function buildWords(content, week) {
+  const { TERMS } = await import("./glossary-data.js");
+  const terms = TERMS.filter((t) => t.week === week).sort((a, b) => a.term.localeCompare(b.term, "tr"));
+  if (!terms.length) return;
+  const old = $(":scope > .words", content);
+  const box = h("div", { class: "words" },
+    h("div", { class: "words-title" }, `Bu hafta öğreneceğin ${terms.length} terim`, h("span", { class: "words-hint" }, " · üzerine gel: tanım · tıkla: sözlük")),
+    h("div", { class: "words-list" }, terms.map((t) => h("a", { href: `sozluk.html#${t.id}`, class: "word-chip no-gl", title: `${t.def}${t.en ? ` (${t.en})` : ""}` }, t.term, t.en ? h("span", { class: "en-tag" }, t.en) : null))));
+  if (old) old.replaceWith(box);
+  else ($(":scope > .pre-row", content) || $(":scope > .essence", content) || $(":scope > .lead", content))?.after(box);
+}
+
 async function init() {
   const id = document.body.dataset.page || "index";
   const info = pageInfo(id);
@@ -408,6 +421,7 @@ async function init() {
     const { mountAll } = await import("./widgets.js");
     mountAll(content);
   }
+  if (info?.week) await buildWords(content, info.week);
   if (id !== "sozluk") {
     const { annotateTerms, installTermPopover } = await import("./glossary.js");
     annotateTerms(content, info?.week || 0, id);

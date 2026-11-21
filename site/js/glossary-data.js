@@ -300,6 +300,14 @@ export const TERMS = [
 "en": "training"
 },
 {
+"term": "En küçük kareler",
+"def": "Tahminlerle gerçek değerler arasındaki farkların karelerinin toplamını en küçük yapan doğruyu bulmak. (w₁ = Σ(x − x̄)(y − ȳ)/Σ(x − x̄)², w₀ = ȳ − w₁x̄)",
+"id": "t-en-kucuk-kareler",
+"match": "en küçük kareler",
+"week": 4,
+"en": "least squares"
+},
+{
 "term": "Entropi",
 "def": "Bir kümenin ne kadar “karışık” olduğu. Hepsi aynı sınıfsa 0, iki sınıf yarı yarıyaysa 1 bit. “Bu örneğin sınıfını öğrenmek için ortalama kaç evet/hayır sorusu gerekir?” (H = −Σ pᵢ log₂ pᵢ)",
 "id": "t-entropi",
@@ -364,6 +372,14 @@ export const TERMS = [
 "en": "F1 score"
 },
 {
+"term": "Find-S",
+"def": "En özel hipotezden başlayıp her pozitif örnekte uymayan kısıtı genelleyen (“?” yapan) kavram öğrenme algoritması.",
+"id": "t-find-s",
+"match": "Find-S",
+"week": 1,
+"en": "Find-S"
+},
+{
 "term": "Genelleme",
 "def": "Modelin görmediği yeni veride de iyi çalışması. Makine öğrenmesinin asıl amacı.",
 "id": "t-genelleme",
@@ -404,6 +420,14 @@ export const TERMS = [
 "en": "hidden state"
 },
 {
+"term": "Gizli katman",
+"def": "Girdi ile çıktı arasındaki nöron katmanı; her nöronu bir doğru ya da bir öznitelik gibi çalışır. (h = g(Wx + b))",
+"id": "t-gizli-katman",
+"match": "gizli katman",
+"week": 8,
+"en": "hidden layer"
+},
+{
 "term": "GMM ve EM",
 "def": "Veriyi Gauss dağılımlarının karışımıyla modelleyen yumuşak kümeleme; parametreler E (sorumluluklar) ve M (güncelleme) adımlarıyla bulunur.",
 "id": "t-gmm-ve-em",
@@ -418,6 +442,14 @@ export const TERMS = [
 "match": "gömme(?!li)",
 "week": 10,
 "en": "embedding"
+},
+{
+"term": "Gözetimli öğrenme",
+"def": "Her örneğin doğru cevabının (etiketinin) verildiği öğrenme; model girdiden etikete giden kuralı öğrenir.",
+"id": "t-gozetimli-ogrenme",
+"match": "gözetimli",
+"week": 1,
+"en": "supervised learning"
 },
 {
 "term": "Gözetimsiz öğrenme",
@@ -785,6 +817,17 @@ export const TERMS = [
 "en": "model"
 },
 {
+"term": "Momentum ve Adam",
+"def": "Gradyan inişinin hızlandırılmış biçimleri: momentum geçmiş gradyanların yürüyen ortalamasıyla ilerler; Adam bunu her parametre için ayrı ölçekleme ile birleştirir. (m ← βm + g, θ ← θ − ηm)",
+"id": "t-momentum-ve-adam",
+"match": "momentum|Adam(?![a-zçğıöşü])",
+"week": 8,
+"en": "momentum / Adam optimizer",
+"skip": [
+"w10-seq"
+]
+},
+{
 "term": "MSE, MAE, RMSE",
 "def": "Regresyon hata ölçütleri: hataların karelerinin ortalaması, mutlak değerlerinin ortalaması, MSE'nin karekökü.",
 "id": "t-mse-mae-rmse",
@@ -859,6 +902,14 @@ export const TERMS = [
 "match": "öznitelik",
 "week": 2,
 "en": "feature"
+},
+{
+"term": "Öznitelik önemi",
+"def": "Bir özniteliğin modelin kararlarına ne kadar katkı yaptığının ölçüsü; ağaçlarda safsızlık azalmalarının toplamı ya da permütasyonla ölçülür.",
+"id": "t-oznitelik-onemi",
+"match": "öznitelik önemi",
+"week": 6,
+"en": "feature importance"
 },
 {
 "term": "Öznitelik seçimi / çıkarımı",
@@ -941,12 +992,44 @@ export const TERMS = [
 "en": "random forest"
 },
 {
+"term": "RBF çekirdeği",
+"def": "İki noktanın benzerliğini uzaklıklarıyla azalan bir çan eğrisiyle ölçen çekirdek; γ büyüdükçe tümsekler daralır. (K(x, z) = exp(−γ‖x − z‖²))",
+"id": "t-rbf-cekirdegi",
+"match": "RBF",
+"week": 7,
+"en": "RBF (Gaussian) kernel"
+},
+{
 "term": "Recall",
 "def": "“Gerçek pozitiflerin kaçını yakaladım?” Kaçırmak (FN) pahalıysa önemli (kanser taraması). (TP/(TP + FN))",
 "id": "t-recall-duyarlilik-tpr",
 "match": "recall|duyarlılık",
 "week": 2,
 "en": "recall / sensitivity"
+},
+{
+"term": "Regresyon",
+"def": "Tahmin edilen şeyin bir sayı olduğu gözetimli görev: fiyat, sıcaklık, süre.",
+"id": "t-regresyon",
+"match": "regresyon(?! ağac)",
+"week": 1,
+"en": "regression"
+},
+{
+"term": "Regresyon ağacı",
+"def": "Yapraklarında sayı tahmin eden karar ağacı; bölme, dallardaki kare hatayı (varyansı) en çok azaltan eşikle seçilir.",
+"id": "t-regresyon-agaci-cart",
+"match": "regresyon ağac|CART",
+"week": 5,
+"en": "regression tree / CART"
+},
+{
+"term": "ReLU",
+"def": "Negatifleri 0 yapan, pozitifleri olduğu gibi geçiren etkinleştirme; pozitif bölgede türevi 1 olduğu için gradyan sönmez. (max(0, z))",
+"id": "t-relu",
+"match": "ReLU",
+"week": 8,
+"en": "rectified linear unit"
 },
 {
 "term": "Ridge",
@@ -1005,6 +1088,14 @@ export const TERMS = [
 "en": "class"
 },
 {
+"term": "Sınıflandırma",
+"def": "Tahmin edilen şeyin bir kategori olduğu gözetimli görev: spam mı değil mi, hangi rakam.",
+"id": "t-siniflandirma",
+"match": "sınıflandırma",
+"week": 1,
+"en": "classification"
+},
+{
 "term": "Skor",
 "def": "Modelin bir örnek için ürettiği ham sayı (örneğin z = w·x + b); eşikle karşılaştırılarak sınıfa çevrilir.",
 "id": "t-skor",
@@ -1027,6 +1118,14 @@ export const TERMS = [
 "match": "specificity|özgüllük",
 "week": 2,
 "en": "specificity / TNR"
+},
+{
+"term": "Stacking",
+"def": "Farklı modellerin tahminlerini girdi olarak alan ikinci bir modelle (meta model) bunları birleştirmek.",
+"id": "t-stacking-yiginlama",
+"match": "stacking|yığınlama",
+"week": 6,
+"en": "stacking"
 },
 {
 "term": "SVM",
@@ -1052,6 +1151,14 @@ export const TERMS = [
 "week": 1,
 "en": "prediction",
 "lower": true
+},
+{
+"term": "tanh",
+"def": "Çıktısı −1 ile 1 arasında, sıfır merkezli, türevlenebilir etkinleştirme; sign fonksiyonunun yumuşak hâli. (tanh′(z) = 1 − tanh²(z))",
+"id": "t-tanh",
+"match": "tanh",
+"week": 8,
+"en": "hyperbolic tangent"
 },
 {
 "term": "TD öğrenme",
@@ -1123,6 +1230,14 @@ export const TERMS = [
 ]
 },
 {
+"term": "VC boyutu",
+"def": "Bir model ailesinin her türlü etiketlemesini ayırabildiği en büyük nokta sayısı; kapasitenin ölçüsü. Düzlemdeki doğrular için 3.",
+"id": "t-vc-boyutu",
+"match": "VC boyut",
+"week": 7,
+"en": "VC dimension"
+},
+{
 "term": "Veri çoğaltma",
 "def": "Eğitim örneklerinden etiketi değiştirmeyen dönüşümlerle (kırpma, çevirme, döndürme) yeni örnekler üretmek. Yalnız eğitim kümesine uygulanır.",
 "id": "t-veri-cogaltma",
@@ -1145,6 +1260,14 @@ export const TERMS = [
 "match": "Word2Vec|skip-gram|CBOW",
 "week": 10,
 "en": "Word2Vec"
+},
+{
+"term": "XOR problemi",
+"def": "Girdilerden yalnız biri 1 iken 1 veren fonksiyon; tek bir doğruyla ayrılamaz, bu yüzden gizli katman gerektirir.",
+"id": "t-xor-problemi",
+"match": "XOR",
+"week": 8,
+"en": "XOR problem"
 },
 {
 "term": "Yanlılık",
