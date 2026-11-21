@@ -233,7 +233,7 @@ function buildPageNav(content, id) {
   const link = (hd, cls) => h("a", { href: `#${hd.id}`, class: cls || null, "data-target": hd.id }, tocText(hd));
 
   if (!$(".page-toc", content)) {
-    const toc = h("nav", { class: "page-toc", "aria-label": "Bu sayfada" }, h("div", { class: "page-toc-title" }, "Bu sayfada"),
+    const toc = h("details", { class: "page-toc", "aria-label": "Bu sayfada" }, h("summary", { class: "page-toc-title" }, `Bu sayfada: ${tree.length} bölüm`),
       h("ol", {}, tree.map((t) => h("li", {}, link(t.hd)))));
     ($(":scope > .studied", content) || $(":scope > .lead", content) || $(":scope > h1", content)).after(toc);
   }
@@ -314,7 +314,7 @@ function buildPageNav(content, id) {
 /** "How to study this page" box: the order to follow and what the coloured boxes mean. */
 const HOWTO = {
   week: {
-    title: "<span class='ic ic-book' aria-hidden='true'></span>Bu sayfa nasıl çalışılır? (önerilen sıra ve kutuların anlamı)",
+    title: "<span class='ic ic-book' aria-hidden='true'></span>Bu sayfa nasıl çalışılır?",
     steps: [
       "<b><span class='ic ic-target' aria-hidden='true'></span>Sınav haritasına</b> 1 dakika göz at: bu haftadan ne sorulduğunu ve puanın nereden geldiğini söyler. Terimleri henüz bilmiyorsan sorun değil.",
       "Bölümleri <b>yukarıdan aşağı</b> oku. Her bölüm önce sarı <b><span class='ic ic-idea' aria-hidden='true'></span>sezgi</b> kutusuyla başlar: önce fikri anla, formül sonra gelir.",
@@ -347,10 +347,38 @@ function buildHowto(id, info) {
   const kind = HOWTO_KIND[id] || (info?.week ? "week" : null);
   if (!kind) return null;
   const k = HOWTO[kind];
-  const open = store.get("howto-open-" + kind, true);
+  const open = store.get("howto-open-" + kind, false);
   const d = h("details", { class: "howto", open }, h("summary", { html: k.title }), h("ol", {}, k.steps.map((st) => h("li", { html: st }))));
   d.addEventListener("toggle", () => store.set("howto-open-" + kind, d.open));
   return d;
+}
+
+/**
+ * The top of a week page used to be a wall of boxes before the first section. Keep the five-sentence summary open
+ * right under the title; fold "what is asked in the exam", "where this week comes from" and "how this page works"
+ * into one row of closed boxes the reader opens on demand.
+ */
+function compactIntro(content, howto) {
+  const anchor = $(":scope > .studied", content) || $(":scope > .lead", content);
+  if (!anchor) return;
+  const essence = $(":scope > .essence", content);
+  if (essence) anchor.after(essence);
+  const fold = (el, title, cls) => {
+    if (!el) return null;
+    const d = h("details", { class: "pre " + cls }, h("summary", {}, title));
+    d.append(...[...el.childNodes].filter((n) => !(n.classList && (n.classList.contains("callout-title") || n.classList.contains("bridge-title")))));
+    el.replaceWith(d);
+    return d;
+  };
+  const exam = fold($(":scope > .callout.exam", content), "Sınavda bu haftadan ne çıkar?", "pre-exam");
+  const bridge = fold($(":scope > .bridge", content), "Nereden geldik, nereye gidiyoruz?", "pre-bridge");
+  const row = h("div", { class: "pre-row" });
+  for (const d of [bridge, exam, howto]) if (d) { d.classList.add("pre"); row.append(d); }
+  (essence || anchor).after(row);
+  const words = $(":scope > .words", content);
+  if (words) row.after(words);
+  // opening one box widens it to the full row; the others stay compact
+  row.addEventListener("toggle", () => row.classList.toggle("has-open", !![...row.children].some((d) => d.open)), true);
 }
 
 async function init() {
@@ -366,6 +394,7 @@ async function init() {
   if (h1 && id !== "index") ($(":scope > .lead", content) || h1).after(buildStudied(id));
   const howto = buildHowto(id, info);
   if (howto) ($(":scope > .studied", content) || h1).after(howto);
+  if (info?.week) compactIntro(content, howto);
   const pager = buildPager(id);
   if (pager) content.append(pager);
   content.append(buildFooter());
