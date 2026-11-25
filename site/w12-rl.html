@@ -95,6 +95,23 @@
 <li><strong>2. bölüm, B'den C'ye.</strong> C'deki en büyük Q artık 5: Q(B, sağ) = −0.5 + 0.5·(−1 + 0.9·5 + 0.5) = −0.5 + 0.5·4 = <strong>1.5</strong>. Hedefteki ödül bir adım geriye taşındı.</li>
 <li><strong>2. bölüm, C'den G'ye.</strong> Q(C, sağ) = 5 + 0.5·(10 − 5) = <strong>7.5</strong>. Bölümler tekrarlandıkça Q(C, sağ) 10'a, Q(B, sağ) 8'e, Q(A, sağ) 6.2'ye yaklaşır: değer yinelemesinin bulduğu değerler.</li>
 </ol>
+<details class="aside code-read"><summary>Kodla: koridorda Q-öğrenme (sınavda istenmez)</summary><pre class="code">import numpy as np
+Q = np.zeros((3, 2))            # durumlar A, B, C; eylemler 0 = sol, 1 = sağ
+alpha, gamma = 0.5, 0.9
+for episode in range(2):
+    s = 0                       # her bölüm A'dan başlar
+    while True:
+        a = 1                   # bu örnekte ajan hep sağa gidiyor
+        s2 = s + 1
+        done = s2 == 3          # C'den sağa gidince G'ye varılır
+        r = 10 if done else -1
+        target = r + (0 if done else gamma * Q[s2].max())
+        Q[s, a] += alpha * (target - Q[s, a])
+        if done: break
+        s = s2
+    print(episode + 1, Q[:, 1])
+# 1 [-0.5 -0.5  5. ]
+# 2 [-0.75  1.5  7.5 ]</pre><p class="small">target satırı Q-öğrenmenin hedefidir, bir sonraki satır güncellemedir. Çıktı yukarıdaki iki bölümün elle hesabıyla aynıdır; A'daki −0.75, B'de henüz denenmemiş sol eylemin 0 değerinden gelir.</p></details>
 <p>Aynı süreci kendiniz yürütün: ajanı adım adım ilerletin ve ödülün hedeften geriye doğru nasıl yayıldığını izleyin.</p>
 <div data-widget="qcorridor"></div>
 <p>Q-öğrenmenin dikkat çekici bir özelliği, ajan en iyi olmayan eylemler yapsa bile (yeterince keşif yapıldığı ve α uygun biçimde küçültüldüğü sürece) en iyi Q değerlerine yakınsamasıdır. Çünkü hedefte ajanın gerçekte seçeceği eylem değil, en iyi eylemin değeri (max) kullanılır. Buna <strong>politika dışı</strong> (off-policy) öğrenme denir.</p>

@@ -153,6 +153,14 @@
 <li><strong>Çıktılar.</strong> Her kelimenin çıktısı değerlerin ağırlıklı toplamıdır. z₁ = 0.401·(1, 2) + 0.198·(3, 0) + 0.401·(0, 1) = (0.401 + 0.594, 0.802 + 0.401) = <strong>(0.99, 1.20)</strong>. Aynı biçimde z₂ = <strong>(1.40, 0.80)</strong> ve z₃ = 0.248·(1, 2) + 0.248·(3, 0) + 0.503·(0, 1) = <strong>(0.99, 1.00)</strong>.</li>
 </ol>
 <p><strong>Yorum.</strong> “Üstünde” kelimesi en çok kendisine bakıyor (0.503) ve öteki iki kelimeye eşit ağırlık veriyor; çıktısı üç değerin karışımı. Aynı kelime farklı bir cümlede farklı ağırlıklar alacağı için farklı bir vektöre dönüşür: dikkatin özü, bir kelimenin temsilini bağlama göre değiştirmesidir.</p>
+<details class="aside code-read"><summary>Kodla: aynı dikkat hesabı dört satırda (sınavda istenmez)</summary><pre class="code">import numpy as np
+Q = K = np.array([[1., 0], [0, 1], [1, 1]])        # kedi, hasır, üstünde
+V = np.array([[1., 2], [3, 0], [0, 1]])
+S = Q @ K.T / np.sqrt(2)                          # skorlar, √dₖ ile ölçekli
+A = np.exp(S) / np.exp(S).sum(axis=1, keepdims=True)   # satır satır softmax
+Z = A @ V                                          # değerlerin ağırlıklı toplamı
+print(A.round(3))   # [[0.401 0.198 0.401] [0.198 0.401 0.401] [0.248 0.248 0.503]]
+print(Z.round(2))   # [[0.99 1.2] [1.4 0.8] [0.99 1.]]</pre><p class="small">Elle yaptığımız dört adımın her biri bir satırdır: skor, ölçekleme, softmax ve ağırlıklı toplam. Çıktılar yukarıdaki elle hesapla aynıdır.</p></details>
 <div data-widget="fig" data-fig="attnflow" data-caption="Üçüncü kelimenin (üstünde) dikkat hesabı: sorgusu üç anahtarla karşılaştırılır, skorlar softmax ile ağırlığa çevrilir ve değerler bu ağırlıklarla toplanır. Okların kalınlığı ağırlığı gösterir."></div>
 <div data-widget="attention"></div>
 <h3>Maskeli (nedensel) dikkat</h3>

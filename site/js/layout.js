@@ -394,6 +394,29 @@ async function buildWords(content, week) {
   else ($(":scope > .pre-row", content) || $(":scope > .essence", content) || $(":scope > .lead", content))?.after(box);
 }
 
+/** Colour Python in <pre class="code"> blocks: comments, strings, numbers, keywords, function calls. */
+const PY_KW = new Set("import from as for in if elif else while def class return with lambda not and or is None True False pass break continue yield try except raise global".split(" "));
+function highlightCode(root) {
+  const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  for (const pre of $$("pre.code", root)) {
+    if (pre.dataset.hl) continue;
+    const src = pre.textContent, out = [];
+    const re = /(#[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|(\b\d+(?:\.\d+)?(?:e-?\d+)?\b)|([A-Za-z_]\w*)(?=\s*\()|([A-Za-z_]\w*)|([\s\S])/g;
+    let m;
+    while ((m = re.exec(src))) {
+      const [t, com, str, num, call, word] = m;
+      if (com) out.push(`<span class="tok-c">${esc(com)}</span>`);
+      else if (str) out.push(`<span class="tok-s">${esc(str)}</span>`);
+      else if (num) out.push(`<span class="tok-n">${num}</span>`);
+      else if (call) out.push(`<span class="${PY_KW.has(call) ? "tok-k" : "tok-f"}">${call}</span>`);
+      else if (word) out.push(PY_KW.has(word) ? `<span class="tok-k">${word}</span>` : word);
+      else out.push(esc(t));
+    }
+    pre.innerHTML = out.join("");
+    pre.dataset.hl = "1";
+  }
+}
+
 async function init() {
   const id = document.body.dataset.page || "index";
   const info = pageInfo(id);
@@ -417,6 +440,7 @@ async function init() {
   document.body.prepend(h("a", { class: "skip-link", href: "#content" }, "İçeriğe geç"), buildHeader(), h("div", { class: "scrim", onclick: () => document.body.classList.remove("nav-open") }));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.body.classList.remove("nav-open"); });
   enhanceQuizzes(content);
+  highlightCode(content);
   if ($("[data-widget]", content)) {
     const { mountAll } = await import("./widgets.js");
     mountAll(content);
