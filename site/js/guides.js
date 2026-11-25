@@ -38,17 +38,17 @@ export const GUIDE = {
   },
   kmeans: {
     what: "Verdiğiniz noktalar ve başlangıç merkezleriyle k-ortalamaları yineleme yineleme yürütür: her yinelemede uzaklık kareleri tablosu, atama, yeni merkezler ve SSE.",
-    tryit: ["Varsayılan veri sayfadaki örnektir: 2. yinelemede B'nin birinci kümeye geçtiğini görün.", "Merkezleri “1 1” ve “5 5” yapın: tek yinelemede doğru kümeler bulunur.", "Tek boyutlu Problem 1'i deneyin: noktalar 1 2 3 4 6 12 (her biri ayrı satırda), merkezler 2, 3, 4."],
+    tryit: ["Varsayılan veri derste çözülen örnektir: 2. yinelemede C'nin ikinci kümeye geçtiğini görün.", "Merkezleri “3 4” ve “4.5 5” yapın: Problem 1(a).", "Kendi noktalarınızı ve merkezlerinizi yazın; tek boyutlu veri de olur."],
     see: "SSE her yinelemede azalır ya da aynı kalır; atamalar değişmeyince algoritma durur. Kötü başlangıç daha çok yineleme gerektirir.",
   },
   linkage: {
     what: "Bir uzaklık matrisinden birleştirici hiyerarşik kümeleme yapar; her birleşmeyi ve güncellenen uzaklıkları yazar, dendrogramı çizer.",
-    tryit: ["Varsayılan matriste tam bağlantının son birleşmesinin 10'da olduğunu görün.", "Bağlantıyı “tek” yapın: son birleşme 5'e iner.", "Problem 2'nin matrisini yazın (P Q R S)."],
-    see: "Tam bağlantı en uzak çifte, tek bağlantı en yakın çifte bakar; bu yüzden tek bağlantı kümeleri daha alçakta birleştirir.",
+    tryit: ["Varsayılan matris derste çözülen 5 noktadır: tekil bağlantıda yükseklikler 1.00, 1.12, 1.58, 3.20.", "Bağlantıyı “tam” yapın: 2.12 ve 6.36 olur.", "Problem 2'nin matrisini yazın."],
+    see: "Tam bağlantı en uzak çifte, tekil bağlantı en yakın çifte bakar; birleşme sırası çoğu zaman aynı kalır, yükseklikler değişir.",
   },
   nbayes: {
     what: "Etiketli metinlerden önsel ve Laplace düzeltmeli kelime olasılıklarını çıkarıp yeni bir metnin sınıf olasılıklarını adım adım hesaplar.",
-    tryit: ["Varsayılan örnekte sonucun spam (0.6) çıktığını görün.", "Yeni metni “toplantı yarın” yapın.", "Problem 3'ün verisini yazın: olumlu: harika ürün, olumlu: harika hızlı kargo, olumsuz: kötü ürün, olumsuz: kötü kargo yavaş, olumsuz: yavaş."],
+    tryit: ["Varsayılan örnek derste çözülendir: sonuç ekonomi (0.719).", "Test metnini “gol maç” yapın.", "Problem 3'ün üç sınıflı verisini yazın (olumlu, olumsuz, nötr)."],
     see: "Önsel olasılık ve tek bir güçlü kelime kararı değiştirebilir; Laplace düzeltmesi görülmemiş kelimelerin çarpımı sıfırlamasını önler.",
   },
   qlearn: {

@@ -22,21 +22,21 @@ const range = (a, b, n) => Array.from({ length: n + 1 }, (_, i) => a + ((b - a) 
 export const FIG = {
   // ---------------------------------------------------------------- week 11
   kmeansit: () => {
-    const P = [[1, 1], [2, 1], [1, 2], [3, 3], [5, 4], [4, 5], [5, 5]], L = "ABCDEFG";
+    const P = [[1, 1], [1.5, 2], [3, 4], [5, 7], [3.5, 5], [4.5, 5], [3.5, 4.5]], L = "ABCDEFG";
     const stages = [
-      { t: "1. yineleme", c: [[1, 1], [2, 1]], a: [0, 1, 0, 1, 1, 1, 1] },
-      { t: "2. yineleme", c: [[1, 1.5], [3.8, 3.6]], a: [0, 0, 0, 1, 1, 1, 1] },
-      { t: "3. yineleme (değişiklik yok)", c: [[1.33, 1.33], [4.25, 4.25]], a: [0, 0, 0, 1, 1, 1, 1] },
+      { t: "1. yineleme (C eşitlikte küme 1)", c: [[1, 1], [5, 7]], a: [0, 0, 0, 1, 1, 1, 1] },
+      { t: "2. yineleme (C küme 2'ye geçer)", c: [[1.83, 2.33], [4.13, 5.38]], a: [0, 0, 1, 1, 1, 1, 1] },
+      { t: "3. yineleme (değişiklik yok)", c: [[1.25, 1.5], [3.9, 5.1]], a: [0, 0, 1, 1, 1, 1, 1] },
     ];
-    const S = 26, pw = 160;
+    const S = 21, pw = 160;
     let s = "";
     stages.forEach((st, k) => {
-      const ox = 10 + k * (pw + 10), X = (v) => ox + 10 + (v - 0.5) * S, Y = (v) => 168 - (v - 0.5) * S;
-      s += `<rect x="${ox}" y="20" width="${pw}" height="160" rx="8" class="fig-box2"/>` + T(ox + pw / 2, 14, st.t, { anchor: "middle", cls: "fig-sub" });
-      P.forEach((p, i) => { s += `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="6" class="kc${st.a[i]}"/>` + T(X(p[0]) + 7, Y(p[1]) - 6, L[i], { cls: "fig-sub", size: 10 }); });
-      st.c.forEach((c, j) => { s += `<circle cx="${X(c[0])}" cy="${Y(c[1])}" r="11" class="kring kc${j}"/>`; });
+      const ox = 10 + k * (pw + 10), X = (v) => ox + 14 + (v - 0.5) * S * 1.15, Y = (v) => 176 - (v - 0.3) * S;
+      s += `<rect x="${ox}" y="20" width="${pw}" height="162" rx="8" class="fig-box2"/>` + T(ox + pw / 2, 14, st.t, { anchor: "middle", cls: "fig-sub" });
+      P.forEach((p, i) => { const left = L[i] === "C" || L[i] === "G"; s += `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="5.5" class="kc${st.a[i]}"/>` + T(X(p[0]) + (left ? -8 : 7), Y(p[1]) + (L[i] === "G" ? 12 : -5), L[i], { cls: "fig-sub", size: 10, anchor: left ? "end" : null }); });
+      st.c.forEach((c, j) => { s += `<circle cx="${X(c[0])}" cy="${Y(c[1])}" r="10" class="kring kc${j}"/>`; });
     });
-    return svg(10 + 3 * (pw + 10), 190, s, "k-ortalamaların üç yinelemesi");
+    return svg(10 + 3 * (pw + 10), 192, s, "k-ortalamaların üç yinelemesi");
   },
 
   elbow: () => lines({ series: [
@@ -45,18 +45,19 @@ export const FIG = {
   ], xlim: [1, 8], ylim: [0, 105], xstep: 1, ystep: 20, xlabel: "küme sayısı k", ylabel: "küme içi kare toplamı (WCSS)", aria: "Dirsek yöntemi" }),
 
   dendro: () => {
-    // complete linkage of A..E: AB at 2, DE at 3, C+DE at 5, all at 10
-    const X = { A: 60, B: 120, C: 190, D: 250, E: 310 }, Y = (v) => 190 - v * 16;
-    let s = `<line x1="34" y1="${Y(0)}" x2="34" y2="${Y(10)}" class="fig-grid"/>` + [0, 2, 3, 5, 10].map((v) => T(28, Y(v) + 4, String(v), { anchor: "end", cls: "fig-sub" })).join("");
+    // single linkage of A(1,1) B(2,1.5) C(4,4) D(5,4) E(5.5,5.5): CD 1.00, AB 1.12, CDE 1.58, all 3.20
+    const X = { A: 60, B: 120, C: 190, D: 250, E: 310 }, Y = (v) => 190 - v * 50;
+    let s = `<line x1="34" y1="${Y(0)}" x2="34" y2="${Y(3.2)}" class="fig-grid"/>` + [0, 1, 2, 3].map((v) => T(28, Y(v) + 4, String(v), { anchor: "end", cls: "fig-sub" })).join("");
     const link = (x1, y1, x2, y2, y) => `<path d="M${x1},${y1} V${y} H${x2} V${y2}" class="fig-arrow" fill="none"/>`;
-    s += link(X.A, Y(0), X.B, Y(0), Y(2)) + link(X.D, Y(0), X.E, Y(0), Y(3));
-    const de = (X.D + X.E) / 2, ab = (X.A + X.B) / 2;
-    s += link(X.C, Y(0), de, Y(3), Y(5));
-    const cde = (X.C + de) / 2;
-    s += link(ab, Y(2), cde, Y(5), Y(10));
-    s += `<line x1="40" y1="${Y(7)}" x2="336" y2="${Y(7)}" class="line dash"/>` + T(340, Y(7) + 4, "kesim: 2 küme", { cls: "fig-sub" });
+    s += link(X.C, Y(0), X.D, Y(0), Y(1)) + link(X.A, Y(0), X.B, Y(0), Y(1.12));
+    const cd = (X.C + X.D) / 2, ab = (X.A + X.B) / 2;
+    s += link(cd, Y(1), X.E, Y(0), Y(1.58));
+    const cde = (cd + X.E) / 2;
+    s += link(ab, Y(1.12), cde, Y(1.58), Y(3.2));
+    s += T(cde + 6, Y(1.58) - 4, "1.58", { cls: "fig-sub" }) + T((ab + cde) / 2, Y(3.2) - 5, "3.20", { anchor: "middle", cls: "fig-sub" }) + T(cd, Y(1) - 4, "1.00", { anchor: "middle", cls: "fig-sub" }) + T(ab - 6, Y(1.12) - 4, "1.12", { anchor: "end", cls: "fig-sub" });
+    s += `<line x1="40" y1="${Y(2.3)}" x2="336" y2="${Y(2.3)}" class="line dash"/>` + T(340, Y(2.3) + 4, "kesim 2.3: 2 küme", { cls: "fig-sub" });
     for (const [k, x] of Object.entries(X)) s += T(x, Y(0) + 16, k, { anchor: "middle" });
-    return svg(430, 214, s, "Tam bağlantılı dendrogram");
+    return svg(450, 214, s, "Tekil bağlantılı dendrogram");
   },
 
   dbscan: () => {

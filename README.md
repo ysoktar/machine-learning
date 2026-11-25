@@ -34,8 +34,8 @@ Her hafta sayfası aynı akışı izler:
 alıştırma üreteci (22 hesap türü), hiperparametre tablosu alıştırması, formül kâğıdı, terim ve formül sözlüğü
 (terimler sayfalarda altı çizili; üzerine gelince tanım ve İngilizce karşılık çıkar) ve matematik ön bilgisi.
 
-11. ve 12. hafta sayfaları, bu haftaların slaytları yayımlanmadan önce izlencedeki konu listesine ve önceki dönemin
-ders notlarına dayanarak hazırlandı; slaytlar yayımlanınca güncellenebilir.
+1–11. hafta sayfaları bu dönemin slaytlarından hazırlandı. 12. hafta sayfası, slaytları yayımlanmadan önce izlencedeki
+konu listesine ve önceki dönemin ders notlarına dayanarak hazırlandı; slaytlar yayımlanınca güncellenecek.
 
 Bu resmî bir ders sitesi değildir ve ders slaytlarını içermez; anlatımlar yeniden yazılmıştır. Tarih ve kurallar için
 ders platformunu ve izlenceyi esas alın. Site statiktir, bağımlılığı yoktur; hiçbir veri tarayıcıdan çıkmaz

@@ -1608,7 +1608,7 @@ function clusterPic(P, assign, C) {
 
 W.kmeans = () => {
   const { el, body } = frame("k-ortalamalar adım adım");
-  const pts = area("1 1\n2 1\n1 2\n3 3\n5 4\n4 5\n5 5", 5), cen = area("1 1\n2 1", 3);
+  const pts = area("1 1\n1.5 2\n3 4\n5 7\n3.5 5\n4.5 5\n3.5 4.5", 5), cen = area("1 1\n5 7", 3);
   const its = h("input", { type: "text", value: "3", style: { width: "3rem" } });
   const out = outBox();
   body.append(h("div", { class: "two-col" }, h("div", {}, h("p", { class: "field-hint" }, "Noktalar (her satır bir nokta; tek ya da iki sayı)"), pts), h("div", {}, h("p", { class: "field-hint" }, "Başlangıç merkezleri (k satır)"), cen)),
@@ -1645,8 +1645,8 @@ W.kmeans = () => {
 
 W.linkage = () => {
   const { el, body } = frame("Hiyerarşik kümeleme: uzaklık matrisinden dendrogram");
-  const src = area("A B C D E\n0 2 6 10 9\n2 0 5 9 8\n6 5 0 4 5\n10 9 4 0 3\n9 8 5 3 0", 6);
-  const meth = select("bağlantı ", [["complete", "tam (en büyük)"], ["single", "tek (en küçük)"], ["average", "ortalama"]], "complete");
+  const src = area("A B C D E\n0 1.12 4.24 5 6.36\n1.12 0 3.2 3.91 5.32\n4.24 3.2 0 1 2.12\n5 3.91 1 0 1.58\n6.36 5.32 2.12 1.58 0", 6);
+  const meth = select("bağlantı ", [["single", "tekil (en küçük)"], ["complete", "tam (en büyük)"], ["average", "ortalama"]], "single");
   const out = outBox();
   body.append(h("p", { class: "field-hint" }, "İlk satır adlar, sonraki satırlar simetrik uzaklık matrisi."), src, h("div", { class: "controls" }, meth.label), out);
   live(body, () => {
@@ -1686,8 +1686,8 @@ W.linkage = () => {
 
 W.nbayes = () => {
   const { el, body } = frame("Naive Bayes ile metin sınıflandırma (Laplace düzeltmeli)");
-  const src = area("spam: ücretsiz kazan\nspam: ücretsiz para kazan\nnormal: toplantı yarın\nnormal: proje toplantı kazan", 5);
-  const q = h("input", { type: "text", value: "ücretsiz kazan toplantı", style: { width: "100%" } });
+  const src = area("spor: gol maç takım\nspor: maç kupa\nekonomi: faiz dolar hisse\nekonomi: hisse gol dolar", 5);
+  const q = h("input", { type: "text", value: "gol dolar", style: { width: "100%" } });
   const out = outBox();
   body.append(h("p", { class: "field-hint" }, "Her satır: sınıf: metin"), src, h("label", { class: "block" }, "yeni metin ", q), out);
   live(body, () => {
