@@ -182,13 +182,13 @@ Aracı bu ifadelerle ve geçmiş final listesindekilerle deneyin: <code>(x1 ∧ 
 <li data-why="">step(Σh − 3.5): hepsi +1 iken 0.5, biri bozulunca Σh = 2 → −1.5</li>
 <li data-why="Biri bozulsa da Σh = 2 &gt; 0.5.">step(Σh − 0.5)</li></ol><div class="explain">sign nöronları +1 ya da −1 verir. Dört koşulun hepsi sağlanınca Σh = 4 ve 4 − 3.5 = 0.5 &gt; 0 olduğu için çıktı 1 olur. Tek bir koşul bozulursa bir +1, −1'e döner, Σh = 2 olur ve 2 − 3.5 = −1.5 çıktıyı 0 yapar. Eşik bu iki değerin arasında olduğu için doğru çalışır.</div></div>
 
-<div class="quiz" data-answer="1"><p>Sigmoid + BCE çıktısında ∂L/∂u nedir?</p><ol>
+<div class="quiz" data-answer="1"><p>Çıktısı sigmoid, kaybı ikili çapraz entropi (BCE) olan bir ağda, kaybın çıktı nöronunun toplamı u'ya göre türevi ∂L/∂u nedir?</p><ol>
 <li data-why="">ŷ − y</li>
 <li data-why="σ′ çarpanı log-loss ile sadeleşir.">(ŷ − y)·σ′(u)</li>
 <li data-why="Bu MSE'nin türevine benzer ama işaret ve çarpan farklı.">2(y − ŷ)</li>
 <li data-why="Türevi vardır.">Tanımsız</li></ol><div class="explain">BCE kaybının sigmoid çıktıya göre türevi ile sigmoidin kendi türevi σ′(u) = ŷ(1 − ŷ) çarpılınca paydadaki ŷ(1 − ŷ) sadeleşir ve geriye yalnız ŷ − y kalır. Bu sade sonuç, sigmoid ile BCE'nin birlikte kullanılmasının bir nedenidir.</div></div>
 
-<div class="quiz" data-answer="4"><p>Bütün ağırlıklar 0 ile ilklendirilirse?</p><ol>
+<div class="quiz" data-answer="4"><p>Bir MLP'de bütün ağırlıklar 0 ile ilklendirilirse ne olur?</p><ol>
 <li data-why="Simetri kırılmaz.">En iyi başlangıç budur</li>
 <li data-why="Gradyanlar sıfır olmayabilir ama hepsi eşit.">Gradyan hiç hesaplanamaz</li>
 <li data-why="Sorun hız değil.">Yalnız eğitim yavaşlar</li>

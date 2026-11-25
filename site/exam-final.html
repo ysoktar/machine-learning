@@ -143,7 +143,7 @@
 <li><strong>LSTM.</strong> 4·15,100 = <strong>60,400</strong>.</li>
 <li><strong>GRU.</strong> 3·15,100 = <strong>45,300</strong>.</li>
 </ol></div></details>
-<h3>Deneme 6: k-ortalamalar</h3>
+<h3>Deneme 6: k-ortalamaları yakınsayana kadar yürütmek</h3>
 <div class="problem"><div class="ptitle">Soru <span class="muted small">(11. hafta kalıbı)</span></div><p>Noktalar (0, 0), (1, 0), (0, 1), (4, 4), (5, 4), (4, 5); başlangıç merkezleri m₁ = (0, 0), m₂ = (1, 0). k-ortalamaları yakınsayana kadar uygulayın.</p></div>
 <details class="solution"><summary>Önce kendin dene, sonra çözümü aç</summary><div class="body">
 <ol class="walk">
@@ -179,7 +179,7 @@
 <li data-why="Parametre sayısı görüntü boyutuna bağlı değildir.">Görüntü boyutu bilinmeden hesaplanamaz</li>
 <li data-why="">32·(3·3·16 + 1) = 4,640</li>
 <li data-why="Bias filtre başınadır.">3·3·16·32 + 16 = 4,624</li></ol><div class="explain">Her filtre girdinin 16 kanalının hepsine baktığı için 3·3·16 = 144 ağırlığa ve bir bias'a sahiptir; filtre başına 145 parametre eder. Katmanda 32 filtre olduğu için toplam 32·145 = 4,640 parametre vardır.</div></div>
-<div class="quiz" data-answer="4"><p>Toplu normalleştirmenin asıl yararı?</p><ol>
+<div class="quiz" data-answer="4"><p>Toplu normalleştirmenin (BN) asıl yararı nedir?</p><ol>
 <li data-why="BN parametre ekler (γ, β).">Parametre sayısını azaltmak</li>
 <li data-why="Tahminde eğitimdeki yürüyen ortalamalar kullanılır.">Tahminde her mini yığını ayrı normalleştirmek</li>
 <li data-why="Düzenlileştirme etkisi zayıf, yan üründür.">Dropout'un yerine geçen güçlü bir düzenlileştirici olmak</li>

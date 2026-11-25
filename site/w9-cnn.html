@@ -22,7 +22,7 @@
 <tr><td>1B evrişim</td><td>10 elemanlı bir sinyal ve bir kutu ya da kenar filtresi verilir; dolgusuz, sıfır dolgulu ya da “same” dolgulu, adım 1 ya da 2 ile hesap istenir.</td><td>Her çıktı hücresinin toplamını açıkça yazmak ve çıktı uzunluğunu doğru bulmak.</td></tr>
 <tr><td>2B evrişim</td><td>4×4 ile 6×6 arası bir görüntü, 3×3 bir filtre, dolgu ve adım verilir.</td><td>Her çıktı için kullanılan pencereyi göstermek ve eleman eleman çarpımların toplamını yazmak.</td></tr>
 <tr><td>Çıktı boyutu ve parametre</td><td>Girdinin boyutu (H×W×C), filtre sayısı ve boyutu, adım ve dolgu verilir.</td><td>Her eksen için ⌊(n + 2p − k)/s⌋ + 1 formülünü uygulamak; ağırlık sayısını F·k_h·k_w·C, bias sayısını F olarak bulmak.</td></tr>
-<tr><td>Kavram</td><td>MLP görüntüde neden verimsizdir; dropout, toplu normalleştirme, erken durdurma, ilklendirme ne işe yarar; aktarımlı öğrenme nedir?</td><td>Her yöntemin nasıl çalıştığını ve ne kazandırdığını birlikte yazmak.</td></tr>
+<tr><td>Kavram</td><td>Tam bağlı ağ (MLP) görüntüde neden verimsizdir; dropout, toplu normalleştirme, erken durdurma, ilklendirme ne işe yarar; aktarımlı öğrenme nedir?</td><td>Her yöntemin nasıl çalıştığını ve ne kazandırdığını birlikte yazmak.</td></tr>
 </tbody></table></div></div>
 <!-- taught -->
 <div class="words"><div class="words-title">Bu sayfada öğreneceğin kelimeler (tıkla: sözlük)</div><a href="sozluk.html#t-evrisim">Evrişim</a> · <a href="sozluk.html#t-dropout-seyreltme">Dropout</a> · <a href="sozluk.html#t-aktarimli-ogrenme">Aktarımlı öğrenme</a> · <a href="sozluk.html#t-erken-durdurma">Erken durdurma</a></div>
@@ -240,7 +240,7 @@ opt = torch.optim.Adam(m.fc.parameters(), lr=1e-3)</pre>
 <li data-why="Parametre sayısı görüntü boyutuna bağlı değildir.">Görüntü boyutu bilinmeden hesaplanamaz</li>
 <li data-why="Bias filtre başınadır.">3·3·16·32 + 16 = 4,624</li></ol><div class="explain">Her filtre girdinin 16 kanalının hepsine baktığı için 3·3·16 = 144 ağırlığa ve bir bias'a sahiptir; filtre başına 145 parametre eder. Katmanda 32 filtre olduğu için toplam 32·145 = 4,640 parametre vardır. Görüntünün boyutu bu hesaba girmez.</div></div>
 
-<div class="quiz" data-answer="4"><p>Toplu normalleştirmenin asıl yararı?</p><ol>
+<div class="quiz" data-answer="4"><p>Toplu normalleştirmenin (BN) asıl yararı nedir?</p><ol>
 <li data-why="BN parametre ekler (γ, β).">Parametre sayısını azaltmak</li>
 <li data-why="Testte ortalama/varyans eğitimdeki koşu ortalamalarıdır.">Testte her batch'i ayrı normalleştirmek</li>
 <li data-why="Etkisi zayıf, yan ürün.">Dropout'un yerine geçen güçlü bir düzenlileştirici</li>

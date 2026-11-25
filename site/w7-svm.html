@@ -188,7 +188,7 @@
 <li data-why="">w = (1, 1), b = −2; sınır x₁ + x₂ = 2, marj 1/√2 ≈ 0.707</li></ol>
 <div class="explain">Sert marjlı SVM'de destek vektörleri sokağın tam kenarındadır, yani skorları y·(w·x + b) = 1'i sağlar. Sınıflara en yakın noktalar (2, 1) (pozitif) ile (0, 1) ve (1, 0) (negatif) olduğu için üç denklem yazarız: 2w₁ + w₂ + b = 1, w₂ + b = −1, w₁ + b = −1. Son ikisi w₁ = w₂ olduğunu söyler; ilkine koyunca 3w₁ + b = 1, ikinciden çıkarınca 2w₁ = 2: w = (1, 1), b = −2. Sınır x₁ + x₂ = 2, marj 1/‖w‖ = 1/√2 ≈ 0.707. Denetim: kalan nokta (3, 2) için f = 3 ≥ 1, yani sokağın dışında kalıyor ✓.</div></div>
 
-<div class="quiz" data-answer="1"><p>Yumuşak marjlı SVM'de C küçültülürse?</p><ol>
+<div class="quiz" data-answer="1"><p>Yumuşak marjlı SVM'de C küçültülürse ne olur?</p><ol>
 <li data-why="">Marj genişler, destek vektörü sayısı artar, aşırı uyum eğilimi azalır</li>
 <li data-why="Ters yön: C küçülünce ihlaller ucuzlar, marj genişler ve sokağa daha çok nokta düştüğü için destek vektörü sayısı artar.">Marj daralır, destek vektörü azalır</li>
 <li data-why="C, marj genişliği ile ihlaller arasındaki dengeyi kurar; değiştirmek çözümün kendisini değiştirir, yalnız süreyi değil.">Yalnız eğitim süresi değişir</li>
