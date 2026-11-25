@@ -1381,6 +1381,51 @@ const GEN = {
       ])],
     };
   } },
+  hypcount: { title: "Hipotez uzayının büyüklüğü", wk: 1, make(R) {
+    const k = Array.from({ length: R.int(3, 5) }, () => R.int(2, 4));
+    const inst = k.reduce((a, b) => a * b, 1), hyp = 1 + k.reduce((a, b) => a * (b + 1), 1);
+    return {
+      prompt: [h("p", {}, `${k.length} öznitelik var; değer sayıları sırasıyla ${k.join(", ")}. Kaç farklı örnek olabilir? VE'li kısıtlarla (değer, “?”, Ø) yazılabilen anlamca farklı kaç hipotez vardır?`)],
+      fields: [{ label: "örnek", v: inst, tol: 0 }, { label: "hipotez", v: hyp, tol: 0 }],
+      solution: () => [steps([
+        { what: "Her öznitelik kendi değerlerinden birini alır; seçenekler çarpılır.", formula: "örnek = k₁ × k₂ × …", calc: k.join(" × "), result: String(inst) },
+        { what: "Her özniteliğe “?” (hepsi olur) seçeneği eklenir; Ø içeren bütün hipotezler tek bir boş kural sayılır.", formula: "hipotez = 1 + (k₁ + 1) × (k₂ + 1) × …", calc: `1 + ${k.map((x) => x + 1).join(" × ")}`, result: String(hyp), note: `Olası kavram sayısı ise 2^${inst}'tir: dili seçmek bir varsayımdır (tümevarımsal yanlılık).` },
+      ])],
+    };
+  } },
+  stepunit: { title: "Step nöronuyla VE terimi", wk: 8, make(R) {
+    const n = 4, lits = [];
+    for (let i = 0; i < n; i++) { const r = R(); if (r < 0.35) lits.push({ i, neg: false }); else if (r < 0.65) lits.push({ i, neg: true }); }
+    if (lits.length < 2) lits.splice(0, lits.length, { i: 0, neg: false }, { i: 2, neg: true });
+    const pos = lits.filter((l) => !l.neg).length, b = 0.5 - pos;
+    const x = Array.from({ length: n }, () => (R() < 0.5 ? 0 : 1));
+    const w = Array(n).fill(0); lits.forEach((l) => { w[l.i] = l.neg ? -1 : 1; });
+    const z = dot(w, x) + b, y = z > 0 ? 1 : 0;
+    const term = lits.map((l) => `${l.neg ? "¬" : ""}x${sub(l.i + 1)}`).join(" ∧ ");
+    return {
+      prompt: [h("p", {}, `Girdiler x₁…x₄ ∈ {0, 1}. “${term}” terimini tek bir step nöronuyla (step(z) = 1, z > 0 ise) kuruyoruz: olumlu değişkenlere +1, ¬'li değişkenlere −1, terimde olmayanlara 0 ağırlık. Sabit terim b nedir? x = (${x.join(", ")}) için z ve çıktı nedir?`)],
+      fields: [{ label: "b", v: b }, { label: "z", v: z }, { label: "çıktı", v: y, tol: 0 }],
+      solution: () => [steps([
+        { what: "VE nöronu yalnız bütün koşullar sağlanınca ateşlenmeli: olumlu değişkenlerin hepsi 1, ¬'lilerin hepsi 0 iken z = (olumlu sayısı) + b > 0, bir koşul bozulunca z ≤ 0 olmalı.", formula: "b = −(olumlu değişken sayısı) + 0.5", calc: `−${pos} + 0.5`, result: f(b) },
+        { what: "Toplamı hesapla.", formula: "z = w·x + b", calc: `${w.map((wi, i) => `${par(wi)}·${x[i]}`).join(" + ")} ${pm(b)}`, result: f(z) },
+        { what: "Step fonksiyonu.", formula: "çıktı = 1, z > 0 ise", calc: `step(${f(z)})`, result: String(y), note: y ? "Bütün koşullar sağlandığı için nöron ateşlendi." : "En az bir koşul bozulduğu için nöron ateşlenmedi." },
+      ])],
+    };
+  } },
+  fwd221: { title: "2-2-1 ağında ileri yayılım ve bir gradyan", wk: 8, make(R) {
+    const W = [[R.int(-2, 2), R.int(-2, 2)], [R.int(-2, 2), R.int(-2, 2)]], b = [R.int(-1, 1), R.int(-1, 1)], v = [R.int(-2, 2), R.int(-2, 2)], c = R.int(-1, 1), x = [R.int(0, 2), R.int(0, 2)], y = R() < 0.5 ? 0 : 1;
+    const z = W.map((r, j) => dot(r, x) + b[j]), hh = z.map((t) => Math.max(0, t)), u = dot(v, hh) + c, p = 1 / (1 + Math.exp(-u));
+    return {
+      prompt: [h("p", {}, `Gizli katman ReLU, çıktı sigmoid. W = [${W.map((r) => `(${r.join(", ")})`).join(", ")}], b = (${b.join(", ")}), v = (${v.join(", ")}), c = ${c}; girdi x = (${x.join(", ")}), etiket y = ${y}. h₁, h₂ ve u = v·h + c nedir? σ(u) ≈ ${f(p)} verildiğine göre log-loss için ∂L/∂v₁ nedir?`)],
+      fields: [{ label: "h₁", v: hh[0], tol: 0 }, { label: "h₂", v: hh[1], tol: 0 }, { label: "u", v: u, tol: 0 }, { label: "∂L/∂v₁", v: (p - y) * hh[0] }],
+      solution: () => [steps([
+        { what: "Gizli nöronların toplamları.", formula: "zⱼ = Wⱼ·x + bⱼ", calc: z.map((t, j) => `z${sub(j + 1)} = ${dotTxt(W[j], x)} ${pm(b[j])} = ${f(t)}`).join(";  ") },
+        { what: "ReLU negatifleri sıfırlar.", formula: "hⱼ = max(0, zⱼ)", calc: `h = (${hh.join(", ")})` },
+        { what: "Çıktı nöronunun toplamı.", formula: "u = v·h + c", calc: `${dotTxt(v, hh)} ${pm(c)}`, result: f(u) },
+        { what: "Sigmoid ve log-loss birlikte olduğunda çıktı hatası p − y olur; v₁'in gradyanı bunun h₁ katıdır.", formula: "∂L/∂v₁ = (p − y)·h₁", calc: `(${f(p)} − ${y})·${hh[0]}`, result: f((p - y) * hh[0]) },
+      ])],
+    };
+  } },
 };
 W.drill = (ds) => {
   const scope = ds.week ? ds.week.split(",") : ds.set === "final" ? ["9", "10", "11", "12"] : null;
